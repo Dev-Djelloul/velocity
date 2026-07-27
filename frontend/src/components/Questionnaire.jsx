@@ -18,6 +18,34 @@ function loadInitial() {
   }
 }
 
+function Select({ formData, onChange, section, field, label, options }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <select value={formData[section][field]} onChange={e => onChange(section, field, e.target.value)}>
+        {Object.entries(options).map(([key, val]) => (
+          <option key={key} value={key}>{val}</option>
+        ))}
+      </select>
+    </label>
+  )
+}
+
+function Text({ formData, onChange, section, field, label, placeholder, textarea }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      {textarea ? (
+        <textarea rows={3} value={formData[section][field]} placeholder={placeholder}
+          onChange={e => onChange(section, field, e.target.value)} />
+      ) : (
+        <input type="text" value={formData[section][field]} placeholder={placeholder}
+          onChange={e => onChange(section, field, e.target.value)} />
+      )}
+    </label>
+  )
+}
+
 export default function Questionnaire({ onSubmit, loading, lang }) {
   const [step, setStep] = useState(0)
   const [formData, setFormData] = useState(loadInitial)
@@ -47,30 +75,6 @@ export default function Questionnaire({ onSubmit, loading, lang }) {
 
   const steps = t(lang, 'steps')
 
-  const Select = ({ section, field, label, options }) => (
-    <label className="field">
-      <span>{label}</span>
-      <select value={formData[section][field]} onChange={e => handleChange(section, field, e.target.value)}>
-        {Object.entries(options).map(([key, val]) => (
-          <option key={key} value={key}>{val}</option>
-        ))}
-      </select>
-    </label>
-  )
-
-  const Text = ({ section, field, label, placeholder, textarea }) => (
-    <label className="field">
-      <span>{label}</span>
-      {textarea ? (
-        <textarea rows={3} value={formData[section][field]} placeholder={placeholder}
-          onChange={e => handleChange(section, field, e.target.value)} />
-      ) : (
-        <input type="text" value={formData[section][field]} placeholder={placeholder}
-          onChange={e => handleChange(section, field, e.target.value)} />
-      )}
-    </label>
-  )
-
   return (
     <div className="questionnaire-container card">
       <div className="progress-bar">
@@ -86,32 +90,32 @@ export default function Questionnaire({ onSubmit, loading, lang }) {
         {step === 0 && (
           <>
             <h2>{t(lang, 'product.title')}</h2>
-            <Text section="product" field="name" label={t(lang, 'product.name')} placeholder={t(lang, 'product.namePh')} />
-            <Select section="product" field="stage" label={t(lang, 'product.stage')} options={t(lang, 'product.stageOptions')} />
-            <Select section="product" field="category" label={t(lang, 'product.category')} options={t(lang, 'product.categoryOptions')} />
-            <Text section="product" field="pitch" label={t(lang, 'product.pitch')} placeholder={t(lang, 'product.pitchPh')} textarea />
-            <Text section="product" field="usp" label={t(lang, 'product.usp')} placeholder={t(lang, 'product.uspPh')} />
-            <Select section="product" field="targetUser" label={t(lang, 'product.targetUser')} options={t(lang, 'product.targetUserOptions')} />
+            <Text formData={formData} onChange={handleChange} section="product" field="name" label={t(lang, 'product.name')} placeholder={t(lang, 'product.namePh')} />
+            <Select formData={formData} onChange={handleChange} section="product" field="stage" label={t(lang, 'product.stage')} options={t(lang, 'product.stageOptions')} />
+            <Select formData={formData} onChange={handleChange} section="product" field="category" label={t(lang, 'product.category')} options={t(lang, 'product.categoryOptions')} />
+            <Text formData={formData} onChange={handleChange} section="product" field="pitch" label={t(lang, 'product.pitch')} placeholder={t(lang, 'product.pitchPh')} textarea />
+            <Text formData={formData} onChange={handleChange} section="product" field="usp" label={t(lang, 'product.usp')} placeholder={t(lang, 'product.uspPh')} />
+            <Select formData={formData} onChange={handleChange} section="product" field="targetUser" label={t(lang, 'product.targetUser')} options={t(lang, 'product.targetUserOptions')} />
           </>
         )}
 
         {step === 1 && (
           <>
             <h2>{t(lang, 'market.title')}</h2>
-            <Select section="market" field="geography" label={t(lang, 'market.geography')} options={t(lang, 'market.geographyOptions')} />
-            <Select section="market" field="b2bVsB2c" label={t(lang, 'market.b2bVsB2c')} options={t(lang, 'market.b2bVsB2cOptions')} />
-            <Text section="market" field="segment" label={t(lang, 'market.segment')} placeholder={t(lang, 'market.segmentPh')} />
-            <Select section="market" field="audienceSize" label={t(lang, 'market.audienceSize')} options={t(lang, 'market.audienceSizeOptions')} />
-            <Select section="market" field="competition" label={t(lang, 'market.competition')} options={t(lang, 'market.competitionOptions')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="geography" label={t(lang, 'market.geography')} options={t(lang, 'market.geographyOptions')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="b2bVsB2c" label={t(lang, 'market.b2bVsB2c')} options={t(lang, 'market.b2bVsB2cOptions')} />
+            <Text formData={formData} onChange={handleChange} section="market" field="segment" label={t(lang, 'market.segment')} placeholder={t(lang, 'market.segmentPh')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="audienceSize" label={t(lang, 'market.audienceSize')} options={t(lang, 'market.audienceSizeOptions')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="competition" label={t(lang, 'market.competition')} options={t(lang, 'market.competitionOptions')} />
           </>
         )}
 
         {step === 2 && (
           <>
             <h2>{t(lang, 'resources.title')}</h2>
-            <Select section="resources" field="timelineWeeks" label={t(lang, 'resources.timelineWeeks')} options={t(lang, 'resources.timelineOptions')} />
-            <Select section="resources" field="budgetEur" label={t(lang, 'resources.budgetEur')} options={t(lang, 'resources.budgetOptions')} />
-            <Select section="resources" field="teamSize" label={t(lang, 'resources.teamSize')} options={t(lang, 'resources.teamSizeOptions')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="timelineWeeks" label={t(lang, 'resources.timelineWeeks')} options={t(lang, 'resources.timelineOptions')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="budgetEur" label={t(lang, 'resources.budgetEur')} options={t(lang, 'resources.budgetOptions')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="teamSize" label={t(lang, 'resources.teamSize')} options={t(lang, 'resources.teamSizeOptions')} />
             <div className="field">
               <span>{t(lang, 'resources.rolesPresent')}</span>
               <div className="chip-group">
@@ -130,10 +134,10 @@ export default function Questionnaire({ onSubmit, loading, lang }) {
         {step === 3 && (
           <>
             <h2>{t(lang, 'priorities.title')}</h2>
-            <Select section="priorities" field="focus" label={t(lang, 'priorities.focus')} options={t(lang, 'priorities.focusOptions')} />
-            <Select section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} />
-            <Select section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} />
-            <Select section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="focus" label={t(lang, 'priorities.focus')} options={t(lang, 'priorities.focusOptions')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} />
           </>
         )}
       </div>
