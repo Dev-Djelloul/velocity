@@ -11,6 +11,7 @@ import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
 import { savePlan, getPlanById, getShareLink } from './lib/planStorage'
 import './styles/design-system.css'
+import './styles/accessibility.css'
 import './App.css'
 
 export default function App() {
@@ -105,14 +106,19 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="header-top">
-          <div className="header-brand">
-            <div className="brand-logo">
-              🚀
+          <button className="header-brand-btn" onClick={() => {
+            setCurrentPage('landing')
+            window.scrollTo(0, 0)
+          }} style={{ background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>
+            <div className="header-brand">
+              <div className="brand-logo">
+                🚀
+              </div>
+              <div>
+                <h1 className="wordmark">VelocityLaunch</h1>
+              </div>
             </div>
-            <div>
-              <h1>VelocityLaunch</h1>
-            </div>
-          </div>
+          </button>
           <div className="header-actions">
             <button className="btn-header" onClick={() => setShowHistory(true)} title="Mes plans">
               📋 Plans

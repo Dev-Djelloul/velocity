@@ -2,6 +2,7 @@ import { useState } from 'react'
 import VelocityLaunchLogo from './VelocityLaunchLogo'
 import DemoModal from './DemoModal'
 import { t } from '../lib/i18n'
+import { tLanding } from '../lib/landingI18n'
 import '../styles/Landing.css'
 
 export default function Landing({ lang, onStartClick, onLoadDemo }) {
@@ -11,60 +12,60 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
   const features = [
     {
       icon: '📋',
-      title: 'Plan en 5 minutes',
-      desc: 'Répondez à 12 questions et générateur un plan complet'
+      title: tLanding(lang, 'features.plan5min.title'),
+      desc: tLanding(lang, 'features.plan5min.desc')
     },
     {
       icon: '🎯',
-      title: 'Roadmap détaillée',
-      desc: 'Sprints, stories, efforts et coûts calculés automatiquement'
+      title: tLanding(lang, 'features.roadmap.title'),
+      desc: tLanding(lang, 'features.roadmap.desc')
     },
     {
       icon: '📊',
-      title: 'Stratégie Marketing',
-      desc: 'Budget alloué par canal avec objectifs et KPIs'
+      title: tLanding(lang, 'features.marketing.title'),
+      desc: tLanding(lang, 'features.marketing.desc')
     },
     {
       icon: '📈',
-      title: 'KPIs personnalisés',
-      desc: 'Métriques de succès adaptées à votre produit'
+      title: tLanding(lang, 'features.kpis.title'),
+      desc: tLanding(lang, 'features.kpis.desc')
     },
     {
       icon: '🤖',
-      title: 'IA Intelligente',
-      desc: 'Recommandations basées sur votre contexte'
+      title: tLanding(lang, 'features.ai.title'),
+      desc: tLanding(lang, 'features.ai.desc')
     },
     {
       icon: '⚡',
-      title: 'Exportable',
-      desc: 'PDF, CSV et partage facile avec votre équipe'
+      title: tLanding(lang, 'features.export.title'),
+      desc: tLanding(lang, 'features.export.desc')
     }
   ]
 
   const stats = [
-    { number: '2.5k+', label: 'Plans générés' },
-    { number: '4.9★', label: 'Note moyenne' },
-    { number: '95%', label: 'Taux de satisfaction' },
-    { number: '15min', label: 'Temps moyen' }
+    { number: '2.5k+', label: tLanding(lang, 'stats.generated') },
+    { number: '4.9★', label: tLanding(lang, 'stats.rating') },
+    { number: '95%', label: tLanding(lang, 'stats.satisfaction') },
+    { number: '15min', label: tLanding(lang, 'stats.avgTime') }
   ]
 
   const testimonials = [
     {
-      quote: 'VelocityLaunch m\'a fait gagner 2 jours de planning. Invaluable!',
-      author: 'Sarah M.',
-      role: 'Founder, FinTech',
+      quote: tLanding(lang, 'testimonials.testimonial1.quote'),
+      author: tLanding(lang, 'testimonials.testimonial1.author'),
+      role: tLanding(lang, 'testimonials.testimonial1.role'),
       avatar: '👩‍💼'
     },
     {
-      quote: 'Le meilleur outil pour structurer un lancement. Très intuitif.',
-      author: 'Marc L.',
-      role: 'Product Manager, SaaS',
+      quote: tLanding(lang, 'testimonials.testimonial2.quote'),
+      author: tLanding(lang, 'testimonials.testimonial2.author'),
+      role: tLanding(lang, 'testimonials.testimonial2.role'),
       avatar: '👨‍💼'
     },
     {
-      quote: 'Recommended to all founders. Crystal clear roadmaps.',
-      author: 'Emma T.',
-      role: 'CTO, E-commerce',
+      quote: tLanding(lang, 'testimonials.testimonial3.quote'),
+      author: tLanding(lang, 'testimonials.testimonial3.author'),
+      role: tLanding(lang, 'testimonials.testimonial3.role'),
       avatar: '👩‍💻'
     }
   ]
@@ -75,31 +76,30 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-badge">
-            🚀 Lancez plus vite que jamais
+            {tLanding(lang, 'hero.badge')}
           </div>
-          
+
           <h1 className="hero-title">
-            Générez votre plan de lancement
-            <span className="hero-highlight"> en 5 minutes</span>
+            {tLanding(lang, 'hero.title')}
+            <span className="hero-highlight"> {tLanding(lang, 'hero.titleHighlight')}</span>
           </h1>
-          
+
           <p className="hero-subtitle">
-            Répondez à 12 questions intelligentes et obtenez une roadmap complète,
-            une stratégie marketing et des KPIs personnalisés pour votre produit.
+            {tLanding(lang, 'hero.subtitle')}
           </p>
 
           <div className="hero-cta-group">
             <button className="btn-cta-primary" onClick={onStartClick}>
-              Commencer gratuitement
+              {tLanding(lang, 'hero.ctaPrimary')}
               <span className="arrow">→</span>
             </button>
             <button className="btn-cta-secondary" onClick={() => setShowDemo(true)}>
-              Voir une démo
+              {tLanding(lang, 'hero.ctaSecondary')}
             </button>
           </div>
 
           <p className="hero-footnote">
-            ✅ Pas de carte bancaire requise • Résultat instantané • Partageable
+            {tLanding(lang, 'hero.footnote')}
           </p>
         </div>
 
@@ -129,8 +129,8 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       {/* Features Grid */}
       <section className="features-section">
         <div className="section-header">
-          <h2>Tout ce dont vous avez besoin</h2>
-          <p>Un outil complet pour planifier votre lancement comme un pro</p>
+          <h2>{tLanding(lang, 'features.title')}</h2>
+          <p>{tLanding(lang, 'features.subtitle')}</p>
         </div>
 
         <div className="features-grid">
@@ -152,25 +152,25 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       {/* How It Works */}
       <section className="how-it-works">
         <div className="section-header">
-          <h2>Comment ça marche</h2>
-          <p>3 étapes simples pour votre plan de lancement</p>
+          <h2>{tLanding(lang, 'howItWorks.title')}</h2>
+          <p>{tLanding(lang, 'howItWorks.subtitle')}</p>
         </div>
 
         <div className="steps-grid">
           <div className="step-card">
             <div className="step-number">1</div>
-            <h3>Répondez aux questions</h3>
-            <p>Décrivez votre produit, votre marché et vos priorités. C'est rapide et intuitif.</p>
+            <h3>{tLanding(lang, 'howItWorks.step1.title')}</h3>
+            <p>{tLanding(lang, 'howItWorks.step1.desc')}</p>
           </div>
           <div className="step-card">
             <div className="step-number">2</div>
-            <h3>Générateur crée le plan</h3>
-            <p>Notre IA analyse vos réponses et génère une stratégie complète en 5 secondes.</p>
+            <h3>{tLanding(lang, 'howItWorks.step2.title')}</h3>
+            <p>{tLanding(lang, 'howItWorks.step2.desc')}</p>
           </div>
           <div className="step-card">
             <div className="step-number">3</div>
-            <h3>Exportez et lancez</h3>
-            <p>Récupérez votre plan en PDF, partagez avec votre équipe et lancez!</p>
+            <h3>{tLanding(lang, 'howItWorks.step3.title')}</h3>
+            <p>{tLanding(lang, 'howItWorks.step3.desc')}</p>
           </div>
         </div>
       </section>
@@ -178,8 +178,8 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       {/* Testimonials */}
       <section className="testimonials-section">
         <div className="section-header">
-          <h2>Approuvé par les founders</h2>
-          <p>Découvrez pourquoi 2500+ entrepreneurs font confiance à VelocityLaunch</p>
+          <h2>{tLanding(lang, 'testimonials.title')}</h2>
+          <p>{tLanding(lang, 'testimonials.subtitle')}</p>
         </div>
 
         <div className="testimonials-grid">
@@ -201,10 +201,10 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       {/* CTA Section - Mid Page */}
       <section className="cta-mid-section">
         <div className="cta-content">
-          <h2>Prêt à gagner 2 jours de planning?</h2>
-          <p>Rejoignez 2500+ founders qui font confiance à VelocityLaunch</p>
+          <h2>{tLanding(lang, 'ctaMid.title')}</h2>
+          <p>{tLanding(lang, 'ctaMid.subtitle')}</p>
           <button className="btn-cta-large" onClick={onStartClick}>
-            Créer mon plan maintenant
+            {tLanding(lang, 'ctaMid.button')}
           </button>
         </div>
       </section>
@@ -212,25 +212,25 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       {/* FAQ Preview */}
       <section className="faq-section">
         <div className="section-header">
-          <h2>Questions fréquentes</h2>
+          <h2>{tLanding(lang, 'faq.title')}</h2>
         </div>
 
         <div className="faq-grid">
           <div className="faq-card">
-            <h4>Combien de temps ça prend?</h4>
-            <p>Entre 5 et 15 minutes selon le détail de vos réponses. Vous pouvez aussi sauvegarder et continuer plus tard.</p>
+            <h4>{tLanding(lang, 'faq.q1.title')}</h4>
+            <p>{tLanding(lang, 'faq.q1.answer')}</p>
           </div>
           <div className="faq-card">
-            <h4>Les données sont-elles sécurisées?</h4>
-            <p>100% sécurisées. Chiffrement end-to-end, RGPD compliant, audité régulièrement.</p>
+            <h4>{tLanding(lang, 'faq.q2.title')}</h4>
+            <p>{tLanding(lang, 'faq.q2.answer')}</p>
           </div>
           <div className="faq-card">
-            <h4>Puis-je modifier mon plan?</h4>
-            <p>Oui! Régénérez autant que vous voulez. Vos plans sont sauvegardés (une fois connecté).</p>
+            <h4>{tLanding(lang, 'faq.q3.title')}</h4>
+            <p>{tLanding(lang, 'faq.q3.answer')}</p>
           </div>
           <div className="faq-card">
-            <h4>Quel format de sortie?</h4>
-            <p>PDF interactif, CSV exportable, et accès web. Partageable via lien private.</p>
+            <h4>{tLanding(lang, 'faq.q4.title')}</h4>
+            <p>{tLanding(lang, 'faq.q4.answer')}</p>
           </div>
         </div>
       </section>
@@ -238,10 +238,10 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       {/* Final CTA */}
       <section className="final-cta">
         <div className="final-cta-content">
-          <h2>Lancez votre produit avec confiance</h2>
-          <p>Rejoignez les founders qui ont gagné du temps et de la clarté avec VelocityLaunch</p>
+          <h2>{tLanding(lang, 'finalCta.title')}</h2>
+          <p>{tLanding(lang, 'finalCta.subtitle')}</p>
           <button className="btn-cta-final" onClick={onStartClick}>
-            Commencer gratuitement →
+            {tLanding(lang, 'finalCta.button')}
           </button>
         </div>
       </section>

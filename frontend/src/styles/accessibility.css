@@ -1,0 +1,115 @@
+/* Accessibility Improvements - Better Contrast Ratios */
+
+:root {
+  /* Override muted text color for better contrast (WCAG AA compliant) */
+  --color-text-muted-accessible: #8b8f96;
+  --color-text-secondary-accessible: #6b7280;
+}
+
+/* Hero Section Accessibility */
+.hero-subtitle {
+  color: #e5e7eb;
+  font-weight: 500;
+}
+
+.hero-footnote {
+  color: #d1d5db;
+}
+
+.btn-cta-secondary {
+  border-color: rgba(16, 185, 129, 0.5);
+  color: #f0f9ff;
+}
+
+.btn-cta-secondary:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+/* Stats Section Accessibility */
+.stat-label {
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.stat-card {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Features Section Accessibility */
+.section-header p {
+  color: #d1d5db;
+  font-weight: 500;
+}
+
+.feature-card p {
+  color: #d1d5db;
+}
+
+.feature-card {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* How It Works Section */
+.step-card p {
+  color: #d1d5db;
+}
+
+/* Testimonials Section */
+.testimonial-quote {
+  color: #f3f4f6;
+}
+
+.testimonial-role {
+  color: #d1d5db;
+}
+
+.testimonial-card {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* CTA Sections */
+.cta-content p {
+  color: #d1d5db;
+}
+
+/* FAQ Section */
+.faq-card p {
+  color: #d1d5db;
+}
+
+.faq-card {
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+/* Final CTA */
+.final-cta-content p {
+  color: #d1d5db;
+}
+
+/* Hero Card */
+.hero-card p {
+  color: #d1d5db;
+}
+
+/* Ensure all interactive elements meet WCAG AA standards */
+button {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Focus states for keyboard navigation */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Improve readability with better line heights */
+p {
+  line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  line-height: 1.2;
+}
