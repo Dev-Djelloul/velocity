@@ -1,23 +1,42 @@
-import { useState } from 'react'
 import { t } from '../lib/i18n'
+import '../styles/KPIDashboard.css'
 
 export default function KPIDashboard({ kpis, lang }) {
-  const [active, setActive] = useState(null)
+  if (!kpis || kpis.length === 0) return null
+
+  const primaryKpi = kpis[0]
+  const additionalKpis = kpis.slice(1)
 
   return (
-    <div className="card plan-card">
-      <h3>{t(lang, 'outputs.kpis')}</h3>
-      <div className="kpi-grid">
-        {kpis.map(kpi => (
-          <button key={kpi.name} className="kpi-tile" onClick={() => setActive(active === kpi.name ? null : kpi.name)}>
-            <div className="kpi-name">{kpi.name}</div>
-            <div className="kpi-value">{kpi.target != null ? `${kpi.target} ${kpi.unit}` : '—'}</div>
-            {active === kpi.name && (
-              <div className="kpi-formula">{t(lang, 'outputs.formula')}: {kpi.formula}</div>
-            )}
-          </button>
-        ))}
+    <div className="kpi-dashboard card">
+      <div className="kpi-dashboard-header">
+        <h3>{t(lang, 'outputs.kpis')}</h3>
+        <p className="kpi-subtitle">Métriques principales de succès</p>
       </div>
+
+      {/* Primary KPI */}
+      <div className="kpi-primary">
+        <div className="kpi-tile">
+          <div className="kpi-label">{primaryKpi.name}</div>
+          <div className="kpi-value">{primaryKpi.target || '—'}</div>
+          <div className="kpi-unit">{primaryKpi.unit}</div>
+          <div className="kpi-formula">{primaryKpi.formula}</div>
+        </div>
+      </div>
+
+      {/* Additional KPIs Grid */}
+      {additionalKpis.length > 0 && (
+        <div className="kpi-grid">
+          {additionalKpis.map((kpi, idx) => (
+            <div key={idx} className="kpi-tile">
+              <div className="kpi-label">{kpi.name}</div>
+              <div className="kpi-value">{kpi.target || '—'}</div>
+              <div className="kpi-unit">{kpi.unit}</div>
+              <div className="kpi-formula">{kpi.formula}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   )
 }

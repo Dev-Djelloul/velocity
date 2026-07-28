@@ -1,0 +1,201 @@
+.marketing-card {
+  grid-column: 2 / -1;
+  grid-row: 2 / 4;
+}
+
+.marketing-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.marketing-header h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.marketing-subtitle {
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.marketing-budget {
+  padding: var(--spacing-lg) 0;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  margin-bottom: var(--spacing-lg);
+}
+
+.budget-note {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-md);
+}
+
+.marketing-channels {
+  margin-bottom: var(--spacing-xl);
+}
+
+.marketing-channels h4 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-accent);
+}
+
+.channels-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.channel-card {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.channel-card.active {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.channel-card.active:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.channel-card.disabled {
+  opacity: 0.5;
+  background: rgba(30, 41, 59, 0.3);
+}
+
+.channel-header {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.channel-toggle {
+  background: none;
+  border: none;
+  color: var(--color-accent);
+  font-size: var(--font-size-lg);
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.2s ease;
+}
+
+.channel-toggle:hover {
+  transform: scale(1.2);
+}
+
+.channel-name {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+}
+
+.channel-budget {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+  padding: var(--spacing-sm) 0;
+}
+
+.budget-amount {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-bold);
+}
+
+.budget-pct {
+  background: rgba(16, 185, 129, 0.2);
+  color: var(--color-accent);
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+}
+
+.channel-goal,
+.channel-cadence {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.goal-label,
+.cadence-label {
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.goal-value,
+.cadence-value {
+  color: var(--color-text-secondary);
+}
+
+.marketing-content {
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.marketing-content h4 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-md);
+  color: var(--color-accent);
+}
+
+.pillars-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.pillar {
+  background: var(--color-bg-primary);
+  border-left: 2px solid var(--color-accent);
+  padding: var(--spacing-md);
+  border-radius: 4px;
+}
+
+.pillar strong {
+  color: var(--color-text-primary);
+  display: block;
+  margin-bottom: var(--spacing-xs);
+}
+
+.pillar p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+  .marketing-card {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .channel-budget {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .channel-goal,
+  .channel-cadence {
+    flex-direction: column;
+    gap: var(--spacing-xs);
+  }
+}

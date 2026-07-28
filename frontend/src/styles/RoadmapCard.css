@@ -1,0 +1,173 @@
+.roadmap-card {
+  grid-column: 1 / 2;
+  grid-row: 2 / 4;
+}
+
+.roadmap-header {
+  margin-bottom: var(--spacing-lg);
+}
+
+.roadmap-header h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.roadmap-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.roadmap-metrics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+}
+
+.roadmap-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.sprint-item {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(16, 185, 129, 0.15);
+  border-left: 3px solid var(--color-accent);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.sprint-item:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+}
+
+.sprint-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.sprint-number {
+  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
+  color: var(--color-bg-primary);
+  padding: var(--spacing-xs) var(--spacing-md);
+  border-radius: 4px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+}
+
+.sprint-info {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-xs);
+}
+
+.sprint-duration {
+  color: var(--color-text-secondary);
+}
+
+.sprint-cost {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.sprint-risks {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 2px solid var(--color-danger);
+  color: #fca5a5;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-radius: 4px;
+  font-size: var(--font-size-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.sprint-risks strong {
+  color: #fff;
+}
+
+.sprint-stories {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.story {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--color-bg-primary);
+  padding: var(--spacing-sm);
+  border-radius: 4px;
+  border: 1px solid rgba(16, 185, 129, 0.08);
+}
+
+.story-id {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-accent);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: 3px;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+  height: fit-content;
+}
+
+.story-details {
+  flex: 1;
+  min-width: 0;
+}
+
+.story-title {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.story-meta {
+  display: flex;
+  gap: var(--spacing-md);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  flex-wrap: wrap;
+}
+
+.story-effort,
+.story-assignee,
+.story-cost {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.story-effort {
+  color: var(--color-info);
+}
+
+.story-cost {
+  color: var(--color-accent);
+  font-weight: var(--font-weight-medium);
+}
+
+@media (max-width: 768px) {
+  .roadmap-card {
+    grid-column: 1 / -1;
+    grid-row: auto;
+  }
+
+  .sprint-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .sprint-info {
+    width: 100%;
+  }
+}
