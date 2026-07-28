@@ -1,16 +1,22 @@
+import { c } from './contentI18n'
+
 export function classifyProduct(product, market) {
   const audienceSize = market?.audienceSize
   if (product?.stage === 'prelaunch' && (audienceSize === 'xs' || audienceSize === 's')) {
-    return 'Awareness + Validation'
+    return 'awareness'
   }
-  if (product?.stage === 'mvp') return 'Acquisition + Product-market fit'
-  return 'Growth + Retention'
+  if (product?.stage === 'mvp') return 'acquisition'
+  return 'growth'
+}
+
+export function classificationLabel(key, lang) {
+  return c(lang).classification[key] || key
 }
 
 export function selectMarketingStrategy(market) {
   if (market?.b2bVsB2c === 'b2b') {
     return {
-      name: 'Enterprise play',
+      key: 'enterprise',
       allocation: { LinkedIn: 0.5, Content: 0.25, Partnerships: 0.15, Paid: 0.10 }
     }
   }
@@ -18,20 +24,24 @@ export function selectMarketingStrategy(market) {
   const smallAudience = market?.audienceSize === 'xs' || market?.audienceSize === 's'
   if (smallAudience || market?.competition === 'high') {
     return {
-      name: 'Viral growth strategy',
+      key: 'viral',
       allocation: { TikTok: 0.6, YouTube: 0.2, Community: 0.2 }
     }
   }
   if (market?.competition === 'moderate') {
     return {
-      name: 'Balanced',
+      key: 'balanced',
       allocation: { TikTok: 0.4, LinkedIn: 0.3, Content: 0.2, Paid: 0.1 }
     }
   }
   return {
-    name: 'Content-driven',
+    key: 'content',
     allocation: { Content: 0.4, LinkedIn: 0.3, Social: 0.2, Paid: 0.1 }
   }
+}
+
+export function strategyLabel(key, lang) {
+  return c(lang).strategyNames[key] || key
 }
 
 export function allocateBudget(budgetEur, strategy) {
@@ -54,26 +64,11 @@ export function sprintCount(timelineWeeks) {
   return Math.max(1, Math.ceil(timelineWeeks / 2))
 }
 
-export function kpiFocus(priorityFocus) {
-  if (priorityFocus === 'retain') {
-    return {
-      primary: { name: 'DAU/MAU', formula: 'active_users_daily / active_users_monthly', unit: '%' },
-      secondary: { name: 'Churn rate', formula: '(churned_users / total_users) × 100', unit: '%' },
-      tertiary: { name: 'Engagement score', formula: 'weighted(sessions, actions, duration)', unit: 'pts' }
-    }
-  }
-  if (priorityFocus === 'monetize') {
-    return {
-      primary: { name: 'ARR', formula: 'Σ(subscription_value × 12)', unit: '€' },
-      secondary: { name: 'ARPU', formula: 'total_revenue / total_users', unit: '€' },
-      tertiary: { name: 'Expansion rate', formula: 'upsell_revenue / base_revenue', unit: '%' }
-    }
-  }
-  return {
-    primary: { name: 'Total Signups', formula: 'Σ(signup_events)', unit: '#' },
-    secondary: { name: 'CAC', formula: 'total_budget / total_signups', unit: '€/signup' },
-    tertiary: { name: 'Conversion Rate', formula: '(signups / visitors) × 100', unit: '%' }
-  }
+export function kpiFocus(priorityFocus, lang) {
+  const focus = c(lang).kpiFocus
+  if (priorityFocus === 'retain') return focus.retain
+  if (priorityFocus === 'monetize') return focus.monetize
+  return focus.acquire
 }
 
 const AUDIENCE_TARGET = { xs: 200, s: 500, m: 2000, l: 8000 }

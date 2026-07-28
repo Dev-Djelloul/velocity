@@ -21,7 +21,7 @@ export default function PlanViewer({ plan, onReset, lang }) {
   }
 
   const liveMarketing = (() => {
-    const base = generateMarketingStrategy(plan.market ?? { b2bVsB2c: 'b2b' }, plan.priorities, budgetKeyFor(budget))
+    const base = generateMarketingStrategy(plan.market ?? { b2bVsB2c: 'b2b' }, plan.priorities, budgetKeyFor(budget), plan.language || lang)
     const filtered = base.channels.filter(c => !disabledChannels.includes(c.name))
     const totalPct = filtered.reduce((s, c) => s + c.pct, 0) || 1
     const redistributed = filtered.map(c => ({ ...c, budget: Math.round((c.pct / totalPct) * budget) }))

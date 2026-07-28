@@ -1,7 +1,7 @@
 import { generateRoadmap } from '../lib/generator/roadmapGenerator'
 import { generateMarketingStrategy } from '../lib/generator/marketingStrategyGenerator'
 import { calculateKPIs } from '../lib/generator/kpiCalculator'
-import { generatePersona, classifyProduct } from '../lib/engine'
+import { generatePersona, classifyProduct, classificationLabel } from '../lib/engine'
 
 const CORS_HEADERS = {
   'Content-Type': 'application/json',
@@ -21,12 +21,13 @@ export default {
 
     try {
       const data = await request.json()
+      const lang = data.language || 'fr'
 
-      const persona = generatePersona(data.market, data.product, data.priorities)
-      const classification = classifyProduct(data.product, data.market)
-      const roadmap = generateRoadmap(data.resources, data.product, data.priorities)
-      const marketing = generateMarketingStrategy(data.market, data.priorities, data.resources?.budgetEur)
-      const kpis = calculateKPIs(data.priorities, data.resources, data.market)
+      const persona = generatePersona(data.market, data.product, data.priorities, lang)
+      const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
+      const roadmap = generateRoadmap(data.resources, data.product, data.priorities, lang)
+      const marketing = generateMarketingStrategy(data.market, data.priorities, data.resources?.budgetEur, lang)
+      const kpis = calculateKPIs(data.priorities, data.resources, data.market, lang)
 
       return new Response(JSON.stringify({
         product: data.product,

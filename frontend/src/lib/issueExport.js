@@ -1,4 +1,5 @@
 import { downloadBlob, slug } from './pdfExport'
+import { t } from './i18n'
 
 function allStories(plan) {
   return plan.roadmap.sprints.flatMap(sp =>
@@ -7,14 +8,15 @@ function allStories(plan) {
 }
 
 export function exportGithubIssues(plan) {
+  const lang = plan.language || 'fr'
   const issues = allStories(plan).map(s => ({
     title: `[${s.id}] ${s.title}`,
     labels: [s.assignee, `sprint-${s.sprintId}`],
     body: [
-      `**Effort**: ${s.effort} story points`,
-      `**Estimated cost**: ${s.cost} €`,
-      `**Sprint**: ${s.sprintId}`,
-      s.dependsOn.length ? `**Depends on**: ${s.dependsOn.join(', ')}` : null
+      `**${t(lang, 'outputs.effort')}**: ${s.effort} story points`,
+      `**${t(lang, 'outputs.cost')}**: ${s.cost} €`,
+      `**${t(lang, 'outputs.sprint')}**: ${s.sprintId}`,
+      s.dependsOn.length ? `**${t(lang, 'outputs.dependsOn')}**: ${s.dependsOn.join(', ')}` : null
     ].filter(Boolean).join('\n')
   }))
 
@@ -23,11 +25,20 @@ export function exportGithubIssues(plan) {
 }
 
 export function exportJira(plan) {
-  const header = ['Summary', 'Issue Type', 'Sprint', 'Story Points', 'Assignee', 'Estimated Cost (EUR)', 'Depends On']
+  const lang = plan.language || 'fr'
+  const header = [
+    t(lang, 'outputs.summary'),
+    t(lang, 'outputs.issueType'),
+    t(lang, 'outputs.sprint'),
+    t(lang, 'outputs.storyPoints'),
+    t(lang, 'outputs.assignee'),
+    t(lang, 'outputs.estimatedCostEur'),
+    t(lang, 'outputs.dependsOnCsv')
+  ]
   const rows = allStories(plan).map(s => [
     `${s.id}: ${s.title}`,
     'Story',
-    `Sprint ${s.sprintId}`,
+    `${t(lang, 'outputs.sprint')} ${s.sprintId}`,
     s.effort,
     s.assignee,
     s.cost,

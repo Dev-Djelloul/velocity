@@ -1,15 +1,16 @@
-import { selectMarketingStrategy, allocateBudget } from '../engine'
+import { selectMarketingStrategy, strategyLabel, allocateBudget } from '../engine'
+import { c } from '../contentI18n'
 
 const BUDGET = { b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000 }
 
-export function generateMarketingStrategy(market, priorities, budgetKey) {
+export function generateMarketingStrategy(market, priorities, budgetKey, lang) {
   const budget = BUDGET[budgetKey] ?? 5000
   const strategy = selectMarketingStrategy(market)
   const channels = allocateBudget(budget, strategy).map(ch => ({
     ...ch,
-    goal: goalFor(ch.name, ch.budget),
-    cadence: '3x/week',
-    contentPillars: contentPillarsFor(ch.name)
+    goal: goalFor(ch.name, ch.budget, lang),
+    cadence: c(lang).cadence,
+    contentPillars: contentPillarsFor(ch.name, lang)
   }))
 
   const contentCalendar = []
@@ -19,33 +20,25 @@ export function generateMarketingStrategy(market, priorities, budgetKey) {
     })
   }
 
-  return { strategy: strategy.name, channels, contentCalendar, totalBudget: budget }
+  return { strategy: strategyLabel(strategy.key, lang), channels, contentCalendar, totalBudget: budget }
 }
 
-function goalFor(channel, budget) {
-  const goals = {
-    TikTok: `${Math.round(budget / 3)}k views`,
-    YouTube: `${Math.round(budget / 5)} subscribers`,
-    LinkedIn: `${Math.round(budget / 20)} leads`,
-    Content: `${Math.round(budget / 200)} articles`,
-    Paid: `${Math.round(budget / 15)} conversions`,
-    Community: `${Math.round(budget / 10)} members`,
-    Partnerships: `${Math.round(budget / 500)} partners`,
-    Social: `${Math.round(budget / 20)} followers`
-  }
-  return goals[channel] || `Growth via ${channel}`
+function goalFor(channel, budget, lang) {
+  const dict = c(lang)
+  const unit = dict.channelUnits[channel]
+  if (!unit) return `${dict.channelGoalGeneric} ${channel}`
+  const amount = channel === 'TikTok' ? Math.round(budget / 3)
+    : channel === 'YouTube' ? Math.round(budget / 5)
+    : channel === 'LinkedIn' ? Math.round(budget / 20)
+    : channel === 'Content' ? Math.round(budget / 200)
+    : channel === 'Paid' ? Math.round(budget / 15)
+    : channel === 'Community' ? Math.round(budget / 10)
+    : channel === 'Partnerships' ? Math.round(budget / 500)
+    : Math.round(budget / 20)
+  return `${amount} ${unit}`
 }
 
-function contentPillarsFor(channel) {
-  const pillars = {
-    TikTok: ['Product demos', 'Behind the scenes', 'User stories'],
-    LinkedIn: ['Thought leadership', 'Case studies', 'Product updates'],
-    Content: ['SEO guides', 'Comparisons', 'Tutorials'],
-    YouTube: ['Deep dives', 'Tutorials'],
-    Paid: ['Retargeting', 'Lookalike audiences'],
-    Community: ['Q&A', 'Feature requests'],
-    Partnerships: ['Co-marketing', 'Integrations'],
-    Social: ['Announcements', 'UGC']
-  }
-  return pillars[channel] || ['General content']
+function contentPillarsFor(channel, lang) {
+  const dict = c(lang)
+  return dict.contentPillars[channel] || dict.contentPillarsGeneric
 }

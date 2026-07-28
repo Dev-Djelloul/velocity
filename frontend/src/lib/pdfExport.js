@@ -1,3 +1,5 @@
+import { t } from './i18n'
+
 export function exportJSON(plan) {
   const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' })
   downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.json`)
@@ -14,19 +16,19 @@ export async function exportPDF(plan, lang) {
       { text: plan.classification, style: 'subheader' },
       { text: plan.product?.pitch || '', margin: [0, 0, 0, 10] },
 
-      { text: 'Roadmap', style: 'section' },
+      { text: t(lang, 'outputs.roadmap'), style: 'section' },
       ...plan.roadmap.sprints.map(sp => ({
-        text: `Sprint ${sp.sprintId} — ${sp.estimatedCost} € — ${sp.stories.map(s => s.title).join(', ')}`,
+        text: `${t(lang, 'outputs.sprint')} ${sp.sprintId} — ${sp.estimatedCost} € — ${sp.stories.map(s => s.title).join(', ')}`,
         margin: [0, 2, 0, 2]
       })),
 
-      { text: 'Marketing', style: 'section' },
+      { text: t(lang, 'outputs.marketing'), style: 'section' },
       ...plan.marketing.channels.map(ch => ({
         text: `${ch.name}: ${ch.budget} € — ${ch.goal}`,
         margin: [0, 2, 0, 2]
       })),
 
-      { text: 'KPIs', style: 'section' },
+      { text: t(lang, 'outputs.kpis'), style: 'section' },
       ...plan.kpis.map(k => ({
         text: `${k.name}: ${k.target ?? '—'} ${k.unit}`,
         margin: [0, 2, 0, 2]
