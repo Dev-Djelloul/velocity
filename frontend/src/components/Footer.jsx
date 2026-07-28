@@ -1,7 +1,7 @@
 import { t } from '../lib/i18n'
 import '../styles/Footer.css'
 
-export default function Footer({ lang }) {
+export default function Footer({ lang, onShowSecurity }) {
   const currentYear = new Date().getFullYear()
 
   return (
@@ -43,7 +43,7 @@ export default function Footer({ lang }) {
             <li><a href="#privacy">Confidentialité</a></li>
             <li><a href="#terms">Conditions</a></li>
             <li><a href="#cookies">Cookies</a></li>
-            <li><a href="#status">Status</a></li>
+            <li><button onClick={onShowSecurity} style={{background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', textDecoration: 'underline'}}>🔒 Sécurité</button></li>
           </ul>
         </div>
 

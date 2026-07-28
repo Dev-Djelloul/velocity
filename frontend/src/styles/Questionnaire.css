@@ -305,6 +305,17 @@
   cursor: not-allowed;
 }
 
+.button-group-row {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.button-group-row .btn-secondary {
+  flex: 1;
+  min-width: 120px;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .questionnaire-container {

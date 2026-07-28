@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import VelocityLaunchLogo from './VelocityLaunchLogo'
+import DemoModal from './DemoModal'
 import { t } from '../lib/i18n'
 import '../styles/Landing.css'
 
-export default function Landing({ lang, onStartClick }) {
+export default function Landing({ lang, onStartClick, onLoadDemo }) {
   const [hoveredFeature, setHoveredFeature] = useState(null)
+  const [showDemo, setShowDemo] = useState(false)
 
   const features = [
     {
@@ -91,7 +93,7 @@ export default function Landing({ lang, onStartClick }) {
               Commencer gratuitement
               <span className="arrow">→</span>
             </button>
-            <button className="btn-cta-secondary">
+            <button className="btn-cta-secondary" onClick={() => setShowDemo(true)}>
               Voir une démo
             </button>
           </div>
@@ -243,6 +245,17 @@ export default function Landing({ lang, onStartClick }) {
           </button>
         </div>
       </section>
+
+      {showDemo && (
+        <DemoModal
+          lang={lang}
+          onClose={() => setShowDemo(false)}
+          onLoadDemo={(demoData) => {
+            if (onLoadDemo) onLoadDemo(demoData)
+            else console.log('Demo data:', demoData)
+          }}
+        />
+      )}
     </div>
   )
 }

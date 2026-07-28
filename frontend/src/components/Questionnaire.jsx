@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { t } from '../lib/i18n'
+import { saveDraft } from '../lib/draftStorage'
 import '../styles/Questionnaire.css'
 
 const DEFAULT_DATA = {
@@ -46,9 +47,10 @@ function Text({ formData, onChange, section, field, label, placeholder, textarea
   )
 }
 
-export default function Questionnaire({ onSubmit, loading, lang }) {
+export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts }) {
   const [step, setStep] = useState(0)
   const [formData, setFormData] = useState(loadInitial)
+  const [draftSaved, setDraftSaved] = useState(false)
 
   useEffect(() => {
     localStorage.setItem('plp_form', JSON.stringify(formData))
@@ -71,6 +73,12 @@ export default function Questionnaire({ onSubmit, loading, lang }) {
     if (step === 0) return formData.product.name.trim() && formData.product.pitch.trim() && formData.product.usp.trim()
     if (step === 1) return formData.market.segment.trim()
     return true
+  }
+
+  const handleSaveDraft = () => {
+    saveDraft(formData, `Brouillon - ${formData.product.name || 'Sans titre'}`)
+    setDraftSaved(true)
+    setTimeout(() => setDraftSaved(false), 2000)
   }
 
   const steps = t(lang, 'steps')
@@ -143,9 +151,19 @@ export default function Questionnaire({ onSubmit, loading, lang }) {
       </div>
 
       <div className="button-group">
-        <button className="btn-secondary" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
-          {t(lang, 'nav.previous')}
-        </button>
+        <div className="button-group-row">
+          <button className="btn-secondary" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
+            {t(lang, 'nav.previous')}
+          </button>
+          <button className="btn-secondary" onClick={handleSaveDraft} title="Sauvegarde en cours...">
+            {draftSaved ? '✓ Sauvegardé' : '💾 Continuer plus tard'}
+          </button>
+          {onShowDrafts && (
+            <button className="btn-secondary" onClick={onShowDrafts}>
+              📋 Mes brouillons
+            </button>
+          )}
+        </div>
         {step < steps.length - 1 ? (
           <button className="btn-primary" onClick={() => setStep(step + 1)} disabled={!isStepValid()}>
             {t(lang, 'nav.next')}
