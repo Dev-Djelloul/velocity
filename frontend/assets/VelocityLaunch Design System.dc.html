@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #0f1419; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif; color: #e9e9ed; line-height: 1.6; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 60px 40px; }
+    .section { margin-bottom: 80px; }
+    .section-title { font-size: 32px; font-weight: 700; margin-bottom: 40px; color: #e9e9ed; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; }
+    .subsection { margin-bottom: 40px; }
+    .subsection-title { font-size: 18px; font-weight: 600; margin-bottom: 24px; color: #e9e9ed; opacity: 0.9; }
+    
+    /* Color Palette */
+    .palette { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .color-swatch { border-radius: 8px; padding: 20px; text-align: center; }
+    .color-name { font-size: 14px; font-weight: 600; margin-top: 12px; color: #e9e9ed; }
+    .color-hex { font-size: 12px; color: #a1a1a6; margin-top: 4px; font-family: 'Courier New', monospace; }
+    
+    /* Typography */
+    .typo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+    .typo-item { padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+    .typo-label { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: #a1a1a6; margin-bottom: 12px; }
+    .h1 { font-size: 48px; font-weight: 700; line-height: 1.2; }
+    .h2 { font-size: 36px; font-weight: 700; line-height: 1.2; }
+    .h3 { font-size: 28px; font-weight: 700; line-height: 1.3; }
+    .h4 { font-size: 20px; font-weight: 600; line-height: 1.4; }
+    .body-lg { font-size: 16px; font-weight: 400; line-height: 1.6; }
+    .body { font-size: 14px; font-weight: 400; line-height: 1.6; }
+    .caption { font-size: 12px; font-weight: 500; line-height: 1.5; color: #a1a1a6; }
+    
+    /* Buttons */
+    .btn-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px; margin-bottom: 40px; }
+    .btn { padding: 10px 20px; border-radius: 8px; font-size: 14px; font-weight: 600; border: 1px solid; cursor: pointer; transition: all 0.2s; text-align: center; display: inline-block; }
+    .btn-primary { border-color: #9184d9; color: #e9e9ed; background: transparent; }
+    .btn-primary:hover { background: rgba(145, 132, 217, 0.1); border-color: #a89fe8; }
+    .btn-primary:active { background: rgba(145, 132, 217, 0.2); }
+    .btn-secondary { border-color: #757580; color: #e9e9ed; background: transparent; }
+    .btn-secondary:hover { background: rgba(117, 117, 128, 0.1); }
+    .btn-secondary:active { background: rgba(117, 117, 128, 0.2); }
+    .btn-ghost { border-color: transparent; color: #9184d9; background: transparent; }
+    .btn-ghost:hover { background: rgba(145, 132, 217, 0.08); }
+    .btn-filled { border-color: #9184d9; color: #0f1419; background: #9184d9; }
+    .btn-filled:hover { background: #a89fe8; border-color: #a89fe8; }
+    .btn-disabled { opacity: 0.45; cursor: not-allowed; }
+    
+    /* States */
+    .state-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 40px; }
+    .state-item { padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; text-align: center; }
+    .state-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #a1a1a6; margin-bottom: 12px; }
+    
+    /* Links */
+    .link-demo { color: #9184d9; text-decoration: none; border-bottom: 1px solid rgba(145, 132, 217, 0.3); transition: all 0.2s; }
+    .link-demo:hover { color: #a89fe8; border-bottom-color: #a89fe8; }
+    .link-demo:active { color: #6f63c0; }
+    
+    /* Components */
+    .component-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .component-card { padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+    .component-title { font-size: 14px; font-weight: 600; color: #e9e9ed; margin-bottom: 16px; }
+    .input-field { width: 100%; padding: 10px 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; color: #e9e9ed; font-size: 14px; margin-bottom: 12px; }
+    .input-field:focus { outline: none; border-color: #9184d9; background: rgba(145, 132, 217, 0.05); }
+    .input-field::placeholder { color: #757580; }
+    .checkbox { display: flex; align-items: center; gap: 8px; }
+    .checkbox input { width: 18px; height: 18px; cursor: pointer; }
+    .tag { display: inline-block; padding: 6px 12px; border-radius: 16px; font-size: 12px; font-weight: 500; margin-right: 8px; margin-bottom: 8px; }
+    .tag-accent { background: rgba(145, 132, 217, 0.15); color: #c4bff0; border: 1px solid rgba(145, 132, 217, 0.3); }
+    .tag-success { background: rgba(74, 222, 128, 0.15); color: #a3f4a3; border: 1px solid rgba(74, 222, 128, 0.3); }
+    .tag-warning { background: rgba(251, 146, 60, 0.15); color: #fed7aa; border: 1px solid rgba(251, 146, 60, 0.3); }
+    .tag-error { background: rgba(239, 68, 68, 0.15); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.3); }
+    
+    /* Spacing Reference */
+    .spacing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 24px; margin-bottom: 40px; }
+    .spacing-item { padding: 16px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; }
+    .spacing-value { font-size: 12px; color: #a1a1a6; font-family: 'Courier New', monospace; margin-bottom: 12px; }
+    .spacing-block { background: #9184d9; border-radius: 4px; }
+    
+    /* Code Block */
+    .code-block { background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 16px; margin: 16px 0; overflow-x: auto; }
+    .code-block code { font-family: 'Courier New', monospace; font-size: 12px; color: #a8dadc; line-height: 1.5; }
+    
+    /* Elevation */
+    .elevation-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 40px; }
+    .shadow-sm { box-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+    .shadow-md { box-shadow: 0 4px 6px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2); }
+    .shadow-lg { box-shadow: 0 10px 15px rgba(0,0,0,0.3), 0 4px 6px rgba(0,0,0,0.2); }
+  </style>
+</helmet>
+
+<div class="container">
+  <!-- Header -->
+  <div style="margin-bottom: 60px; padding-bottom: 40px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+    <h1 style="font-size: 54px; font-weight: 800; margin-bottom: 12px; letter-spacing: -1px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; display: flex; align-items: center; gap: 0; line-height: 1;">
+      <svg style="width: 75px; height: 75px; flex-shrink: 0; margin-right: -4px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 70 60 L 100 130" stroke="#9184d9" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M 130 60 L 100 130" stroke="#6366f1" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M 100 130 L 100 70" stroke="#06b6d4" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <polygon points="100,55 95,68 105,68" fill="#06b6d4"/>
+      </svg>
+      <span style="color: #e9e9ed;">elocity</span><span style="background: linear-gradient(135deg, #9184d9 0%, #6366f1 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Launch</span>
+    </h1>
+    <p style="font-size: 18px; color: #a1a1a6;">Design System • Composants • Couleurs • Typographie</p>
+    <div style="display: flex; gap: 20px; margin-top: 24px;">
+      <svg style="width: 60px; height: 60px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <path d="M 70 60 L 100 130" stroke="#9184d9" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M 130 60 L 100 130" stroke="#6366f1" stroke-width="8" fill="none" stroke-linecap="round"/>
+        <path d="M 100 130 L 100 70" stroke="#06b6d4" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <polygon points="100,55 95,68 105,68" fill="#06b6d4"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- WORDMARK STYLE GUIDE -->
+  <div class="section" style="background: rgba(145, 132, 217, 0.08); border: 1px solid rgba(145, 132, 217, 0.2); border-radius: 12px; padding: 40px; margin-bottom: 80px;">
+    <h2 style="font-size: 28px; font-weight: 700; margin-bottom: 24px; color: #e9e9ed;">Wordmark: 🎯 Logo + Text Hybrid</h2>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 32px;">
+      <div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #e9e9ed;">Caractéristiques</h3>
+        <ul style="list-style: none; color: #a1a1a6; line-height: 1.8;">
+          <li>✦ <strong style="color: #e9e9ed;">Logo + Text Fusion</strong> — V géométrique remplace la lettre</li>
+          <li>✦ <strong style="color: #e9e9ed;">Weight 800</strong> — Extra-bold pour impact</li>
+          <li>✦ <strong style="color: #e9e9ed;">Logo 75px (header)</strong> — Dominant & visible</li>
+          <li>✦ <strong style="color: #e9e9ed;">Texte blanc (#e9e9ed)</strong> — Neutre pour mettre en avant le logo</li>
+          <li>✦ <strong style="color: #e9e9ed;">Margin-right -4px</strong> — Fusion serrée logo-texte</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h3 style="font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #e9e9ed;">Utilisation</h3>
+        <ul style="list-style: none; color: #a1a1a6; line-height: 1.8;">
+          <li>✓ Logo + branding principal</li>
+          <li>✓ Header/hero sections</li>
+          <li>✓ Page titles & headings clés</li>
+          <li>✓ Marketing materials</li>
+          <li>✓ Social media headers</li>
+        </ul>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 32px;">
+      <div style="padding: 24px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+        <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Harmonisé (Recommandé)</p>
+        <div style="font-size: 42px; font-weight: 800; display: flex; align-items: center; gap: 0; line-height: 1;">
+          <svg style="width: 54px; height: 54px; flex-shrink: 0; margin-right: -3px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 70 60 L 100 130" stroke="#9184d9" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M 130 60 L 100 130" stroke="#6366f1" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M 100 130 L 100 70" stroke="#06b6d4" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <polygon points="100,55 95,68 105,68" fill="#06b6d4"/>
+          </svg>
+          <span style="color: #e9e9ed;">eloci</span><span style="background: linear-gradient(135deg, #9184d9 0%, #6366f1 100%); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ty</span><span style="color: #e9e9ed;">Launch</span>
+        </div>
+      </div>
+      <div style="padding: 24px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px;">
+        <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.5px;">Mono Blanc</p>
+        <div style="font-size: 42px; font-weight: 800; display: flex; align-items: center; gap: 0; line-height: 1; color: #e9e9ed;">
+          <svg style="width: 54px; height: 54px; flex-shrink: 0; margin-right: -3px;" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 70 60 L 100 130" stroke="#e9e9ed" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M 130 60 L 100 130" stroke="#e9e9ed" stroke-width="8" fill="none" stroke-linecap="round"/>
+            <path d="M 100 130 L 100 70" stroke="#e9e9ed" stroke-width="3" fill="none" stroke-linecap="round"/>
+            <polygon points="100,55 95,68 105,68" fill="#e9e9ed"/>
+          </svg>
+          <span>elocityLaunch</span>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding: 20px; background: rgba(0,0,0,0.3); border-left: 3px solid #06b6d4; border-radius: 4px; margin-top: 24px;">
+      <p style="font-size: 13px; color: #a1a1a6;"><strong style="color: #e9e9ed;">CSS Variables:</strong></p>
+      <div class="code-block" style="margin: 12px 0 0 0;">
+        <code>--wordmark-font: 800;<br/>
+--wordmark-letter-spacing: -1px;<br/>
+--wordmark-gradient: linear-gradient(135deg, #9184d9 0%, #6366f1 40%, #06b6d4 100%);</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1. COLOR PALETTE -->
+  <div class="section">
+    <h2 class="section-title">1. Palette de Couleurs</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Couleurs Primaires</h3>
+      <div class="palette">
+        <div class="color-swatch" style="background: #9184d9;">
+          <div class="color-name">Primary</div>
+          <div class="color-hex">#9184d9</div>
+        </div>
+        <div class="color-swatch" style="background: #6366f1;">
+          <div class="color-name">Indigo</div>
+          <div class="color-hex">#6366f1</div>
+        </div>
+        <div class="color-swatch" style="background: #06b6d4;">
+          <div class="color-name">Cyan</div>
+          <div class="color-hex">#06b6d4</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Couleurs Neutres</h3>
+      <div class="palette">
+        <div class="color-swatch" style="background: #0f1419;">
+          <div class="color-name">Background</div>
+          <div class="color-hex">#0f1419</div>
+        </div>
+        <div class="color-swatch" style="background: #1a1f2e; border: 1px solid rgba(255,255,255,0.1);">
+          <div class="color-name">Surface</div>
+          <div class="color-hex">#1a1f2e</div>
+        </div>
+        <div class="color-swatch" style="background: #e9e9ed;">
+          <div class="color-name" style="color: #0f1419;">Text</div>
+          <div class="color-hex" style="color: #0f1419;">#e9e9ed</div>
+        </div>
+        <div class="color-swatch" style="background: #a1a1a6;">
+          <div class="color-name" style="color: #0f1419;">Muted</div>
+          <div class="color-hex" style="color: #0f1419;">#a1a1a6</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Couleurs Sémantiques</h3>
+      <div class="palette">
+        <div class="color-swatch" style="background: #4ade80;">
+          <div class="color-name">Success</div>
+          <div class="color-hex">#4ade80</div>
+        </div>
+        <div class="color-swatch" style="background: #fb923c;">
+          <div class="color-name">Warning</div>
+          <div class="color-hex">#fb923c</div>
+        </div>
+        <div class="color-swatch" style="background: #ef4444;">
+          <div class="color-name">Error</div>
+          <div class="color-hex">#ef4444</div>
+        </div>
+        <div class="color-swatch" style="background: #06b6d4;">
+          <div class="color-name">Info</div>
+          <div class="color-hex">#06b6d4</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. TYPOGRAPHY -->
+  <div class="section">
+    <h2 class="section-title">2. Typographie</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Échelle Typographique</h3>
+      <div class="typo-grid">
+        <div class="typo-item">
+          <div class="typo-label">H1 - Heading Large</div>
+          <div class="h1">Heading One</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">48px • 700 Bold • Line: 1.2</div>
+        </div>
+        <div class="typo-item">
+          <div class="typo-label">H2 - Heading Medium</div>
+          <div class="h2">Heading Two</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">36px • 700 Bold • Line: 1.2</div>
+        </div>
+        <div class="typo-item">
+          <div class="typo-label">H3 - Heading Small</div>
+          <div class="h3">Heading Three</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">28px • 700 Bold • Line: 1.3</div>
+        </div>
+        <div class="typo-item">
+          <div class="typo-label">H4 - Heading XSmall</div>
+          <div class="h4">Heading Four</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">20px • 600 Semi-Bold • Line: 1.4</div>
+        </div>
+        <div class="typo-item">
+          <div class="typo-label">Body Large</div>
+          <div class="body-lg">Body text pour les descriptions principales. Lisibilité optimisée pour lecture longue.</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">16px • 400 Regular • Line: 1.6</div>
+        </div>
+        <div class="typo-item">
+          <div class="typo-label">Body Regular</div>
+          <div class="body">Body text pour contenu standard. Taille confortable pour interface.</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">14px • 400 Regular • Line: 1.6</div>
+        </div>
+        <div class="typo-item">
+          <div class="typo-label">Caption / Small</div>
+          <div class="caption">Texte pour étiquettes, légendes, métadonnées</div>
+          <div style="margin-top: 12px; font-size: 12px; color: #a1a1a6;">12px • 500 Medium • Line: 1.5</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Font Stack</h3>
+      <div class="code-block">
+        <code>Font Family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif<br/>
+Weights: 400 (Regular), 600 (Semi-Bold), 700 (Bold)</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. BUTTONS -->
+  <div class="section">
+    <h2 class="section-title">3. Boutons</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Variantes</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          <div class="typo-label">Primary</div>
+          <div style="margin-top: 12px;"><button class="btn btn-primary">Primary Button</button></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          <div class="typo-label">Secondary</div>
+          <div style="margin-top: 12px;"><button class="btn btn-secondary">Secondary Button</button></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          <div class="typo-label">Ghost</div>
+          <div style="margin-top: 12px;"><button class="btn btn-ghost">Ghost Button</button></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          <div class="typo-label">Filled / CTA</div>
+          <div style="margin-top: 12px;"><button class="btn btn-filled">Filled Button</button></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          <div class="typo-label">Disabled</div>
+          <div style="margin-top: 12px;"><button class="btn btn-primary btn-disabled">Disabled Button</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">États (Primary Button)</h3>
+      <div class="state-grid">
+        <div class="state-item">
+          <div class="state-label">Default</div>
+          <button class="btn btn-primary">Normal</button>
+        </div>
+        <div class="state-item">
+          <div class="state-label">Hover</div>
+          <button class="btn btn-primary" style="background: rgba(145, 132, 217, 0.1); border-color: #a89fe8;">Hover</button>
+        </div>
+        <div class="state-item">
+          <div class="state-label">Active</div>
+          <button class="btn btn-primary" style="background: rgba(145, 132, 217, 0.2);">Active</button>
+        </div>
+        <div class="state-item">
+          <div class="state-label">Focus</div>
+          <button class="btn btn-primary" style="border-color: #9184d9; box-shadow: 0 0 0 2px rgba(145, 132, 217, 0.2);">Focus</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. LINKS & TEXT -->
+  <div class="section">
+    <h2 class="section-title">4. Liens & Texte Interactif</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Démonstration</h3>
+      <div style="padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+        <p style="margin-bottom: 12px;">Ceci est un <a class="link-demo" href="#">lien standard</a> avec hover et active states.</p>
+        <p style="margin-bottom: 12px;">Vous pouvez aussi <a class="link-demo" href="#" style="color: #06b6d4; border-bottom-color: rgba(6, 182, 212, 0.3);">utiliser le cyan</a> pour l'accent.</p>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">CSS</h3>
+      <div class="code-block">
+        <code>color: #9184d9;<br/>
+text-decoration: none;<br/>
+border-bottom: 1px solid rgba(145, 132, 217, 0.3);<br/>
+transition: all 0.2s;<br/>
+<br/>
+&:hover {<br/>
+&nbsp;&nbsp;color: #a89fe8;<br/>
+&nbsp;&nbsp;border-bottom-color: #a89fe8;<br/>
+}</code>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. FORM ELEMENTS -->
+  <div class="section">
+    <h2 class="section-title">5. Composants de Formulaire</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Champs & Entrées</h3>
+      <div class="component-grid">
+        <div class="component-card">
+          <div class="component-title">Text Input</div>
+          <input type="text" class="input-field" placeholder="Saisissez du texte...">
+          <input type="text" class="input-field" placeholder="Focused state" style="border-color: #9184d9; background: rgba(145, 132, 217, 0.05);">
+        </div>
+        <div class="component-card">
+          <div class="component-title">Text Area</div>
+          <textarea class="input-field" placeholder="Entrez votre message..." style="resize: vertical; min-height: 80px;"></textarea>
+        </div>
+        <div class="component-card">
+          <div class="component-title">Checkboxes</div>
+          <label class="checkbox">
+            <input type="checkbox" checked>
+            <span>Option 1 (checked)</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox">
+            <span>Option 2 (unchecked)</span>
+          </label>
+        </div>
+        <div class="component-card">
+          <div class="component-title">Radio Buttons</div>
+          <label class="checkbox">
+            <input type="radio" name="demo" checked>
+            <span>Option A (selected)</span>
+          </label>
+          <label class="checkbox">
+            <input type="radio" name="demo">
+            <span>Option B</span>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. TAGS & BADGES -->
+  <div class="section">
+    <h2 class="section-title">6. Tags & Badges</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Variantes</h3>
+      <div style="padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+        <span class="tag tag-accent">Accent</span>
+        <span class="tag tag-success">Success</span>
+        <span class="tag tag-warning">Warning</span>
+        <span class="tag tag-error">Error</span>
+        <span class="tag" style="background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #e9e9ed;">Outline</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. SPACING SYSTEM -->
+  <div class="section">
+    <h2 class="section-title">7. Système d'Espacement</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Échelle (px)</h3>
+      <div class="spacing-grid">
+        <div class="spacing-item">
+          <div class="spacing-value">4px</div>
+          <div class="spacing-block" style="height: 4px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">8px</div>
+          <div class="spacing-block" style="height: 8px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">12px</div>
+          <div class="spacing-block" style="height: 12px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">16px</div>
+          <div class="spacing-block" style="height: 16px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">20px</div>
+          <div class="spacing-block" style="height: 20px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">24px</div>
+          <div class="spacing-block" style="height: 24px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">32px</div>
+          <div class="spacing-block" style="height: 32px;"></div>
+        </div>
+        <div class="spacing-item">
+          <div class="spacing-value">40px</div>
+          <div class="spacing-block" style="height: 40px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subsection">
+      <h3 class="subsection-title">Usage Recommandé</h3>
+      <div style="padding: 24px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+        <p style="margin-bottom: 12px;"><strong>Padding Intérieur:</strong> 8px, 12px, 16px, 20px</p>
+        <p style="margin-bottom: 12px;"><strong>Margin Extérieur:</strong> 12px, 16px, 24px, 32px</p>
+        <p style="margin-bottom: 0;"><strong>Gap (Flexbox/Grid):</strong> 8px, 12px, 16px, 24px</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. ELEVATION & SHADOWS -->
+  <div class="section">
+    <h2 class="section-title">8. Élévation & Ombres</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Niveaux d'Ombrage</h3>
+      <div class="elevation-grid">
+        <div style="padding: 32px; text-align: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; shadow-sm; box-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 4px;">Small</p>
+          <p style="font-size: 11px; color: #757580; font-family: monospace;">0 1px 2px</p>
+        </div>
+        <div style="padding: 32px; text-align: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.2);">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 4px;">Medium</p>
+          <p style="font-size: 11px; color: #757580; font-family: monospace;">0 4px 6px</p>
+        </div>
+        <div style="padding: 32px; text-align: center; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; box-shadow: 0 10px 15px rgba(0,0,0,0.3), 0 4px 6px rgba(0,0,0,0.2);">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 4px;">Large</p>
+          <p style="font-size: 11px; color: #757580; font-family: monospace;">0 10px 15px</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9. BORDER RADIUS -->
+  <div class="section">
+    <h2 class="section-title">9. Rayon de Bordure</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Tailles Recommandées</h3>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 20px;">
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px;">4px - Subtle</p>
+          <div style="width: 100%; height: 40px; background: #9184d9; border-radius: 4px;"></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 6px;">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px;">6px - Input</p>
+          <div style="width: 100%; height: 40px; background: #6366f1; border-radius: 6px;"></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px;">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px;">8px - Default</p>
+          <div style="width: 100%; height: 40px; background: #06b6d4; border-radius: 8px;"></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px;">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px;">12px - Card</p>
+          <div style="width: 100%; height: 40px; background: #4ade80; border-radius: 12px;"></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px;">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px;">16px - Large</p>
+          <div style="width: 100%; height: 40px; background: #fb923c; border-radius: 16px;"></div>
+        </div>
+        <div style="padding: 20px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 50%;">
+          <p style="font-size: 12px; color: #a1a1a6; margin-bottom: 12px;">50% - Circle</p>
+          <div style="width: 40px; height: 40px; background: #ef4444; border-radius: 50%; margin: 0 auto;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. COMPONENT GUIDELINES -->
+  <div class="section">
+    <h2 class="section-title">10. Directives d'Implémentation</h2>
+    
+    <div class="subsection">
+      <h3 class="subsection-title">Pour Claude Code</h3>
+      <div style="padding: 24px; background: rgba(145, 132, 217, 0.05); border: 1px solid rgba(145, 132, 217, 0.2); border-radius: 8px;">
+        <p style="margin-bottom: 16px;"><strong>1. Utilise toujours les variables CSS :</strong></p>
+        <div class="code-block">
+          <code>--color-primary: #9184d9;<br/>
+--color-indigo: #6366f1;<br/>
+--color-cyan: #06b6d4;<br/>
+--color-bg: #0f1419;<br/>
+--color-text: #e9e9ed;<br/>
+--color-muted: #a1a1a6;</code>
+        </div>
+
+        <p style="margin-bottom: 16px; margin-top: 16px;"><strong>2. Spacing scale (pour padding/margin/gap) :</strong></p>
+        <div class="code-block">
+          <code>--space-xs: 4px;<br/>
+--space-sm: 8px;<br/>
+--space-md: 12px;<br/>
+--space-lg: 16px;<br/>
+--space-xl: 20px;<br/>
+--space-2xl: 24px;</code>
+        </div>
+
+        <p style="margin-bottom: 16px; margin-top: 16px;"><strong>3. Border Radius :</strong></p>
+        <div class="code-block">
+          <code>--radius-sm: 4px;<br/>
+--radius-md: 6px;<br/>
+--radius-lg: 8px;<br/>
+--radius-xl: 12px;<br/>
+--radius-full: 50%;</code>
+        </div>
+
+        <p style="margin-bottom: 16px; margin-top: 16px;"><strong>4. Shadow :</strong></p>
+        <div class="code-block">
+          <code>--shadow-sm: 0 1px 2px rgba(0,0,0,0.3);<br/>
+--shadow-md: 0 4px 6px rgba(0,0,0,0.3);<br/>
+--shadow-lg: 0 10px 15px rgba(0,0,0,0.3);</code>
+        </div>
+
+        <p style="margin-top: 16px;"><strong>5. Règles de Design :</strong></p>
+        <ul style="margin-left: 24px; margin-top: 8px; color: #a1a1a6;">
+          <li>Tous les textes utilisent Inter (system fonts)</li>
+          <li>Contraste minimum AAA pour l'accessibilité</li>
+          <li>Les boutons primary sont des outlines avec border, jamais des fills</li>
+          <li>Les liens ont une couleur d'accent avec underline subtil</li>
+          <li>Utilisez gap pour espacer les flex/grid items (pas de margin individuelle)</li>
+          <li>Les inputs/fields ont un focus visible avec outline à 2px</li>
+          <li>Pas de couleurs fixes — utilise toujours les ramps de couleurs</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div style="margin-top: 80px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); text-align: center; color: #a1a1a6;">
+    <p>VelocityLaunch Design System v1.0 • Ready for Implementation</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

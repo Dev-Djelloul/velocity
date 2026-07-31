@@ -1,0 +1,16 @@
+<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  
+  <path d="M 70 60 L 100 130" stroke="#9184d9" stroke-width="8" fill="none" stroke-linecap="round"></path>
+  
+  
+  <path d="M 130 60 L 100 130" stroke="#6366f1" stroke-width="8" fill="none" stroke-linecap="round"></path>
+  
+  
+  <path d="M 100 130 L 100 70" stroke="#06b6d4" stroke-width="3" fill="none" stroke-linecap="round"></path>
+  
+  
+  <polygon points="100,55 95,68 105,68" fill="#06b6d4"></polygon>
+  
+  
+  <circle cx="100" cy="100" r="85" fill="none" stroke="rgba(6, 182, 212, 0.1)" stroke-width="1"></circle>
+</svg>
