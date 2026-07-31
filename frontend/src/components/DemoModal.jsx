@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
+import { IconBriefcase, IconShoppingBag, IconSmartphone, IconSparkle } from './Icons'
 import '../styles/DemoModal.css'
 
 export default function DemoModal({ onClose, onLoadDemo, lang }) {
@@ -10,25 +11,25 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
       id: 'saas',
       title: 'SaaS B2B',
       desc: 'Plateforme de gestion pour PME',
-      icon: '💼'
+      Icon: IconBriefcase
     },
     {
       id: 'ecommerce',
       title: 'E-commerce',
       desc: 'Boutique en ligne de vêtements',
-      icon: '👕'
+      Icon: IconShoppingBag
     },
     {
       id: 'mobile',
       title: 'Application Mobile',
       desc: 'App de productivité pour équipes',
-      icon: '📱'
+      Icon: IconSmartphone
     },
     {
       id: 'ai',
       title: 'Plateforme IA',
       desc: 'SaaS avec IA générative',
-      icon: '🤖'
+      Icon: IconSparkle
     }
   ]
 
@@ -82,7 +83,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
               className={`demo-card ${selectedDemo === demo.id ? 'selected' : ''}`}
               onClick={() => setSelectedDemo(demo.id)}
             >
-              <div className="demo-icon">{demo.icon}</div>
+              <div className="demo-icon"><demo.Icon width={22} height={22} /></div>
               <h3>{demo.title}</h3>
               <p>{demo.desc}</p>
             </button>

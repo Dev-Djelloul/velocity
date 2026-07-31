@@ -21,7 +21,7 @@
 
 .marketing-budget {
   padding: var(--spacing-lg) 0;
-  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  border-bottom: 1px solid rgba(145, 132, 217, 0.1);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -52,7 +52,7 @@
 
 .channel-card {
   background: var(--color-bg-tertiary);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(145, 132, 217, 0.15);
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-md);
   transition: all 0.2s ease;
@@ -60,12 +60,12 @@
 }
 
 .channel-card.active {
-  border-color: rgba(16, 185, 129, 0.3);
+  border-color: rgba(145, 132, 217, 0.3);
 }
 
 .channel-card.active:hover {
   border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 12px rgba(145, 132, 217, 0.2);
 }
 
 .channel-card.disabled {
@@ -114,7 +114,7 @@
 }
 
 .budget-pct {
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(145, 132, 217, 0.2);
   color: var(--color-accent);
   padding: 2px 8px;
   border-radius: 12px;
@@ -144,7 +144,7 @@
 
 .marketing-content {
   padding-top: var(--spacing-lg);
-  border-top: 1px solid rgba(16, 185, 129, 0.1);
+  border-top: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .marketing-content h4 {

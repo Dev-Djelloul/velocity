@@ -1,4 +1,5 @@
 import { t } from '../lib/i18n'
+import { IconAlertTriangle, IconTarget, IconUser, IconCoin } from './Icons'
 import '../styles/RoadmapCard.css'
 
 export default function RoadmapCard({ roadmap, lang }) {
@@ -47,7 +48,7 @@ export default function RoadmapCard({ roadmap, lang }) {
 
             {sprint.risks && sprint.risks.length > 0 && (
               <div className="sprint-risks">
-                <strong>⚠️ Risques:</strong> {sprint.risks.join(', ')}
+                <strong><IconAlertTriangle width={14} height={14} /> Risques:</strong> {sprint.risks.join(', ')}
               </div>
             )}
 
@@ -58,9 +59,9 @@ export default function RoadmapCard({ roadmap, lang }) {
                   <div className="story-details">
                     <div className="story-title">{story.title}</div>
                     <div className="story-meta">
-                      <span className="story-effort">🎯 {story.effort}pts</span>
-                      <span className="story-assignee">👤 {story.assignee}</span>
-                      <span className="story-cost">💰 {story.cost}€</span>
+                      <span className="story-effort"><IconTarget width={13} height={13} /> {story.effort}pts</span>
+                      <span className="story-assignee"><IconUser width={13} height={13} /> {story.assignee}</span>
+                      <span className="story-cost"><IconCoin width={13} height={13} /> {story.cost}€</span>
                     </div>
                   </div>
                 </div>

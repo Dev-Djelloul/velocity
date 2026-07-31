@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { t } from '../lib/i18n'
+import { IconPencil } from './Icons'
 import '../styles/DraftsModal.css'
 
 export default function DraftsModal({ lang, onLoadDraft, onClose }) {
@@ -87,7 +88,7 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
                   setEditingId(draft.id)
                   setEditingName(draft.name)
                 }}>
-                  ✏️ Renommer
+                  <IconPencil width={14} height={14} /> Renommer
                 </button>
                 <button className="btn-small danger" onClick={() => handleDelete(draft.id)}>
                   Supprimer

@@ -65,7 +65,7 @@
 }
 
 .demo-icon {
-  font-size: 32px;
+  color: var(--color-primary, #9184d9);
   margin-bottom: 8px;
 }
 

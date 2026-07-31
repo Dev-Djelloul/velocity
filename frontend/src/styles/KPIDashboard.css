@@ -19,7 +19,7 @@
 
 .kpi-primary {
   background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(36, 45, 66, 0.3));
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(145, 132, 217, 0.2);
   border-radius: var(--border-radius);
   padding: var(--spacing-xl);
   margin-bottom: var(--spacing-lg);
@@ -37,7 +37,7 @@
   justify-content: space-between;
   align-items: center;
   padding: var(--spacing-md) 0;
-  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  border-bottom: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .kpi-meta-item:last-child {
@@ -71,7 +71,7 @@
 }
 
 .kpi-secondary .kpi-tile {
-  border: 2px solid rgba(16, 185, 129, 0.3);
+  border: 2px solid rgba(145, 132, 217, 0.3);
 }
 
 .kpi-grid {

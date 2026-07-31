@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { t } from '../lib/i18n'
 import { saveDraft } from '../lib/draftStorage'
+import { IconSave, IconClipboard } from './Icons'
 import '../styles/Questionnaire.css'
 
 const DEFAULT_DATA = {
@@ -156,11 +157,11 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
             {t(lang, 'nav.previous')}
           </button>
           <button className="btn-secondary" onClick={handleSaveDraft} title="Sauvegarde en cours...">
-            {draftSaved ? '✓ Sauvegardé' : '💾 Continuer plus tard'}
+            {draftSaved ? '✓ Sauvegardé' : <><IconSave width={14} height={14} /> Continuer plus tard</>}
           </button>
           {onShowDrafts && (
             <button className="btn-secondary" onClick={onShowDrafts}>
-              📋 Mes brouillons
+              <IconClipboard width={14} height={14} /> Mes brouillons
             </button>
           )}
         </div>

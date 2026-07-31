@@ -1,13 +1,14 @@
 export const landingTranslations = {
   fr: {
     hero: {
-      badge: '🚀 Lancez plus vite que jamais',
+      badge: 'Lancez plus vite que jamais',
       title: 'Générez votre plan de lancement',
       titleHighlight: 'en 5 minutes',
       subtitle: 'Répondez à 12 questions intelligentes et obtenez une roadmap complète, une stratégie marketing et des KPIs personnalisés pour votre produit.',
-      ctaPrimary: 'Commencer gratuitement',
-      ctaSecondary: 'Voir une démo',
-      footnote: '✅ Pas de carte bancaire requise • Résultat instantané • Partageable'
+      ctaPrimary: 'Démarrer',
+      ctaSecondary: 'Découvrir',
+      demoLink: 'Voir une démo',
+      footnote: 'Pas de carte bancaire requise • Résultat instantané • Partageable'
     },
     stats: {
       generated: 'Plans générés',
@@ -67,17 +68,41 @@ export const landingTranslations = {
       title: 'Lancez votre produit avec confiance',
       subtitle: 'Rejoignez les founders qui ont gagné du temps et de la clarté avec VelocityLaunch',
       button: 'Commencer gratuitement →'
+    },
+    hiw: {
+      eyebrow: 'Guide',
+      title: 'Comment fonctionne VelocityLaunch',
+      subtitle: 'De l\'idée au plan de lancement complet : découvrez les 3 étapes qui transforment vos réponses en roadmap actionnable.',
+      meta: '3 étapes · 5 minutes chrono · Gratuit pour commencer',
+      valuesTitle: 'Pensé pour les founders pressés',
+      valuesSubtitle: 'Une approche simple, rapide et sérieuse pour cadrer votre lancement',
+      value1: { title: 'Rapide', desc: 'Un plan complet généré en moins de 5 minutes, pas en 5 heures.' },
+      value2: { title: 'Intelligent', desc: 'Des recommandations adaptées à votre marché et votre stade.' },
+      value3: { title: 'Sur mesure', desc: 'Roadmap, budget et KPIs calculés selon vos propres réponses.' },
+      value4: { title: 'Actionnable', desc: 'Exportez, partagez et suivez votre plan dès aujourd\'hui.' },
+      step1detail: 'Douze questions ciblées sur votre produit, votre marché et vos ressources suffisent à cadrer un lancement solide.',
+      step2detail: 'Notre moteur croise vos réponses avec des centaines de patterns de lancement pour construire une roadmap réaliste, sprint par sprint.',
+      step3detail: 'Récupérez un PDF prêt à partager, une roadmap exportable et des KPIs de suivi personnalisés.',
+      galleryTitle: 'Un aperçu de l\'expérience',
+      gallerySubtitle: 'Ce que vous obtenez concrètement, à chaque étape de votre lancement',
+      trustedTitle: 'Ils nous font confiance',
+      trustedSubtitle: 'Découvrez pourquoi 2500+ entrepreneurs font confiance à VelocityLaunch',
+      faqTitle: 'Questions fréquentes',
+      ctaTitle: 'Prêt à voir votre plan prendre forme ?',
+      ctaSubtitle: 'Lancez le questionnaire maintenant, votre roadmap complète vous attend dans 5 minutes.',
+      ctaButton: 'Démarrer maintenant'
     }
   },
   en: {
     hero: {
-      badge: '🚀 Launch faster than ever',
+      badge: 'Launch faster than ever',
       title: 'Generate your launch plan',
       titleHighlight: 'in 5 minutes',
       subtitle: 'Answer 12 intelligent questions and get a complete roadmap, marketing strategy, and custom KPIs for your product.',
-      ctaPrimary: 'Get started for free',
-      ctaSecondary: 'See a demo',
-      footnote: '✅ No credit card required • Instant results • Shareable'
+      ctaPrimary: 'Get Started',
+      ctaSecondary: 'Discover',
+      demoLink: 'Watch a demo',
+      footnote: 'No credit card required • Instant results • Shareable'
     },
     stats: {
       generated: 'Plans generated',
@@ -137,6 +162,29 @@ export const landingTranslations = {
       title: 'Launch your product with confidence',
       subtitle: 'Join the founders who gained time and clarity with VelocityLaunch',
       button: 'Get started for free →'
+    },
+    hiw: {
+      eyebrow: 'Guide',
+      title: 'How VelocityLaunch works',
+      subtitle: 'From idea to complete launch plan: discover the 3 steps that turn your answers into an actionable roadmap.',
+      meta: '3 steps · 5 minutes · Free to start',
+      valuesTitle: 'Built for founders in a hurry',
+      valuesSubtitle: 'A simple, fast and serious approach to frame your launch',
+      value1: { title: 'Fast', desc: 'A complete plan generated in under 5 minutes, not 5 hours.' },
+      value2: { title: 'Smart', desc: 'Recommendations tailored to your market and stage.' },
+      value3: { title: 'Custom', desc: 'Roadmap, budget and KPIs calculated from your own answers.' },
+      value4: { title: 'Actionable', desc: 'Export, share and track your plan starting today.' },
+      step1detail: 'Twelve targeted questions about your product, market and resources are enough to frame a solid launch.',
+      step2detail: 'Our engine cross-references your answers with hundreds of launch patterns to build a realistic, sprint-by-sprint roadmap.',
+      step3detail: 'Get a share-ready PDF, an exportable roadmap and custom tracking KPIs.',
+      galleryTitle: 'A glimpse of the experience',
+      gallerySubtitle: 'What you actually get, at every step of your launch',
+      trustedTitle: 'Trusted by founders',
+      trustedSubtitle: 'Discover why 2500+ entrepreneurs trust VelocityLaunch',
+      faqTitle: 'Frequently asked questions',
+      ctaTitle: 'Ready to see your plan take shape?',
+      ctaSubtitle: 'Start the questionnaire now, your complete roadmap is 5 minutes away.',
+      ctaButton: 'Start now'
     }
   }
 }

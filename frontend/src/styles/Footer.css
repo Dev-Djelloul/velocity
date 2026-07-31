@@ -1,6 +1,6 @@
 .footer {
-  background: linear-gradient(180deg, var(--color-dashboard) 0%, var(--color-bg-primary) 100%);
-  border-top: 1px solid rgba(16, 185, 129, 0.2);
+  background: var(--color-bg-primary);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
   padding: 4rem 2rem 2rem;
   margin-top: 6rem;
 }
@@ -14,15 +14,8 @@
   margin-bottom: 3rem;
 }
 
-.footer-section h3 {
-  font-size: var(--font-size-xl);
-  color: var(--color-text-primary);
+.footer-section .brand-lockup {
   margin-bottom: 0.75rem;
-  font-family: "Faster One", system-ui;
-  background: linear-gradient(135deg, var(--color-text-primary), var(--color-accent-light));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
 }
 
 .footer-section h4 {
@@ -48,16 +41,35 @@
   gap: 0.75rem;
 }
 
-.footer-section a {
+.footer-section li {
+  display: flex;
+  align-items: center;
+}
+
+.footer-section a,
+.footer-link {
   color: var(--color-text-secondary);
   text-decoration: none;
   font-size: var(--font-size-sm);
+  line-height: 1.25rem;
+  min-height: 44px;
   transition: all 0.2s ease;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.footer-section a:hover {
-  color: var(--color-accent);
+.footer-link {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.footer-section a:hover,
+.footer-link:hover {
+  color: var(--color-primary);
   transform: translateX(2px);
 }
 
@@ -73,7 +85,7 @@
   height: 40px;
   border-radius: 8px;
   background: var(--color-bg-tertiary);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(145, 132, 217, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -88,38 +100,12 @@
   transform: translateY(-2px);
 }
 
-/* CTA Section */
-.footer-cta {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-  border-radius: var(--border-radius);
-  padding: 1.5rem;
-}
-
-.btn-footer {
-  background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
-  color: var(--color-bg-primary);
-  border: none;
-  padding: 0.75rem 1.5rem;
-  border-radius: 6px;
-  font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  width: 100%;
-}
-
-.btn-footer:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
-}
-
 /* Footer Bottom */
 .footer-bottom {
   max-width: 1400px;
   margin: 0 auto;
   padding-top: 2rem;
-  border-top: 1px solid rgba(16, 185, 129, 0.1);
+  border-top: 1px solid rgba(145, 132, 217, 0.1);
   text-align: center;
 }
 
@@ -133,6 +119,11 @@
   margin-bottom: 0;
 }
 
+.footer-brand-highlight {
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .footer {
@@ -144,7 +135,8 @@
     gap: 2rem;
   }
 
-  .footer-cta {
-    grid-column: 1 / -1;
+  /* Clears the floating scroll-to-top button so it doesn't cover the copyright lines */
+  .footer-bottom {
+    padding-bottom: 3.5rem;
   }
 }

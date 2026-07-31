@@ -24,7 +24,7 @@
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
   padding-bottom: var(--spacing-lg);
-  border-bottom: 1px solid rgba(16, 185, 129, 0.1);
+  border-bottom: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .roadmap-timeline {
@@ -35,7 +35,7 @@
 
 .sprint-item {
   background: var(--color-bg-tertiary);
-  border: 1px solid rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(145, 132, 217, 0.15);
   border-left: 3px solid var(--color-accent);
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-md);
@@ -44,7 +44,7 @@
 
 .sprint-item:hover {
   border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 12px rgba(145, 132, 217, 0.2);
 }
 
 .sprint-header {
@@ -90,6 +90,10 @@
 
 .sprint-risks strong {
   color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  vertical-align: middle;
 }
 
 .sprint-stories {
@@ -104,11 +108,11 @@
   background: var(--color-bg-primary);
   padding: var(--spacing-sm);
   border-radius: 4px;
-  border: 1px solid rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(145, 132, 217, 0.08);
 }
 
 .story-id {
-  background: rgba(16, 185, 129, 0.15);
+  background: rgba(145, 132, 217, 0.15);
   color: var(--color-accent);
   padding: var(--spacing-xs) var(--spacing-sm);
   border-radius: 3px;

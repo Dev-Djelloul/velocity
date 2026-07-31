@@ -1,42 +1,42 @@
 import { useState } from 'react'
-import VelocityLaunchLogo from './VelocityLaunchLogo'
 import DemoModal from './DemoModal'
+import { IconClipboard, IconTarget, IconBarChart, IconTrendingUp, IconSparkle, IconDownload } from './Icons'
 import { t } from '../lib/i18n'
 import { tLanding } from '../lib/landingI18n'
 import '../styles/Landing.css'
 
-export default function Landing({ lang, onStartClick, onLoadDemo }) {
+export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClick }) {
   const [hoveredFeature, setHoveredFeature] = useState(null)
   const [showDemo, setShowDemo] = useState(false)
 
   const features = [
     {
-      icon: '📋',
+      Icon: IconClipboard,
       title: tLanding(lang, 'features.plan5min.title'),
       desc: tLanding(lang, 'features.plan5min.desc')
     },
     {
-      icon: '🎯',
+      Icon: IconTarget,
       title: tLanding(lang, 'features.roadmap.title'),
       desc: tLanding(lang, 'features.roadmap.desc')
     },
     {
-      icon: '📊',
+      Icon: IconBarChart,
       title: tLanding(lang, 'features.marketing.title'),
       desc: tLanding(lang, 'features.marketing.desc')
     },
     {
-      icon: '📈',
+      Icon: IconTrendingUp,
       title: tLanding(lang, 'features.kpis.title'),
       desc: tLanding(lang, 'features.kpis.desc')
     },
     {
-      icon: '🤖',
+      Icon: IconSparkle,
       title: tLanding(lang, 'features.ai.title'),
       desc: tLanding(lang, 'features.ai.desc')
     },
     {
-      icon: '⚡',
+      Icon: IconDownload,
       title: tLanding(lang, 'features.export.title'),
       desc: tLanding(lang, 'features.export.desc')
     }
@@ -53,22 +53,21 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
     {
       quote: tLanding(lang, 'testimonials.testimonial1.quote'),
       author: tLanding(lang, 'testimonials.testimonial1.author'),
-      role: tLanding(lang, 'testimonials.testimonial1.role'),
-      avatar: '👩‍💼'
+      role: tLanding(lang, 'testimonials.testimonial1.role')
     },
     {
       quote: tLanding(lang, 'testimonials.testimonial2.quote'),
       author: tLanding(lang, 'testimonials.testimonial2.author'),
-      role: tLanding(lang, 'testimonials.testimonial2.role'),
-      avatar: '👨‍💼'
+      role: tLanding(lang, 'testimonials.testimonial2.role')
     },
     {
       quote: tLanding(lang, 'testimonials.testimonial3.quote'),
       author: tLanding(lang, 'testimonials.testimonial3.author'),
-      role: tLanding(lang, 'testimonials.testimonial3.role'),
-      avatar: '👩‍💻'
+      role: tLanding(lang, 'testimonials.testimonial3.role')
     }
   ]
+
+  const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
   return (
     <div className="landing">
@@ -76,6 +75,7 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       <section className="hero">
         <div className="hero-content">
           <div className="hero-badge">
+            <span className="hero-badge-dot" />
             {tLanding(lang, 'hero.badge')}
           </div>
 
@@ -93,24 +93,18 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
               {tLanding(lang, 'hero.ctaPrimary')}
               <span className="arrow">→</span>
             </button>
-            <button className="btn-cta-secondary" onClick={() => setShowDemo(true)}>
+            <button className="btn-cta-secondary" onClick={onDiscoverClick}>
               {tLanding(lang, 'hero.ctaSecondary')}
             </button>
           </div>
 
           <p className="hero-footnote">
             {tLanding(lang, 'hero.footnote')}
+            {' '}•{' '}
+            <button className="link-demo" onClick={() => setShowDemo(true)}>
+              {tLanding(lang, 'hero.demoLink')}
+            </button>
           </p>
-        </div>
-
-        <div className="hero-visual">
-          <div className="hero-card">
-            <VelocityLaunchLogo width={80} height={80} animated={true} />
-            <div className="hero-card-text">
-              <h3>VelocityLaunch</h3>
-              <p>Launch Intelligence Platform</p>
-            </div>
-          </div>
         </div>
       </section>
 
@@ -127,7 +121,7 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       </section>
 
       {/* Features Grid */}
-      <section className="features-section">
+      <section className="features-section" id="features">
         <div className="section-header">
           <h2>{tLanding(lang, 'features.title')}</h2>
           <p>{tLanding(lang, 'features.subtitle')}</p>
@@ -141,7 +135,7 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
               onMouseEnter={() => setHoveredFeature(i)}
               onMouseLeave={() => setHoveredFeature(null)}
             >
-              <div className="feature-icon">{feature.icon}</div>
+              <div className="feature-icon"><feature.Icon width={24} height={24} /></div>
               <h3>{feature.title}</h3>
               <p>{feature.desc}</p>
             </div>
@@ -150,7 +144,7 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
       </section>
 
       {/* How It Works */}
-      <section className="how-it-works">
+      <section className="how-it-works" id="how-it-works">
         <div className="section-header">
           <h2>{tLanding(lang, 'howItWorks.title')}</h2>
           <p>{tLanding(lang, 'howItWorks.subtitle')}</p>
@@ -173,6 +167,11 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
             <p>{tLanding(lang, 'howItWorks.step3.desc')}</p>
           </div>
         </div>
+
+        <button className="link-demo how-it-works-link" onClick={onDiscoverClick}>
+          {lang === 'fr' ? 'Voir le guide complet' : 'See the full guide'}
+          <span className="arrow">→</span>
+        </button>
       </section>
 
       {/* Testimonials */}
@@ -187,7 +186,7 @@ export default function Landing({ lang, onStartClick, onLoadDemo }) {
             <div key={i} className="testimonial-card">
               <div className="testimonial-quote">"{testimonial.quote}"</div>
               <div className="testimonial-author">
-                <span className="testimonial-avatar">{testimonial.avatar}</span>
+                <span className="testimonial-avatar">{initials(testimonial.author)}</span>
                 <div>
                   <div className="testimonial-name">{testimonial.author}</div>
                   <div className="testimonial-role">{testimonial.role}</div>

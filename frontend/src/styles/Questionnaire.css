@@ -4,7 +4,7 @@
   padding: 2rem;
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%);
   border-radius: var(--border-radius);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(145, 132, 217, 0.2);
   backdrop-filter: blur(10px);
 }
 
@@ -32,7 +32,7 @@
   left: 50%;
   width: 100%;
   height: 2px;
-  background: rgba(16, 185, 129, 0.2);
+  background: rgba(145, 132, 217, 0.2);
   z-index: -1;
 }
 
@@ -50,7 +50,7 @@
   height: 48px;
   border-radius: 50%;
   background: var(--color-bg-tertiary);
-  border: 2px solid rgba(16, 185, 129, 0.3);
+  border: 2px solid rgba(145, 132, 217, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -64,7 +64,7 @@
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
   border-color: var(--color-accent);
   color: var(--color-bg-primary);
-  box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 0 16px rgba(145, 132, 217, 0.4);
 }
 
 .step.completed .step-num {
@@ -89,7 +89,7 @@
 /* Form Section */
 .form-section {
   background: var(--color-dashboard);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  border: 1px solid rgba(145, 132, 217, 0.2);
   border-radius: var(--border-radius);
   padding: 2.5rem;
   margin-bottom: 2rem;
@@ -151,7 +151,7 @@
 .field input[type="text"],
 .field textarea {
   background: var(--color-bg-tertiary);
-  border: 2px solid rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(145, 132, 217, 0.2);
   color: var(--color-text-primary);
   padding: 1rem 1.25rem;
   border-radius: 8px;
@@ -170,7 +170,7 @@
   outline: none;
   border-color: var(--color-accent);
   background: var(--color-bg-secondary);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 3px rgba(145, 132, 217, 0.1);
 }
 
 .field textarea {
@@ -181,7 +181,7 @@
 /* Select Styles */
 .field select {
   background: var(--color-bg-tertiary);
-  border: 2px solid rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(145, 132, 217, 0.2);
   color: var(--color-text-primary);
   padding: 1rem 1.25rem;
   border-radius: 8px;
@@ -204,7 +204,7 @@
   outline: none;
   border-color: var(--color-accent);
   background-color: var(--color-bg-secondary);
-  box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  box-shadow: 0 0 0 3px rgba(145, 132, 217, 0.1);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2310b981' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1.25rem center;
@@ -227,7 +227,7 @@
   padding: 0.75rem 1.25rem;
   border-radius: 20px;
   background: var(--color-bg-tertiary);
-  border: 2px solid rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(145, 132, 217, 0.2);
   color: var(--color-text-secondary);
   cursor: pointer;
   font-weight: var(--font-weight-medium);
@@ -238,14 +238,14 @@
 .chip:hover {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(145, 132, 217, 0.05);
 }
 
 .chip.active {
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
   border-color: var(--color-accent);
   color: var(--color-bg-primary);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(145, 132, 217, 0.3);
 }
 
 /* Button Group */
@@ -271,12 +271,12 @@
 .btn-primary {
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
   color: var(--color-bg-primary);
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  box-shadow: 0 4px 12px rgba(145, 132, 217, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 16px rgba(145, 132, 217, 0.4);
 }
 
 .btn-primary:active:not(:disabled) {
@@ -291,13 +291,13 @@
 .btn-secondary {
   background: var(--color-bg-tertiary);
   color: var(--color-text-primary);
-  border: 2px solid rgba(16, 185, 129, 0.2);
+  border: 2px solid rgba(145, 132, 217, 0.2);
 }
 
 .btn-secondary:hover:not(:disabled) {
   border-color: var(--color-accent);
   color: var(--color-accent);
-  background: rgba(16, 185, 129, 0.05);
+  background: rgba(145, 132, 217, 0.05);
 }
 
 .btn-secondary:disabled {
