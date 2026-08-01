@@ -185,7 +185,9 @@ html, body, #root {
   box-shadow: 0 4px 12px rgba(145, 132, 217, 0.3);
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .btn-primary:hover:not(:disabled) {
@@ -210,7 +212,9 @@ html, body, #root {
   transition: all 0.2s ease;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .btn-secondary:hover:not(:disabled) {
@@ -432,7 +436,7 @@ h1, h2, h3, h4, h5, h6 {
 .brand-lockup {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0;
 }
 
 /* Wordmark: geometric logomark fused with "elocity" + gradient "Launch" */
