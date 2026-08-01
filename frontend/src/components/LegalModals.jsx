@@ -1,104 +1,105 @@
 import InfoModal from './InfoModal'
+import { t } from '../lib/i18n'
 import { IconLock, IconFileText, IconCookie } from './Icons'
 
 const CONTACT_EMAIL = 'contact@digitalblueskye.com'
 
-export function PrivacyModal({ onClose }) {
+export function PrivacyModal({ lang, onClose }) {
   return (
-    <InfoModal icon={<IconLock width={26} height={26} />} title="Politique de confidentialité" onClose={onClose}>
+    <InfoModal icon={<IconLock width={26} height={26} />} title={t(lang, 'modals.privacy.title')} onClose={onClose}>
       <section>
-        <p>Dernière mise à jour : juillet 2026. VelocityLaunch accorde une attention particulière à la confidentialité de vos données.</p>
+        <p>{t(lang, 'modals.privacy.updated')}</p>
       </section>
 
       <section>
-        <h2>Données collectées</h2>
-        <p>Les réponses que vous saisissez dans le questionnaire (informations produit, marché, ressources) servent uniquement à générer votre plan de lancement. Par défaut, ces données restent stockées localement dans votre navigateur (localStorage) et ne transitent vers nos serveurs que si vous choisissez explicitement de partager un plan via un lien.</p>
+        <h2>{t(lang, 'modals.privacy.dataHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.dataText')}</p>
       </section>
 
       <section>
-        <h2>Utilisation des données</h2>
-        <p>Nous n'utilisons jamais le contenu de vos plans à des fins publicitaires ou de revente. Google Analytics est utilisé uniquement pour comprendre l'usage global du service, sans lien avec le contenu de vos plans.</p>
+        <h2>{t(lang, 'modals.privacy.usageHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.usageText')}</p>
       </section>
 
       <section>
-        <h2>Vos droits (RGPD)</h2>
+        <h2>{t(lang, 'modals.privacy.rightsHeading')}</h2>
         <ul>
-          <li><strong>Accès :</strong> vous pouvez consulter toutes les données que vous avez générées</li>
-          <li><strong>Suppression :</strong> vider votre localStorage supprime immédiatement vos données locales</li>
-          <li><strong>Portabilité :</strong> export possible à tout moment en PDF ou CSV</li>
-          <li><strong>Opposition :</strong> écrivez-nous pour toute demande spécifique</li>
+          <li><strong>{t(lang, 'modals.privacy.rightAccessLabel')}</strong> {t(lang, 'modals.privacy.rightAccessText')}</li>
+          <li><strong>{t(lang, 'modals.privacy.rightDeleteLabel')}</strong> {t(lang, 'modals.privacy.rightDeleteText')}</li>
+          <li><strong>{t(lang, 'modals.privacy.rightPortabilityLabel')}</strong> {t(lang, 'modals.privacy.rightPortabilityText')}</li>
+          <li><strong>{t(lang, 'modals.privacy.rightOppositionLabel')}</strong> {t(lang, 'modals.privacy.rightOppositionText')}</li>
         </ul>
       </section>
 
       <section>
-        <h2>Contact</h2>
-        <p>Pour toute question relative à vos données : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+        <h2>{t(lang, 'modals.privacy.contactHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.contactText')} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
       </section>
 
-      <p className="info-modal-note">Ce document est fourni à titre indicatif pour un projet en beta. Il ne remplace pas un avis juridique et sera précisé avant toute mise en production commerciale.</p>
+      <p className="info-modal-note">{t(lang, 'modals.privacy.note')}</p>
     </InfoModal>
   )
 }
 
-export function TermsModal({ onClose }) {
+export function TermsModal({ lang, onClose }) {
   return (
-    <InfoModal icon={<IconFileText width={26} height={26} />} title="Conditions d'utilisation" onClose={onClose}>
+    <InfoModal icon={<IconFileText width={26} height={26} />} title={t(lang, 'modals.terms.title')} onClose={onClose}>
       <section>
-        <p>Dernière mise à jour : juillet 2026. En utilisant VelocityLaunch, vous acceptez les conditions suivantes.</p>
+        <p>{t(lang, 'modals.terms.updated')}</p>
       </section>
 
       <section>
-        <h2>Le service</h2>
-        <p>VelocityLaunch génère des recommandations (roadmap, stratégie marketing, KPIs) à partir des réponses que vous fournissez. Ces recommandations sont des points de départ, pas des conseils professionnels garantis : à vous de les adapter à votre contexte réel.</p>
+        <h2>{t(lang, 'modals.terms.serviceHeading')}</h2>
+        <p>{t(lang, 'modals.terms.serviceText')}</p>
       </section>
 
       <section>
-        <h2>Utilisation acceptable</h2>
+        <h2>{t(lang, 'modals.terms.usageHeading')}</h2>
         <ul>
-          <li>Le service est fourni "tel quel", sans garantie de résultat commercial</li>
-          <li>Vous restez propriétaire du contenu de vos plans</li>
-          <li>Toute tentative d'abus, de scraping massif ou d'attaque du service est interdite</li>
+          <li>{t(lang, 'modals.terms.usageItem1')}</li>
+          <li>{t(lang, 'modals.terms.usageItem2')}</li>
+          <li>{t(lang, 'modals.terms.usageItem3')}</li>
         </ul>
       </section>
 
       <section>
-        <h2>Disponibilité</h2>
-        <p>VelocityLaunch est en beta gratuite : le service peut évoluer, et certaines fonctionnalités peuvent être ajustées sans préavis pendant cette phase.</p>
+        <h2>{t(lang, 'modals.terms.availabilityHeading')}</h2>
+        <p>{t(lang, 'modals.terms.availabilityText')}</p>
       </section>
 
       <section>
-        <h2>Contact</h2>
-        <p>Pour toute question sur ces conditions : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+        <h2>{t(lang, 'modals.terms.contactHeading')}</h2>
+        <p>{t(lang, 'modals.terms.contactText')} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
       </section>
 
-      <p className="info-modal-note">Ce document est fourni à titre indicatif pour un projet en beta. Il ne remplace pas un avis juridique et sera précisé avant toute mise en production commerciale.</p>
+      <p className="info-modal-note">{t(lang, 'modals.terms.note')}</p>
     </InfoModal>
   )
 }
 
-export function CookiesModal({ onClose }) {
+export function CookiesModal({ lang, onClose }) {
   return (
-    <InfoModal icon={<IconCookie width={26} height={26} />} title="Politique de cookies" onClose={onClose}>
+    <InfoModal icon={<IconCookie width={26} height={26} />} title={t(lang, 'modals.cookies.title')} onClose={onClose}>
       <section>
-        <p>VelocityLaunch utilise le minimum de cookies et de stockage nécessaire au fonctionnement du service.</p>
+        <p>{t(lang, 'modals.cookies.intro')}</p>
       </section>
 
       <section>
-        <h2>Stockage local (essentiel)</h2>
-        <p>Votre langue préférée, vos brouillons et vos plans générés sont conservés dans le localStorage de votre navigateur. Ce stockage n'est pas un cookie tiers : il reste sur votre appareil et n'est jamais transmis sans action de votre part.</p>
+        <h2>{t(lang, 'modals.cookies.storageHeading')}</h2>
+        <p>{t(lang, 'modals.cookies.storageText')}</p>
       </section>
 
       <section>
-        <h2>Mesure d'audience</h2>
-        <p>Google Analytics dépose des cookies de mesure d'audience pour comprendre l'utilisation globale du service (pages visitées, provenance). Aucune donnée personnelle issue de vos plans n'y est associée.</p>
+        <h2>{t(lang, 'modals.cookies.analyticsHeading')}</h2>
+        <p>{t(lang, 'modals.cookies.analyticsText')}</p>
       </section>
 
       <section>
-        <h2>Gérer vos cookies</h2>
-        <p>Vous pouvez à tout moment bloquer les cookies de mesure d'audience via les réglages de votre navigateur, sans impact sur le fonctionnement du générateur de plan.</p>
+        <h2>{t(lang, 'modals.cookies.manageHeading')}</h2>
+        <p>{t(lang, 'modals.cookies.manageText')}</p>
       </section>
 
-      <p className="info-modal-note">Ce document est fourni à titre indicatif pour un projet en beta. Il ne remplace pas un avis juridique et sera précisé avant toute mise en production commerciale.</p>
+      <p className="info-modal-note">{t(lang, 'modals.cookies.note')}</p>
     </InfoModal>
   )
 }

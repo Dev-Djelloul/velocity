@@ -118,7 +118,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
   }
 
   const handleSaveDraft = () => {
-    saveDraft(formData, `Brouillon - ${formData.product.name || 'Sans titre'}`)
+    saveDraft(formData, `${t(lang, 'nav.draftNamePrefix')} - ${formData.product.name || t(lang, 'nav.draftUntitled')}`)
     setDraftSaved(true)
     setTimeout(() => setDraftSaved(false), 2000)
   }

@@ -210,15 +210,15 @@ export default function App() {
       )}
 
       {activeModal === 'security' && <SecurityPage lang={lang} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'about' && <AboutModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'careers' && <CareersModal onClose={() => setActiveModal(null)} onContactClick={() => setActiveModal('contact')} />}
-      {activeModal === 'contact' && <ContactModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'pricing' && <PricingModal onClose={() => setActiveModal(null)} onContactClick={() => setActiveModal('contact')} />}
-      {activeModal === 'changelog' && <ChangelogModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'roadmap' && <RoadmapModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'privacy' && <PrivacyModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'terms' && <TermsModal onClose={() => setActiveModal(null)} />}
-      {activeModal === 'cookies' && <CookiesModal onClose={() => setActiveModal(null)} />}
+      {activeModal === 'about' && <AboutModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'careers' && <CareersModal lang={lang} onClose={() => setActiveModal(null)} onContactClick={() => setActiveModal('contact')} />}
+      {activeModal === 'contact' && <ContactModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'pricing' && <PricingModal lang={lang} onClose={() => setActiveModal(null)} onContactClick={() => setActiveModal('contact')} />}
+      {activeModal === 'changelog' && <ChangelogModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'roadmap' && <RoadmapModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'privacy' && <PrivacyModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'terms' && <TermsModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'cookies' && <CookiesModal lang={lang} onClose={() => setActiveModal(null)} />}
     </div>
   )
 }

@@ -1,68 +1,69 @@
 import InfoModal from './InfoModal'
+import { t } from '../lib/i18n'
 import { IconLock, IconShield, IconClipboard, IconSave, IconSearch, IconSmartphone, IconHelpCircle, IconCheckCircle } from './Icons'
 
 export default function SecurityPage({ lang, onClose }) {
   return (
-    <InfoModal icon={<IconLock width={26} height={26} />} title="Sécurité et Confidentialité" onClose={onClose}>
+    <InfoModal icon={<IconLock width={26} height={26} />} title={t(lang, 'modals.security.title')} onClose={onClose}>
       <section>
-        <h2>Protégez vos données</h2>
-        <p>Chez VelocityLaunch, la sécurité de vos données est notre priorité absolue. Nous mettons en place les meilleures pratiques pour protéger vos informations.</p>
+        <h2>{t(lang, 'modals.security.protectHeading')}</h2>
+        <p>{t(lang, 'modals.security.protectText')}</p>
       </section>
 
       <section>
-        <h2><IconShield width={20} height={20} /> Chiffrement End-to-End</h2>
-        <p>Toutes les données transmises entre votre navigateur et nos serveurs sont chiffrées en utilisant le protocole HTTPS avec TLS 1.2 ou supérieur. Vos plans ne peuvent être interceptés.</p>
+        <h2><IconShield width={20} height={20} /> {t(lang, 'modals.security.encryptionHeading')}</h2>
+        <p>{t(lang, 'modals.security.encryptionText')}</p>
       </section>
 
       <section>
-        <h2><IconClipboard width={20} height={20} /> Conformité RGPD</h2>
-        <p>VelocityLaunch est entièrement conforme au Règlement Général sur la Protection des Données (RGPD) de l'UE.</p>
+        <h2><IconClipboard width={20} height={20} /> {t(lang, 'modals.security.gdprHeading')}</h2>
+        <p>{t(lang, 'modals.security.gdprText')}</p>
         <ul>
-          <li><strong>Droit d'accès:</strong> Vous pouvez accéder à tous vos données générées</li>
-          <li><strong>Droit à l'oubli:</strong> Vous pouvez demander la suppression complète de vos données</li>
-          <li><strong>Portabilité:</strong> Vous pouvez exporter vos plans à tout moment</li>
-          <li><strong>Transparence:</strong> Nous vous informons exactement de comment vos données sont utilisées</li>
+          <li><strong>{t(lang, 'modals.security.gdprAccessLabel')}</strong> {t(lang, 'modals.security.gdprAccessText')}</li>
+          <li><strong>{t(lang, 'modals.security.gdprForgetLabel')}</strong> {t(lang, 'modals.security.gdprForgetText')}</li>
+          <li><strong>{t(lang, 'modals.security.gdprPortabilityLabel')}</strong> {t(lang, 'modals.security.gdprPortabilityText')}</li>
+          <li><strong>{t(lang, 'modals.security.gdprTransparencyLabel')}</strong> {t(lang, 'modals.security.gdprTransparencyText')}</li>
         </ul>
       </section>
 
       <section>
-        <h2><IconSave width={20} height={20} /> Stockage Local</h2>
-        <p>Par défaut, vos plans sont stockés localement dans votre navigateur (localStorage). Nous ne conservons aucune donnée sur nos serveurs sans votre consentement explicite.</p>
+        <h2><IconSave width={20} height={20} /> {t(lang, 'modals.security.storageHeading')}</h2>
+        <p>{t(lang, 'modals.security.storageText')}</p>
       </section>
 
       <section>
-        <h2><IconSearch width={20} height={20} /> Pas de Tracking Invasif</h2>
-        <p>Nous utilisons uniquement Google Analytics pour comprendre l'utilisation globale du service. Nous ne trackons pas les données personnelles ou le contenu de vos plans.</p>
+        <h2><IconSearch width={20} height={20} /> {t(lang, 'modals.security.trackingHeading')}</h2>
+        <p>{t(lang, 'modals.security.trackingText')}</p>
       </section>
 
       <section>
-        <h2><IconShield width={20} height={20} /> Sécurité de l'Infrastructure</h2>
+        <h2><IconShield width={20} height={20} /> {t(lang, 'modals.security.infraHeading')}</h2>
         <ul>
-          <li>Hébergement sur Cloudflare Workers avec sauvegardes automatiques</li>
-          <li>Audit de sécurité régulier par des experts externes</li>
-          <li>Prévention des attaques DDoS et injection SQL</li>
-          <li>Certificats SSL/TLS à jour et validés</li>
+          <li>{t(lang, 'modals.security.infraItem1')}</li>
+          <li>{t(lang, 'modals.security.infraItem2')}</li>
+          <li>{t(lang, 'modals.security.infraItem3')}</li>
+          <li>{t(lang, 'modals.security.infraItem4')}</li>
         </ul>
       </section>
 
       <section>
-        <h2><IconSmartphone width={20} height={20} /> Partage Sécurisé</h2>
-        <p>Lorsque vous partagez un plan via lien privé:</p>
+        <h2><IconSmartphone width={20} height={20} /> {t(lang, 'modals.security.sharingHeading')}</h2>
+        <p>{t(lang, 'modals.security.sharingIntro')}</p>
         <ul>
-          <li>Un ID unique et non devinable est généré</li>
-          <li>Le lien expire automatiquement après 30 jours</li>
-          <li>Seuls ceux ayant le lien peuvent accéder</li>
-          <li>Les liens sont lecture seule</li>
+          <li>{t(lang, 'modals.security.sharingItem1')}</li>
+          <li>{t(lang, 'modals.security.sharingItem2')}</li>
+          <li>{t(lang, 'modals.security.sharingItem3')}</li>
+          <li>{t(lang, 'modals.security.sharingItem4')}</li>
         </ul>
       </section>
 
       <section>
-        <h2><IconHelpCircle width={20} height={20} /> Questions?</h2>
-        <p>Pour toute question concernant votre confidentialité, contactez-nous à <a href="mailto:security@digitalblueskye.com"><strong>security@digitalblueskye.com</strong></a></p>
+        <h2><IconHelpCircle width={20} height={20} /> {t(lang, 'modals.security.questionsHeading')}</h2>
+        <p>{t(lang, 'modals.security.questionsText')} <a href="mailto:security@digitalblueskye.com"><strong>security@digitalblueskye.com</strong></a></p>
       </section>
 
       <div className="info-badge">
-        <p><IconCheckCircle width={18} height={18} /> Nous nous engageons à protéger votre vie privée</p>
+        <p><IconCheckCircle width={18} height={18} /> {t(lang, 'modals.security.badge')}</p>
       </div>
     </InfoModal>
   )

@@ -41,24 +41,24 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
 
   if (plans.length === 0) {
     return (
-      <InfoModal icon={<IconClipboard width={26} height={26} />} title="Historique des plans" onClose={onClose}>
-        <p className="plans-empty-state">Vous n'avez pas encore généré de plan. Commencez par en créer un !</p>
+      <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.emptyTitle')} onClose={onClose}>
+        <p className="plans-empty-state">{t(lang, 'plans.emptyText')}</p>
       </InfoModal>
     )
   }
 
   return (
     <>
-    <InfoModal icon={<IconClipboard width={26} height={26} />} title="Vos plans de lancement" onClose={onClose} wide>
-      <p className="plans-intro">Gérez vos plans générés et partagez-les avec votre équipe</p>
+    <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.title')} onClose={onClose} wide>
+      <p className="plans-intro">{t(lang, 'plans.intro')}</p>
 
       <div className="plans-list">
         {plans.map(plan => (
           <div key={plan.id} className="plan-item">
             <div className="plan-info">
-              <h3>{plan.product?.name || 'Plan sans titre'}</h3>
+              <h3>{plan.product?.name || t(lang, 'plans.untitled')}</h3>
               <p className="plan-meta">
-                Créé le {formatDateTime(plan.savedAt, lang)}
+                {t(lang, 'plans.createdAtPrefix')} {formatDateTime(plan.savedAt, lang)}
               </p>
               {plan.classification && (
                 <p className="plan-type">{plan.classification}</p>
@@ -67,13 +67,13 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
 
             <div className="plan-actions">
               <button className="btn-secondary" onClick={() => handleLoad(plan)}>
-                Charger
+                {t(lang, 'plans.load')}
               </button>
               <button className="btn-secondary" onClick={() => handleShare(plan.id)}>
-                Partager
+                {t(lang, 'plans.share')}
               </button>
               <button className="btn-plan-danger" onClick={() => setDeleteTarget(plan)}>
-                Supprimer
+                {t(lang, 'plans.delete')}
               </button>
             </div>
           </div>
@@ -82,17 +82,17 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
 
       {shareLink && (
         <div className="share-section">
-          <h3><IconDownload width={16} height={16} /> Lien de partage</h3>
+          <h3><IconDownload width={16} height={16} /> {t(lang, 'plans.shareLinkHeading')}</h3>
           <div className="share-link-group">
             <input type="text" value={shareLink.url} readOnly />
             <button
               className="btn-secondary"
               onClick={() => copyToClipboard(shareLink.url)}
             >
-              {copiedShareId === shareLink.url ? <><IconCheckCircle width={14} height={14} /> Copié</> : 'Copier'}
+              {copiedShareId === shareLink.url ? <><IconCheckCircle width={14} height={14} /> {t(lang, 'plans.copied')}</> : t(lang, 'plans.copy')}
             </button>
           </div>
-          <p className="share-note">Ce lien expire dans 30 jours</p>
+          <p className="share-note">{t(lang, 'plans.shareExpiry')}</p>
         </div>
       )}
     </InfoModal>
@@ -101,11 +101,11 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
       <div className="confirm-modal-backdrop" onClick={() => setDeleteTarget(null)}>
         <div className="confirm-modal" onClick={e => e.stopPropagation()}>
           <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
-          <h3>Supprimer ce plan ?</h3>
-          <p><strong>{deleteTarget.product?.name || 'Ce plan'}</strong> sera définitivement supprimé. Cette action est irréversible.</p>
+          <h3>{t(lang, 'plans.deleteConfirmTitle')}</h3>
+          <p><strong>{deleteTarget.product?.name || t(lang, 'plans.defaultPlanName')}</strong> {t(lang, 'plans.deleteConfirmSuffix')}</p>
           <div className="confirm-modal-actions">
-            <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>Annuler</button>
-            <button className="btn-danger" onClick={confirmDelete}>Supprimer</button>
+            <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>{t(lang, 'plans.cancel')}</button>
+            <button className="btn-danger" onClick={confirmDelete}>{t(lang, 'plans.delete')}</button>
           </div>
         </div>
       </div>

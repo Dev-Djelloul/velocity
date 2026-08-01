@@ -43,11 +43,11 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
     return (
       <div className="drafts-modal-backdrop" onClick={onClose}>
         <div className="drafts-modal" onClick={e => e.stopPropagation()}>
-          <button className="drafts-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+          <button className="drafts-modal-close" onClick={onClose} aria-label={t(lang, 'drafts.close')}>×</button>
           <div className="drafts-modal-empty">
-            <h2>Mes brouillons</h2>
-            <p className="empty-state">Aucun brouillon sauvegardé. Créez-en un pour continuer plus tard!</p>
-            <button className="btn-primary" onClick={onClose}>Fermer</button>
+            <h2>{t(lang, 'drafts.title')}</h2>
+            <p className="empty-state">{t(lang, 'drafts.emptyText')}</p>
+            <button className="btn-primary" onClick={onClose}>{t(lang, 'drafts.close')}</button>
           </div>
         </div>
       </div>
@@ -57,10 +57,10 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
   return (
     <div className="drafts-modal-backdrop" onClick={onClose}>
       <div className="drafts-modal" onClick={e => e.stopPropagation()}>
-        <button className="drafts-modal-close" onClick={onClose} aria-label="Fermer">×</button>
+        <button className="drafts-modal-close" onClick={onClose} aria-label={t(lang, 'drafts.close')}>×</button>
         <div className="drafts-modal-header">
-          <h2>Mes brouillons</h2>
-          <p>Continuez vos réponses là où vous les aviez laissées</p>
+          <h2>{t(lang, 'drafts.title')}</h2>
+          <p>{t(lang, 'drafts.subtitle')}</p>
         </div>
 
         <div className="drafts-list">
@@ -83,7 +83,7 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
                   <>
                     <h3>{draft.name}</h3>
                     <p className="draft-meta">
-                      Modifié le {formatDateTime(draft.updatedAt, lang)}
+                      {t(lang, 'drafts.updatedAtPrefix')} {formatDateTime(draft.updatedAt, lang)}
                     </p>
                   </>
                 )}
@@ -91,27 +91,27 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
 
               <div className="draft-actions">
                 <button className="btn-small" onClick={() => handleLoad(draft)}>
-                  Charger
+                  {t(lang, 'drafts.load')}
                 </button>
                 <button className="btn-small" onClick={() => {
                   setEditingId(draft.id)
                   setEditingName(draft.name)
                 }}>
-                  <IconPencil width={14} height={14} /> Renommer
+                  <IconPencil width={14} height={14} /> {t(lang, 'drafts.rename')}
                 </button>
                 <button
                   className={`btn-small danger ${deleteConfirmId === draft.id ? 'confirm' : ''}`}
                   onClick={() => handleDelete(draft.id)}
                   onBlur={() => setDeleteConfirmId(null)}
                 >
-                  {deleteConfirmId === draft.id ? 'Confirmer ?' : 'Supprimer'}
+                  {deleteConfirmId === draft.id ? t(lang, 'drafts.confirmDelete') : t(lang, 'drafts.delete')}
                 </button>
               </div>
             </div>
           ))}
         </div>
 
-        <button className="btn-secondary close-btn" onClick={onClose}>Fermer</button>
+        <button className="btn-secondary close-btn" onClick={onClose}>{t(lang, 'drafts.close')}</button>
       </div>
     </div>
   )
