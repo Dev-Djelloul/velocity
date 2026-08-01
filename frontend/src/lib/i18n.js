@@ -77,7 +77,16 @@ export const translations = {
     gantt: {
       title: 'Gantt interactif',
       subtitle: 'Glisse une story vers un autre sprint pour la replanifier',
-      dragHint: 'Astuce : fais glisser une carte vers une autre colonne pour changer son sprint.'
+      dragHint: 'Astuce : fais glisser une carte vers une autre colonne pour changer son sprint. Clique sur ▸ pour voir le détail complet.',
+      expand: 'Voir le détail',
+      collapse: 'Réduire',
+      edit: 'Modifier',
+      done: 'Terminé',
+      errors: {
+        pastSprint: 'Impossible de replanifier avant le sprint en cours.',
+        beforeDependency: 'Cette story dépend de {dep} — elle ne peut pas être planifiée avant.',
+        afterDependent: '{dep} dépend de cette story — elle ne peut pas être planifiée après.'
+      }
     },
     askChart: {
       title: 'Graphiques en langage naturel',
@@ -272,7 +281,16 @@ export const translations = {
     gantt: {
       title: 'Interactive Gantt',
       subtitle: 'Drag a story to another sprint to reschedule it',
-      dragHint: 'Tip: drag a card to another column to change its sprint.'
+      dragHint: 'Tip: drag a card to another column to change its sprint. Click ▸ to see the full detail.',
+      expand: 'View detail',
+      collapse: 'Collapse',
+      edit: 'Edit',
+      done: 'Done',
+      errors: {
+        pastSprint: 'Cannot reschedule before the current sprint.',
+        beforeDependency: 'This story depends on {dep} — it cannot be scheduled before it.',
+        afterDependent: '{dep} depends on this story — it cannot be scheduled after it.'
+      }
     },
     askChart: {
       title: 'Natural language charts',
