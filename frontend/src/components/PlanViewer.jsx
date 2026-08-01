@@ -2,15 +2,21 @@ import { useState } from 'react'
 import RoadmapCard from './RoadmapCard'
 import MarketingCard from './MarketingCard'
 import KPIDashboard from './KPIDashboard'
+import FinancialsCard from './FinancialsCard'
+import StrategyToolkitCard from './StrategyToolkitCard'
 import ExportModal from './ExportModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
+import { savePlan } from '../lib/planStorage'
 import { t } from '../lib/i18n'
+import { IconSparkle, IconCopy, IconCheckCircle } from './Icons'
 import '../styles/PlanViewer.css'
 
-export default function PlanViewer({ plan, onReset, lang }) {
+export default function PlanViewer({ plan: initialPlan, onReset, lang }) {
+  const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
+  const [summaryCopied, setSummaryCopied] = useState(false)
 
   const budgetKeyFor = (value) => {
     if (value <= 3500) return 'b2k'
@@ -32,6 +38,20 @@ export default function PlanViewer({ plan, onReset, lang }) {
     setDisabledChannels(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name])
   }
 
+  const updateRoadmap = (nextRoadmap) => {
+    const nextPlan = { ...plan, roadmap: nextRoadmap }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
+  const copySummary = async () => {
+    try {
+      await navigator.clipboard.writeText(plan.executiveSummary)
+      setSummaryCopied(true)
+      setTimeout(() => setSummaryCopied(false), 2000)
+    } catch { /* clipboard indisponible, on ignore silencieusement */ }
+  }
+
   return (
     <div className="plan-viewer">
       <div className="plan-header card">
@@ -49,6 +69,16 @@ export default function PlanViewer({ plan, onReset, lang }) {
         </div>
       </div>
 
+      {plan.executiveSummary && (
+        <div className="executive-summary card">
+          <div className="executive-summary-icon"><IconSparkle width={18} height={18} /></div>
+          <p>{plan.executiveSummary}</p>
+          <button className="executive-summary-copy" onClick={copySummary} title={t(lang, 'outputs.copySummary')}>
+            {summaryCopied ? <IconCheckCircle width={16} height={16} /> : <IconCopy width={16} height={16} />}
+          </button>
+        </div>
+      )}
+
       <div className="budget-control card">
         <label>
           {t(lang, 'outputs.totalBudget')}: <strong>{budget.toLocaleString()} €</strong>
@@ -58,9 +88,11 @@ export default function PlanViewer({ plan, onReset, lang }) {
       </div>
 
       <div className="plan-grid">
-        <RoadmapCard roadmap={plan.roadmap} lang={lang} />
+        <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} />
         <KPIDashboard kpis={plan.kpis} lang={lang} />
+        <FinancialsCard financials={plan.financials} lang={lang} />
+        <StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} />
       </div>
 
       {showExport && (

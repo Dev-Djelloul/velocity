@@ -1,0 +1,95 @@
+.strategy-card {
+  grid-column: 1 / -1;
+}
+
+.strategy-header { margin-bottom: var(--spacing-lg); }
+
+.strategy-header h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.strategy-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.swot-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.swot-quadrant {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  border-left: 3px solid transparent;
+}
+
+.swot-positive { border-left-color: var(--color-success); }
+.swot-negative { border-left-color: var(--color-warning); }
+
+.swot-quadrant-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.swot-positive .swot-quadrant-title { color: var(--color-success); }
+.swot-negative .swot-quadrant-title { color: var(--color-warning); }
+
+.swot-quadrant ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.swot-quadrant li {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  padding-left: 0.9rem;
+  position: relative;
+}
+
+.swot-quadrant li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55rem;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.positioning {
+  border-top: 1px solid rgba(145, 132, 217, 0.1);
+  padding-top: var(--spacing-lg);
+}
+
+.positioning-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-accent);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: var(--spacing-sm);
+}
+
+.positioning p {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+}

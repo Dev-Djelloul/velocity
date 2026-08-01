@@ -102,7 +102,39 @@ export const translations = {
       channel: 'Canal',
       name: 'Nom',
       unit: 'Unité',
-      baseline: 'Référence'
+      baseline: 'Référence',
+      category: 'Poste',
+      executiveSummary: 'Résumé exécutif',
+      copySummary: 'Copier le résumé',
+      summaryCopied: 'Copié !',
+      financials: {
+        title: 'Prévisionnel financier',
+        subtitle: 'Estimation simplifiée à partir de votre budget',
+        monthlyBurn: 'Dépense mensuelle',
+        runway: 'Runway',
+        months: 'mois',
+        breakEven: 'Seuil de rentabilité',
+        clients: 'clients payants',
+        breakEvenNote: (users, revenue, arpu) => `≈ ${revenue.toLocaleString()} €/mois à ${arpu} €/client`,
+        breakdown: 'Répartition du budget'
+      },
+      strategy: {
+        title: 'Boîte à outils stratégique',
+        subtitle: 'Analyse SWOT et positionnement',
+        strengths: 'Forces',
+        weaknesses: 'Faiblesses',
+        opportunities: 'Opportunités',
+        threats: 'Menaces',
+        positioning: 'Positionnement concurrentiel'
+      },
+      rollover: {
+        overdue: 'En retard',
+        markDone: 'Marquer comme fait',
+        markTodo: 'Rouvrir',
+        moveToCurrent: 'Reporter au sprint courant',
+        current: 'Sprint en cours',
+        progress: 'complété'
+      }
     },
     export: {
       title: 'Exporter le plan',
@@ -220,7 +252,39 @@ export const translations = {
       channel: 'Channel',
       name: 'Name',
       unit: 'Unit',
-      baseline: 'Baseline'
+      baseline: 'Baseline',
+      category: 'Category',
+      executiveSummary: 'Executive summary',
+      copySummary: 'Copy summary',
+      summaryCopied: 'Copied!',
+      financials: {
+        title: 'Financial forecast',
+        subtitle: 'Simplified estimate based on your budget',
+        monthlyBurn: 'Monthly burn',
+        runway: 'Runway',
+        months: 'months',
+        breakEven: 'Break-even point',
+        clients: 'paying customers',
+        breakEvenNote: (users, revenue, arpu) => `≈ €${revenue.toLocaleString()}/month at €${arpu}/customer`,
+        breakdown: 'Budget breakdown'
+      },
+      strategy: {
+        title: 'Strategy toolkit',
+        subtitle: 'SWOT analysis and positioning',
+        strengths: 'Strengths',
+        weaknesses: 'Weaknesses',
+        opportunities: 'Opportunities',
+        threats: 'Threats',
+        positioning: 'Competitive positioning'
+      },
+      rollover: {
+        overdue: 'Overdue',
+        markDone: 'Mark as done',
+        markTodo: 'Reopen',
+        moveToCurrent: 'Move to current sprint',
+        current: 'Current sprint',
+        progress: 'complete'
+      }
     },
     export: {
       title: 'Export plan',

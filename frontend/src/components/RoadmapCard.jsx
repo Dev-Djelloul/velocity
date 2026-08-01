@@ -1,11 +1,58 @@
 import { t } from '../lib/i18n'
-import { IconAlertTriangle, IconTarget, IconUser, IconCoin } from './Icons'
+import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle } from './Icons'
 import '../styles/RoadmapCard.css'
 
-export default function RoadmapCard({ roadmap, lang }) {
+const SPRINT_DAYS = 14
+
+function sprintDates(generatedAt, sprintId) {
+  const start = new Date(generatedAt || Date.now())
+  start.setDate(start.getDate() + (sprintId - 1) * SPRINT_DAYS)
+  const end = new Date(start)
+  end.setDate(end.getDate() + SPRINT_DAYS)
+  return { start, end }
+}
+
+function formatRange(start, end, lang) {
+  const locale = lang === 'en' ? 'en-US' : 'fr-FR'
+  const opts = { day: 'numeric', month: 'short' }
+  return `${start.toLocaleDateString(locale, opts)} → ${end.toLocaleDateString(locale, opts)}`
+}
+
+export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChange }) {
   if (!roadmap) return null
 
   const { sprints, totalDuration, estimatedCost } = roadmap
+  const now = new Date()
+
+  const currentSprint = sprints.find(sp => sprintDates(generatedAt, sp.sprintId).end >= now) || sprints[sprints.length - 1]
+
+  const overdue = []
+  sprints.forEach(sp => {
+    if (sp.sprintId >= currentSprint.sprintId) return
+    sp.stories.forEach(story => {
+      if (story.status !== 'done') overdue.push({ sprintId: sp.sprintId, story })
+    })
+  })
+
+  const toggleStory = (sprintId, storyId) => {
+    const nextSprints = sprints.map(sp => {
+      if (sp.sprintId !== sprintId) return sp
+      return {
+        ...sp,
+        stories: sp.stories.map(s => s.id === storyId ? { ...s, status: s.status === 'done' ? 'todo' : 'done' } : s)
+      }
+    })
+    onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
+  }
+
+  const rolloverStory = (fromSprintId, story) => {
+    const nextSprints = sprints.map(sp => {
+      if (sp.sprintId === fromSprintId) return { ...sp, stories: sp.stories.filter(s => s.id !== story.id) }
+      if (sp.sprintId === currentSprint.sprintId) return { ...sp, stories: [...sp.stories, story] }
+      return sp
+    })
+    onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
+  }
 
   return (
     <div className="roadmap-card card">
@@ -35,40 +82,76 @@ export default function RoadmapCard({ roadmap, lang }) {
         </div>
       </div>
 
+      {overdue.length > 0 && (
+        <div className="rollover-banner">
+          <div className="rollover-banner-title">
+            <IconAlertTriangle width={14} height={14} /> {overdue.length} · {t(lang, 'outputs.rollover.overdue')}
+          </div>
+          <div className="rollover-list">
+            {overdue.map(({ sprintId, story }) => (
+              <div key={story.id} className="rollover-item">
+                <span><span className="story-id">{story.id}</span> {story.title}</span>
+                <button className="rollover-move-btn" onClick={() => rolloverStory(sprintId, story)}>
+                  {t(lang, 'outputs.rollover.moveToCurrent')}
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       <div className="roadmap-timeline">
-        {sprints.map((sprint, idx) => (
-          <div key={idx} className="sprint-item">
-            <div className="sprint-header">
-              <div className="sprint-number">Sprint {sprint.sprintId}</div>
-              <div className="sprint-info">
-                <span className="sprint-duration">{sprint.duration}</span>
-                <span className="sprint-cost">{sprint.estimatedCost.toLocaleString()}€</span>
-              </div>
-            </div>
+        {sprints.map((sprint, idx) => {
+          const { start, end } = sprintDates(generatedAt, sprint.sprintId)
+          const isCurrent = sprint.sprintId === currentSprint.sprintId
+          const doneEffort = sprint.stories.filter(s => s.status === 'done').reduce((s, x) => s + x.effort, 0)
+          const totalEffort = sprint.stories.reduce((s, x) => s + x.effort, 0)
 
-            {sprint.risks && sprint.risks.length > 0 && (
-              <div className="sprint-risks">
-                <strong><IconAlertTriangle width={14} height={14} /> Risques:</strong> {sprint.risks.join(', ')}
+          return (
+            <div key={idx} className={`sprint-item ${isCurrent ? 'sprint-current' : ''}`}>
+              <div className="sprint-header">
+                <div className="sprint-number">
+                  Sprint {sprint.sprintId}
+                  {isCurrent && <span className="sprint-current-tag">{t(lang, 'outputs.rollover.current')}</span>}
+                </div>
+                <div className="sprint-info">
+                  <span className="sprint-dates">{formatRange(start, end, lang)}</span>
+                  <span className="sprint-velocity">{doneEffort}/{totalEffort}pts {t(lang, 'outputs.rollover.progress')}</span>
+                  <span className="sprint-cost">{sprint.estimatedCost.toLocaleString()}€</span>
+                </div>
               </div>
-            )}
 
-            <div className="sprint-stories">
-              {sprint.stories.map((story, sidx) => (
-                <div key={sidx} className="story">
-                  <div className="story-id">{story.id}</div>
-                  <div className="story-details">
-                    <div className="story-title">{story.title}</div>
-                    <div className="story-meta">
-                      <span className="story-effort"><IconTarget width={13} height={13} /> {story.effort}pts</span>
-                      <span className="story-assignee"><IconUser width={13} height={13} /> {story.assignee}</span>
-                      <span className="story-cost"><IconCoin width={13} height={13} /> {story.cost}€</span>
+              {sprint.risks && sprint.risks.length > 0 && (
+                <div className="sprint-risks">
+                  <strong><IconAlertTriangle width={14} height={14} /> Risques:</strong> {sprint.risks.join(', ')}
+                </div>
+              )}
+
+              <div className="sprint-stories">
+                {sprint.stories.map((story, sidx) => (
+                  <div key={sidx} className={`story ${story.status === 'done' ? 'story-done' : ''}`}>
+                    <button
+                      className="story-status-toggle"
+                      onClick={() => toggleStory(sprint.sprintId, story.id)}
+                      title={t(lang, story.status === 'done' ? 'outputs.rollover.markTodo' : 'outputs.rollover.markDone')}
+                    >
+                      {story.status === 'done' ? <IconCheckCircle width={18} height={18} /> : <IconCircleDot width={18} height={18} />}
+                    </button>
+                    <div className="story-id">{story.id}</div>
+                    <div className="story-details">
+                      <div className="story-title">{story.title}</div>
+                      <div className="story-meta">
+                        <span className="story-effort"><IconTarget width={13} height={13} /> {story.effort}pts</span>
+                        <span className="story-assignee"><IconUser width={13} height={13} /> {story.assignee}</span>
+                        <span className="story-cost"><IconCoin width={13} height={13} /> {story.cost}€</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

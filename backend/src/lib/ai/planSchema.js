@@ -63,9 +63,52 @@ const KPI_SCHEMA = {
   required: ['name', 'formula', 'unit', 'target', 'baseline']
 }
 
+const COST_LINE_SCHEMA = {
+  type: 'object',
+  properties: {
+    category: { type: 'string', description: 'ex: Développement, Marketing, Design, Opérations' },
+    amount: { type: 'integer', description: 'Montant en euros' },
+    pct: { type: 'integer', description: 'Pourcentage du budget total (0-100)' }
+  },
+  required: ['category', 'amount', 'pct']
+}
+
+const FINANCIALS_SCHEMA = {
+  type: 'object',
+  description: 'Prévisionnel financier simplifié, chiffré à partir du budget et du modèle économique déclarés',
+  properties: {
+    monthlyBurn: { type: 'integer', description: 'Dépense mensuelle moyenne en euros sur la durée du plan' },
+    runwayMonths: { type: 'number', description: 'Nombre de mois que couvre le budget déclaré à ce rythme de dépense' },
+    assumedArpu: { type: 'integer', description: 'Revenu mensuel moyen par utilisateur/client supposé, en euros, réaliste pour ce type de produit et ce marché' },
+    breakEvenUsers: { type: 'integer', description: 'Nombre de clients payants nécessaires pour couvrir le burn mensuel, au prix (ARPU) supposé' },
+    breakEvenMonthlyRevenue: { type: 'integer', description: 'Revenu mensuel correspondant au seuil de rentabilité, en euros' },
+    costBreakdown: { type: 'array', items: COST_LINE_SCHEMA, description: 'Répartition du budget total par poste, les montants doivent sommer exactement au budget total' }
+  },
+  required: ['monthlyBurn', 'runwayMonths', 'assumedArpu', 'breakEvenUsers', 'breakEvenMonthlyRevenue', 'costBreakdown']
+}
+
+const STRATEGY_TOOLKIT_SCHEMA = {
+  type: 'object',
+  description: 'Boîte à outils stratégique : analyse SWOT et positionnement concurrentiel',
+  properties: {
+    swot: {
+      type: 'object',
+      properties: {
+        strengths: { type: 'array', items: { type: 'string' }, description: '2-3 forces spécifiques au produit décrit' },
+        weaknesses: { type: 'array', items: { type: 'string' }, description: '2-3 faiblesses réalistes, pas génériques' },
+        opportunities: { type: 'array', items: { type: 'string' }, description: '2-3 opportunités liées au marché déclaré' },
+        threats: { type: 'array', items: { type: 'string' }, description: '2-3 menaces liées à la concurrence déclarée' }
+      },
+      required: ['strengths', 'weaknesses', 'opportunities', 'threats']
+    },
+    competitivePositioning: { type: 'string', description: '2-3 phrases sur comment se positionner face au niveau de concurrence déclaré' }
+  },
+  required: ['swot', 'competitivePositioning']
+}
+
 export const PLAN_GENERATION_TOOL = {
   name: 'generate_launch_plan',
-  description: 'Génère la partie calculée d\'un plan de lancement produit (persona, classification, roadmap agile, stratégie marketing, KPIs) à partir des réponses au questionnaire fournies dans le prompt.',
+  description: 'Génère la partie calculée d\'un plan de lancement produit (persona, classification, roadmap agile, stratégie marketing, KPIs, prévisionnel financier, boîte à outils stratégique, résumé exécutif) à partir des réponses au questionnaire fournies dans le prompt.',
   input_schema: {
     type: 'object',
     properties: {
@@ -107,8 +150,14 @@ export const PLAN_GENERATION_TOOL = {
         type: 'array',
         items: KPI_SCHEMA,
         description: '4 KPIs : le principal, le secondaire, le tertiaire lié à la priorité déclarée, et un KPI de production de contenu'
+      },
+      financials: FINANCIALS_SCHEMA,
+      strategyToolkit: STRATEGY_TOOLKIT_SCHEMA,
+      executiveSummary: {
+        type: 'string',
+        description: '3 à 5 phrases résumant le plan pour quelqu\'un qui n\'a pas le temps de tout lire : quoi, pour qui, comment, avec quel objectif chiffré'
       }
     },
-    required: ['persona', 'classification', 'roadmap', 'marketing', 'kpis']
+    required: ['persona', 'classification', 'roadmap', 'marketing', 'kpis', 'financials', 'strategyToolkit', 'executiveSummary']
   }
 }

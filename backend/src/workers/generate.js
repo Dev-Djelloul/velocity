@@ -1,6 +1,7 @@
 import { generateRoadmap } from '../lib/generator/roadmapGenerator'
 import { generateMarketingStrategy } from '../lib/generator/marketingStrategyGenerator'
 import { calculateKPIs } from '../lib/generator/kpiCalculator'
+import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from '../lib/generator/extendedGenerator'
 import { generatePersona, classifyProduct, classificationLabel } from '../lib/engine'
 import { generatePlanWithAI } from '../lib/ai/client'
 import { recordUsage } from '../lib/ai/usageTracker'
@@ -13,12 +14,16 @@ const CORS_HEADERS = {
 }
 
 function generateWithRules(data, lang) {
+  const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
   return {
     persona: generatePersona(data.market, data.product, data.priorities, lang),
-    classification: classificationLabel(classifyProduct(data.product, data.market), lang),
+    classification,
     roadmap: generateRoadmap(data.resources, data.product, data.priorities, lang),
     marketing: generateMarketingStrategy(data.market, data.priorities, data.resources?.budgetEur, lang),
-    kpis: calculateKPIs(data.priorities, data.resources, data.market, lang)
+    kpis: calculateKPIs(data.priorities, data.resources, data.market, lang),
+    financials: generateFinancials(data.resources, data.market),
+    strategyToolkit: generateStrategyToolkit(data.product, data.market, lang),
+    executiveSummary: generateExecutiveSummary(data.product, classification, data.resources, lang)
   }
 }
 

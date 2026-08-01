@@ -1,0 +1,112 @@
+.financials-card {
+  grid-column: 1 / -1;
+}
+
+.financials-header { margin-bottom: var(--spacing-lg); }
+
+.financials-header h3 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.financials-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+}
+
+.financials-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+  padding-bottom: var(--spacing-lg);
+  border-bottom: 1px solid rgba(145, 132, 217, 0.1);
+}
+
+.fin-tile {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  transition: all 0.2s ease;
+}
+
+.fin-tile:hover {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 12px rgba(145, 132, 217, 0.15);
+}
+
+.fin-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--radius-lg);
+  background: rgba(145, 132, 217, 0.12);
+  color: var(--color-accent);
+  margin-bottom: var(--spacing-sm);
+}
+
+.fin-label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-xs);
+}
+
+.fin-value {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+.fin-value-unit {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-secondary);
+}
+
+.fin-sub {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  margin-top: var(--spacing-xs);
+}
+
+.financials-breakdown h4 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.cost-line { margin-bottom: var(--spacing-md); }
+.cost-line:last-child { margin-bottom: 0; }
+
+.cost-line-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.cost-line-header span:last-child {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.cost-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(145, 132, 217, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.cost-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
+  border-radius: 3px;
+}

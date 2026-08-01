@@ -1,4 +1,5 @@
 import { t } from '../lib/i18n'
+import ABTestCalculator from './ABTestCalculator'
 import '../styles/KPIDashboard.css'
 
 export default function KPIDashboard({ kpis, lang }) {
@@ -37,6 +38,8 @@ export default function KPIDashboard({ kpis, lang }) {
           ))}
         </div>
       )}
+
+      <ABTestCalculator lang={lang} />
     </div>
   )
 }

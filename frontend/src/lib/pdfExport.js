@@ -14,6 +14,12 @@ export function toCSV(rows) {
 export function exportCSV(plan, lang) {
   const rows = []
 
+  if (plan.executiveSummary) {
+    rows.push([t(lang, 'outputs.executiveSummary')])
+    rows.push([plan.executiveSummary])
+    rows.push([])
+  }
+
   rows.push([t(lang, 'outputs.roadmap')])
   rows.push([t(lang, 'outputs.sprint'), t(lang, 'outputs.summary'), t(lang, 'outputs.assignee'), t(lang, 'outputs.effort'), t(lang, 'outputs.estimatedCostEur'), t(lang, 'outputs.dependsOnCsv')])
   plan.roadmap.sprints.forEach(sp => {
@@ -36,6 +42,30 @@ export function exportCSV(plan, lang) {
     rows.push([k.name, k.formula, k.unit, k.target ?? '', k.baseline ?? ''])
   })
 
+  if (plan.financials) {
+    const f = plan.financials
+    rows.push([])
+    rows.push([t(lang, 'outputs.financials.title')])
+    rows.push([t(lang, 'outputs.financials.monthlyBurn'), `${f.monthlyBurn} €`])
+    rows.push([t(lang, 'outputs.financials.runway'), `${f.runwayMonths} ${t(lang, 'outputs.financials.months')}`])
+    rows.push([t(lang, 'outputs.financials.breakEven'), `${f.breakEvenUsers} ${t(lang, 'outputs.financials.clients')}`])
+    rows.push([])
+    rows.push([t(lang, 'outputs.financials.breakdown')])
+    rows.push([t(lang, 'outputs.category'), t(lang, 'outputs.estimatedCostEur'), '%'])
+    f.costBreakdown.forEach(line => rows.push([line.category, line.amount, line.pct]))
+  }
+
+  if (plan.strategyToolkit) {
+    const { swot, competitivePositioning } = plan.strategyToolkit
+    rows.push([])
+    rows.push([t(lang, 'outputs.strategy.title')])
+    rows.push([t(lang, 'outputs.strategy.strengths'), swot.strengths.join(' / ')])
+    rows.push([t(lang, 'outputs.strategy.weaknesses'), swot.weaknesses.join(' / ')])
+    rows.push([t(lang, 'outputs.strategy.opportunities'), swot.opportunities.join(' / ')])
+    rows.push([t(lang, 'outputs.strategy.threats'), swot.threats.join(' / ')])
+    rows.push([t(lang, 'outputs.strategy.positioning'), competitivePositioning])
+  }
+
   const blob = new Blob(['﻿' + toCSV(rows)], { type: 'text/csv;charset=utf-8' })
   downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.csv`)
 }
@@ -45,30 +75,62 @@ export async function exportPDF(plan, lang) {
   const { default: pdfFonts } = await import('pdfmake/build/vfs_fonts')
   pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs
 
+  const content = [
+    { text: plan.product?.name || 'Launch Plan', style: 'header' },
+    { text: plan.classification, style: 'subheader' },
+    { text: plan.product?.pitch || '', margin: [0, 0, 0, 10] }
+  ]
+
+  if (plan.executiveSummary) {
+    content.push(
+      { text: t(lang, 'outputs.executiveSummary'), style: 'section' },
+      { text: plan.executiveSummary, margin: [0, 0, 0, 6], italics: true }
+    )
+  }
+
+  content.push(
+    { text: t(lang, 'outputs.roadmap'), style: 'section' },
+    ...plan.roadmap.sprints.map(sp => ({
+      text: `${t(lang, 'outputs.sprint')} ${sp.sprintId} — ${sp.estimatedCost} € — ${sp.stories.map(s => s.title).join(', ')}`,
+      margin: [0, 2, 0, 2]
+    })),
+
+    { text: t(lang, 'outputs.marketing'), style: 'section' },
+    ...plan.marketing.channels.map(ch => ({
+      text: `${ch.name}: ${ch.budget} € — ${ch.goal}`,
+      margin: [0, 2, 0, 2]
+    })),
+
+    { text: t(lang, 'outputs.kpis'), style: 'section' },
+    ...plan.kpis.map(k => ({
+      text: `${k.name}: ${k.target ?? '—'} ${k.unit}`,
+      margin: [0, 2, 0, 2]
+    }))
+  )
+
+  if (plan.financials) {
+    const f = plan.financials
+    content.push(
+      { text: t(lang, 'outputs.financials.title'), style: 'section' },
+      { text: `${t(lang, 'outputs.financials.monthlyBurn')}: ${f.monthlyBurn} € — ${t(lang, 'outputs.financials.runway')}: ${f.runwayMonths} ${t(lang, 'outputs.financials.months')} — ${t(lang, 'outputs.financials.breakEven')}: ${f.breakEvenUsers} ${t(lang, 'outputs.financials.clients')}`, margin: [0, 0, 0, 4] },
+      ...f.costBreakdown.map(line => ({ text: `${line.category}: ${line.amount} € (${line.pct}%)`, margin: [0, 1, 0, 1] }))
+    )
+  }
+
+  if (plan.strategyToolkit) {
+    const { swot, competitivePositioning } = plan.strategyToolkit
+    content.push(
+      { text: t(lang, 'outputs.strategy.title'), style: 'section' },
+      { text: `${t(lang, 'outputs.strategy.strengths')}: ${swot.strengths.join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'outputs.strategy.weaknesses')}: ${swot.weaknesses.join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'outputs.strategy.opportunities')}: ${swot.opportunities.join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'outputs.strategy.threats')}: ${swot.threats.join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'outputs.strategy.positioning')}: ${competitivePositioning}`, margin: [0, 4, 0, 0], italics: true }
+    )
+  }
+
   const docDefinition = {
-    content: [
-      { text: plan.product?.name || 'Launch Plan', style: 'header' },
-      { text: plan.classification, style: 'subheader' },
-      { text: plan.product?.pitch || '', margin: [0, 0, 0, 10] },
-
-      { text: t(lang, 'outputs.roadmap'), style: 'section' },
-      ...plan.roadmap.sprints.map(sp => ({
-        text: `${t(lang, 'outputs.sprint')} ${sp.sprintId} — ${sp.estimatedCost} € — ${sp.stories.map(s => s.title).join(', ')}`,
-        margin: [0, 2, 0, 2]
-      })),
-
-      { text: t(lang, 'outputs.marketing'), style: 'section' },
-      ...plan.marketing.channels.map(ch => ({
-        text: `${ch.name}: ${ch.budget} € — ${ch.goal}`,
-        margin: [0, 2, 0, 2]
-      })),
-
-      { text: t(lang, 'outputs.kpis'), style: 'section' },
-      ...plan.kpis.map(k => ({
-        text: `${k.name}: ${k.target ?? '—'} ${k.unit}`,
-        margin: [0, 2, 0, 2]
-      }))
-    ],
+    content,
     styles: {
       header: { fontSize: 20, bold: true, color: '#6366f1' },
       subheader: { fontSize: 12, color: '#6b7280', margin: [0, 0, 0, 10] },

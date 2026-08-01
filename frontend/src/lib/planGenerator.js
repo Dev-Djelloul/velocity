@@ -1,6 +1,7 @@
 import { classifyProduct, classificationLabel, selectMarketingStrategy, strategyLabel, allocateBudget, sprintCapacity, sprintCount, kpiFocus, primaryTarget } from './engine'
 import { costFor } from './costMatrix'
 import { generatePersona } from './personaGenerator'
+import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
 import { c } from './contentI18n'
 
 const STORY_TEMPLATES = [
@@ -140,6 +141,9 @@ export function generatePlan(formData) {
   const roadmap = generateRoadmap(resources, product, priorities, lang)
   const marketing = generateMarketingStrategy(market, priorities, resources.budgetEur, lang)
   const kpis = calculateKPIs(priorities, resources, market, lang)
+  const financials = generateFinancials(resources, market)
+  const strategyToolkit = generateStrategyToolkit(product, market, lang)
+  const executiveSummary = generateExecutiveSummary(product, classification, resources, lang)
 
   return {
     product,
@@ -151,6 +155,9 @@ export function generatePlan(formData) {
     roadmap,
     marketing,
     kpis,
+    financials,
+    strategyToolkit,
+    executiveSummary,
     language,
     generatedAt: new Date().toISOString()
   }

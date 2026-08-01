@@ -269,6 +269,24 @@ export function IconExternalLink(props) {
   )
 }
 
+export function IconCopy(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="9" y="9" width="12" height="12" rx="2" />
+      <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+    </svg>
+  )
+}
+
+export function IconCircleDot(props) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="3" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
 export function IconRocket(props) {
   return (
     <svg {...base} {...props}>
