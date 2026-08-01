@@ -254,6 +254,29 @@
   gap: 1rem;
   margin-top: 2.5rem;
   justify-content: space-between;
+  align-items: flex-start;
+}
+
+.generate-block {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.5rem;
+}
+
+.generating-hint {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  animation: generating-fade 0.3s ease;
+}
+
+@keyframes generating-fade {
+  from { opacity: 0; transform: translateY(-2px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .generating-hint { animation: none; }
 }
 
 .btn-primary,

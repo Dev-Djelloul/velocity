@@ -8,7 +8,8 @@ const DEFAULT_DATA = {
   product: { name: '', stage: 'mvp', category: 'pm', pitch: '', usp: '', targetUser: 'smb' },
   market: { geography: 'global', b2bVsB2c: 'b2b', segment: '', audienceSize: 's', competition: 'moderate' },
   resources: { timelineWeeks: 'w8', budgetEur: 'b5k', teamSize: 'small', rolesPresent: ['product', 'dev'] },
-  priorities: { focus: 'acquire', engagement: 'moderate', riskKnown: 'none', successMetric: 'signups' }
+  priorities: { focus: 'acquire', engagement: 'moderate', riskKnown: 'none', successMetric: 'signups' },
+  context: ''
 }
 
 function loadInitial() {
@@ -52,13 +53,28 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
   const [step, setStep] = useState(0)
   const [formData, setFormData] = useState(loadInitial)
   const [draftSaved, setDraftSaved] = useState(false)
+  const [loadingStep, setLoadingStep] = useState(0)
 
   useEffect(() => {
     localStorage.setItem('plp_form', JSON.stringify(formData))
   }, [formData])
 
+  useEffect(() => {
+    if (!loading) {
+      setLoadingStep(0)
+      return
+    }
+    const steps = t(lang, 'nav.generatingSteps')
+    const interval = setInterval(() => setLoadingStep(s => (s + 1) % steps.length), 3500)
+    return () => clearInterval(interval)
+  }, [loading, lang])
+
   const handleChange = (section, field, value) => {
     setFormData(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }))
+  }
+
+  const handleContextChange = (value) => {
+    setFormData(prev => ({ ...prev, context: value }))
   }
 
   const toggleRole = (role) => {
@@ -147,6 +163,11 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
             <Select formData={formData} onChange={handleChange} section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} />
+            <label className="field">
+              <span>{t(lang, 'priorities.context')}</span>
+              <textarea rows={3} value={formData.context} placeholder={t(lang, 'priorities.contextPh')}
+                onChange={e => handleContextChange(e.target.value)} />
+            </label>
           </>
         )}
       </div>
@@ -170,9 +191,14 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
             {t(lang, 'nav.next')}
           </button>
         ) : (
-          <button className="btn-primary" onClick={() => onSubmit(formData)} disabled={loading}>
-            {loading ? t(lang, 'nav.generating') : t(lang, 'nav.generate')}
-          </button>
+          <div className="generate-block">
+            <button className="btn-primary" onClick={() => onSubmit(formData)} disabled={loading}>
+              {loading ? t(lang, 'nav.generating') : t(lang, 'nav.generate')}
+            </button>
+            {loading && (
+              <p className="generating-hint">{t(lang, 'nav.generatingSteps')[loadingStep]}</p>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -7,7 +7,15 @@ export const translations = {
       export: 'Exporter'
     },
     steps: ['Produit', 'Marché', 'Ressources', 'Priorités'],
-    nav: { previous: 'Précédent', next: 'Suivant', generate: 'Générer le plan', generating: 'Génération en cours…' },
+    nav: {
+      previous: 'Précédent', next: 'Suivant', generate: 'Générer le plan', generating: 'Génération en cours…',
+      generatingSteps: [
+        'Analyse de votre produit et de votre marché…',
+        'Construction de la roadmap et des sprints…',
+        'Calcul de la stratégie marketing et des budgets…',
+        'Finalisation des KPIs…'
+      ]
+    },
     product: {
       title: 'Informations produit',
       name: 'Nom du produit',
@@ -56,7 +64,9 @@ export const translations = {
       riskKnown: 'Risques connus',
       riskOptions: { none: 'Aucun', notready: 'Produit non prêt', pmf: 'Product-market fit incertain', budget: 'Budget limité' },
       successMetric: 'Métrique de succès',
-      successOptions: { signups: '# Inscriptions', arr: 'ARR', retention: 'Rétention', community: 'Taille communauté' }
+      successOptions: { signups: '# Inscriptions', arr: 'ARR', retention: 'Rétention', community: 'Taille communauté' },
+      context: 'Autre chose à préciser ? (optionnel)',
+      contextPh: 'Contraintes spécifiques, particularités du marché, éléments que le questionnaire ne couvre pas...'
     },
     outputs: {
       roadmap: 'Roadmap Agile',
@@ -115,7 +125,15 @@ export const translations = {
       export: 'Export'
     },
     steps: ['Product', 'Market', 'Resources', 'Priorities'],
-    nav: { previous: 'Previous', next: 'Next', generate: 'Generate plan', generating: 'Generating…' },
+    nav: {
+      previous: 'Previous', next: 'Next', generate: 'Generate plan', generating: 'Generating…',
+      generatingSteps: [
+        'Analyzing your product and market…',
+        'Building the roadmap and sprints…',
+        'Calculating marketing strategy and budgets…',
+        'Finalizing KPIs…'
+      ]
+    },
     product: {
       title: 'Product information',
       name: 'Product name',
@@ -164,7 +182,9 @@ export const translations = {
       riskKnown: 'Known risks',
       riskOptions: { none: 'None', notready: 'Product not ready', pmf: 'Market fit unclear', budget: 'Budget limits' },
       successMetric: 'Success metric',
-      successOptions: { signups: '# Signups', arr: 'ARR', retention: 'Retention', community: 'Community size' }
+      successOptions: { signups: '# Signups', arr: 'ARR', retention: 'Retention', community: 'Community size' },
+      context: 'Anything else to add? (optional)',
+      contextPh: "Specific constraints, market particularities, anything the questionnaire doesn't cover..."
     },
     outputs: {
       roadmap: 'Agile Roadmap',
