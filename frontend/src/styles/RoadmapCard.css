@@ -1,6 +1,3 @@
-.roadmap-card {
-  grid-column: 1 / 2;
-}
 
 .roadmap-header {
   margin-bottom: var(--spacing-lg);
@@ -289,11 +286,6 @@
 }
 
 @media (max-width: 768px) {
-  .roadmap-card {
-    grid-column: 1 / -1;
-    grid-row: auto;
-  }
-
   .sprint-header {
     flex-direction: column;
     align-items: flex-start;

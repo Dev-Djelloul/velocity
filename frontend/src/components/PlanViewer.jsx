@@ -99,11 +99,11 @@ export default function PlanViewer({ plan: initialPlan, onReset, lang }) {
 
       <div className="plan-grid">
         <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
+        <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} />
         <KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} />
         <FinancialsCard financials={plan.financials} lang={lang} />
         <StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} />
-        <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} />
         <GeneratedTable lang={lang} />
       </div>
