@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { t } from '../lib/i18n'
+import { formatDateTime } from '../lib/dateFormat'
 import { IconPencil } from './Icons'
 import '../styles/DraftsModal.css'
 
@@ -76,7 +77,7 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
                   <>
                     <h3>{draft.name}</h3>
                     <p className="draft-meta">
-                      Modifié le {new Date(draft.updatedAt).toLocaleDateString('fr-FR')}
+                      Modifié le {formatDateTime(draft.updatedAt, lang)}
                     </p>
                   </>
                 )}

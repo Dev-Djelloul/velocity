@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getAllPlans, deletePlan, createShareLink, getPlanById } from '../lib/planStorage'
 import { t } from '../lib/i18n'
+import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
 import { IconClipboard, IconDownload, IconCheckCircle } from './Icons'
 import '../styles/PlansHistory.css'
@@ -60,7 +61,7 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
             <div className="plan-info">
               <h3>{plan.product?.name || 'Plan sans titre'}</h3>
               <p className="plan-meta">
-                Créé le {new Date(plan.savedAt).toLocaleDateString('fr-FR')}
+                Créé le {formatDateTime(plan.savedAt, lang)}
               </p>
               {plan.classification && (
                 <p className="plan-type">{plan.classification}</p>

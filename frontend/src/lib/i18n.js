@@ -163,6 +163,10 @@ export const translations = {
       executiveSummary: 'Résumé exécutif',
       copySummary: 'Copier le résumé',
       summaryCopied: 'Copié !',
+      planReadyTitle: 'Ton plan de lancement est prêt !',
+      planReadySubtitle: (dateTime) => `Généré à l'instant — ${dateTime}. À toi de jouer !`,
+      planLoadedTitle: 'Te revoilà !',
+      planLoadedSubtitle: (dateTime) => `Ce plan a été généré le ${dateTime}.`,
       assets: {
         post: 'Brief de post',
         email: 'Objet email',
@@ -396,6 +400,10 @@ export const translations = {
       executiveSummary: 'Executive summary',
       copySummary: 'Copy summary',
       summaryCopied: 'Copied!',
+      planReadyTitle: 'Your launch plan is ready!',
+      planReadySubtitle: (dateTime) => `Generated just now — ${dateTime}. Your move!`,
+      planLoadedTitle: 'Welcome back!',
+      planLoadedSubtitle: (dateTime) => `This plan was generated on ${dateTime}.`,
       assets: {
         post: 'Post brief',
         email: 'Email subject',

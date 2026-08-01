@@ -24,6 +24,7 @@ export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('plp_lang') || 'fr')
   const [currentPage, setCurrentPage] = useState('landing') // landing, questionnaire, result
   const [plan, setPlan] = useState(null)
+  const [justGenerated, setJustGenerated] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showHistory, setShowHistory] = useState(false)
@@ -41,6 +42,7 @@ export default function App() {
       const shared = getShareLink(shareId)
       if (shared?.plan) {
         setPlan(shared.plan)
+        setJustGenerated(false)
         setCurrentPage('result')
       }
     }
@@ -67,12 +69,14 @@ export default function App() {
       }
       savePlan(generatedPlan)
       setPlan(generatedPlan)
+      setJustGenerated(true)
       setCurrentPage('result')
     } catch (e) {
       try {
         const generatedPlan = generatePlan(payload)
         savePlan(generatedPlan)
         setPlan(generatedPlan)
+        setJustGenerated(true)
         setCurrentPage('result')
       } catch {
         setError(t(lang, 'errors.generic'))
@@ -89,6 +93,7 @@ export default function App() {
 
   const handleReset = () => {
     setPlan(null)
+    setJustGenerated(false)
     setCurrentPage('landing')
     window.scrollTo(0, 0)
   }
@@ -99,6 +104,7 @@ export default function App() {
 
   const handleLoadFromHistory = (plan) => {
     setPlan(plan)
+    setJustGenerated(false)
     setCurrentPage('result')
   }
 
@@ -173,7 +179,7 @@ export default function App() {
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} />
         )}
         {currentPage === 'result' && plan && (
-          <PlanViewer plan={plan} onReset={handleReset} lang={lang} />
+          <PlanViewer plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />
         )}
       </main>
 
