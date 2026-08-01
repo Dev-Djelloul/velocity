@@ -34,6 +34,21 @@ function Select({ formData, onChange, section, field, label, options }) {
   )
 }
 
+// Progression organique façon "trickle" : avance vite au début puis ralentit
+// asymptotiquement sans jamais s'arrêter complètement tant que loading est vrai,
+// pour donner une sensation de travail réel plutôt qu'un minuteur linéaire fixe.
+function nextIncrement(progress) {
+  const jitter = 0.6 + Math.random() * 0.8
+  if (progress < 20) return 2.4 * jitter
+  if (progress < 45) return 1.1 * jitter
+  if (progress < 70) return 0.5 * jitter
+  if (progress < 88) return 0.2 * jitter
+  if (progress < 97) return 0.06 * jitter
+  return 0.015 * jitter
+}
+
+const STEP_THRESHOLDS = [22, 48, 74, 100]
+
 function Text({ formData, onChange, section, field, label, placeholder, textarea }) {
   return (
     <label className="field">
@@ -64,13 +79,9 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
       setLoadingStep(0)
       return
     }
-    const startTime = Date.now()
-    const totalDuration = 14000
     const interval = setInterval(() => {
-      const elapsed = Date.now() - startTime
-      const progress = Math.min((elapsed / totalDuration) * 100, 99)
-      setLoadingStep(progress)
-    }, 50)
+      setLoadingStep(p => Math.min(p + nextIncrement(p), 99.5))
+    }, 100)
     return () => clearInterval(interval)
   }, [loading])
 
@@ -215,17 +226,22 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
           <button className="btn-primary" onClick={() => setStep(step + 1)} disabled={!isStepValid()}>
             {t(lang, 'nav.next')}
           </button>
-        ) : loading ? (
-          <div className="generating-progress">
-            <div className="progress-bar-container">
-              <div className="progress-bar-fill" style={{ width: `${loadingStep}%` }}></div>
-            </div>
-            <p className="generating-text">{t(lang, 'nav.generatingSteps')[Math.floor((loadingStep / 100) * t(lang, 'nav.generatingSteps').length)] || t(lang, 'nav.generatingSteps')[0]}</p>
-          </div>
         ) : (
-          <button className="btn-primary btn-generate" onClick={() => onSubmit(formData)}>
-            {t(lang, 'nav.generate')}
-          </button>
+          <div className="generate-block">
+            <button className="btn-primary btn-generate" onClick={() => onSubmit(formData)} disabled={loading}>
+              {loading ? <><span className="btn-spinner" aria-hidden="true" /> {t(lang, 'nav.generating')}</> : t(lang, 'nav.generate')}
+            </button>
+            {loading && (
+              <div className="generating-progress">
+                <div className="progress-bar-container">
+                  <div className="progress-bar-fill" style={{ width: `${loadingStep}%` }}></div>
+                </div>
+                <p className="generating-text">
+                  {t(lang, 'nav.generatingSteps')[STEP_THRESHOLDS.findIndex(threshold => loadingStep < threshold)]}
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </div>

@@ -36,8 +36,9 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
 
   if (drafts.length === 0) {
     return (
-      <div className="modal-backdrop" onClick={onClose}>
-        <div className="drafts-modal card" onClick={e => e.stopPropagation()}>
+      <div className="drafts-modal-backdrop" onClick={onClose}>
+        <div className="drafts-modal" onClick={e => e.stopPropagation()}>
+          <button className="drafts-modal-close" onClick={onClose} aria-label="Fermer">×</button>
           <h2>Mes brouillons</h2>
           <p className="empty-state">Aucun brouillon sauvegardé. Créez-en un pour continuer plus tard!</p>
           <button className="btn-primary" onClick={onClose}>Fermer</button>
@@ -47,8 +48,9 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
   }
 
   return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="drafts-modal card" onClick={e => e.stopPropagation()}>
+    <div className="drafts-modal-backdrop" onClick={onClose}>
+      <div className="drafts-modal" onClick={e => e.stopPropagation()}>
+        <button className="drafts-modal-close" onClick={onClose} aria-label="Fermer">×</button>
         <div className="drafts-modal-header">
           <h2>Mes brouillons</h2>
           <p>Continuez vos réponses là où vous les aviez laissées</p>
