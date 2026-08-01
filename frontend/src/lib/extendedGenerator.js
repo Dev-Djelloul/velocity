@@ -5,7 +5,12 @@ const BUDGET = { b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000 }
 const TIMELINE_WEEKS = { w4: 4, w8: 8, w12: 12, w26: 26 }
 const ARPU_BY_MODEL = { b2b: 99, b2c: 15, hybrid: 40 }
 
-export function generateFinancials(resources, market) {
+const COST_CATEGORY_LABELS = {
+  fr: { product: 'Développement', marketing: 'Marketing', ops: 'Opérations' },
+  en: { product: 'Development', marketing: 'Marketing', ops: 'Operations' }
+}
+
+export function generateFinancials(resources, market, lang) {
   const budget = BUDGET[resources?.budgetEur] ?? 5000
   const weeks = TIMELINE_WEEKS[resources?.timelineWeeks] ?? 8
   const months = Math.max(1, weeks / 4.33)
@@ -16,11 +21,12 @@ export function generateFinancials(resources, market) {
   const breakEvenUsers = Math.ceil(monthlyBurn / assumedArpu)
   const breakEvenMonthlyRevenue = breakEvenUsers * assumedArpu
 
+  const labels = COST_CATEGORY_LABELS[lang] || COST_CATEGORY_LABELS.fr
   const split = { product: 0.5, marketing: 0.35, ops: 0.15 }
   const costBreakdown = [
-    { category: 'Développement', amount: Math.round(budget * split.product), pct: Math.round(split.product * 100) },
-    { category: 'Marketing', amount: Math.round(budget * split.marketing), pct: Math.round(split.marketing * 100) },
-    { category: 'Opérations', amount: Math.round(budget * split.ops), pct: Math.round(split.ops * 100) }
+    { category: labels.product, amount: Math.round(budget * split.product), pct: Math.round(split.product * 100) },
+    { category: labels.marketing, amount: Math.round(budget * split.marketing), pct: Math.round(split.marketing * 100) },
+    { category: labels.ops, amount: Math.round(budget * split.ops), pct: Math.round(split.ops * 100) }
   ]
 
   return { monthlyBurn, runwayMonths, assumedArpu, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown }

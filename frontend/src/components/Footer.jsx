@@ -16,7 +16,7 @@ export default function Footer({ lang, onOpenModal, onNavigateFeatures }) {
       <div className="footer-content">
         <div className="footer-section">
           <Wordmark size={38} />
-          <p>Générateur intelligent de plan de lancement pour startups</p>
+          <p>{t(lang, 'footer.tagline')}</p>
           <div className="social-links">
             <a href={TWITTER_URL} target="_blank" rel="noopener noreferrer" aria-label="Twitter / X">𝕏</a>
             <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">in</a>
@@ -25,39 +25,39 @@ export default function Footer({ lang, onOpenModal, onNavigateFeatures }) {
         </div>
 
         <div className="footer-section">
-          <h4>Produit</h4>
+          <h4>{t(lang, 'footer.product')}</h4>
           <ul>
-            <li><button className="footer-link" onClick={onNavigateFeatures}>Fonctionnalités</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('pricing')}>Tarification</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('changelog')}>Changelog</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('roadmap')}>Roadmap</button></li>
+            <li><button className="footer-link" onClick={onNavigateFeatures}>{t(lang, 'footer.features')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('pricing')}>{t(lang, 'footer.pricing')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('changelog')}>{t(lang, 'footer.changelog')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('roadmap')}>{t(lang, 'footer.roadmap')}</button></li>
           </ul>
         </div>
 
         <div className="footer-section">
-          <h4>Entreprise</h4>
+          <h4>{t(lang, 'footer.company')}</h4>
           <ul>
-            <li><button className="footer-link" onClick={() => onOpenModal('about')}>À propos</button></li>
-            <li><a href={BLOG_URL} target="_blank" rel="noopener noreferrer">Blog <IconExternalLink width={12} height={12} /></a></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('careers')}>Nous rejoindre</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('contact')}>Contact</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('about')}>{t(lang, 'footer.about')}</button></li>
+            <li><a href={BLOG_URL} target="_blank" rel="noopener noreferrer">{t(lang, 'footer.blog')} <IconExternalLink width={12} height={12} /></a></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('careers')}>{t(lang, 'footer.careers')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('contact')}>{t(lang, 'footer.contact')}</button></li>
           </ul>
         </div>
 
         <div className="footer-section">
-          <h4>Légal</h4>
+          <h4>{t(lang, 'footer.legal')}</h4>
           <ul>
-            <li><button className="footer-link" onClick={() => onOpenModal('privacy')}>Confidentialité</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('terms')}>Conditions</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('cookies')}>Cookies</button></li>
-            <li><button className="footer-link" onClick={() => onOpenModal('security')}><IconLock width={13} height={13} /> Sécurité</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('privacy')}>{t(lang, 'footer.privacy')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('terms')}>{t(lang, 'footer.terms')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('cookies')}>{t(lang, 'footer.cookies')}</button></li>
+            <li><button className="footer-link" onClick={() => onOpenModal('security')}><IconLock width={13} height={13} /> {t(lang, 'footer.security')}</button></li>
           </ul>
         </div>
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {currentYear} <span className="footer-brand-highlight">VelocityLaunch</span>. Tous droits réservés.</p>
-        <p>Construit avec 🧡 pour les makers et founders</p>
+        <p>&copy; {currentYear} <span className="footer-brand-highlight">VelocityLaunch</span>. {t(lang, 'footer.rightsReserved')}</p>
+        <p>{t(lang, 'footer.madeWith')}</p>
       </div>
     </footer>
   )

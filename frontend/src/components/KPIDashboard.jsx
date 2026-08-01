@@ -29,7 +29,7 @@ export default function KPIDashboard({ kpis, lang, onKpisChange }) {
     <div className="kpi-dashboard card">
       <div className="kpi-dashboard-header">
         <h3>{t(lang, 'outputs.kpis')}</h3>
-        <p className="kpi-subtitle">Métriques principales de succès</p>
+        <p className="kpi-subtitle">{t(lang, 'outputs.kpiSubtitle')}</p>
       </div>
 
       <div className="kpi-primary">{renderTile(kpis[0], 0)}</div>

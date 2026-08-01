@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
-import { IconTarget, IconUser, IconAlertTriangle, IconCheckCircle } from './Icons'
+import { IconTarget, IconUser, IconAlertTriangle, IconCheckCircle, IconPencil } from './Icons'
 import '../styles/GanttChart.css'
 
 const SPRINT_DAYS = 14
@@ -215,7 +215,7 @@ export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange
                               <span className="gantt-bar-deps">{t(lang, 'outputs.dependsOn')}: {story.dependsOn.join(', ')}</span>
                             )}
                             <button type="button" className="gantt-bar-edit-btn" onClick={() => setEditingStoryId(story.id)}>
-                              {t(lang, 'gantt.edit')}
+                              <IconPencil width={11} height={11} /> {t(lang, 'gantt.edit')}
                             </button>
                           </>
                         )}

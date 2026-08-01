@@ -12,7 +12,7 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
     <div className="marketing-card card">
       <div className="marketing-header">
         <h3>{t(lang, 'outputs.marketing')}</h3>
-        <p className="marketing-subtitle">Stratégie: {strategy}</p>
+        <p className="marketing-subtitle">{t(lang, 'outputs.strategyLabel')}: {strategy}</p>
       </div>
 
       <div className="marketing-budget">
@@ -25,11 +25,11 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
             <div className="gauge-fill" style={{ width: `${(totalAllocated / totalBudget) * 100}%` }} />
           </div>
         </div>
-        <p className="budget-note">Budget disponible: {totalBudget.toLocaleString()} €</p>
+        <p className="budget-note">{t(lang, 'outputs.budgetAvailable')(`${totalBudget.toLocaleString()} €`)}</p>
       </div>
 
       <div className="marketing-channels">
-        <h4>Canaux de marketing</h4>
+        <h4>{t(lang, 'outputs.marketingChannelsTitle')}</h4>
         <div className="channels-list">
           {channels.map((channel, idx) => (
             <div

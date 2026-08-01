@@ -197,12 +197,12 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
           <button className="btn-secondary" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
             {t(lang, 'nav.previous')}
           </button>
-          <button className="btn-secondary" onClick={handleSaveDraft} title="Sauvegarde en cours...">
-            {draftSaved ? '✓ Sauvegardé' : <><IconSave width={14} height={14} /> Continuer plus tard</>}
+          <button className="btn-secondary" onClick={handleSaveDraft}>
+            {draftSaved ? t(lang, 'nav.draftSaved') : <><IconSave width={14} height={14} /> {t(lang, 'nav.continueLater')}</>}
           </button>
           {onShowDrafts && (
             <button className="btn-secondary" onClick={onShowDrafts}>
-              <IconClipboard width={14} height={14} /> Mes brouillons
+              <IconClipboard width={14} height={14} /> {t(lang, 'nav.myDrafts')}
             </button>
           )}
         </div>

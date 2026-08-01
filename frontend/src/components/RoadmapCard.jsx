@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { validateRoadmap } from '../lib/roadmapValidator'
 import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle } from './Icons'
@@ -20,6 +21,8 @@ function formatRange(start, end, lang) {
 }
 
 export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChange }) {
+  const [issuesExpanded, setIssuesExpanded] = useState(false)
+
   if (!roadmap) return null
 
   const { sprints, totalDuration, estimatedCost } = roadmap
@@ -60,14 +63,14 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
     <div className="roadmap-card card">
       <div className="roadmap-header">
         <h3>{t(lang, 'outputs.roadmap')}</h3>
-        <p className="roadmap-subtitle">Plan d'exécution par sprints</p>
+        <p className="roadmap-subtitle">{t(lang, 'outputs.roadmapSubtitle')}</p>
       </div>
 
       <div className="roadmap-metrics">
         <div className="gauge">
           <div className="gauge-header">
             <span className="gauge-title">{t(lang, 'outputs.duration')}</span>
-            <span className="gauge-value">{totalDuration} semaines</span>
+            <span className="gauge-value">{totalDuration} {t(lang, 'outputs.weeks')}</span>
           </div>
           <div className="gauge-bar">
             <div className="gauge-fill" style={{ width: `${(totalDuration / 26) * 100}%` }} />
@@ -86,17 +89,24 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
 
       {issues.length > 0 && (
         <div className="roadmap-issues-banner">
-          <div className="roadmap-issues-title">
+          <button
+            type="button"
+            className="roadmap-issues-title roadmap-issues-toggle"
+            onClick={() => setIssuesExpanded(v => !v)}
+          >
             <IconAlertTriangle width={14} height={14} /> {issues.length} · {t(lang, 'roadmapIssues.title')}
-          </div>
-          <div className="roadmap-issues-list">
-            {issues.map((issue, i) => (
-              <div key={i} className="roadmap-issue-item">
-                <span className={`issue-tag issue-${issue.type}`}>{t(lang, `roadmapIssues.${issue.type}`)}</span>
-                <span>{issue.message}</span>
-              </div>
-            ))}
-          </div>
+            <span className="roadmap-issues-chevron">{issuesExpanded ? '▾' : '▸'}</span>
+          </button>
+          {issuesExpanded && (
+            <div className="roadmap-issues-list">
+              {issues.map((issue, i) => (
+                <div key={i} className="roadmap-issue-item">
+                  <span className={`issue-tag issue-${issue.type}`}>{t(lang, `roadmapIssues.${issue.type}`)}</span>
+                  <span>{issue.message}</span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -141,7 +151,7 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
 
               {sprint.risks && sprint.risks.length > 0 && (
                 <div className="sprint-risks">
-                  <strong><IconAlertTriangle width={14} height={14} /> Risques:</strong> {sprint.risks.map(r => r.risk).join(', ')}
+                  <strong><IconAlertTriangle width={14} height={14} /> {t(lang, 'outputs.risksLabel')}:</strong> {sprint.risks.map(r => r.risk).join(', ')}
                   {sprint.risks.some(r => r.mitigation) && (
                     <div className="sprint-risks-mitigation">
                       {sprint.risks.filter(r => r.mitigation).map(r => r.mitigation).join(' · ')}

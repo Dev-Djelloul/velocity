@@ -9,6 +9,7 @@ export const translations = {
     steps: ['Produit', 'Marché', 'Ressources', 'Priorités'],
     nav: {
       previous: 'Précédent', next: 'Suivant', generate: 'Générer le plan', generating: 'Génération en cours…',
+      continueLater: 'Continuer plus tard', draftSaved: '✓ Sauvegardé', myDrafts: 'Mes brouillons',
       generatingSteps: [
         'Analyse de votre produit et de votre marché…',
         'Construction de la roadmap et des sprints…',
@@ -121,7 +122,15 @@ export const translations = {
       kpis: 'Dashboard KPI',
       persona: 'Persona',
       sprint: 'Sprint',
+      duration: 'Durée',
+      estimatedCost: 'Coût estimé',
       weeks: 'semaines',
+      roadmapSubtitle: 'Plan d\'exécution par sprints',
+      kpiSubtitle: 'Métriques principales de succès',
+      marketingChannelsTitle: 'Canaux de marketing',
+      strategyLabel: 'Stratégie',
+      risksLabel: 'Risques',
+      budgetAvailable: (amount) => `Budget disponible : ${amount}`,
       effort: 'Effort',
       cost: 'Coût',
       dependsOn: 'Dépend de',
@@ -201,6 +210,26 @@ export const translations = {
     },
     errors: {
       generic: 'Une erreur est survenue. Réessaie.'
+    },
+    footer: {
+      tagline: 'Générateur intelligent de plan de lancement pour startups',
+      product: 'Produit',
+      features: 'Fonctionnalités',
+      pricing: 'Tarification',
+      changelog: 'Changelog',
+      roadmap: 'Roadmap',
+      company: 'Entreprise',
+      about: 'À propos',
+      blog: 'Blog',
+      careers: 'Nous rejoindre',
+      contact: 'Contact',
+      legal: 'Légal',
+      privacy: 'Confidentialité',
+      terms: 'Conditions',
+      cookies: 'Cookies',
+      security: 'Sécurité',
+      rightsReserved: 'Tous droits réservés.',
+      madeWith: 'Construit avec 🧡 pour les makers et founders'
     }
   },
   en: {
@@ -213,6 +242,7 @@ export const translations = {
     steps: ['Product', 'Market', 'Resources', 'Priorities'],
     nav: {
       previous: 'Previous', next: 'Next', generate: 'Generate plan', generating: 'Generating…',
+      continueLater: 'Continue later', draftSaved: '✓ Saved', myDrafts: 'My drafts',
       generatingSteps: [
         'Analyzing your product and market…',
         'Building the roadmap and sprints…',
@@ -325,7 +355,15 @@ export const translations = {
       kpis: 'KPI Dashboard',
       persona: 'Persona',
       sprint: 'Sprint',
+      duration: 'Duration',
+      estimatedCost: 'Estimated cost',
       weeks: 'weeks',
+      roadmapSubtitle: 'Sprint execution plan',
+      kpiSubtitle: 'Key success metrics',
+      marketingChannelsTitle: 'Marketing channels',
+      strategyLabel: 'Strategy',
+      risksLabel: 'Risks',
+      budgetAvailable: (amount) => `Available budget: ${amount}`,
       effort: 'Effort',
       cost: 'Cost',
       dependsOn: 'Depends on',
@@ -405,6 +443,26 @@ export const translations = {
     },
     errors: {
       generic: 'Something went wrong. Try again.'
+    },
+    footer: {
+      tagline: 'Intelligent SaaS launch plan generator',
+      product: 'Product',
+      features: 'Features',
+      pricing: 'Pricing',
+      changelog: 'Changelog',
+      roadmap: 'Roadmap',
+      company: 'Company',
+      about: 'About',
+      blog: 'Blog',
+      careers: 'Careers',
+      contact: 'Contact',
+      legal: 'Legal',
+      privacy: 'Privacy',
+      terms: 'Terms',
+      cookies: 'Cookies',
+      security: 'Security',
+      rightsReserved: 'All rights reserved.',
+      madeWith: 'Built with 🧡 for makers and founders'
     }
   }
 }
