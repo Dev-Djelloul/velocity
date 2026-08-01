@@ -25,6 +25,7 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState('landing') // landing, questionnaire, result
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
+  const [initialFormData, setInitialFormData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showHistory, setShowHistory] = useState(false)
@@ -96,7 +97,9 @@ export default function App() {
   const handleReset = () => {
     setPlan(null)
     setJustGenerated(false)
-    setCurrentPage('landing')
+    localStorage.removeItem('plp_form')
+    setInitialFormData(null)
+    setCurrentPage('questionnaire')
     window.scrollTo(0, 0)
   }
 
@@ -112,9 +115,9 @@ export default function App() {
   }
 
   const handleLoadDraft = (formData) => {
-    // Charge les données du brouillon et retourne au questionnaire
+    setInitialFormData(formData)
     setCurrentPage('questionnaire')
-    // Les données seront chargées dans le composant Questionnaire
+    window.scrollTo(0, 0)
   }
 
   const handleNavAnchor = (anchorId) => {
@@ -179,7 +182,7 @@ export default function App() {
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
         )}
         {currentPage === 'questionnaire' && (
-          <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} />
+          <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
         {currentPage === 'result' && plan && (
           <PlanViewer plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />

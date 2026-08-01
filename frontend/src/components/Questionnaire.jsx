@@ -12,7 +12,8 @@ const DEFAULT_DATA = {
   context: ''
 }
 
-function loadInitial() {
+function loadInitial(initialData) {
+  if (initialData) return initialData
   try {
     const saved = localStorage.getItem('plp_form')
     return saved ? JSON.parse(saved) : DEFAULT_DATA
@@ -64,9 +65,9 @@ function Text({ formData, onChange, section, field, label, placeholder, textarea
   )
 }
 
-export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts }) {
+export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, initialData }) {
   const [step, setStep] = useState(0)
-  const [formData, setFormData] = useState(loadInitial)
+  const [formData, setFormData] = useState(() => loadInitial(initialData))
   const [draftSaved, setDraftSaved] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
 
