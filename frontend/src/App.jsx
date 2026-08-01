@@ -71,6 +71,7 @@ export default function App() {
       setPlan(generatedPlan)
       setJustGenerated(true)
       setCurrentPage('result')
+      window.scrollTo(0, 0)
     } catch (e) {
       try {
         const generatedPlan = generatePlan(payload)
@@ -78,6 +79,7 @@ export default function App() {
         setPlan(generatedPlan)
         setJustGenerated(true)
         setCurrentPage('result')
+        window.scrollTo(0, 0)
       } catch {
         setError(t(lang, 'errors.generic'))
       }
@@ -106,6 +108,7 @@ export default function App() {
     setPlan(plan)
     setJustGenerated(false)
     setCurrentPage('result')
+    window.scrollTo(0, 0)
   }
 
   const handleLoadDraft = (formData) => {

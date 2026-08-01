@@ -2,23 +2,23 @@ import { useState, useEffect } from 'react'
 import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
-import { IconPencil } from './Icons'
+import { IconPencil, IconAlertTriangle } from './Icons'
 import '../styles/DraftsModal.css'
 
 export default function DraftsModal({ lang, onLoadDraft, onClose }) {
   const [drafts, setDrafts] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [editingName, setEditingName] = useState('')
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   useEffect(() => {
     setDrafts(getAllDrafts())
   }, [])
 
-  const handleDelete = (id) => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce brouillon?')) {
-      deleteDraft(id)
-      setDrafts(drafts.filter(d => d.id !== id))
-    }
+  const confirmDelete = () => {
+    deleteDraft(deleteTarget.id)
+    setDrafts(drafts.filter(d => d.id !== deleteTarget.id))
+    setDeleteTarget(null)
   }
 
   const handleRename = (id) => {
@@ -93,7 +93,7 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
                 }}>
                   <IconPencil width={14} height={14} /> Renommer
                 </button>
-                <button className="btn-small danger" onClick={() => handleDelete(draft.id)}>
+                <button className="btn-small danger" onClick={() => setDeleteTarget(draft)}>
                   Supprimer
                 </button>
               </div>
@@ -103,6 +103,20 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
 
         <button className="btn-secondary close-btn" onClick={onClose}>Fermer</button>
       </div>
+
+      {deleteTarget && (
+        <div className="confirm-modal-backdrop" onClick={e => { e.stopPropagation(); setDeleteTarget(null) }}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>Supprimer ce brouillon ?</h3>
+            <p><strong>{deleteTarget.name}</strong> sera définitivement supprimé. Cette action est irréversible.</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>Annuler</button>
+              <button className="btn-danger" onClick={confirmDelete}>Supprimer</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

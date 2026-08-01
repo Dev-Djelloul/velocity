@@ -17,80 +17,114 @@
   font-size: var(--font-size-sm);
 }
 
-.kpi-primary {
-  background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(36, 45, 66, 0.3));
-  border: 1px solid rgba(145, 132, 217, 0.2);
+.kpi-hero {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: linear-gradient(135deg, rgba(145, 132, 217, 0.14), rgba(99, 102, 241, 0.1) 55%, rgba(6, 182, 212, 0.08));
+  border: 1px solid rgba(145, 132, 217, 0.25);
   border-radius: var(--border-radius);
-  padding: var(--spacing-xl);
+  padding: 1.75rem 2rem;
   margin-bottom: var(--spacing-lg);
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-2xl);
 }
 
-.kpi-meta {
+.kpi-hero-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 50%, #06b6d4 100%);
+  color: var(--color-bg-primary);
+  box-shadow: 0 4px 14px rgba(145, 132, 217, 0.35);
+}
+
+.kpi-hero-body {
   flex: 1;
+  min-width: 0;
 }
 
-.kpi-meta-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--spacing-md) 0;
-  border-bottom: 1px solid rgba(145, 132, 217, 0.1);
-}
-
-.kpi-meta-item:last-child {
-  border-bottom: none;
-}
-
-.kpi-meta-label {
+.kpi-hero-label {
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.4rem;
 }
 
-.kpi-meta-value {
-  background: var(--color-bg-primary);
-  color: var(--color-accent);
-  padding: var(--spacing-sm) var(--spacing-md);
-  border-radius: 4px;
-  font-family: var(--font-family-mono);
+.kpi-hero-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.kpi-hero-input {
+  background: transparent;
+  border: none;
+  border-bottom: 2px dashed rgba(145, 132, 217, 0.35);
+  color: var(--color-text-primary);
+  font-size: 2.5rem;
+  font-weight: var(--font-weight-bold);
+  max-width: 220px;
+  padding: 0 0 0.15rem;
+}
+
+.kpi-hero-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+.kpi-hero-unit {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-base);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.kpi-hero-formula {
+  color: var(--color-text-muted);
   font-size: var(--font-size-xs);
-}
-
-.kpi-target {
-  color: var(--color-accent);
-  font-size: var(--font-size-xl);
-  display: block;
-}
-
-.kpi-secondary {
-  margin-bottom: var(--spacing-lg);
-}
-
-.kpi-secondary .kpi-tile {
-  border: 2px solid rgba(145, 132, 217, 0.3);
+  font-family: var(--font-family-mono);
+  margin-top: 0.5rem;
 }
 
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: var(--spacing-lg);
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: var(--spacing-md);
 }
 
 .kpi-tile {
   background: var(--color-bg-tertiary);
   border: 1px solid rgba(145, 132, 217, 0.15);
-  border-radius: var(--border-radius-sm);
-  padding: var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  padding: 1.25rem;
+  transition: all 0.2s ease;
 }
 
-.kpi-label {
+.kpi-tile:hover {
+  border-color: rgba(145, 132, 217, 0.35);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(145, 132, 217, 0.12);
+}
+
+.kpi-tile-label {
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.65rem;
+}
+
+.kpi-tile-value-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
 }
 
 .kpi-value-input {
@@ -100,9 +134,8 @@
   color: var(--color-accent);
   font-size: var(--font-size-2xl);
   font-weight: var(--font-weight-bold);
-  width: 100%;
-  padding: 0 0 var(--spacing-xs);
-  margin-bottom: var(--spacing-xs);
+  width: 90px;
+  padding: 0 0 0.2rem;
 }
 
 .kpi-value-input:focus {
@@ -115,7 +148,6 @@
   font-size: var(--font-size-xs);
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  margin-bottom: var(--spacing-sm);
 }
 
 .kpi-formula {
@@ -183,9 +215,14 @@
 }
 
 @media (max-width: 768px) {
-  .kpi-primary {
+  .kpi-hero {
     flex-direction: column;
-    gap: var(--spacing-lg);
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .kpi-hero-input {
+    font-size: 2rem;
   }
 
   .kpi-grid {

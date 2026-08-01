@@ -164,9 +164,9 @@ export const translations = {
       copySummary: 'Copier le résumé',
       summaryCopied: 'Copié !',
       planReadyTitle: 'Ton plan de lancement est prêt !',
-      planReadySubtitle: (dateTime) => `Généré à l'instant, ${dateTime}. À toi de jouer !`,
+      planReadySubtitle: (dateTime) => `Généré à l'instant, ${dateTime}.`,
       planLoadedTitle: 'Ravi de te revoir !',
-      planLoadedSubtitle: (dateTime) => `Ce plan a été généré ${dateTime} — reprenons là où tu t'étais arrêté.`,
+      planLoadedSubtitle: (dateTime) => `Ce plan a été généré ${dateTime} — reprenons là où tu t'étais arrêté 😃`,
       assets: {
         post: 'Brief de post',
         email: 'Objet email',
@@ -401,9 +401,9 @@ export const translations = {
       copySummary: 'Copy summary',
       summaryCopied: 'Copied!',
       planReadyTitle: 'Your launch plan is ready!',
-      planReadySubtitle: (dateTime) => `Generated just now, ${dateTime}. Your move!`,
+      planReadySubtitle: (dateTime) => `Generated just now, ${dateTime}.`,
       planLoadedTitle: 'Good to see you again!',
-      planLoadedSubtitle: (dateTime) => `This plan was generated ${dateTime} — let's pick up where you left off.`,
+      planLoadedSubtitle: (dateTime) => `This plan was generated ${dateTime} — let's pick up where you left off 😃`,
       assets: {
         post: 'Post brief',
         email: 'Email subject',
