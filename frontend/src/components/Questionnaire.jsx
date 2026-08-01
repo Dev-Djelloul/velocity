@@ -64,10 +64,15 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
       setLoadingStep(0)
       return
     }
-    const steps = t(lang, 'nav.generatingSteps')
-    const interval = setInterval(() => setLoadingStep(s => (s + 1) % steps.length), 3500)
+    const startTime = Date.now()
+    const totalDuration = 14000
+    const interval = setInterval(() => {
+      const elapsed = Date.now() - startTime
+      const progress = Math.min((elapsed / totalDuration) * 100, 99)
+      setLoadingStep(progress)
+    }, 50)
     return () => clearInterval(interval)
-  }, [loading, lang])
+  }, [loading])
 
   const handleChange = (section, field, value) => {
     setFormData(prev => ({ ...prev, [section]: { ...prev[section], [field]: value } }))
@@ -212,19 +217,10 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
           </button>
         ) : loading ? (
           <div className="generating-progress">
-            <div className="progress-indicator">
-              <div className="progress-steps">
-                {t(lang, 'nav.generatingSteps').map((step, i) => (
-                  <div key={i} className={`progress-step ${i === loadingStep ? 'active' : i < loadingStep ? 'completed' : ''}`}>
-                    <span className="progress-step-dot"></span>
-                    <span className="progress-step-text">{step}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="progress-bar-container">
-                <div className="progress-bar-fill" style={{ width: `${((loadingStep + 1) / t(lang, 'nav.generatingSteps').length) * 100}%` }}></div>
-              </div>
+            <div className="progress-bar-container">
+              <div className="progress-bar-fill" style={{ width: `${loadingStep}%` }}></div>
             </div>
+            <p className="generating-text">{t(lang, 'nav.generatingSteps')[Math.floor((loadingStep / 100) * t(lang, 'nav.generatingSteps').length)] || t(lang, 'nav.generatingSteps')[0]}</p>
           </div>
         ) : (
           <button className="btn-primary btn-generate" onClick={() => onSubmit(formData)}>
