@@ -3,27 +3,23 @@ import { getAllPlans, deletePlan, createShareLink, getPlanById } from '../lib/pl
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
-import { IconClipboard, IconDownload, IconCheckCircle } from './Icons'
+import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle } from './Icons'
 import '../styles/PlansHistory.css'
 
 export default function PlansHistory({ lang, onLoadPlan, onClose }) {
   const [plans, setPlans] = useState([])
   const [shareLink, setShareLink] = useState(null)
   const [copiedShareId, setCopiedShareId] = useState(null)
-  const [deleteConfirmId, setDeleteConfirmId] = useState(null)
+  const [deleteTarget, setDeleteTarget] = useState(null)
 
   useEffect(() => {
     setPlans(getAllPlans())
   }, [])
 
-  const handleDelete = (id) => {
-    if (deleteConfirmId !== id) {
-      setDeleteConfirmId(id)
-      return
-    }
-    deletePlan(id)
-    setPlans(plans.filter(p => p.id !== id))
-    setDeleteConfirmId(null)
+  const confirmDelete = () => {
+    deletePlan(deleteTarget.id)
+    setPlans(plans.filter(p => p.id !== deleteTarget.id))
+    setDeleteTarget(null)
   }
 
   const handleShare = (planId) => {
@@ -52,6 +48,7 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
   }
 
   return (
+    <>
     <InfoModal icon={<IconClipboard width={26} height={26} />} title="Vos plans de lancement" onClose={onClose} wide>
       <p className="plans-intro">Gérez vos plans générés et partagez-les avec votre équipe</p>
 
@@ -75,12 +72,8 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
               <button className="btn-secondary" onClick={() => handleShare(plan.id)}>
                 Partager
               </button>
-              <button
-                className={`btn-plan-danger ${deleteConfirmId === plan.id ? 'confirm' : ''}`}
-                onClick={() => handleDelete(plan.id)}
-                onBlur={() => setDeleteConfirmId(null)}
-              >
-                {deleteConfirmId === plan.id ? 'Confirmer ?' : 'Supprimer'}
+              <button className="btn-plan-danger" onClick={() => setDeleteTarget(plan)}>
+                Supprimer
               </button>
             </div>
           </div>
@@ -103,5 +96,20 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
         </div>
       )}
     </InfoModal>
+
+    {deleteTarget && (
+      <div className="confirm-modal-backdrop" onClick={() => setDeleteTarget(null)}>
+        <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+          <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+          <h3>Supprimer ce plan ?</h3>
+          <p><strong>{deleteTarget.product?.name || 'Ce plan'}</strong> sera définitivement supprimé. Cette action est irréversible.</p>
+          <div className="confirm-modal-actions">
+            <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>Annuler</button>
+            <button className="btn-danger" onClick={confirmDelete}>Supprimer</button>
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   )
 }
