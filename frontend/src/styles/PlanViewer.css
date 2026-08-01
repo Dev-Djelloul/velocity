@@ -24,18 +24,30 @@
 }
 
 .plan-confirmation-icon {
-  font-size: 2.25rem;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
   flex-shrink: 0;
+  animation: plan-confirmation-icon-in 0.5s ease 0.1s backwards;
 }
 
 .plan-confirmation.just-generated .plan-confirmation-icon {
-  animation: plan-confirmation-bounce 1.8s ease-in-out infinite;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 50%, #06b6d4 100%);
+  color: var(--color-bg-primary);
+  box-shadow: 0 4px 14px rgba(145, 132, 217, 0.4);
 }
 
-@keyframes plan-confirmation-bounce {
-  0%, 100% { transform: translateY(0) rotate(0deg); }
-  50% { transform: translateY(-4px) rotate(-8deg); }
+.plan-confirmation.loaded .plan-confirmation-icon {
+  background: rgba(145, 132, 217, 0.12);
+  color: var(--color-primary);
+}
+
+@keyframes plan-confirmation-icon-in {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 .plan-confirmation-text h3 {
@@ -52,7 +64,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .plan-confirmation { animation: none; }
-  .plan-confirmation.just-generated .plan-confirmation-icon { animation: none; }
+  .plan-confirmation-icon { animation: none; }
 }
 
 @media (max-width: 640px) {

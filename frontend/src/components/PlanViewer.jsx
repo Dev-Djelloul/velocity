@@ -11,8 +11,8 @@ import ExportModal from './ExportModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
 import { t } from '../lib/i18n'
-import { formatDateTime } from '../lib/dateFormat'
-import { IconSparkle, IconCopy, IconCheckCircle } from './Icons'
+import { formatFullDateTime } from '../lib/dateFormat'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock } from './Icons'
 import '../styles/PlanViewer.css'
 
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang }) {
@@ -63,13 +63,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     } catch { /* clipboard indisponible, on ignore silencieusement */ }
   }
 
-  const generatedDateTime = formatDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
+  const generatedDateTime = formatFullDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
 
   return (
     <div className="plan-viewer" ref={captureRef}>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
-          <span className="plan-confirmation-icon" aria-hidden="true">{justGenerated ? '🎉' : '👋'}</span>
+          <span className="plan-confirmation-icon" aria-hidden="true">
+            {justGenerated ? <IconRocket width={22} height={22} /> : <IconClock width={22} height={22} />}
+          </span>
           <div className="plan-confirmation-text">
             <h3>{justGenerated ? t(lang, 'outputs.planReadyTitle') : t(lang, 'outputs.planLoadedTitle')}</h3>
             <p>{justGenerated ? t(lang, 'outputs.planReadySubtitle')(generatedDateTime) : t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
