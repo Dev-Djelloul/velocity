@@ -7,6 +7,7 @@ const BLOG_URL = 'https://www.digitalblueskye.com/blog/digital/blogarticles'
 const TWITTER_URL = 'https://twitter.com/digitalblueskye'
 const LINKEDIN_URL = 'https://www.linkedin.com/in/yellowblueskye/'
 const GITHUB_URL = 'https://github.com/Dev-Djelloul'
+const CONTACT_EMAIL = 'digitalblueskye@gmail.com'
 
 export default function Footer({ lang, onOpenModal, onNavigateFeatures }) {
   const currentYear = new Date().getFullYear()
@@ -56,8 +57,11 @@ export default function Footer({ lang, onOpenModal, onNavigateFeatures }) {
       </div>
 
       <div className="footer-bottom">
-        <p>&copy; {currentYear} <span className="footer-brand-highlight">VelocityLaunch</span>. {t(lang, 'footer.rightsReserved')}</p>
-        <p>{t(lang, 'footer.madeWith')}</p>
+        <div>
+          <p>&copy; {currentYear} <span className="footer-brand-highlight">VelocityLaunch</span>. {t(lang, 'footer.rightsReserved')}</p>
+          <p>{t(lang, 'footer.madeWith')}</p>
+        </div>
+        <a href={`mailto:${CONTACT_EMAIL}`} className="footer-email">{CONTACT_EMAIL}</a>
       </div>
     </footer>
   )

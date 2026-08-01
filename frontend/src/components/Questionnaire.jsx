@@ -210,15 +210,26 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
           <button className="btn-primary" onClick={() => setStep(step + 1)} disabled={!isStepValid()}>
             {t(lang, 'nav.next')}
           </button>
-        ) : (
-          <div className="generate-block">
-            <button className="btn-primary" onClick={() => onSubmit(formData)} disabled={loading}>
-              {loading ? t(lang, 'nav.generating') : t(lang, 'nav.generate')}
-            </button>
-            {loading && (
-              <p className="generating-hint">{t(lang, 'nav.generatingSteps')[loadingStep]}</p>
-            )}
+        ) : loading ? (
+          <div className="generating-progress">
+            <div className="progress-indicator">
+              <div className="progress-steps">
+                {t(lang, 'nav.generatingSteps').map((step, i) => (
+                  <div key={i} className={`progress-step ${i === loadingStep ? 'active' : i < loadingStep ? 'completed' : ''}`}>
+                    <span className="progress-step-dot"></span>
+                    <span className="progress-step-text">{step}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="progress-bar-container">
+                <div className="progress-bar-fill" style={{ width: `${((loadingStep + 1) / t(lang, 'nav.generatingSteps').length) * 100}%` }}></div>
+              </div>
+            </div>
           </div>
+        ) : (
+          <button className="btn-primary btn-generate" onClick={() => onSubmit(formData)}>
+            {t(lang, 'nav.generate')}
+          </button>
         )}
       </div>
     </div>

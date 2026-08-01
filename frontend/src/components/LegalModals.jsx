@@ -1,7 +1,7 @@
 import InfoModal from './InfoModal'
 import { IconLock, IconFileText, IconCookie } from './Icons'
 
-const CONTACT_EMAIL = 'digitalblueskye@gmail.com'
+const CONTACT_EMAIL = 'contact@digitalblueskye.com'
 
 export function PrivacyModal({ onClose }) {
   return (
