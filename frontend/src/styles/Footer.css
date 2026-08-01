@@ -106,10 +106,7 @@
   margin: 0 auto;
   padding-top: 2rem;
   border-top: 1px solid rgba(145, 132, 217, 0.1);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
+  text-align: center;
 }
 
 .footer-bottom p {
@@ -120,23 +117,6 @@
 
 .footer-bottom p:last-child {
   margin-bottom: 0;
-}
-
-.footer-bottom > div {
-  flex: 1;
-  text-align: center;
-}
-
-.footer-email {
-  color: var(--color-text-secondary);
-  text-decoration: none;
-  font-size: var(--font-size-sm);
-  transition: all 0.2s ease;
-  white-space: nowrap;
-}
-
-.footer-email:hover {
-  color: var(--color-accent);
 }
 
 .footer-brand-highlight {
@@ -157,12 +137,6 @@
 
   /* Clears the floating scroll-to-top button so it doesn't cover the copyright lines */
   .footer-bottom {
-    flex-direction: column;
     padding-bottom: 3.5rem;
-    text-align: center;
-  }
-
-  .footer-email {
-    white-space: normal;
   }
 }
