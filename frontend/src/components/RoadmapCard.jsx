@@ -141,7 +141,12 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
 
               {sprint.risks && sprint.risks.length > 0 && (
                 <div className="sprint-risks">
-                  <strong><IconAlertTriangle width={14} height={14} /> Risques:</strong> {sprint.risks.join(', ')}
+                  <strong><IconAlertTriangle width={14} height={14} /> Risques:</strong> {sprint.risks.map(r => r.risk).join(', ')}
+                  {sprint.risks.some(r => r.mitigation) && (
+                    <div className="sprint-risks-mitigation">
+                      {sprint.risks.filter(r => r.mitigation).map(r => r.mitigation).join(' · ')}
+                    </div>
+                  )}
                 </div>
               )}
 

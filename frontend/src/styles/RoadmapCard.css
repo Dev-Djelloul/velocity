@@ -194,6 +194,12 @@
   margin-bottom: var(--spacing-sm);
 }
 
+.sprint-risks-mitigation {
+  margin-top: var(--spacing-xs);
+  color: var(--color-text-secondary);
+  font-style: italic;
+}
+
 .sprint-risks strong {
   color: #fff;
   display: inline-flex;
