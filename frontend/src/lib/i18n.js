@@ -88,11 +88,16 @@ export const translations = {
       abSampleSize: 'Taille échantillon requise',
       abVariant: 'variante',
       abDuration: 'Durée estimée',
-      days: 'jours'
+      days: 'jours',
+      channel: 'Canal',
+      name: 'Nom',
+      unit: 'Unité',
+      baseline: 'Référence'
     },
     export: {
       title: 'Exporter le plan',
       json: 'Export JSON',
+      csv: 'Export CSV',
       pdf: 'Export PDF',
       github: 'Export GitHub Issues',
       jira: 'Export Jira (CSV)',
@@ -191,11 +196,16 @@ export const translations = {
       abSampleSize: 'Required sample size',
       abVariant: 'variant',
       abDuration: 'Estimated duration',
-      days: 'days'
+      days: 'days',
+      channel: 'Channel',
+      name: 'Name',
+      unit: 'Unit',
+      baseline: 'Baseline'
     },
     export: {
       title: 'Export plan',
       json: 'Export JSON',
+      csv: 'Export CSV',
       pdf: 'Export PDF',
       github: 'Export GitHub Issues',
       jira: 'Export Jira (CSV)',

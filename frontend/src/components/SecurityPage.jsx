@@ -58,7 +58,7 @@ export default function SecurityPage({ lang, onClose }) {
 
       <section>
         <h2><IconHelpCircle width={20} height={20} /> Questions?</h2>
-        <p>Pour toute question concernant votre confidentialité, contactez-nous à <strong>security@velocitylaunch.app</strong></p>
+        <p>Pour toute question concernant votre confidentialité, contactez-nous à <a href="mailto:security@digitalblueskye.com"><strong>security@digitalblueskye.com</strong></a></p>
       </section>
 
       <div className="info-badge">

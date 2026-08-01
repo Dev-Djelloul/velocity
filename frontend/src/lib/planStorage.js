@@ -83,16 +83,3 @@ export function getShareLink(shareId) {
 export function generateId() {
   return Math.random().toString(36).substr(2, 9)
 }
-
-export function getDemoPlans() {
-  return [
-    {
-      id: 'demo-saas',
-      product: { name: 'WorkFlow Pro', stage: 'mvp', category: 'pm', pitch: 'Plateforme de gestion de projets collaborative', usp: 'Meilleure intégration avec Slack et autres outils', targetUser: 'smb' },
-      market: { geography: 'europe', b2bVsB2c: 'b2b', segment: 'PME en France', audienceSize: 'm', competition: 'moderate' },
-      resources: { timelineWeeks: 'w12', budgetEur: 'b10k', teamSize: 'medium', rolesPresent: ['product', 'dev', 'design', 'marketing'] },
-      priorities: { focus: 'acquire', engagement: 'high', riskKnown: 'some', successMetric: 'signups' },
-      isDemo: true
-    }
-  ]
-}

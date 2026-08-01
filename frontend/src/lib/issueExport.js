@@ -1,4 +1,4 @@
-import { downloadBlob, slug } from './pdfExport'
+import { downloadBlob, slug, toCSV } from './pdfExport'
 import { t } from './i18n'
 
 function allStories(plan) {
@@ -45,10 +45,8 @@ export function exportJira(plan) {
     s.dependsOn.join(';')
   ])
 
-  const csv = [header, ...rows]
-    .map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(','))
-    .join('\n')
+  const csv = toCSV([header, ...rows])
 
-  const blob = new Blob([csv], { type: 'text/csv' })
+  const blob = new Blob(['﻿' + csv], { type: 'text/csv;charset=utf-8' })
   downloadBlob(blob, `${slug(plan.product?.name)}-jira-import.csv`)
 }
