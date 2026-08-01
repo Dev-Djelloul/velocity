@@ -27,6 +27,50 @@
   border-bottom: 1px solid rgba(145, 132, 217, 0.1);
 }
 
+.roadmap-issues-banner {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.roadmap-issues-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-danger);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.roadmap-issues-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.roadmap-issue-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.issue-tag {
+  flex-shrink: 0;
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+  padding: 0.15rem 0.5rem;
+  border-radius: 3px;
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
 .rollover-banner {
   background: rgba(217, 164, 65, 0.1);
   border: 1px solid rgba(217, 164, 65, 0.3);

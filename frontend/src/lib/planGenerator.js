@@ -19,6 +19,22 @@ const STORY_TEMPLATES = [
   { key: 'feedback', category: 'product', type: 'frontend', effort: 8, assignee: 'Dev' }
 ]
 
+const RULE_PRIORITY = {
+  marketingFirst: { marketing: -1, product: 0, ops: 0 },
+  designFirst: { design: -1 },
+  devFirst: { backend: -1, frontend: -1 }
+}
+
+function applyRules(templates, rulesFlags) {
+  if (!rulesFlags?.length) return templates
+  const weight = (tmpl) => rulesFlags.reduce((acc, flag) => {
+    const rule = RULE_PRIORITY[flag]
+    if (!rule) return acc
+    return acc + (rule[tmpl.category] ?? rule[tmpl.type] ?? 0)
+  }, 0)
+  return templates.map((tmpl, idx) => ({ tmpl, idx })).sort((a, b) => weight(a.tmpl) - weight(b.tmpl) || a.idx - b.idx).map(x => x.tmpl)
+}
+
 function timelineWeeksFromKey(key) {
   return { w4: 4, w8: 8, w12: 12, w26: 26 }[key] ?? 8
 }
@@ -33,6 +49,7 @@ export function generateRoadmap(resources, product, priorities, lang) {
   const nbSprints = sprintCount(weeks)
   const capacity = sprintCapacity(resources?.teamSize)
   const risk = dict.riskLabels[priorities?.riskKnown]
+  const templates = applyRules(STORY_TEMPLATES, priorities?.rulesFlags)
 
   const sprints = []
   let storyCounter = 1
@@ -41,8 +58,8 @@ export function generateRoadmap(resources, product, priorities, lang) {
   for (let i = 0; i < nbSprints; i++) {
     const stories = []
     let used = 0
-    while (used < capacity && templateIdx < STORY_TEMPLATES.length * 3) {
-      const tmpl = STORY_TEMPLATES[templateIdx % STORY_TEMPLATES.length]
+    while (used < capacity && templateIdx < templates.length * 3) {
+      const tmpl = templates[templateIdx % templates.length]
       if (used + tmpl.effort > capacity && stories.length > 0) break
       const id = `US-${String(storyCounter).padStart(3, '0')}`
       stories.push({
@@ -81,7 +98,8 @@ export function generateMarketingStrategy(market, priorities, budgetKey, lang) {
     ...ch,
     goal: goalFor(ch.name, ch.budget, lang),
     cadence: c(lang).cadence,
-    contentPillars: contentPillarsFor(ch.name, lang)
+    contentPillars: contentPillarsFor(ch.name, lang),
+    assets: assetsFor(ch.name, lang)
   }))
 
   const contentCalendar = []
@@ -117,6 +135,11 @@ function goalFor(channel, budget, lang) {
 function contentPillarsFor(channel, lang) {
   const dict = c(lang)
   return dict.contentPillars[channel] || dict.contentPillarsGeneric
+}
+
+function assetsFor(channel, lang) {
+  const dict = c(lang)
+  return dict.channelAssets[channel] || dict.channelAssetsGeneric
 }
 
 export function calculateKPIs(priorities, resources, market, lang) {

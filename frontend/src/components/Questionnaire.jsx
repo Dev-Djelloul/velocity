@@ -8,7 +8,7 @@ const DEFAULT_DATA = {
   product: { name: '', stage: 'mvp', category: 'pm', pitch: '', usp: '', targetUser: 'smb' },
   market: { geography: 'global', b2bVsB2c: 'b2b', segment: '', audienceSize: 's', competition: 'moderate' },
   resources: { timelineWeeks: 'w8', budgetEur: 'b5k', teamSize: 'small', rolesPresent: ['product', 'dev'] },
-  priorities: { focus: 'acquire', engagement: 'moderate', riskKnown: 'none', successMetric: 'signups' },
+  priorities: { focus: 'acquire', engagement: 'moderate', riskKnown: 'none', successMetric: 'signups', rulesFlags: [] },
   context: ''
 }
 
@@ -83,6 +83,14 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
         ? prev.resources.rolesPresent.filter(r => r !== role)
         : [...prev.resources.rolesPresent, role]
       return { ...prev, resources: { ...prev.resources, rolesPresent: roles } }
+    })
+  }
+
+  const toggleRule = (rule) => {
+    setFormData(prev => {
+      const current = prev.priorities.rulesFlags || []
+      const rulesFlags = current.includes(rule) ? current.filter(r => r !== rule) : [...current, rule]
+      return { ...prev, priorities: { ...prev.priorities, rulesFlags } }
     })
   }
 
@@ -163,6 +171,18 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts })
             <Select formData={formData} onChange={handleChange} section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} />
+            <div className="field">
+              <span>{t(lang, 'priorities.rules')}</span>
+              <div className="chip-group">
+                {Object.entries(t(lang, 'priorities.rulesOptions')).map(([key, label]) => (
+                  <button type="button" key={key}
+                    className={`chip ${(formData.priorities.rulesFlags || []).includes(key) ? 'active' : ''}`}
+                    onClick={() => toggleRule(key)}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
             <label className="field">
               <span>{t(lang, 'priorities.context')}</span>
               <textarea rows={3} value={formData.context} placeholder={t(lang, 'priorities.contextPh')}

@@ -1,4 +1,5 @@
 import { t } from '../lib/i18n'
+import { validateRoadmap } from '../lib/roadmapValidator'
 import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle } from './Icons'
 import '../styles/RoadmapCard.css'
 
@@ -23,6 +24,7 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
 
   const { sprints, totalDuration, estimatedCost } = roadmap
   const now = new Date()
+  const issues = validateRoadmap(roadmap)
 
   const currentSprint = sprints.find(sp => sprintDates(generatedAt, sp.sprintId).end >= now) || sprints[sprints.length - 1]
 
@@ -81,6 +83,22 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
           </div>
         </div>
       </div>
+
+      {issues.length > 0 && (
+        <div className="roadmap-issues-banner">
+          <div className="roadmap-issues-title">
+            <IconAlertTriangle width={14} height={14} /> {issues.length} · {t(lang, 'roadmapIssues.title')}
+          </div>
+          <div className="roadmap-issues-list">
+            {issues.map((issue, i) => (
+              <div key={i} className="roadmap-issue-item">
+                <span className={`issue-tag issue-${issue.type}`}>{t(lang, `roadmapIssues.${issue.type}`)}</span>
+                <span>{issue.message}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {overdue.length > 0 && (
         <div className="rollover-banner">

@@ -56,6 +56,19 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
                     <span className="goal-label">{t(lang, 'outputs.goal')}:</span>
                     <span className="goal-value">{channel.goal}</span>
                   </div>
+                  {channel.assets && (
+                    <div className="channel-assets">
+                      {channel.assets.postBrief && (
+                        <p><strong>{t(lang, 'outputs.assets.post')}:</strong> {channel.assets.postBrief}</p>
+                      )}
+                      {channel.assets.emailSubject && (
+                        <p><strong>{t(lang, 'outputs.assets.email')}:</strong> {channel.assets.emailSubject}</p>
+                      )}
+                      {channel.assets.landingTagline && (
+                        <p><strong>{t(lang, 'outputs.assets.landing')}:</strong> {channel.assets.landingTagline}</p>
+                      )}
+                    </div>
+                  )}
                 </>
               )}
             </div>

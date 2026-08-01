@@ -1,9 +1,12 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import RoadmapCard from './RoadmapCard'
 import MarketingCard from './MarketingCard'
 import KPIDashboard from './KPIDashboard'
 import FinancialsCard from './FinancialsCard'
 import StrategyToolkitCard from './StrategyToolkitCard'
+import GanttChart from './GanttChart'
+import AskChart from './AskChart'
+import GeneratedTable from './GeneratedTable'
 import ExportModal from './ExportModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
@@ -17,6 +20,7 @@ export default function PlanViewer({ plan: initialPlan, onReset, lang }) {
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
+  const captureRef = useRef(null)
 
   const budgetKeyFor = (value) => {
     if (value <= 3500) return 'b2k'
@@ -44,6 +48,12 @@ export default function PlanViewer({ plan: initialPlan, onReset, lang }) {
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateKpis = (nextKpis) => {
+    const nextPlan = { ...plan, kpis: nextKpis }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const copySummary = async () => {
     try {
       await navigator.clipboard.writeText(plan.executiveSummary)
@@ -53,7 +63,7 @@ export default function PlanViewer({ plan: initialPlan, onReset, lang }) {
   }
 
   return (
-    <div className="plan-viewer">
+    <div className="plan-viewer" ref={captureRef}>
       <div className="plan-header card">
         <div>
           <h2>{plan.product?.name} — {plan.classification}</h2>
@@ -90,13 +100,16 @@ export default function PlanViewer({ plan: initialPlan, onReset, lang }) {
       <div className="plan-grid">
         <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} />
-        <KPIDashboard kpis={plan.kpis} lang={lang} />
+        <KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} />
         <FinancialsCard financials={plan.financials} lang={lang} />
         <StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} />
+        <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
+        <AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} />
+        <GeneratedTable lang={lang} />
       </div>
 
       {showExport && (
-        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} onClose={() => setShowExport(false)} />
+        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} onClose={() => setShowExport(false)} captureRef={captureRef} />
       )}
     </div>
   )

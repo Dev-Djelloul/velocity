@@ -2,11 +2,28 @@ import { t } from '../lib/i18n'
 import ABTestCalculator from './ABTestCalculator'
 import '../styles/KPIDashboard.css'
 
-export default function KPIDashboard({ kpis, lang }) {
+export default function KPIDashboard({ kpis, lang, onKpisChange }) {
   if (!kpis || kpis.length === 0) return null
 
-  const primaryKpi = kpis[0]
-  const additionalKpis = kpis.slice(1)
+  const updateTarget = (idx, value) => {
+    const next = kpis.map((k, i) => i === idx ? { ...k, target: value === '' ? null : Number(value) } : k)
+    onKpisChange?.(next)
+  }
+
+  const renderTile = (kpi, idx) => (
+    <div key={idx} className="kpi-tile">
+      <div className="kpi-label">{kpi.name}</div>
+      <input
+        className="kpi-value-input"
+        type="number"
+        value={kpi.target ?? ''}
+        placeholder="—"
+        onChange={e => updateTarget(idx, e.target.value)}
+      />
+      <div className="kpi-unit">{kpi.unit}</div>
+      <div className="kpi-formula">{kpi.formula}</div>
+    </div>
+  )
 
   return (
     <div className="kpi-dashboard card">
@@ -15,27 +32,11 @@ export default function KPIDashboard({ kpis, lang }) {
         <p className="kpi-subtitle">Métriques principales de succès</p>
       </div>
 
-      {/* Primary KPI */}
-      <div className="kpi-primary">
-        <div className="kpi-tile">
-          <div className="kpi-label">{primaryKpi.name}</div>
-          <div className="kpi-value">{primaryKpi.target || '—'}</div>
-          <div className="kpi-unit">{primaryKpi.unit}</div>
-          <div className="kpi-formula">{primaryKpi.formula}</div>
-        </div>
-      </div>
+      <div className="kpi-primary">{renderTile(kpis[0], 0)}</div>
 
-      {/* Additional KPIs Grid */}
-      {additionalKpis.length > 0 && (
+      {kpis.length > 1 && (
         <div className="kpi-grid">
-          {additionalKpis.map((kpi, idx) => (
-            <div key={idx} className="kpi-tile">
-              <div className="kpi-label">{kpi.name}</div>
-              <div className="kpi-value">{kpi.target || '—'}</div>
-              <div className="kpi-unit">{kpi.unit}</div>
-              <div className="kpi-formula">{kpi.formula}</div>
-            </div>
-          ))}
+          {kpis.slice(1).map((kpi, idx) => renderTile(kpi, idx + 1))}
         </div>
       )}
 

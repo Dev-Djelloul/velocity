@@ -80,6 +80,50 @@
   gap: var(--spacing-lg);
 }
 
+.kpi-tile {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-lg);
+}
+
+.kpi-label {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.kpi-value-input {
+  background: transparent;
+  border: none;
+  border-bottom: 1px dashed rgba(145, 132, 217, 0.3);
+  color: var(--color-accent);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  width: 100%;
+  padding: 0 0 var(--spacing-xs);
+  margin-bottom: var(--spacing-xs);
+}
+
+.kpi-value-input:focus {
+  outline: none;
+  border-bottom-color: var(--color-accent);
+}
+
+.kpi-unit {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: var(--spacing-sm);
+}
+
+.kpi-formula {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-family: var(--font-family-mono);
+}
+
 .ab-test-calc {
   margin-top: var(--spacing-xl);
   border-top: 1px solid rgba(145, 132, 217, 0.1);

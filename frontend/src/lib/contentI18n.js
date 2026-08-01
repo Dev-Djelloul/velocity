@@ -59,6 +59,17 @@ export const content = {
       Social: ['Annonces', 'Contenu généré par les utilisateurs']
     },
     contentPillarsGeneric: ['Contenu général'],
+    channelAssets: {
+      TikTok: { postBrief: 'Vidéo verticale 15s : montrer le produit en action dès la 1ère seconde, texte overlay avec le bénéfice clé.', emailSubject: null, landingTagline: null },
+      YouTube: { postBrief: 'Format tutoriel 3-5min : présenter un cas d\'usage concret de bout en bout.', emailSubject: null, landingTagline: null },
+      LinkedIn: { postBrief: 'Post texte + visuel : partager un résultat chiffré obtenu par un client ou l\'équipe.', emailSubject: 'Comment [segment] gagne du temps avec [produit]', landingTagline: 'La solution que [segment] attendait' },
+      Content: { postBrief: 'Article de fond (1200+ mots) répondant à une question précise de la cible.', emailSubject: 'Le guide complet pour [objectif]', landingTagline: 'Tout ce qu\'il faut savoir pour [objectif]' },
+      Paid: { postBrief: 'Visuel + accroche orientée bénéfice, avec un CTA unique et clair.', emailSubject: null, landingTagline: 'Essayez gratuitement, sans carte bancaire' },
+      Community: { postBrief: 'Question ouverte pour lancer une discussion sur un pain point courant.', emailSubject: 'Rejoignez la communauté [produit]', landingTagline: null },
+      Partnerships: { postBrief: 'Proposition de co-marketing : offre croisée avec un partenaire complémentaire.', emailSubject: 'Proposition de partenariat avec [produit]', landingTagline: null },
+      Social: { postBrief: 'Annonce courte et visuelle, ton direct, appel à partager.', emailSubject: null, landingTagline: null }
+    },
+    channelAssetsGeneric: { postBrief: 'Contenu adapté au canal, orienté bénéfice utilisateur.', emailSubject: 'Découvrez [produit]', landingTagline: 'Simplifiez [objectif] avec [produit]' },
     kpiFocus: {
       retain: {
         primary: { name: 'DAU/MAU', formula: 'utilisateurs_actifs_jour / utilisateurs_actifs_mois', unit: '%' },
@@ -163,6 +174,17 @@ export const content = {
       Social: ['Announcements', 'UGC']
     },
     contentPillarsGeneric: ['General content'],
+    channelAssets: {
+      TikTok: { postBrief: '15s vertical video: show the product in action from second 1, overlay text with the key benefit.', emailSubject: null, landingTagline: null },
+      YouTube: { postBrief: '3-5min tutorial format: walk through one concrete use case end to end.', emailSubject: null, landingTagline: null },
+      LinkedIn: { postBrief: 'Text + visual post: share a quantified result from a customer or the team.', emailSubject: 'How [segment] saves time with [product]', landingTagline: 'The solution [segment] has been waiting for' },
+      Content: { postBrief: 'In-depth article (1200+ words) answering a specific question from the target audience.', emailSubject: 'The complete guide to [goal]', landingTagline: 'Everything you need to know to [goal]' },
+      Paid: { postBrief: 'Benefit-driven visual + hook, with one clear CTA.', emailSubject: null, landingTagline: 'Try it free, no credit card required' },
+      Community: { postBrief: 'Open question to spark a discussion around a common pain point.', emailSubject: 'Join the [product] community', landingTagline: null },
+      Partnerships: { postBrief: 'Co-marketing proposal: cross offer with a complementary partner.', emailSubject: 'Partnership proposal with [product]', landingTagline: null },
+      Social: { postBrief: 'Short, visual announcement, direct tone, call to share.', emailSubject: null, landingTagline: null }
+    },
+    channelAssetsGeneric: { postBrief: 'Channel-adapted content, focused on user benefit.', emailSubject: 'Discover [product]', landingTagline: 'Simplify [goal] with [product]' },
     kpiFocus: {
       retain: {
         primary: { name: 'DAU/MAU', formula: 'active_users_daily / active_users_monthly', unit: '%' },

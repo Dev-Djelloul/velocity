@@ -147,6 +147,80 @@ export async function exportPDF(plan, lang) {
   pdfMake.createPdf(docDefinition).download(`${slug(plan.product?.name)}-launch-plan.pdf`)
 }
 
+const BRAND_VIOLET = '9184D9'
+const BRAND_DARK = '141922'
+
+export async function exportPPTX(plan, lang) {
+  const { default: PptxGenJS } = await import('pptxgenjs')
+  const pptx = new PptxGenJS()
+  pptx.defineLayout({ name: 'VL', width: 10, height: 5.63 })
+  pptx.layout = 'VL'
+
+  const titleSlide = pptx.addSlide()
+  titleSlide.background = { color: BRAND_DARK }
+  titleSlide.addText(plan.product?.name || 'Launch Plan', { x: 0.5, y: 1.8, w: 9, h: 1, fontSize: 32, bold: true, color: 'FFFFFF' })
+  titleSlide.addText(plan.classification || '', { x: 0.5, y: 2.7, w: 9, h: 0.6, fontSize: 16, color: BRAND_VIOLET })
+  titleSlide.addText(plan.product?.pitch || '', { x: 0.5, y: 3.3, w: 9, h: 1, fontSize: 12, color: 'C2C3C9' })
+  titleSlide.addText('VelocityLaunch', { x: 0.5, y: 5.2, w: 4, h: 0.3, fontSize: 9, color: BRAND_VIOLET, bold: true })
+
+  if (plan.executiveSummary) {
+    const s = pptx.addSlide()
+    s.background = { color: BRAND_DARK }
+    s.addText(t(lang, 'outputs.executiveSummary'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
+    s.addText(plan.executiveSummary, { x: 0.5, y: 1.3, w: 9, h: 3.5, fontSize: 14, color: 'FFFFFF', italic: true })
+  }
+
+  const roadmapSlide = pptx.addSlide()
+  roadmapSlide.background = { color: BRAND_DARK }
+  roadmapSlide.addText(t(lang, 'outputs.roadmap'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
+  roadmapSlide.addTable(
+    [
+      [t(lang, 'outputs.sprint'), t(lang, 'outputs.summary'), t(lang, 'outputs.estimatedCostEur')].map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10 } })),
+      ...plan.roadmap.sprints.map(sp => [
+        { text: `${sp.sprintId}` },
+        { text: sp.stories.map(s => s.title).join(', ') },
+        { text: `${sp.estimatedCost} €` }
+      ].map(cell => ({ ...cell, options: { color: 'FFFFFF', fontSize: 9 } })))
+    ],
+    { x: 0.5, y: 1.2, w: 9, colW: [1, 6, 2], border: { type: 'solid', color: BRAND_VIOLET, pt: 0.5 } }
+  )
+
+  const marketingSlide = pptx.addSlide()
+  marketingSlide.background = { color: BRAND_DARK }
+  marketingSlide.addText(t(lang, 'outputs.marketing'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
+  marketingSlide.addTable(
+    [
+      [t(lang, 'outputs.channel'), t(lang, 'outputs.estimatedCostEur'), t(lang, 'outputs.goal')].map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10 } })),
+      ...plan.marketing.channels.map(ch => [
+        { text: ch.name }, { text: `${ch.budget} €` }, { text: ch.goal }
+      ].map(cell => ({ ...cell, options: { color: 'FFFFFF', fontSize: 9 } })))
+    ],
+    { x: 0.5, y: 1.2, w: 9, colW: [2, 2, 5], border: { type: 'solid', color: BRAND_VIOLET, pt: 0.5 } }
+  )
+
+  const kpiSlide = pptx.addSlide()
+  kpiSlide.background = { color: BRAND_DARK }
+  kpiSlide.addText(t(lang, 'outputs.kpis'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
+  kpiSlide.addTable(
+    [
+      [t(lang, 'outputs.name'), t(lang, 'outputs.target'), t(lang, 'outputs.unit')].map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10 } })),
+      ...plan.kpis.map(k => [
+        { text: k.name }, { text: `${k.target ?? '—'}` }, { text: k.unit }
+      ].map(cell => ({ ...cell, options: { color: 'FFFFFF', fontSize: 9 } })))
+    ],
+    { x: 0.5, y: 1.2, w: 9, colW: [4, 3, 2], border: { type: 'solid', color: BRAND_VIOLET, pt: 0.5 } }
+  )
+
+  await pptx.writeFile({ fileName: `${slug(plan.product?.name)}-pitch-deck.pptx` })
+}
+
+export async function exportImage(node, plan) {
+  if (!node) return
+  const { default: html2canvas } = await import('html2canvas')
+  const canvas = await html2canvas(node, { backgroundColor: '#0f1419', scale: 2, useCORS: true })
+  canvas.toBlob(blob => downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.png`))
+}
+
 export function downloadBlob(blob, filename) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')

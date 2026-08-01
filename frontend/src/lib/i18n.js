@@ -65,8 +65,46 @@ export const translations = {
       riskOptions: { none: 'Aucun', notready: 'Produit non prêt', pmf: 'Product-market fit incertain', budget: 'Budget limité' },
       successMetric: 'Métrique de succès',
       successOptions: { signups: '# Inscriptions', arr: 'ARR', retention: 'Rétention', community: 'Taille communauté' },
+      rules: 'Règles de génération (optionnel)',
+      rulesOptions: {
+        marketingFirst: 'Priorise le marketing avant le dev',
+        designFirst: 'Équipe orientée design',
+        devFirst: 'Priorise le développement'
+      },
       context: 'Autre chose à préciser ? (optionnel)',
       contextPh: 'Contraintes spécifiques, particularités du marché, éléments que le questionnaire ne couvre pas...'
+    },
+    gantt: {
+      title: 'Gantt interactif',
+      subtitle: 'Glisse une story vers un autre sprint pour la replanifier',
+      dragHint: 'Astuce : fais glisser une carte vers une autre colonne pour changer son sprint.'
+    },
+    askChart: {
+      title: 'Graphiques en langage naturel',
+      subtitle: 'Pose une question sur ton plan, le graphique correspondant s\'affiche',
+      placeholder: 'ex : montre-moi le budget par mois',
+      ask: 'Générer',
+      noData: 'Pas assez de données pour répondre à cette question — essaie une des suggestions.',
+      suggestions: [
+        'Budget par canal',
+        'Effort par sprint',
+        'Coût par sprint',
+        'Cibles des KPI'
+      ]
+    },
+    genTable: {
+      title: 'Tableau généré par prompt',
+      subtitle: 'Décris le tableau dont tu as besoin, il se construit automatiquement',
+      placeholder: 'ex : tableau de suivi des influenceurs à contacter',
+      generate: 'Générer le tableau',
+      addRow: '+ Ajouter une ligne'
+    },
+    roadmapIssues: {
+      title: 'Alertes roadmap',
+      bottleneck: 'Goulot de capacité',
+      'dependency-conflict': 'Conflit de dépendance',
+      'same-sprint-dependency': 'Dépendance dans le même sprint',
+      'missing-dependency': 'Dépendance introuvable'
     },
     outputs: {
       roadmap: 'Roadmap Agile',
@@ -107,6 +145,11 @@ export const translations = {
       executiveSummary: 'Résumé exécutif',
       copySummary: 'Copier le résumé',
       summaryCopied: 'Copié !',
+      assets: {
+        post: 'Brief de post',
+        email: 'Objet email',
+        landing: 'Accroche landing'
+      },
       financials: {
         title: 'Prévisionnel financier',
         subtitle: 'Estimation simplifiée à partir de votre budget',
@@ -143,6 +186,8 @@ export const translations = {
       pdf: 'Export PDF',
       github: 'Export GitHub Issues',
       jira: 'Export Jira (CSV)',
+      pptx: 'Export pitch deck (PPTX)',
+      image: 'Export image (PNG)',
       close: 'Fermer'
     },
     errors: {
@@ -215,8 +260,46 @@ export const translations = {
       riskOptions: { none: 'None', notready: 'Product not ready', pmf: 'Market fit unclear', budget: 'Budget limits' },
       successMetric: 'Success metric',
       successOptions: { signups: '# Signups', arr: 'ARR', retention: 'Retention', community: 'Community size' },
+      rules: 'Generation rules (optional)',
+      rulesOptions: {
+        marketingFirst: 'Prioritize marketing before dev',
+        designFirst: 'Design-led team',
+        devFirst: 'Prioritize development'
+      },
       context: 'Anything else to add? (optional)',
       contextPh: "Specific constraints, market particularities, anything the questionnaire doesn't cover..."
+    },
+    gantt: {
+      title: 'Interactive Gantt',
+      subtitle: 'Drag a story to another sprint to reschedule it',
+      dragHint: 'Tip: drag a card to another column to change its sprint.'
+    },
+    askChart: {
+      title: 'Natural language charts',
+      subtitle: 'Ask a question about your plan, the matching chart appears',
+      placeholder: 'e.g. show me the budget by month',
+      ask: 'Generate',
+      noData: 'Not enough data to answer this — try one of the suggestions.',
+      suggestions: [
+        'Budget by channel',
+        'Effort by sprint',
+        'Cost by sprint',
+        'KPI targets'
+      ]
+    },
+    genTable: {
+      title: 'Prompt-generated table',
+      subtitle: 'Describe the table you need, it builds itself automatically',
+      placeholder: 'e.g. tracking table for influencers to contact',
+      generate: 'Generate table',
+      addRow: '+ Add row'
+    },
+    roadmapIssues: {
+      title: 'Roadmap alerts',
+      bottleneck: 'Capacity bottleneck',
+      'dependency-conflict': 'Dependency conflict',
+      'same-sprint-dependency': 'Same-sprint dependency',
+      'missing-dependency': 'Missing dependency'
     },
     outputs: {
       roadmap: 'Agile Roadmap',
@@ -257,6 +340,11 @@ export const translations = {
       executiveSummary: 'Executive summary',
       copySummary: 'Copy summary',
       summaryCopied: 'Copied!',
+      assets: {
+        post: 'Post brief',
+        email: 'Email subject',
+        landing: 'Landing tagline'
+      },
       financials: {
         title: 'Financial forecast',
         subtitle: 'Simplified estimate based on your budget',
@@ -293,6 +381,8 @@ export const translations = {
       pdf: 'Export PDF',
       github: 'Export GitHub Issues',
       jira: 'Export Jira (CSV)',
+      pptx: 'Export pitch deck (PPTX)',
+      image: 'Export image (PNG)',
       close: 'Close'
     },
     errors: {
