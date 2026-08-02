@@ -85,6 +85,7 @@
 }
 
 .plan-sidebar-item {
+  text-decoration: none;
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -165,7 +166,7 @@
 }
 
 .plan-section-anchor {
-  display: contents;
+  scroll-margin-top: 2rem;
 }
 
 @media (max-width: 900px) {

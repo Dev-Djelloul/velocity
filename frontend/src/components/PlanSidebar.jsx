@@ -35,13 +35,7 @@ export default function PlanSidebar({ lang }) {
   const [resizing, setResizing] = useState(false)
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
 
-  const goTo = (id) => {
-    setActiveId(id)
-    const wrapper = document.getElementById(id)
-    const card = wrapper?.firstElementChild || wrapper
-    const heading = card?.querySelector('h1, h2, h3, h4')
-    ;(heading || card)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  const goTo = (id) => setActiveId(id)
 
   const startResize = (e) => {
     e.preventDefault()
@@ -93,15 +87,16 @@ export default function PlanSidebar({ lang }) {
 
       <nav className="plan-sidebar-nav">
         {SECTIONS.map(({ id, labelKey, Icon }) => (
-          <button
+          <a
             key={id}
+            href={`#${id}`}
             className={`plan-sidebar-item ${activeId === id ? 'active' : ''}`}
             onClick={() => goTo(id)}
             title={collapsed ? t(lang, labelKey) : undefined}
           >
             <span className="plan-sidebar-icon"><Icon width={16} height={16} /></span>
             {!collapsed && <span className="plan-sidebar-label">{t(lang, labelKey)}</span>}
-          </button>
+          </a>
         ))}
       </nav>
 
