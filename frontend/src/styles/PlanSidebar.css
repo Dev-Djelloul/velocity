@@ -162,7 +162,10 @@
 .plan-viewer-main {
   flex: 1;
   min-width: 0;
-  padding-bottom: 50vh;
+}
+
+.plan-scroll-spacer {
+  width: 100%;
 }
 
 .plan-section-anchor {
