@@ -476,6 +476,42 @@ export const translations = {
       security: 'Sécurité',
       rightsReserved: 'Tous droits réservés.',
       madeWith: 'Construit avec 🧡 pour les makers et founders'
+    },
+    calendar: {
+      title: 'Calendrier',
+      subtitle: 'Vue calendrier de la roadmap, actualisée automatiquement à chaque déplacement',
+      prevMonth: 'Mois précédent',
+      nextMonth: 'Mois suivant',
+      today: "Aujourd'hui",
+      autoSyncHint: 'Ce calendrier se recalcule automatiquement dès qu\'une story est déplacée dans le Gantt ou la roadmap.'
+    },
+    auth: {
+      getStarted: 'Commencer',
+      signIn: 'Se connecter',
+      signOut: 'Se déconnecter',
+      myAccount: 'Mon compte',
+      plansGate: 'Connecte-toi pour accéder à tes plans et brouillons.',
+      demoModeNotice: 'Mode démo — aucune clé Clerk configurée, la connexion est simulée en local.'
+    },
+    account: {
+      title: 'Mon compte',
+      subtitle: 'Gère ton profil, tes plans et ton abonnement',
+      backToApp: "Retour à l'app",
+      creditsTitle: 'Génération de plans',
+      creditsFree: (used, limit) => `${used} / ${limit} plans gratuits utilisés`,
+      creditsPro: 'Abonnement Pro actif — générations illimitées',
+      creditsExhausted: 'Tu as utilisé tes 3 plans gratuits.',
+      upgradeCta: 'Passer en Pro',
+      upgradeTitle: 'Passer en Pro',
+      upgradeBody: 'Débloque des générations de plans illimitées et les futures fonctionnalités Pro.',
+      upgradeNote: 'Le paiement Stripe sera activé dès que la clé sera configurée côté serveur.',
+      upgradeConfirm: 'Continuer vers le paiement',
+      plansSectionTitle: 'Mes plans',
+      draftsSectionTitle: 'Mes brouillons',
+      noPlans: 'Aucun plan généré pour le moment.',
+      noDrafts: 'Aucun brouillon sauvegardé.',
+      memberSince: 'Membre depuis',
+      demoBadge: 'Compte démo'
     }
   },
   en: {
@@ -955,6 +991,42 @@ export const translations = {
       security: 'Security',
       rightsReserved: 'All rights reserved.',
       madeWith: 'Built with 🧡 for makers and founders'
+    },
+    calendar: {
+      title: 'Calendar',
+      subtitle: 'Calendar view of the roadmap, automatically refreshed on every move',
+      prevMonth: 'Previous month',
+      nextMonth: 'Next month',
+      today: 'Today',
+      autoSyncHint: 'This calendar recalculates automatically whenever a story is moved in the Gantt or roadmap.'
+    },
+    auth: {
+      getStarted: 'Get Started',
+      signIn: 'Sign in',
+      signOut: 'Sign out',
+      myAccount: 'My account',
+      plansGate: 'Sign in to access your plans and drafts.',
+      demoModeNotice: 'Demo mode — no Clerk key configured, sign-in is simulated locally.'
+    },
+    account: {
+      title: 'My account',
+      subtitle: 'Manage your profile, plans and subscription',
+      backToApp: 'Back to app',
+      creditsTitle: 'Plan generation',
+      creditsFree: (used, limit) => `${used} / ${limit} free plans used`,
+      creditsPro: 'Pro subscription active — unlimited generations',
+      creditsExhausted: "You've used your 3 free plans.",
+      upgradeCta: 'Upgrade to Pro',
+      upgradeTitle: 'Upgrade to Pro',
+      upgradeBody: 'Unlock unlimited plan generations and future Pro features.',
+      upgradeNote: 'Stripe payment will go live as soon as the key is configured server-side.',
+      upgradeConfirm: 'Continue to payment',
+      plansSectionTitle: 'My plans',
+      draftsSectionTitle: 'My drafts',
+      noPlans: 'No plan generated yet.',
+      noDrafts: 'No saved drafts.',
+      memberSince: 'Member since',
+      demoBadge: 'Demo account'
     }
   }
 }

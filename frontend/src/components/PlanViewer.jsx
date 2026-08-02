@@ -5,6 +5,7 @@ import KPIDashboard from './KPIDashboard'
 import FinancialsCard from './FinancialsCard'
 import StrategyToolkitCard from './StrategyToolkitCard'
 import GanttChart from './GanttChart'
+import CalendarView from './CalendarView'
 import AskChart from './AskChart'
 import GeneratedTable from './GeneratedTable'
 import ExportModal from './ExportModal'
@@ -115,6 +116,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       <div className="plan-grid">
         <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
+        <CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} />
         <MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} />
         <KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} />
         <FinancialsCard financials={plan.financials} lang={lang} />

@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Landing from './components/Landing'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconHome } from './components/Icons'
+import { IconClipboard, IconHome, IconUser } from './components/Icons'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -10,19 +10,24 @@ import PlansHistory from './components/PlansHistory'
 import DraftsModal from './components/DraftsModal'
 import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
+import AccountPage from './components/AccountPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
 import { PricingModal, ChangelogModal, RoadmapModal } from './components/ProductModals'
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getPlanById, getShareLink } from './lib/planStorage'
+import { savePlan, getShareLink } from './lib/planStorage'
+import { useUser, useAuth, useSignIn, UserButton } from './lib/auth'
+import { canGenerate, consumeCredit, remainingCredits, isPro } from './lib/creditTracker'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account']
+
 export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('plp_lang') || 'fr')
-  const [currentPage, setCurrentPage] = useState('landing') // landing, questionnaire, result
+  const [currentPage, setCurrentPage] = useState('landing') // landing, questionnaire, result, howItWorks, account
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
   const [initialFormData, setInitialFormData] = useState(null)
@@ -31,6 +36,11 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false)
   const [showDrafts, setShowDrafts] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
+
+  const { isSignedIn, isLoaded, user } = useUser()
+  const { userId, signOut } = useAuth()
+  const { open: openSignIn } = useSignIn()
+  const wasSignedIn = useRef(isSignedIn)
 
   useEffect(() => {
     localStorage.setItem('plp_lang', lang)
@@ -48,6 +58,25 @@ export default function App() {
       }
     }
   }, [])
+
+  // Flux demandé : Get Started -> connexion -> atterrit sur "Mon compte" -> l'utilisateur
+  // revient ensuite lui-même vers la génération. Détecte toute transition signed-out -> signed-in.
+  useEffect(() => {
+    if (!isLoaded) return
+    if (!wasSignedIn.current && isSignedIn) {
+      setCurrentPage('account')
+      window.scrollTo(0, 0)
+    }
+    wasSignedIn.current = isSignedIn
+  }, [isSignedIn, isLoaded])
+
+  // Garde-fou : les pages compte/questionnaire/résultat exigent une session active.
+  useEffect(() => {
+    if (!isLoaded) return
+    if (AUTH_ONLY_PAGES.includes(currentPage) && !isSignedIn) {
+      setCurrentPage('landing')
+    }
+  }, [currentPage, isSignedIn, isLoaded])
 
   const handleGenerate = async (data) => {
     setLoading(true)
@@ -69,6 +98,7 @@ export default function App() {
         generatedPlan = generatePlan(payload)
       }
       savePlan(generatedPlan)
+      consumeCredit(userId)
       setPlan(generatedPlan)
       setJustGenerated(true)
       setCurrentPage('result')
@@ -77,6 +107,7 @@ export default function App() {
       try {
         const generatedPlan = generatePlan(payload)
         savePlan(generatedPlan)
+        consumeCredit(userId)
         setPlan(generatedPlan)
         setJustGenerated(true)
         setCurrentPage('result')
@@ -90,6 +121,15 @@ export default function App() {
   }
 
   const handleStartClick = () => {
+    if (!isSignedIn) {
+      openSignIn()
+      return
+    }
+    if (!canGenerate(userId)) {
+      setCurrentPage('account')
+      window.scrollTo(0, 0)
+      return
+    }
     setCurrentPage('questionnaire')
     window.scrollTo(0, 0)
   }
@@ -99,17 +139,21 @@ export default function App() {
     setJustGenerated(false)
     localStorage.removeItem('plp_form')
     setInitialFormData(null)
-    setCurrentPage('questionnaire')
-    window.scrollTo(0, 0)
+    handleStartClick()
   }
 
   const handleLoadDemo = (demoData) => {
+    if (!isSignedIn) {
+      openSignIn()
+      return
+    }
     handleGenerate(demoData)
   }
 
-  const handleLoadFromHistory = (plan) => {
-    setPlan(plan)
+  const handleLoadFromHistory = (loadedPlan) => {
+    setPlan(loadedPlan)
     setJustGenerated(false)
+    setShowHistory(false)
     setCurrentPage('result')
     window.scrollTo(0, 0)
   }
@@ -133,6 +177,14 @@ export default function App() {
     setCurrentPage('howItWorks')
     window.scrollTo(0, 0)
   }
+
+  const goToAccount = () => {
+    setCurrentPage('account')
+    window.scrollTo(0, 0)
+  }
+
+  const remaining = isSignedIn ? remainingCredits(userId) : 0
+  const pro = isSignedIn && isPro(userId)
 
   return (
     <div className="app">
@@ -169,16 +221,32 @@ export default function App() {
           </nav>
 
           <div className="header-actions">
-            <button className="btn-header" onClick={() => setShowHistory(true)} title="Mes plans">
-              <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Plans' : 'Plans'}
-            </button>
+            {isSignedIn && (
+              <>
+                {!pro && (
+                  <span className="header-credits-badge">{remaining}/3 {lang === 'fr' ? 'plans' : 'plans'}</span>
+                )}
+                <button className="btn-header" onClick={() => setShowHistory(true)} title={t(lang, 'account.plansSectionTitle')}>
+                  <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Plans' : 'Plans'}
+                </button>
+              </>
+            )}
             <div className="lang-toggle">
               <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
               <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
             </div>
-            <button className="btn-header-cta" onClick={handleStartClick}>
-              {lang === 'fr' ? 'Commencer' : 'Get Started'}
-            </button>
+            {isSignedIn ? (
+              <>
+                <button className="btn-header" onClick={goToAccount} title={t(lang, 'auth.myAccount')}>
+                  <IconUser width={16} height={16} />
+                </button>
+                <UserButton />
+              </>
+            ) : (
+              <button className="btn-header-cta" onClick={handleStartClick}>
+                {t(lang, 'auth.getStarted')}
+              </button>
+            )}
           </div>
         </div>
       </header>
@@ -192,11 +260,19 @@ export default function App() {
         {currentPage === 'howItWorks' && (
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
         )}
-        {currentPage === 'questionnaire' && (
+        {currentPage === 'questionnaire' && isSignedIn && (
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
-        {currentPage === 'result' && plan && (
+        {currentPage === 'result' && plan && isSignedIn && (
           <PlanViewer plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />
+        )}
+        {currentPage === 'account' && isSignedIn && (
+          <AccountPage
+            lang={lang}
+            onBack={() => setCurrentPage('landing')}
+            onLoadPlan={handleLoadFromHistory}
+            onLoadDraft={handleLoadDraft}
+          />
         )}
       </main>
 
@@ -204,7 +280,7 @@ export default function App() {
 
       <ScrollToTop />
 
-      {showHistory && (
+      {showHistory && isSignedIn && (
         <PlansHistory
           lang={lang}
           onLoadPlan={handleLoadFromHistory}

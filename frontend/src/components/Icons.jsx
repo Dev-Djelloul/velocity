@@ -287,6 +287,56 @@ export function IconCircleDot(props) {
   )
 }
 
+export function IconChevronLeft(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
+  )
+}
+
+export function IconChevronRight(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 5l7 7-7 7" />
+    </svg>
+  )
+}
+
+export function IconCalendar(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="4" y="5" width="16" height="16" rx="2" />
+      <path d="M4 10h16M8 3v4M16 3v4" />
+    </svg>
+  )
+}
+
+export function IconArrowLeft(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M19 12H5M5 12l6-6M5 12l6 6" />
+    </svg>
+  )
+}
+
+export function IconTrash(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />
+    </svg>
+  )
+}
+
+export function IconCreditCard(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3" y="6" width="18" height="13" rx="2" />
+      <path d="M3 10h18M6 15h4" />
+    </svg>
+  )
+}
+
 export function IconRocket(props) {
   return (
     <svg {...base} {...props}>
