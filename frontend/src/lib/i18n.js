@@ -133,6 +133,18 @@ export const translations = {
       onTrack: 'Dans les temps',
       behind: 'En retard'
     },
+    dashboardBi: {
+      title: 'Dashboard',
+      subtitle: 'Vue d\'ensemble croisée du plan — budget, charge, vélocité et KPIs',
+      budgetByChannel: 'Budget par canal',
+      workloadByRole: 'Charge par responsable',
+      velocityBySprint: 'Vélocité par sprint',
+      kpiTargets: 'Objectifs KPIs',
+      costSplit: 'Répartition des coûts',
+      total: 'Total',
+      totalEffort: 'Effort total',
+      monthlyBurn: 'Burn mensuel'
+    },
     roadmapIssues: {
       title: 'Alertes roadmap',
       bottleneck: 'Goulot de capacité',
@@ -689,6 +701,18 @@ export const translations = {
       actual: 'Actual',
       onTrack: 'On track',
       behind: 'Behind'
+    },
+    dashboardBi: {
+      title: 'Dashboard',
+      subtitle: 'Cross-cutting overview of the plan — budget, workload, velocity and KPIs',
+      budgetByChannel: 'Budget by channel',
+      workloadByRole: 'Workload by role',
+      velocityBySprint: 'Velocity by sprint',
+      kpiTargets: 'KPI targets',
+      costSplit: 'Cost split',
+      total: 'Total',
+      totalEffort: 'Total effort',
+      monthlyBurn: 'Monthly burn'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

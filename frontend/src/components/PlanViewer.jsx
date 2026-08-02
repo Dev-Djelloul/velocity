@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
 import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
@@ -112,6 +113,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       <div className="plan-grid">
+        <DashboardBI plan={plan} lang={lang} />
         <PersonaCard persona={plan.persona} lang={lang} />
         <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} />
