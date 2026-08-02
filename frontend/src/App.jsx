@@ -155,7 +155,7 @@ export default function App() {
                 window.scrollTo(0, 0)
               }}
             >
-              <IconHome width={16} height={16} />
+              <IconHome width={20} height={20} />
             </button>
             <button className="header-nav-link" onClick={() => handleNavAnchor('features')}>
               {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
