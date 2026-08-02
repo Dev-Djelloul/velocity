@@ -93,6 +93,62 @@ export async function findUserIdByStripeCustomer(env, stripeCustomerId) {
   return row?.user_id ?? null
 }
 
+export async function createAgentTask(env, { id, planId, userId, type, input }) {
+  await env.DB.prepare(
+    `INSERT INTO agent_tasks (id, plan_id, user_id, type, status, input, created_at, updated_at)
+     VALUES (?, ?, ?, ?, 'queued', ?, datetime('now'), datetime('now'))`
+  ).bind(id, planId, userId, type, JSON.stringify(input)).run()
+}
+
+export async function updateAgentTask(env, id, { status, output, error, attempts }) {
+  await env.DB.prepare(
+    `UPDATE agent_tasks
+     SET status = ?, output = ?, error = ?, attempts = ?, updated_at = datetime('now')
+     WHERE id = ?`
+  ).bind(
+    status,
+    output !== undefined ? JSON.stringify(output) : null,
+    error ?? null,
+    attempts ?? 0,
+    id
+  ).run()
+}
+
+export async function getAgentTask(env, id) {
+  const row = await env.DB.prepare('SELECT * FROM agent_tasks WHERE id = ?').bind(id).first()
+  if (!row) return null
+  return {
+    id: row.id,
+    planId: row.plan_id,
+    userId: row.user_id,
+    type: row.type,
+    status: row.status,
+    input: JSON.parse(row.input),
+    output: row.output ? JSON.parse(row.output) : null,
+    error: row.error,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  }
+}
+
+export async function listAgentTasksForPlan(env, planId) {
+  const { results } = await env.DB.prepare(
+    'SELECT * FROM agent_tasks WHERE plan_id = ? ORDER BY created_at DESC LIMIT 50'
+  ).bind(planId).all()
+  return results.map(row => ({
+    id: row.id,
+    planId: row.plan_id,
+    userId: row.user_id,
+    type: row.type,
+    status: row.status,
+    input: JSON.parse(row.input),
+    output: row.output ? JSON.parse(row.output) : null,
+    error: row.error,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at
+  }))
+}
+
 export async function setPro(env, userId, isPro, stripeCustomerId) {
   await env.DB.prepare(
     `INSERT INTO credits (user_id, is_pro, stripe_customer_id, updated_at) VALUES (?, ?, ?, datetime('now'))

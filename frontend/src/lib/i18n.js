@@ -152,6 +152,26 @@ export const translations = {
       expand: 'Déplier le panneau',
       createPlan: 'Créer un plan'
     },
+    agents: {
+      title: 'Agents IA',
+      subtitle: 'Des actions IA asynchrones qui tournent en tâche de fond, indépendamment de cette page',
+      briefLabel: 'Rédiger un brief d\'exécution',
+      kpiLabel: 'Recalculer les KPIs',
+      selectStory: 'Choisir une story...',
+      run: 'Lancer',
+      logTitle: 'Journal d\'activité',
+      logEmpty: 'Aucune action lancée pour le moment.',
+      type: {
+        story_brief: 'Brief d\'exécution',
+        recalc_kpis: 'Recalcul des KPIs'
+      },
+      status: {
+        queued: 'En attente',
+        running: 'En cours',
+        done: 'Terminé',
+        error: 'Erreur'
+      }
+    },
     roadmapIssues: {
       title: 'Alertes roadmap',
       bottleneck: 'Goulot de capacité',
@@ -727,6 +747,26 @@ export const translations = {
       collapse: 'Collapse panel',
       expand: 'Expand panel',
       createPlan: 'Create a plan'
+    },
+    agents: {
+      title: 'AI Agents',
+      subtitle: 'Asynchronous AI actions running in the background, independent of this page',
+      briefLabel: 'Write an execution brief',
+      kpiLabel: 'Recalculate KPIs',
+      selectStory: 'Choose a story...',
+      run: 'Run',
+      logTitle: 'Activity log',
+      logEmpty: 'No action triggered yet.',
+      type: {
+        story_brief: 'Execution brief',
+        recalc_kpis: 'KPI recalculation'
+      },
+      status: {
+        queued: 'Queued',
+        running: 'Running',
+        done: 'Done',
+        error: 'Error'
+      }
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

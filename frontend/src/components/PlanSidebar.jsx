@@ -21,7 +21,8 @@ const SECTIONS = [
   { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin },
   { id: 'section-strategy', labelKey: 'outputs.strategy.title', Icon: IconShield },
   { id: 'section-askchart', labelKey: 'askChart.title', Icon: IconSparkle },
-  { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave }
+  { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave },
+  { id: 'section-agents', labelKey: 'agents.title', Icon: IconSparkle }
 ]
 
 const RAIL_WIDTH = 60

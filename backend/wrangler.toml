@@ -14,6 +14,16 @@ binding = "DB"
 database_name = "velocity-launch-db"
 database_id = "7a61b463-24c3-4687-8a37-d71e815ca787"
 
+[[queues.producers]]
+queue = "velocity-agent-tasks"
+binding = "AGENT_TASKS_QUEUE"
+
+[[queues.consumers]]
+queue = "velocity-agent-tasks"
+max_batch_size = 5
+max_batch_timeout = 5
+max_retries = 3
+
 [env.production]
 name = "velocity-launch-prod"
 

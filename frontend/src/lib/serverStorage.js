@@ -81,6 +81,18 @@ export function generateTable(prompt, plan, lang) {
   })
 }
 
+export function enqueueAgentTask(planId, userId, type, input) {
+  return safeFetch('/agents/enqueue', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ planId, userId, type, input })
+  })
+}
+
+export function fetchAgentTasks(planId) {
+  return safeFetch(`/agents/tasks?planId=${encodeURIComponent(planId)}`).then(r => r || [])
+}
+
 export function createCheckoutSession(userId, email) {
   return safeFetch('/checkout', {
     method: 'POST',

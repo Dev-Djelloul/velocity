@@ -13,9 +13,11 @@ import BurndownChart from './BurndownChart'
 import CalendarView from './CalendarView'
 import AskChart from './AskChart'
 import GeneratedTable from './GeneratedTable'
+import AgentActivity from './AgentActivity'
 import ExportModal from './ExportModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
+import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock } from './Icons'
@@ -23,6 +25,7 @@ import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang }) {
+  const { userId } = useAuth()
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
@@ -130,6 +133,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
+        <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
       </div>
 
       {showExport && (
