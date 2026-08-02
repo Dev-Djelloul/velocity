@@ -39,6 +39,8 @@ export function generateRoadmap(resources, product, priorities, lang) {
       stories.push({
         id,
         title: dict.stories[tmpl.key],
+        description: dict.storyDescriptions[tmpl.key],
+        acceptanceCriteria: dict.storyAcceptance[tmpl.key],
         assignee: dict.assignees[tmpl.assignee] || tmpl.assignee,
         effort: tmpl.effort,
         cost: costFor(tmpl.category, tmpl.type),

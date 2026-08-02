@@ -25,6 +25,34 @@ export const content = {
       thoughtLeadership: 'Publier du contenu d\'expertise',
       feedback: 'Itérer sur les retours utilisateurs'
     },
+    storyDescriptions: {
+      onboarding: 'Guider les nouveaux utilisateurs jusqu\'à leur premier succès dans le produit.',
+      positioning: 'Clarifier le message et la différenciation avant toute communication publique.',
+      landing: 'Concevoir la page qui convertira les premiers visiteurs en inscrits.',
+      stagingDeploy: 'Rendre le produit testable dans un environnement proche de la production.',
+      teaser: 'Créer un contenu vidéo qui donne envie avant même le lancement.',
+      analytics: 'Instrumenter le produit pour mesurer l\'usage réel dès le premier jour.',
+      publicBeta: 'Ouvrir l\'accès à un premier groupe d\'utilisateurs réels.',
+      paidCampaign: 'Tester l\'acquisition payante sur le canal identifié comme prioritaire.',
+      community: 'Créer un point de rassemblement pour les premiers utilisateurs engagés.',
+      qa: 'Sécuriser la stabilité avant une exposition plus large.',
+      thoughtLeadership: 'Construire la crédibilité de la marque sur son sujet d\'expertise.',
+      feedback: 'Transformer les retours des premiers utilisateurs en améliorations concrètes.'
+    },
+    storyAcceptance: {
+      onboarding: ['L\'utilisateur atteint la première action clé sans aide', 'Moins de 3 étapes avant la valeur perçue'],
+      positioning: ['Une phrase de positionnement validée par l\'équipe', 'Le document distingue clairement des 2-3 concurrents principaux'],
+      landing: ['Un CTA principal visible sans scroll', 'Le bénéfice principal est lisible en moins de 5 secondes'],
+      stagingDeploy: ['L\'environnement est accessible à l\'équipe', 'Le parcours principal fonctionne de bout en bout'],
+      teaser: ['Durée de 15 à 30 secondes', 'Le produit et son bénéfice sont identifiables en un visionnage'],
+      analytics: ['Les événements clés du parcours utilisateur sont trackés', 'Un dashboard basique est consultable par l\'équipe'],
+      publicBeta: ['Un canal de retour utilisateur est en place', 'Les inscriptions sont limitées et suivies'],
+      paidCampaign: ['Le tracking de conversion est en place avant le lancement', 'Un budget quotidien plafond est défini'],
+      community: ['Le canal est accessible publiquement', 'Un message de bienvenue explique les règles'],
+      qa: ['Le parcours critique est testé manuellement', 'Aucun bug bloquant connu n\'est ouvert'],
+      thoughtLeadership: ['Le contenu est publié sur au moins un canal propre', 'Le sujet est directement lié à la proposition de valeur'],
+      feedback: ['Au moins 3 retours utilisateurs sont synthétisés', 'Une action produit est priorisée à partir de ces retours']
+    },
     assignees: {
       Dev: 'Dev',
       Marketing: 'Marketing',
@@ -96,6 +124,24 @@ export const content = {
         enterprise: 'Chef de produit, Scale-up',
         niche: 'Expert spécialisé'
       },
+      ageRanges: {
+        freelancers: '28-40 ans',
+        smb: '32-45 ans',
+        enterprise: '30-42 ans',
+        niche: '35-50 ans'
+      },
+      contexts: {
+        freelancers: 'Jongle entre plusieurs clients et outils : chaque minute gagnée compte directement sur sa marge.',
+        smb: 'Porte plusieurs casquettes dans une petite équipe et doit justifier chaque dépense en interne.',
+        enterprise: 'Doit faire adopter l\'outil par plusieurs équipes ; la décision passe par un cycle d\'achat plus long.',
+        niche: 'Expert reconnu dans son domaine, exigeant sur la précision et la crédibilité des outils qu\'il utilise.'
+      },
+      preferredChannels: {
+        freelancers: 'LinkedIn et newsletters spécialisées',
+        smb: 'LinkedIn et recommandations entre pairs',
+        enterprise: 'Communautés Slack et conférences métier',
+        niche: 'Forums spécialisés et bouche-à-oreille'
+      },
       painPoints: {
         acquire: ['Peine à trouver des prospects qualifiés', 'La prospection manuelle fait perdre du temps'],
         retain: ['Les utilisateurs abandonnent après le premier usage', 'Faible engagement quotidien'],
@@ -105,6 +151,16 @@ export const content = {
         acquire: ['Faire croître les inscriptions de façon prévisible', 'Réduire le coût d\'acquisition'],
         retain: ['Créer une habitude quotidienne durable', 'Réduire le taux d\'attrition'],
         monetize: ['Augmenter le revenu par utilisateur', 'Convertir les utilisateurs gratuits en payants']
+      },
+      quotes: {
+        acquire: 'Je passe plus de temps à chercher des clients qu\'à faire le travail que j\'aime.',
+        retain: 'J\'ai essayé plein d\'outils, je les abandonne tous au bout de deux semaines.',
+        monetize: 'Je sais que ça vaut le coup, mais j\'ai du mal à justifier le prix en interne.'
+      },
+      buyingTriggers: {
+        acquire: 'Voit un concurrent ou un pair obtenir des résultats visibles avec un outil similaire.',
+        retain: 'Vient de perdre un client ou un utilisateur clé faute de suivi.',
+        monetize: 'Doit présenter un budget ou justifier un ROI lors d\'une revue interne prochaine.'
       }
     },
     pdf: {
@@ -139,6 +195,34 @@ export const content = {
       qa: 'QA regression pass',
       thoughtLeadership: 'Publish thought-leadership content',
       feedback: 'Iterate on user feedback'
+    },
+    storyDescriptions: {
+      onboarding: 'Guide new users to their first success moment in the product.',
+      positioning: 'Clarify the message and differentiation before any public communication.',
+      landing: 'Design the page that will convert first-time visitors into signups.',
+      stagingDeploy: 'Make the product testable in an environment close to production.',
+      teaser: 'Create a video that builds anticipation ahead of launch.',
+      analytics: 'Instrument the product to measure real usage from day one.',
+      publicBeta: 'Open access to a first group of real users.',
+      paidCampaign: 'Test paid acquisition on the channel identified as the priority.',
+      community: 'Create a gathering point for the first engaged users.',
+      qa: 'Lock down stability before wider exposure.',
+      thoughtLeadership: 'Build brand credibility on its area of expertise.',
+      feedback: 'Turn early user feedback into concrete product improvements.'
+    },
+    storyAcceptance: {
+      onboarding: ['User reaches the first key action without help', 'Fewer than 3 steps before perceived value'],
+      positioning: ['A positioning statement validated by the team', 'The doc clearly differentiates from 2-3 main competitors'],
+      landing: ['A primary CTA is visible without scrolling', 'The core benefit is legible in under 5 seconds'],
+      stagingDeploy: ['The environment is accessible to the team', 'The core flow works end to end'],
+      teaser: ['15 to 30 seconds long', 'Product and benefit are identifiable in one viewing'],
+      analytics: ['Key user journey events are tracked', 'A basic dashboard is available to the team'],
+      publicBeta: ['A user feedback channel is in place', 'Signups are capped and tracked'],
+      paidCampaign: ['Conversion tracking is in place before launch', 'A daily budget cap is defined'],
+      community: ['The channel is publicly accessible', 'A welcome message explains the rules'],
+      qa: ['The critical flow is manually tested', 'No known blocking bug is open'],
+      thoughtLeadership: ['Content is published on at least one owned channel', 'The topic ties directly to the value proposition'],
+      feedback: ['At least 3 pieces of user feedback are synthesized', 'One product action is prioritized from that feedback']
     },
     assignees: {
       Dev: 'Dev',
@@ -211,6 +295,24 @@ export const content = {
         enterprise: 'Product Manager, Scale-up',
         niche: 'Specialist Practitioner'
       },
+      ageRanges: {
+        freelancers: '28-40 y/o',
+        smb: '32-45 y/o',
+        enterprise: '30-42 y/o',
+        niche: '35-50 y/o'
+      },
+      contexts: {
+        freelancers: 'Juggles several clients and tools at once — every minute saved shows up directly in their margin.',
+        smb: 'Wears several hats on a small team and has to justify every expense internally.',
+        enterprise: 'Needs several teams to adopt the tool; the decision runs through a longer buying cycle.',
+        niche: 'A recognized expert in their field, demanding on the precision and credibility of the tools they use.'
+      },
+      preferredChannels: {
+        freelancers: 'LinkedIn and niche newsletters',
+        smb: 'LinkedIn and peer recommendations',
+        enterprise: 'Slack communities and industry conferences',
+        niche: 'Specialist forums and word of mouth'
+      },
       painPoints: {
         acquire: ['Struggles to find qualified leads', 'Manual outreach wastes time'],
         retain: ['Users churn after first use', 'Low daily engagement'],
@@ -220,6 +322,16 @@ export const content = {
         acquire: ['Grow signups predictably', 'Lower cost per acquisition'],
         retain: ['Build a sticky daily habit', 'Reduce churn'],
         monetize: ['Increase revenue per user', 'Convert free users to paid']
+      },
+      quotes: {
+        acquire: 'I spend more time chasing leads than doing the work I actually enjoy.',
+        retain: 'I\'ve tried plenty of tools — I abandon all of them within two weeks.',
+        monetize: 'I know it\'s worth it, but I struggle to justify the price internally.'
+      },
+      buyingTriggers: {
+        acquire: 'Sees a competitor or peer getting visible results with a similar tool.',
+        retain: 'Just lost a key customer or user due to a lack of follow-up.',
+        monetize: 'Has to present a budget or justify ROI at an upcoming internal review.'
       }
     },
     pdf: {

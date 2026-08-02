@@ -7,12 +7,14 @@ const STORY_SCHEMA = {
   properties: {
     id: { type: 'string', description: 'Identifiant court, ex: US-001' },
     title: { type: 'string' },
+    description: { type: 'string', description: 'Une phrase expliquant le quoi et le pourquoi de cette story, spécifique au produit décrit' },
+    acceptanceCriteria: { type: 'array', items: { type: 'string' }, description: '2 critères concrets et vérifiables pour considérer la story terminée' },
     assignee: { type: 'string', description: 'Rôle responsable, ex: Dev, Marketing, Design, Product' },
     effort: { type: 'integer', description: 'Points d\'effort (story points)' },
     cost: { type: 'integer', description: 'Coût estimé en euros' },
     dependsOn: { type: 'array', items: { type: 'string' }, description: 'IDs des stories dont celle-ci dépend' }
   },
-  required: ['id', 'title', 'assignee', 'effort', 'cost', 'dependsOn']
+  required: ['id', 'title', 'description', 'acceptanceCriteria', 'assignee', 'effort', 'cost', 'dependsOn']
 }
 
 const SPRINT_SCHEMA = {
@@ -27,6 +29,17 @@ const SPRINT_SCHEMA = {
   required: ['sprintId', 'duration', 'stories', 'estimatedCost', 'risks']
 }
 
+const CHANNEL_ASSETS_SCHEMA = {
+  type: 'object',
+  description: 'Assets concrets prêts à l\'emploi pour ce canal, spécifiques au produit décrit (pas de placeholders génériques type [produit])',
+  properties: {
+    postBrief: { type: 'string', description: 'Brief d\'un post concret pour ce canal : format, accroche, angle' },
+    emailSubject: { type: ['string', 'null'], description: 'Objet d\'email si pertinent pour ce canal, sinon null' },
+    landingTagline: { type: ['string', 'null'], description: 'Accroche de landing page si pertinent pour ce canal, sinon null' }
+  },
+  required: ['postBrief', 'emailSubject', 'landingTagline']
+}
+
 const CHANNEL_SCHEMA = {
   type: 'object',
   properties: {
@@ -35,9 +48,10 @@ const CHANNEL_SCHEMA = {
     pct: { type: 'integer', description: 'Pourcentage du budget total (0-100)' },
     goal: { type: 'string', description: 'Objectif chiffré atteignable avec ce budget' },
     cadence: { type: 'string' },
-    contentPillars: { type: 'array', items: { type: 'string' } }
+    contentPillars: { type: 'array', items: { type: 'string' } },
+    assets: CHANNEL_ASSETS_SCHEMA
   },
-  required: ['name', 'budget', 'pct', 'goal', 'cadence', 'contentPillars']
+  required: ['name', 'budget', 'pct', 'goal', 'cadence', 'contentPillars', 'assets']
 }
 
 const CALENDAR_ITEM_SCHEMA = {
@@ -58,9 +72,10 @@ const KPI_SCHEMA = {
     formula: { type: 'string' },
     unit: { type: 'string' },
     target: { type: ['number', 'null'] },
-    baseline: { type: 'number' }
+    baseline: { type: 'number' },
+    timeframe: { type: 'string', description: 'Fréquence de suivi recommandée, ex: "Hebdomadaire", "Mensuel"' }
   },
-  required: ['name', 'formula', 'unit', 'target', 'baseline']
+  required: ['name', 'formula', 'unit', 'target', 'baseline', 'timeframe']
 }
 
 const COST_LINE_SCHEMA = {
@@ -80,11 +95,12 @@ const FINANCIALS_SCHEMA = {
     monthlyBurn: { type: 'integer', description: 'Dépense mensuelle moyenne en euros sur la durée du plan' },
     runwayMonths: { type: 'number', description: 'Nombre de mois que couvre le budget déclaré à ce rythme de dépense' },
     assumedArpu: { type: 'integer', description: 'Revenu mensuel moyen par utilisateur/client supposé, en euros, réaliste pour ce type de produit et ce marché' },
+    arpuRationale: { type: 'string', description: 'Une phrase justifiant ce montant d\'ARPU : sur quoi il se base (modèle économique, comparables du secteur, prix perçu du marché)' },
     breakEvenUsers: { type: 'integer', description: 'Nombre de clients payants nécessaires pour couvrir le burn mensuel, au prix (ARPU) supposé' },
     breakEvenMonthlyRevenue: { type: 'integer', description: 'Revenu mensuel correspondant au seuil de rentabilité, en euros' },
     costBreakdown: { type: 'array', items: COST_LINE_SCHEMA, description: 'Répartition du budget total par poste, les montants doivent sommer exactement au budget total' }
   },
-  required: ['monthlyBurn', 'runwayMonths', 'assumedArpu', 'breakEvenUsers', 'breakEvenMonthlyRevenue', 'costBreakdown']
+  required: ['monthlyBurn', 'runwayMonths', 'assumedArpu', 'arpuRationale', 'breakEvenUsers', 'breakEvenMonthlyRevenue', 'costBreakdown']
 }
 
 const STRATEGY_TOOLKIT_SCHEMA = {
@@ -114,14 +130,19 @@ export const PLAN_GENERATION_TOOL = {
     properties: {
       persona: {
         type: 'object',
-        description: 'Persona utilisateur cible',
+        description: 'Persona utilisateur cible, incarné et actionnable — pas un profil générique',
         properties: {
           name: { type: 'string', description: 'Prénom réaliste' },
           title: { type: 'string', description: 'Titre/rôle du persona' },
-          painPoints: { type: 'array', items: { type: 'string' }, description: '2-3 points de douleur' },
-          goals: { type: 'array', items: { type: 'string' }, description: '2-3 objectifs' }
+          ageRange: { type: 'string', description: 'Tranche d\'âge plausible, ex: "30-42 ans"' },
+          context: { type: 'string', description: 'Une phrase de contexte situationnel : sa journée type, ses contraintes, ce qui pèse sur ses décisions' },
+          painPoints: { type: 'array', items: { type: 'string' }, description: '2-3 points de douleur spécifiques, pas génériques' },
+          goals: { type: 'array', items: { type: 'string' }, description: '2-3 objectifs concrets' },
+          quote: { type: 'string', description: 'Une citation courte à la première personne qui capture sa frustration principale, dans son propre langage' },
+          preferredChannel: { type: 'string', description: 'Où il/elle passe du temps et comment le/la toucher efficacement' },
+          buyingTrigger: { type: 'string', description: 'L\'événement ou déclic précis qui le/la pousse à chercher activement une solution' }
         },
-        required: ['name', 'title', 'painPoints', 'goals']
+        required: ['name', 'title', 'ageRange', 'context', 'painPoints', 'goals', 'quote', 'preferredChannel', 'buyingTrigger']
       },
       classification: {
         type: 'string',

@@ -121,7 +121,12 @@ export const translations = {
       roadmap: 'Roadmap Agile',
       marketing: 'Stratégie Marketing',
       kpis: 'Dashboard KPI',
-      persona: 'Persona',
+      persona: {
+        painPoints: 'Points de douleur',
+        goals: 'Objectifs',
+        channel: 'Canal préféré',
+        trigger: 'Déclencheur d\'achat'
+      },
       sprint: 'Sprint',
       duration: 'Durée',
       estimatedCost: 'Coût estimé',
@@ -138,6 +143,11 @@ export const translations = {
       risks: 'Risques',
       budget: 'Budget',
       goal: 'Objectif',
+      assets: {
+        post: 'Post',
+        email: 'Objet email',
+        landing: 'Accroche landing'
+      },
       cadence: 'Cadence',
       target: 'Cible',
       formula: 'Formule',
@@ -182,6 +192,7 @@ export const translations = {
         breakEven: 'Seuil de rentabilité',
         clients: 'clients payants',
         breakEvenNote: (users, revenue, arpu) => `≈ ${revenue.toLocaleString()} €/mois à ${arpu} €/client`,
+        arpuLabel: 'Pourquoi cet ARPU :',
         breakdown: 'Répartition du budget'
       },
       strategy: {
@@ -644,7 +655,12 @@ export const translations = {
       roadmap: 'Agile Roadmap',
       marketing: 'Marketing Strategy',
       kpis: 'KPI Dashboard',
-      persona: 'Persona',
+      persona: {
+        painPoints: 'Pain points',
+        goals: 'Goals',
+        channel: 'Preferred channel',
+        trigger: 'Buying trigger'
+      },
       sprint: 'Sprint',
       duration: 'Duration',
       estimatedCost: 'Estimated cost',
@@ -661,6 +677,11 @@ export const translations = {
       risks: 'Risks',
       budget: 'Budget',
       goal: 'Goal',
+      assets: {
+        post: 'Post',
+        email: 'Email subject',
+        landing: 'Landing tagline'
+      },
       cadence: 'Cadence',
       target: 'Target',
       formula: 'Formula',
@@ -705,6 +726,7 @@ export const translations = {
         breakEven: 'Break-even point',
         clients: 'paying customers',
         breakEvenNote: (users, revenue, arpu) => `≈ €${revenue.toLocaleString()}/month at €${arpu}/customer`,
+        arpuLabel: 'Why this ARPU:',
         breakdown: 'Budget breakdown'
       },
       strategy: {

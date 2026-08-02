@@ -1,0 +1,106 @@
+.persona-card {
+  grid-column: 1 / -1;
+}
+
+.persona-card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 0.9rem;
+}
+
+.persona-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(145, 132, 217, 0.14);
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.persona-card-header h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+}
+
+.persona-title {
+  margin: 0.1rem 0 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.persona-context {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0 0 0.9rem;
+}
+
+.persona-quote {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.4rem;
+  margin: 0 0 1.1rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(145, 132, 217, 0.08);
+  border-left: 2px solid var(--color-accent);
+  border-radius: var(--radius-sm);
+  font-style: italic;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.persona-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+  .persona-grid { grid-template-columns: 1fr; }
+}
+
+.persona-block-title {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.5rem;
+}
+
+.persona-block-negative .persona-block-title { color: #ef4444; }
+.persona-block-positive .persona-block-title { color: #22c55e; }
+
+.persona-block ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.persona-block li { margin-bottom: 0.3rem; }
+
+.persona-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem 1.5rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.15);
+}
+
+.persona-meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.persona-meta-item strong { color: var(--color-text-primary); }

@@ -5,7 +5,7 @@ import '../styles/FinancialsCard.css'
 export default function FinancialsCard({ financials, lang }) {
   if (!financials) return null
 
-  const { monthlyBurn, runwayMonths, assumedArpu, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown } = financials
+  const { monthlyBurn, runwayMonths, assumedArpu, arpuRationale, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown } = financials
 
   return (
     <div className="financials-card card">
@@ -32,6 +32,12 @@ export default function FinancialsCard({ financials, lang }) {
           <div className="fin-sub">{t(lang, 'outputs.financials.breakEvenNote')(breakEvenUsers, breakEvenMonthlyRevenue, assumedArpu)}</div>
         </div>
       </div>
+
+      {arpuRationale && (
+        <p className="financials-arpu-rationale">
+          <strong>{t(lang, 'outputs.financials.arpuLabel')}</strong> {arpuRationale}
+        </p>
+      )}
 
       <div className="financials-breakdown">
         <h4>{t(lang, 'outputs.financials.breakdown')}</h4>

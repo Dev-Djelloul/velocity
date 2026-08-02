@@ -78,10 +78,17 @@ const NAMES = ['Marie', 'Thomas', 'Sophie', 'Lucas', 'Emma', 'Nathan', 'Chloé',
 export function generatePersona(market, product, priorities, lang) {
   const persona = c(lang).persona
   const name = NAMES[Math.abs(hashCode(`${product?.name || ''}${market?.segment || ''}`)) % NAMES.length]
-  const title = persona.titles[product?.targetUser] || persona.titles.smb
-  const painPoints = persona.painPoints[priorities?.focus] || persona.painPoints.acquire
-  const goals = persona.goals[priorities?.focus] || persona.goals.acquire
-  return { name, title, painPoints, goals }
+  const targetUser = product?.targetUser
+  const focus = priorities?.focus
+  const title = persona.titles[targetUser] || persona.titles.smb
+  const ageRange = persona.ageRanges[targetUser] || persona.ageRanges.smb
+  const context = persona.contexts[targetUser] || persona.contexts.smb
+  const preferredChannel = persona.preferredChannels[targetUser] || persona.preferredChannels.smb
+  const painPoints = persona.painPoints[focus] || persona.painPoints.acquire
+  const goals = persona.goals[focus] || persona.goals.acquire
+  const quote = persona.quotes[focus] || persona.quotes.acquire
+  const buyingTrigger = persona.buyingTriggers[focus] || persona.buyingTriggers.acquire
+  return { name, title, ageRange, context, painPoints, goals, quote, preferredChannel, buyingTrigger }
 }
 
 function hashCode(str) {

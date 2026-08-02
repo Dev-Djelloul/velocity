@@ -75,6 +75,17 @@
   margin-top: var(--spacing-xs);
 }
 
+.financials-arpu-rationale {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin: 0 0 1.1rem;
+  padding: 0.7rem 0.9rem;
+  background: rgba(145, 132, 217, 0.06);
+  border-radius: var(--radius-sm);
+}
+
+.financials-arpu-rationale strong { color: var(--color-text-primary); }
+
 .financials-breakdown h4 {
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);

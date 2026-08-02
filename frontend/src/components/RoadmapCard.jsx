@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { validateRoadmap } from '../lib/roadmapValidator'
-import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle } from './Icons'
+import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle, IconChevronRight } from './Icons'
 import '../styles/RoadmapCard.css'
 
 const SPRINT_DAYS = 14
@@ -22,6 +22,15 @@ function formatRange(start, end, lang) {
 
 export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChange }) {
   const [issuesExpanded, setIssuesExpanded] = useState(false)
+  const [expandedStories, setExpandedStories] = useState(() => new Set())
+
+  const toggleStoryDetails = (storyId) => {
+    setExpandedStories(prev => {
+      const next = new Set(prev)
+      next.has(storyId) ? next.delete(storyId) : next.add(storyId)
+      return next
+    })
+  }
 
   if (!roadmap) return null
 
@@ -161,26 +170,49 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
               )}
 
               <div className="sprint-stories">
-                {sprint.stories.map((story, sidx) => (
-                  <div key={sidx} className={`story ${story.status === 'done' ? 'story-done' : ''}`}>
-                    <button
-                      className="story-status-toggle"
-                      onClick={() => toggleStory(sprint.sprintId, story.id)}
-                      title={t(lang, story.status === 'done' ? 'outputs.rollover.markTodo' : 'outputs.rollover.markDone')}
-                    >
-                      {story.status === 'done' ? <IconCheckCircle width={18} height={18} /> : <IconCircleDot width={18} height={18} />}
-                    </button>
-                    <div className="story-id">{story.id}</div>
-                    <div className="story-details">
-                      <div className="story-title">{story.title}</div>
-                      <div className="story-meta">
-                        <span className="story-effort"><IconTarget width={13} height={13} /> {story.effort}pts</span>
-                        <span className="story-assignee"><IconUser width={13} height={13} /> {story.assignee}</span>
-                        <span className="story-cost"><IconCoin width={13} height={13} /> {story.cost}€</span>
-                      </div>
+                {sprint.stories.map((story, sidx) => {
+                  const expanded = expandedStories.has(story.id)
+                  const hasDetails = story.description || story.acceptanceCriteria?.length > 0
+                  return (
+                    <div key={sidx} className={`story ${story.status === 'done' ? 'story-done' : ''}`}>
+                      <button
+                        className="story-status-toggle"
+                        onClick={() => toggleStory(sprint.sprintId, story.id)}
+                        title={t(lang, story.status === 'done' ? 'outputs.rollover.markTodo' : 'outputs.rollover.markDone')}
+                      >
+                        {story.status === 'done' ? <IconCheckCircle width={18} height={18} /> : <IconCircleDot width={18} height={18} />}
+                      </button>
+                      <div className="story-id">{story.id}</div>
+                      <button
+                        className="story-details"
+                        onClick={() => hasDetails && toggleStoryDetails(story.id)}
+                        disabled={!hasDetails}
+                      >
+                        <div className="story-title-row">
+                          <div className="story-title">{story.title}</div>
+                          {hasDetails && (
+                            <IconChevronRight width={14} height={14} className={`story-expand-icon ${expanded ? 'expanded' : ''}`} />
+                          )}
+                        </div>
+                        <div className="story-meta">
+                          <span className="story-effort"><IconTarget width={13} height={13} /> {story.effort}pts</span>
+                          <span className="story-assignee"><IconUser width={13} height={13} /> {story.assignee}</span>
+                          <span className="story-cost"><IconCoin width={13} height={13} /> {story.cost}€</span>
+                        </div>
+                        {expanded && (
+                          <div className="story-expanded">
+                            {story.description && <p className="story-description">{story.description}</p>}
+                            {story.acceptanceCriteria?.length > 0 && (
+                              <ul className="story-acceptance">
+                                {story.acceptanceCriteria.map((c, i) => <li key={i}>{c}</li>)}
+                              </ul>
+                            )}
+                          </div>
+                        )}
+                      </button>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )

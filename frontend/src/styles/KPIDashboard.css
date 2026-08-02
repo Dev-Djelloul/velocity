@@ -156,6 +156,20 @@
   font-family: var(--font-family-mono);
 }
 
+.kpi-timeframe,
+.kpi-hero-timeframe {
+  display: inline-block;
+  margin-top: 0.4rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(145, 132, 217, 0.12);
+  color: var(--color-accent);
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
 .ab-test-calc {
   margin-top: var(--spacing-xl);
   border-top: 1px solid rgba(145, 132, 217, 0.1);

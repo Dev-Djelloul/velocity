@@ -27,6 +27,7 @@ export default function KPIDashboard({ kpis, lang, onKpisChange }) {
         <span className="kpi-unit">{kpi.unit}</span>
       </div>
       <div className="kpi-formula">{kpi.formula}</div>
+      {kpi.timeframe && <div className="kpi-timeframe">{kpi.timeframe}</div>}
     </div>
   )
 
@@ -52,6 +53,7 @@ export default function KPIDashboard({ kpis, lang, onKpisChange }) {
             <span className="kpi-hero-unit">{primary.unit}</span>
           </div>
           <div className="kpi-hero-formula">{primary.formula}</div>
+          {primary.timeframe && <div className="kpi-hero-timeframe">{primary.timeframe}</div>}
         </div>
       </div>
 

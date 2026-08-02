@@ -10,6 +10,19 @@ const COST_CATEGORY_LABELS = {
   en: { product: 'Development', marketing: 'Marketing', ops: 'Operations' }
 }
 
+const MODEL_LABEL = {
+  fr: { b2b: 'B2B (vente à d\'autres entreprises)', b2c: 'B2C (vente directe aux particuliers)', hybrid: 'hybride B2B/B2C' },
+  en: { b2b: 'B2B (selling to other businesses)', b2c: 'B2C (direct-to-consumer)', hybrid: 'hybrid B2B/B2C' }
+}
+
+function arpuRationaleFor(model, arpu, lang) {
+  const labels = MODEL_LABEL[lang] || MODEL_LABEL.fr
+  const label = labels[model] || labels.hybrid
+  return lang === 'en'
+    ? `${arpu} €/month reflects a typical ARPU for a ${label} product at this stage — adjust once real pricing is validated.`
+    : `${arpu} €/mois correspond à un ARPU typique pour un modèle ${label} à ce stade — à ajuster une fois le prix réel validé.`
+}
+
 export function generateFinancials(resources, market, lang) {
   const budget = BUDGET[resources?.budgetEur] ?? 5000
   const weeks = TIMELINE_WEEKS[resources?.timelineWeeks] ?? 8
@@ -29,7 +42,9 @@ export function generateFinancials(resources, market, lang) {
     { category: labels.ops, amount: Math.round(budget * split.ops), pct: Math.round(split.ops * 100) }
   ]
 
-  return { monthlyBurn, runwayMonths, assumedArpu, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown }
+  const arpuRationale = arpuRationaleFor(market?.b2bVsB2c, assumedArpu, lang)
+
+  return { monthlyBurn, runwayMonths, assumedArpu, arpuRationale, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown }
 }
 
 const SWOT_FR = {

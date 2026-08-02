@@ -10,7 +10,8 @@ export function generateMarketingStrategy(market, priorities, budgetKey, lang) {
     ...ch,
     goal: goalFor(ch.name, ch.budget, lang),
     cadence: c(lang).cadence,
-    contentPillars: contentPillarsFor(ch.name, lang)
+    contentPillars: contentPillarsFor(ch.name, lang),
+    assets: assetsFor(ch.name, lang)
   }))
 
   const contentCalendar = []
@@ -41,4 +42,9 @@ function goalFor(channel, budget, lang) {
 function contentPillarsFor(channel, lang) {
   const dict = c(lang)
   return dict.contentPillars[channel] || dict.contentPillarsGeneric
+}
+
+function assetsFor(channel, lang) {
+  const dict = c(lang)
+  return dict.channelAssets[channel] || dict.channelAssetsGeneric
 }

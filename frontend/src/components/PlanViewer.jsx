@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import PersonaCard from './PersonaCard'
 import RoadmapCard from './RoadmapCard'
 import MarketingCard from './MarketingCard'
 import KPIDashboard from './KPIDashboard'
@@ -83,11 +84,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       <div className="plan-header card">
         <div>
           <h2>{plan.product?.name} — {plan.classification}</h2>
-          {plan.persona && (
-            <p className="persona-line">
-              {t(lang, 'outputs.persona')}: <strong>{plan.persona.name}</strong>, {plan.persona.title}
-            </p>
-          )}
         </div>
         <div className="plan-actions">
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
@@ -114,6 +110,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       <div className="plan-grid">
+        <PersonaCard persona={plan.persona} lang={lang} />
         <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
         <CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} />

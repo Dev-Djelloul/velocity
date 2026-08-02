@@ -65,6 +65,8 @@ export function generateRoadmap(resources, product, priorities, lang) {
       stories.push({
         id,
         title: dict.stories[tmpl.key],
+        description: dict.storyDescriptions[tmpl.key],
+        acceptanceCriteria: dict.storyAcceptance[tmpl.key],
         assignee: dict.assignees[tmpl.assignee] || tmpl.assignee,
         effort: tmpl.effort,
         cost: costFor(tmpl.category, tmpl.type),
@@ -148,11 +150,14 @@ export function calculateKPIs(priorities, resources, market, lang) {
   const target = primaryTarget(market)
   const budget = budgetFromKey(resources?.budgetEur)
 
+  const monthly = lang === 'en' ? 'Monthly' : 'Mensuel'
+  const weekly = lang === 'en' ? 'Weekly' : 'Hebdomadaire'
+
   return [
-    { name: focus.primary.name, formula: focus.primary.formula, unit: focus.primary.unit, target, baseline: 0 },
-    { name: focus.secondary.name, formula: focus.secondary.formula, unit: focus.secondary.unit, target: focus.secondary.name === 'CAC' ? Math.round(budget / target) : null, baseline: 0 },
-    { name: focus.tertiary.name, formula: focus.tertiary.formula, unit: focus.tertiary.unit, target: null, baseline: 0 },
-    { name: dict.contentPiecesKpi, formula: dict.contentPiecesFormula, unit: '#', target: 12, baseline: 0 }
+    { name: focus.primary.name, formula: focus.primary.formula, unit: focus.primary.unit, target, baseline: 0, timeframe: monthly },
+    { name: focus.secondary.name, formula: focus.secondary.formula, unit: focus.secondary.unit, target: focus.secondary.name === 'CAC' ? Math.round(budget / target) : null, baseline: 0, timeframe: monthly },
+    { name: focus.tertiary.name, formula: focus.tertiary.formula, unit: focus.tertiary.unit, target: null, baseline: 0, timeframe: weekly },
+    { name: dict.contentPiecesKpi, formula: dict.contentPiecesFormula, unit: '#', target: 12, baseline: 0, timeframe: weekly }
   ]
 }
 

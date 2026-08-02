@@ -22,7 +22,7 @@ function generateWithRules(data, lang) {
     roadmap: generateRoadmap(data.resources, data.product, data.priorities, lang),
     marketing: generateMarketingStrategy(data.market, data.priorities, data.resources?.budgetEur, lang),
     kpis: calculateKPIs(data.priorities, data.resources, data.market, lang),
-    financials: generateFinancials(data.resources, data.market),
+    financials: generateFinancials(data.resources, data.market, lang),
     strategyToolkit: generateStrategyToolkit(data.product, data.market, lang),
     executiveSummary: generateExecutiveSummary(data.product, classification, data.resources, lang)
   }
