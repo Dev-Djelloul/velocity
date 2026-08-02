@@ -1,0 +1,135 @@
+.plan-viewer-layout {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.5rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.plan-sidebar {
+  position: sticky;
+  top: 1.5rem;
+  flex-shrink: 0;
+  width: 220px;
+  max-height: calc(100vh - 3rem);
+  background: #0a0a0f;
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: 12px;
+  padding: 1rem 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  overflow-y: auto;
+  transition: width 0.2s ease;
+  z-index: 5;
+}
+
+.plan-sidebar.collapsed {
+  width: 44px;
+  padding: 1rem 0.4rem;
+}
+
+.plan-sidebar-toggle {
+  align-self: flex-end;
+  background: rgba(145, 132, 217, 0.12);
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  color: var(--color-accent);
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.15s ease;
+}
+
+.plan-sidebar-toggle:hover { background: var(--color-accent); color: #0a0a0f; }
+
+.plan-sidebar-title {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0 0.5rem;
+  white-space: nowrap;
+}
+
+.plan-sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.plan-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  padding: 0.55rem 0.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.plan-sidebar-item span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.plan-sidebar-item svg { flex-shrink: 0; }
+
+.plan-sidebar-item:hover {
+  background: rgba(145, 132, 217, 0.1);
+  color: var(--color-text-primary);
+}
+
+.plan-sidebar-item.active {
+  background: rgba(145, 132, 217, 0.18);
+  color: var(--color-accent);
+}
+
+.plan-sidebar.collapsed .plan-sidebar-item {
+  justify-content: center;
+  padding: 0.55rem 0;
+}
+
+.plan-viewer-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.plan-section-anchor {
+  display: contents;
+}
+
+@media (max-width: 900px) {
+  .plan-viewer-layout {
+    flex-direction: column;
+  }
+  .plan-sidebar {
+    position: static;
+    width: 100%;
+    max-height: none;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .plan-sidebar.collapsed { width: 100%; }
+  .plan-sidebar-nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    flex: 1;
+  }
+  .plan-sidebar-title { display: none; }
+  .plan-viewer-main { min-width: 0; width: 100%; }
+}

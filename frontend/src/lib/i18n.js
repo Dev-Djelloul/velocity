@@ -145,6 +145,12 @@ export const translations = {
       totalEffort: 'Effort total',
       monthlyBurn: 'Burn mensuel'
     },
+    sidebar: {
+      title: 'Sommaire du plan',
+      persona: 'Persona',
+      collapse: 'Réduire le panneau',
+      expand: 'Déplier le panneau'
+    },
     roadmapIssues: {
       title: 'Alertes roadmap',
       bottleneck: 'Goulot de capacité',
@@ -713,6 +719,12 @@ export const translations = {
       total: 'Total',
       totalEffort: 'Total effort',
       monthlyBurn: 'Monthly burn'
+    },
+    sidebar: {
+      title: 'Plan overview',
+      persona: 'Persona',
+      collapse: 'Collapse panel',
+      expand: 'Expand panel'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

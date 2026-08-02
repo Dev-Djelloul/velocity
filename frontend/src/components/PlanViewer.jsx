@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react'
+import PlanSidebar from './PlanSidebar'
 import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
 import RoadmapCard from './RoadmapCard'
@@ -19,6 +20,7 @@ import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock } from './Icons'
 import '../styles/PlanViewer.css'
+import '../styles/PlanSidebar.css'
 
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang }) {
   const [plan, setPlan] = useState(initialPlan)
@@ -71,7 +73,9 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const generatedDateTime = formatFullDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
 
   return (
-    <div className="plan-viewer" ref={captureRef}>
+    <div className="plan-viewer-layout">
+      <PlanSidebar lang={lang} />
+      <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
           <span className="plan-confirmation-icon" aria-hidden="true">
@@ -113,24 +117,25 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       <div className="plan-grid">
-        <DashboardBI plan={plan} lang={lang} />
-        <PersonaCard persona={plan.persona} lang={lang} />
-        <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
-        <BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} />
-        <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
-        <BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} />
-        <CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} />
-        <MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} />
-        <KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} />
-        <FinancialsCard financials={plan.financials} lang={lang} />
-        <StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} />
-        <AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} />
-        <GeneratedTable lang={lang} plan={plan} />
+        <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
+        <div id="section-persona" className="plan-section-anchor"><PersonaCard persona={plan.persona} lang={lang} /></div>
+        <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
+        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} /></div>
+        <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
+        <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} /></div>
+        <div id="section-calendar" className="plan-section-anchor"><CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} /></div>
+        <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} /></div>
+        <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
+        <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>
+        <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
+        <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
+        <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
       </div>
 
       {showExport && (
         <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} onClose={() => setShowExport(false)} captureRef={captureRef} />
       )}
+      </div>
     </div>
   )
 }

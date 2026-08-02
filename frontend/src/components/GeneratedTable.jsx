@@ -101,7 +101,11 @@ export default function GeneratedTable({ lang, plan }) {
                   <tr key={ri}>
                     {row.map((cell, ci) => (
                       <td key={ci}>
-                        <input value={cell} onChange={e => updateCell(ri, ci, e.target.value)} />
+                        <textarea
+                          rows={1}
+                          value={cell}
+                          onChange={e => updateCell(ri, ci, e.target.value)}
+                        />
                       </td>
                     ))}
                     <td className="row-action-col">
