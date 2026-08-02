@@ -114,6 +114,25 @@ export const translations = {
       removeColumn: 'Supprimer la colonne',
       exportCsv: 'Exporter en CSV'
     },
+    backlog: {
+      title: 'Backlog',
+      subtitle: (done, total) => `${done}/${total} stories terminées, tous sprints confondus`,
+      searchPlaceholder: 'Rechercher une story...',
+      filterAll: 'Tous les statuts',
+      filterTodo: 'À faire',
+      filterDone: 'Terminé',
+      filterAllAssignees: 'Tous les responsables',
+      empty: 'Aucune story ne correspond à ces filtres.'
+    },
+    burndown: {
+      title: 'Burndown chart',
+      subtitle: 'Effort restant (points) vs temps — ligne idéale en pointillés, réel en trait plein',
+      allSprints: 'Tous les sprints',
+      ideal: 'Idéal',
+      actual: 'Réel',
+      onTrack: 'Dans les temps',
+      behind: 'En retard'
+    },
     roadmapIssues: {
       title: 'Alertes roadmap',
       bottleneck: 'Goulot de capacité',
@@ -651,6 +670,25 @@ export const translations = {
       removeRow: 'Remove row',
       removeColumn: 'Remove column',
       exportCsv: 'Export as CSV'
+    },
+    backlog: {
+      title: 'Backlog',
+      subtitle: (done, total) => `${done}/${total} stories done, across all sprints`,
+      searchPlaceholder: 'Search a story...',
+      filterAll: 'All statuses',
+      filterTodo: 'To do',
+      filterDone: 'Done',
+      filterAllAssignees: 'All assignees',
+      empty: 'No story matches these filters.'
+    },
+    burndown: {
+      title: 'Burndown chart',
+      subtitle: 'Remaining effort (points) vs time — dashed ideal line, solid actual line',
+      allSprints: 'All sprints',
+      ideal: 'Ideal',
+      actual: 'Actual',
+      onTrack: 'On track',
+      behind: 'Behind'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

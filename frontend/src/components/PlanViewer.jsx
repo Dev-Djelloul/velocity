@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react'
 import PersonaCard from './PersonaCard'
 import RoadmapCard from './RoadmapCard'
+import BacklogCard from './BacklogCard'
 import MarketingCard from './MarketingCard'
 import KPIDashboard from './KPIDashboard'
 import FinancialsCard from './FinancialsCard'
 import StrategyToolkitCard from './StrategyToolkitCard'
 import GanttChart from './GanttChart'
+import BurndownChart from './BurndownChart'
 import CalendarView from './CalendarView'
 import AskChart from './AskChart'
 import GeneratedTable from './GeneratedTable'
@@ -112,7 +114,9 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       <div className="plan-grid">
         <PersonaCard persona={plan.persona} lang={lang} />
         <RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
+        <BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} />
         <GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} />
+        <BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} />
         <CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} />
         <MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} />
         <KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} />

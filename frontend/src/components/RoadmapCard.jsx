@@ -53,7 +53,11 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
       if (sp.sprintId !== sprintId) return sp
       return {
         ...sp,
-        stories: sp.stories.map(s => s.id === storyId ? { ...s, status: s.status === 'done' ? 'todo' : 'done' } : s)
+        stories: sp.stories.map(s => {
+          if (s.id !== storyId) return s
+          const nowDone = s.status !== 'done'
+          return { ...s, status: nowDone ? 'done' : 'todo', completedAt: nowDone ? new Date().toISOString() : null }
+        })
       }
     })
     onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
