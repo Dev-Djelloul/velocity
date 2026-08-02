@@ -149,7 +149,8 @@ export const translations = {
       title: 'Sommaire du plan',
       persona: 'Persona',
       collapse: 'Réduire le panneau',
-      expand: 'Déplier le panneau'
+      expand: 'Déplier le panneau',
+      createPlan: 'Créer un plan'
     },
     roadmapIssues: {
       title: 'Alertes roadmap',
@@ -724,7 +725,8 @@ export const translations = {
       title: 'Plan overview',
       persona: 'Persona',
       collapse: 'Collapse panel',
-      expand: 'Expand panel'
+      expand: 'Expand panel',
+      createPlan: 'Create a plan'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

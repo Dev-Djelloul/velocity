@@ -261,8 +261,8 @@ export default function App() {
           <div className="header-actions">
             {isSignedIn && (
               <>
-                <button className="btn-header" onClick={() => setShowHistory(true)} title={t(lang, 'account.plansSectionTitle')}>
-                  <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Plans' : 'Plans'}
+                <button className="btn-header btn-header-gradient-border" onClick={() => setShowHistory(true)} title={t(lang, 'account.plansSectionTitle')}>
+                  <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
                 </button>
                 {!pro && (
                   <span className="header-credits-badge">{remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}</span>

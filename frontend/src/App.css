@@ -121,6 +121,18 @@
   color: var(--color-primary);
 }
 
+.btn-header-gradient-border {
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-primary), var(--color-bg-primary)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+}
+
+.btn-header-gradient-border:hover {
+  color: var(--color-text-primary);
+  filter: brightness(1.15);
+}
+
 .header-avatar-btn {
   width: 38px;
   height: 38px;

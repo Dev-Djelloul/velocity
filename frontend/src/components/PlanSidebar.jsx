@@ -89,10 +89,10 @@ export default function PlanSidebar({ lang, onNewPlan }) {
       <button
         className="plan-sidebar-item plan-sidebar-new-btn"
         onClick={onNewPlan}
-        title={collapsed ? t(lang, 'app.newPlan') : undefined}
+        title={collapsed ? t(lang, 'sidebar.createPlan') : undefined}
       >
-        <span className="plan-sidebar-icon"><IconPlus width={16} height={16} /></span>
-        {!collapsed && <span className="plan-sidebar-label">{t(lang, 'app.newPlan')}</span>}
+        <span className="plan-sidebar-icon plan-sidebar-icon-gradient"><IconPlus width={16} height={16} /></span>
+        {!collapsed && <span className="plan-sidebar-label plan-sidebar-label-gradient">{t(lang, 'sidebar.createPlan')}</span>}
       </button>
 
       <nav className="plan-sidebar-nav">
