@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import {
   IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
@@ -23,9 +23,17 @@ const SECTIONS = [
   { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave }
 ]
 
+const RAIL_WIDTH = 60
+const MIN_WIDTH = 180
+const MAX_WIDTH = 340
+const DEFAULT_WIDTH = 232
+
 export default function PlanSidebar({ lang }) {
   const [collapsed, setCollapsed] = useState(false)
+  const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(SECTIONS[0].id)
+  const [resizing, setResizing] = useState(false)
+  const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
 
   const goTo = (id) => {
     setActiveId(id)
@@ -34,17 +42,53 @@ export default function PlanSidebar({ lang }) {
     target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
-  return (
-    <div className={`plan-sidebar ${collapsed ? 'collapsed' : ''}`}>
-      <button
-        className="plan-sidebar-toggle"
-        onClick={() => setCollapsed(c => !c)}
-        title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
-      >
-        {collapsed ? <IconChevronRight width={14} height={14} /> : <IconChevronLeft width={14} height={14} />}
-      </button>
+  const startResize = (e) => {
+    e.preventDefault()
+    startRef.current = { x: e.clientX, width }
+    setResizing(true)
+  }
 
-      {!collapsed && <div className="plan-sidebar-title">{t(lang, 'sidebar.title')}</div>}
+  const onResizeMove = useCallback((e) => {
+    const delta = e.clientX - startRef.current.x
+    const next = Math.min(MAX_WIDTH, Math.max(MIN_WIDTH, startRef.current.width + delta))
+    setWidth(next)
+  }, [])
+
+  const stopResize = useCallback(() => {
+    setResizing(false)
+  }, [])
+
+  useEffect(() => {
+    if (!resizing) return
+    window.addEventListener('mousemove', onResizeMove)
+    window.addEventListener('mouseup', stopResize)
+    return () => {
+      window.removeEventListener('mousemove', onResizeMove)
+      window.removeEventListener('mouseup', stopResize)
+    }
+  }, [resizing, onResizeMove, stopResize])
+
+  useEffect(() => {
+    if (!resizing) localStorage.setItem('plp_sidebar_width', String(width))
+  }, [resizing, width])
+
+  const currentWidth = collapsed ? RAIL_WIDTH : width
+
+  return (
+    <div
+      className={`plan-sidebar ${collapsed ? 'collapsed' : ''} ${resizing ? 'resizing' : ''}`}
+      style={{ width: currentWidth }}
+    >
+      <div className="plan-sidebar-top">
+        {!collapsed && <span className="plan-sidebar-title">{t(lang, 'sidebar.title')}</span>}
+        <button
+          className="plan-sidebar-toggle"
+          onClick={() => setCollapsed(c => !c)}
+          title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
+        >
+          {collapsed ? <IconChevronRight width={12} height={12} /> : <IconChevronLeft width={12} height={12} />}
+        </button>
+      </div>
 
       <nav className="plan-sidebar-nav">
         {SECTIONS.map(({ id, labelKey, Icon }) => (
@@ -54,11 +98,15 @@ export default function PlanSidebar({ lang }) {
             onClick={() => goTo(id)}
             title={collapsed ? t(lang, labelKey) : undefined}
           >
-            <Icon width={16} height={16} />
-            {!collapsed && <span>{t(lang, labelKey)}</span>}
+            <span className="plan-sidebar-icon"><Icon width={16} height={16} /></span>
+            {!collapsed && <span className="plan-sidebar-label">{t(lang, labelKey)}</span>}
           </button>
         ))}
       </nav>
+
+      {!collapsed && (
+        <div className="plan-sidebar-resize-handle" onMouseDown={startResize} />
+      )}
     </div>
   )
 }
