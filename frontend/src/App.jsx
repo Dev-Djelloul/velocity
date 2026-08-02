@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Landing from './components/Landing'
 import Wordmark from './components/Wordmark'
-import { IconClipboard } from './components/Icons'
+import { IconClipboard, IconHome } from './components/Icons'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -138,12 +138,26 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="header-top">
-          <button className="header-brand-btn" onClick={() => {
-            setCurrentPage('landing')
-            window.scrollTo(0, 0)
-          }}>
-            <Wordmark size={34} animated />
-          </button>
+          <div className="header-brand-group">
+            <button
+              className="header-home-btn"
+              aria-label={lang === 'fr' ? 'Accueil' : 'Home'}
+              title={lang === 'fr' ? 'Accueil' : 'Home'}
+              onClick={() => {
+                setCurrentPage('landing')
+                window.scrollTo(0, 0)
+              }}
+            >
+              <IconHome width={20} height={20} />
+            </button>
+
+            <button className="header-brand-btn" onClick={() => {
+              setCurrentPage('landing')
+              window.scrollTo(0, 0)
+            }}>
+              <Wordmark size={34} animated />
+            </button>
+          </div>
 
           <nav className="header-nav">
             <button className="header-nav-link" onClick={() => handleNavAnchor('features')}>

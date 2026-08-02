@@ -296,3 +296,12 @@ export function IconRocket(props) {
     </svg>
   )
 }
+
+export function IconHome(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 11.5L12 4l8 7.5" />
+      <path d="M6 10v9a1 1 0 0 0 1 1h3v-6h4v6h3a1 1 0 0 0 1-1v-9" />
+    </svg>
+  )
+}

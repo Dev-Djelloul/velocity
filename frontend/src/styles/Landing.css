@@ -7,11 +7,14 @@
 .hero {
   background: var(--color-bg-primary);
   padding: 7rem 2rem 6rem;
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: flex-start;
 }
 
 .hero-content {
   max-width: 780px;
-  margin: 0 auto;
 }
 
 .hero-badge {
@@ -36,9 +39,9 @@
 }
 
 .hero-title {
-  font-size: clamp(2.75rem, 6vw, 4.25rem);
+  font-size: clamp(3.25rem, 7.5vw, 5.5rem);
   font-weight: 800;
-  line-height: 1.08;
+  line-height: 1.05;
   letter-spacing: -0.02em;
   margin-bottom: 1.5rem;
   color: var(--color-text-primary);
