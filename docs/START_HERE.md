@@ -40,8 +40,8 @@ bash ~/CLAUDE_CODE_LAUNCH.sh
 
 ```bash
 # 1. Crée le dossier projet
-mkdir -p ~/projects/product-launch-planner
-cd ~/projects/product-launch-planner
+mkdir -p ~/projects/velocity-launch
+cd ~/projects/velocity-launch
 
 # 2. Copie les fichiers doc
 cp ~/claude/CLAUDE_CODE_PROMPT.md .
@@ -62,7 +62,7 @@ Une fois dans Claude Code (terminal) :
 
 ```bash
 # Ouvre le fichier
-cat ~/projects/product-launch-planner/CLAUDE_CODE_PROMPT.md
+cat ~/projects/velocity-launch/CLAUDE_CODE_PROMPT.md
 
 # Copie **TOUT** le contenu (Cmd+C)
 ```
@@ -90,7 +90,7 @@ Claude Code créera automatiquement :
 ## 📁 Ce Que tu Auras Après
 
 ```
-product-launch-planner/
+velocity-launch/
 ├── frontend/                          # React/Vite app
 │   ├── src/components/               # Questionnaire, PlanViewer, etc
 │   ├── src/lib/                      # Engine, costMatrix, i18n
@@ -171,7 +171,7 @@ Tu as choisi :
 - [ ] Tu as `/home/claude/PROJECT_BOOTSTRAP.md` ?
 - [ ] Tu as `/home/claude/product_launch_planner_spec.md` ?
 - [ ] Tu peux ouvrir Claude Code (`claude` dans terminal) ?
-- [ ] Tu as créé le dossier projet ? (`mkdir ~/projects/product-launch-planner`)
+- [ ] Tu as créé le dossier projet ? (`mkdir ~/projects/velocity-launch`)
 
 **Si oui à tous** → Tu peux lancer ! 🚀
 
@@ -230,7 +230,7 @@ A: Serverless + gratuit + rapide + déjà dans Digital Blue Skye infrastructure
 A: Frontend peut mock les réponses ou utiliser `wrangler dev` local
 
 **Q: Je peux le mettre sur mon portfolio ?**  
-A: Oui ! Add link to product-launch-planner.digitalblueskye.com une fois déployé
+A: Oui ! Add link to velocity-launch.digitalblueskye.com une fois déployé
 
 ---
 
@@ -302,7 +302,7 @@ Tous dans `/home/claude/` :
 
 ```bash
 # Go!
-cd ~/projects/product-launch-planner
+cd ~/projects/velocity-launch
 claude
 
 # Paste CLAUDE_CODE_PROMPT.md content

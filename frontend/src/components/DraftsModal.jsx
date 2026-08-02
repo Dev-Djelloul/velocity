@@ -89,24 +89,26 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
                 )}
               </div>
 
-              <div className="draft-actions">
-                <button className="btn-small" onClick={() => handleLoad(draft)}>
-                  {t(lang, 'drafts.load')}
-                </button>
-                <button className="btn-small" onClick={() => {
-                  setEditingId(draft.id)
-                  setEditingName(draft.name)
-                }}>
-                  <IconPencil width={14} height={14} /> {t(lang, 'drafts.rename')}
-                </button>
-                <button
-                  className={`btn-small danger ${deleteConfirmId === draft.id ? 'confirm' : ''}`}
-                  onClick={() => handleDelete(draft.id)}
-                  onBlur={() => setDeleteConfirmId(null)}
-                >
-                  {deleteConfirmId === draft.id ? t(lang, 'drafts.confirmDelete') : t(lang, 'drafts.delete')}
-                </button>
-              </div>
+              {editingId !== draft.id && (
+                <div className="draft-actions">
+                  <button className="btn-small" onClick={() => handleLoad(draft)}>
+                    {t(lang, 'drafts.load')}
+                  </button>
+                  <button className="btn-small" onClick={() => {
+                    setEditingId(draft.id)
+                    setEditingName(draft.name)
+                  }}>
+                    <IconPencil width={14} height={14} /> {t(lang, 'drafts.rename')}
+                  </button>
+                  <button
+                    className={`btn-small danger ${deleteConfirmId === draft.id ? 'confirm' : ''}`}
+                    onClick={() => handleDelete(draft.id)}
+                    onBlur={() => setDeleteConfirmId(null)}
+                  >
+                    {deleteConfirmId === draft.id ? t(lang, 'drafts.confirmDelete') : t(lang, 'drafts.delete')}
+                  </button>
+                </div>
+              )}
             </div>
           ))}
         </div>

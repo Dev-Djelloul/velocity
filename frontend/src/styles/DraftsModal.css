@@ -122,6 +122,8 @@
 
 .draft-edit input {
   padding: 8px 10px;
+  min-width: 0;
+  flex: 1;
   background: var(--color-bg-primary);
   border: 1px solid rgba(145, 132, 217, 0.25);
   border-radius: var(--radius-sm);

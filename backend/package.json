@@ -1,5 +1,5 @@
 {
-  "name": "product-launch-planner-backend",
+  "name": "velocity-launch-backend",
   "version": "1.0.0",
   "private": true,
   "scripts": {
@@ -7,6 +7,6 @@
     "deploy": "wrangler deploy --env production"
   },
   "devDependencies": {
-    "wrangler": "^3.60.0"
+    "wrangler": "^4.118.0"
   }
 }

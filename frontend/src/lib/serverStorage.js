@@ -72,3 +72,16 @@ export function createShare(planId) {
 export function resolveShare(shareId) {
   return safeFetch(`/shares/${encodeURIComponent(shareId)}`)
 }
+
+export function createCheckoutSession(userId, email) {
+  return safeFetch('/checkout', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      userId,
+      email,
+      successUrl: `${window.location.origin}${window.location.pathname}?upgraded=1`,
+      cancelUrl: window.location.href
+    })
+  })
+}

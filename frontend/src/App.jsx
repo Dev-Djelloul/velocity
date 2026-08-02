@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Landing from './components/Landing'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconHome, IconUser } from './components/Icons'
+import { IconClipboard, IconHome, IconUser, IconLogin } from './components/Icons'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -18,7 +18,7 @@ import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
 import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, syncPlansFromServer } from './lib/planStorage'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
-import { useUser, useAuth, useSignIn, UserButton } from './lib/auth'
+import { useUser, useAuth, useSignIn, useSignUp } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import './styles/design-system.css'
 import './styles/accessibility.css'
@@ -40,9 +40,10 @@ export default function App() {
   const [isSharedView, setIsSharedView] = useState(false)
   const [dataVersion, setDataVersion] = useState(0)
 
-  const { isSignedIn, isLoaded } = useUser()
+  const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
   const { open: openSignIn } = useSignIn()
+  const { open: openSignUp } = useSignUp()
   const wasSignedIn = useRef(isSignedIn)
 
   useEffect(() => {
@@ -87,6 +88,18 @@ export default function App() {
     }
     wasSignedIn.current = isSignedIn
   }, [isSignedIn, isLoaded, userId])
+
+  // Retour depuis Stripe Checkout : le webhook a normalement déjà activé le Pro
+  // côté serveur, on resynchronise le cache local et on nettoie l'URL.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !userId) return
+    const params = new URLSearchParams(window.location.search)
+    if (params.get('upgraded') !== '1') return
+    syncCreditsFromServer(userId).then(() => setDataVersion(v => v + 1))
+    params.delete('upgraded')
+    const query = params.toString()
+    window.history.replaceState({}, '', window.location.pathname + (query ? `?${query}` : ''))
+  }, [isLoaded, isSignedIn, userId])
 
   // Garde-fou : les pages compte/questionnaire/résultat exigent une session active.
   useEffect(() => {
@@ -143,7 +156,7 @@ export default function App() {
 
   const handleStartClick = () => {
     if (!isSignedIn) {
-      openSignIn()
+      openSignUp()
       return
     }
     if (!canGenerate(userId)) {
@@ -240,17 +253,20 @@ export default function App() {
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
+            <button className="btn-header-cta" onClick={handleStartClick}>
+              {t(lang, 'auth.getStarted')}
+            </button>
           </nav>
 
           <div className="header-actions">
             {isSignedIn && (
               <>
-                {!pro && (
-                  <span className="header-credits-badge">{remaining}/3 {lang === 'fr' ? 'plans' : 'plans'}</span>
-                )}
                 <button className="btn-header" onClick={() => setShowHistory(true)} title={t(lang, 'account.plansSectionTitle')}>
                   <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Plans' : 'Plans'}
                 </button>
+                {!pro && (
+                  <span className="header-credits-badge">{remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}</span>
+                )}
               </>
             )}
             <div className="lang-toggle">
@@ -258,15 +274,12 @@ export default function App() {
               <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
             </div>
             {isSignedIn ? (
-              <>
-                <button className="btn-header" onClick={goToAccount} title={t(lang, 'auth.myAccount')}>
-                  <IconUser width={16} height={16} />
-                </button>
-                <UserButton />
-              </>
+              <button className="header-avatar-btn" onClick={goToAccount} title={t(lang, 'auth.myAccount')}>
+                {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
+              </button>
             ) : (
-              <button className="btn-header-cta" onClick={handleStartClick}>
-                {t(lang, 'auth.getStarted')}
+              <button className="btn-header-signin" onClick={openSignIn} title={t(lang, 'auth.signIn')}>
+                <IconLogin width={18} height={18} />
               </button>
             )}
           </div>

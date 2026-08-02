@@ -1,18 +1,44 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
-import { useUser, useAuth, isMockAuth } from '../lib/auth'
+import { useUser, useAuth, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
 import { getAllPlans, deletePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
-import { IconUser, IconClipboard, IconSave, IconRocket, IconArrowLeft, IconTrash } from './Icons'
+import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
+import { IconUser, IconClipboard, IconSave, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack } from './Icons'
+
+const PROVIDER_ICONS = {
+  google: IconProviderGoogle,
+  apple: IconProviderApple,
+  slack: IconProviderSlack
+}
+import AvatarPicker from './AvatarPicker'
 import '../styles/AccountPage.css'
 
 export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
   const { user } = useUser()
   const { userId, signOut } = useAuth()
+  const openSecurity = useOpenSecurity()
+  const authProvider = useAuthProvider()
+  const ProviderIcon = authProvider ? PROVIDER_ICONS[authProvider] : null
   const [plans, setPlans] = useState(getAllPlans)
   const [drafts, setDrafts] = useState(getAllDrafts)
   const [showUpgrade, setShowUpgrade] = useState(false)
+  const [showAvatarPicker, setShowAvatarPicker] = useState(false)
+  const [checkoutLoading, setCheckoutLoading] = useState(false)
+  const [checkoutError, setCheckoutError] = useState(false)
+
+  const startCheckout = async () => {
+    setCheckoutLoading(true)
+    setCheckoutError(false)
+    const result = await createCheckoutSession(userId, user?.primaryEmailAddress?.emailAddress)
+    if (result?.url) {
+      window.location.href = result.url
+      return
+    }
+    setCheckoutLoading(false)
+    setCheckoutError(true)
+  }
 
   const pro = isPro(userId)
   const used = getUsedCredits(userId)
@@ -38,16 +64,26 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
       </button>
 
       <div className="account-header card">
-        <div className="account-avatar">
-          {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={28} height={28} />}
+        <div className="account-avatar-wrap">
+          <button className="account-avatar account-avatar-btn" onClick={() => setShowAvatarPicker(true)} title={t(lang, 'account.avatarChangeCta')}>
+            {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={38} height={38} />}
+          </button>
+          {ProviderIcon && (
+            <span className="account-provider-badge" title={authProvider}>
+              <ProviderIcon width={14} height={14} />
+            </span>
+          )}
         </div>
         <div className="account-identity">
           <h2>{displayName}</h2>
           {email && <p className="account-email">{email}</p>}
           {isMockAuth && <span className="account-demo-badge">{t(lang, 'account.demoBadge')}</span>}
+          <button className="account-avatar-cta" onClick={() => setShowAvatarPicker(true)}>{t(lang, 'account.avatarChangeCta')}</button>
         </div>
         <button className="btn-secondary" onClick={signOut}>{t(lang, 'auth.signOut')}</button>
       </div>
+
+      {showAvatarPicker && <AvatarPicker lang={lang} onClose={() => setShowAvatarPicker(false)} />}
 
       {isMockAuth && <p className="account-demo-notice">{t(lang, 'auth.demoModeNotice')}</p>}
 
@@ -112,15 +148,28 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
         )}
       </div>
 
+      {openSecurity && (
+        <div className="account-section account-security card">
+          <h3><IconShield width={16} height={16} /> {t(lang, 'account.securityTitle')}</h3>
+          <p className="account-security-note">{t(lang, 'account.securityBody')}</p>
+          <button className="btn-security" onClick={openSecurity}>{t(lang, 'account.securityCta')}</button>
+        </div>
+      )}
+
       {showUpgrade && (
         <div className="modal-backdrop" onClick={() => setShowUpgrade(false)}>
           <div className="modal card" onClick={e => e.stopPropagation()}>
             <h3>{t(lang, 'account.upgradeTitle')}</h3>
             <p>{t(lang, 'account.upgradeBody')}</p>
-            <p className="upgrade-note">{t(lang, 'account.upgradeNote')}</p>
+            {!isServerConfigured && <p className="upgrade-note">{t(lang, 'account.upgradeNote')}</p>}
+            {checkoutError && <p className="upgrade-note">{t(lang, 'account.upgradeError')}</p>}
             <div className="modal-actions">
-              <button className="btn-primary" disabled title={t(lang, 'account.upgradeNote')}>
-                {t(lang, 'account.upgradeConfirm')}
+              <button
+                className="btn-primary"
+                disabled={!isServerConfigured || checkoutLoading}
+                onClick={startCheckout}
+              >
+                {checkoutLoading ? t(lang, 'account.upgradeLoading') : t(lang, 'account.upgradeConfirm')}
               </button>
             </div>
             <button className="btn-secondary close-btn" onClick={() => setShowUpgrade(false)}>

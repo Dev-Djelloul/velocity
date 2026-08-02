@@ -1,4 +1,5 @@
 import * as db from '../lib/db'
+import { createCheckoutSession, verifyWebhookSignature } from '../lib/stripe'
 
 export const CORS_HEADERS = {
   'Content-Type': 'application/json',
@@ -84,6 +85,45 @@ export async function handleApi(request, env, url) {
     const resolved = await db.resolveShare(env, shareMatch[1])
     if (!resolved) return json({ error: 'not found or expired' }, 404)
     return json(resolved)
+  }
+
+  if (pathname === '/checkout' && method === 'POST') {
+    const { userId, email, successUrl, cancelUrl } = await request.json()
+    if (!userId || !successUrl || !cancelUrl) {
+      return json({ error: 'userId, successUrl and cancelUrl required' }, 400)
+    }
+    try {
+      const session = await createCheckoutSession(env, { userId, email, successUrl, cancelUrl })
+      return json({ url: session.url })
+    } catch (err) {
+      return json({ error: err.message }, 500)
+    }
+  }
+
+  // Webhook Stripe : active/désactive le Pro selon l'abonnement. La signature est
+  // vérifiée avant tout traitement pour ne faire confiance qu'aux events Stripe réels.
+  if (pathname === '/webhooks/stripe' && method === 'POST') {
+    const payload = await request.text()
+    const signature = request.headers.get('stripe-signature')
+    if (!signature || !(await verifyWebhookSignature(payload, signature, env.STRIPE_WEBHOOK_SECRET))) {
+      return json({ error: 'invalid signature' }, 400)
+    }
+
+    const event = JSON.parse(payload)
+
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object
+      const userId = session.client_reference_id
+      if (userId) await db.setPro(env, userId, true, session.customer)
+    }
+
+    if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object
+      const userId = await db.findUserIdByStripeCustomer(env, subscription.customer)
+      if (userId) await db.setPro(env, userId, false, subscription.customer)
+    }
+
+    return json({ received: true })
   }
 
   return null

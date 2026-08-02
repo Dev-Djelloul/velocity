@@ -63,13 +63,22 @@ function MockAuthProvider({ children }) {
     setUser(null)
   }, [])
 
+  const updateAvatar = useCallback((dataUrl) => {
+    setUser(prev => {
+      if (!prev) return prev
+      const next = { ...prev, imageUrl: dataUrl }
+      localStorage.setItem('plp_mock_user', JSON.stringify(next))
+      return next
+    })
+  }, [])
+
   const openModal = useCallback((onDone) => {
     setAfterSignIn(() => onDone)
     setModalOpen(true)
   }, [])
 
   return (
-    <MockAuthContext.Provider value={{ user, signIn, signOut, openModal }}>
+    <MockAuthContext.Provider value={{ user, signIn, signOut, openModal, updateAvatar }}>
       {children}
       {modalOpen && (
         <div className="modal-backdrop" onClick={() => setModalOpen(false)}>
@@ -159,6 +168,60 @@ export function useSignIn() {
   }
   const clerk = useClerk()
   return { open: () => clerk.openSignIn() }
+}
+
+// Même principe que useSignIn, mais ouvre directement l'écran d'inscription —
+// utilisé par le CTA "Commencer" destiné aux nouveaux arrivants, distinct du
+// bouton "Connexion" du header destiné aux utilisateurs déjà inscrits.
+export function useSignUp() {
+  if (isMockAuth) {
+    const { openModal } = useMockAuthContext()
+    return { open: () => openModal() }
+  }
+  const clerk = useClerk()
+  return { open: () => clerk.openSignUp() }
+}
+
+// Met à jour la photo de profil — en mode démo, stocke un data URL en local ;
+// en mode réel, envoie le blob à Clerk via setProfileImage.
+export function useUpdateAvatar() {
+  if (isMockAuth) {
+    const { updateAvatar } = useMockAuthContext()
+    return async (blob) => {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader()
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(blob)
+      })
+      updateAvatar(dataUrl)
+    }
+  }
+  const { user } = useClerkUser()
+  return async (blob) => {
+    await user.setProfileImage({ file: blob })
+  }
+}
+
+// Ouvre le panneau sécurité/compte natif de Clerk (mot de passe, 2FA, appareils actifs,
+// suppression de compte) — utilisé comme section "avancée" à l'intérieur de la page
+// Mon compte Velocity, plutôt que comme point d'entrée concurrent dans le header.
+// Indisponible en mode démo (pas de backend Clerk).
+// Détecte le provider OAuth utilisé pour la connexion ('google' | 'apple' | 'slack' | null)
+// — sert à afficher un petit logo à côté de l'identité, purement informatif.
+export function useAuthProvider() {
+  const { user } = useUser()
+  if (isMockAuth) {
+    return ['google', 'apple', 'slack'].includes(user?.provider) ? user.provider : null
+  }
+  const provider = user?.externalAccounts?.[0]?.provider
+  return ['google', 'apple', 'slack'].includes(provider) ? provider : null
+}
+
+export function useOpenSecurity() {
+  if (isMockAuth) return null
+  const clerk = useClerk()
+  return () => clerk.openUserProfile()
 }
 
 export function UserButton() {

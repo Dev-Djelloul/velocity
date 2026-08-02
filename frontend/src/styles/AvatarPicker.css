@@ -1,0 +1,68 @@
+.avatar-picker {
+  width: 340px;
+  max-width: calc(100vw - 40px);
+  padding: 1.25rem;
+}
+
+.avatar-picker h3 {
+  margin-bottom: 0.85rem;
+  font-size: 1.05rem;
+}
+
+.avatar-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 0.85rem;
+}
+
+.avatar-picker-item {
+  aspect-ratio: 1;
+  min-width: 44px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+.avatar-picker-item:hover:not(:disabled) {
+  transform: scale(1.08);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.avatar-picker-item:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.avatar-picker-spinner {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-top-color: #fff;
+  animation: avatar-spin 0.7s linear infinite;
+}
+
+@keyframes avatar-spin {
+  to { transform: rotate(360deg); }
+}
+
+.avatar-picker-upload {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-muted, #78748f);
+  font-size: 0.8rem;
+  cursor: pointer;
+  margin-bottom: 1.25rem;
+  transition: color 0.15s ease;
+}
+
+.avatar-picker-upload:hover {
+  color: var(--text-secondary, #c2c3c9);
+}

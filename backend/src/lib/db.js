@@ -88,6 +88,11 @@ export async function consumeCredit(env, userId) {
   ).bind(userId).run()
 }
 
+export async function findUserIdByStripeCustomer(env, stripeCustomerId) {
+  const row = await env.DB.prepare('SELECT user_id FROM credits WHERE stripe_customer_id = ?').bind(stripeCustomerId).first()
+  return row?.user_id ?? null
+}
+
 export async function setPro(env, userId, isPro, stripeCustomerId) {
   await env.DB.prepare(
     `INSERT INTO credits (user_id, is_pro, stripe_customer_id, updated_at) VALUES (?, ?, ?, datetime('now'))

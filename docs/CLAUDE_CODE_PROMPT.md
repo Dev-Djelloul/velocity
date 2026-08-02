@@ -12,7 +12,7 @@ Créer un **générateur intelligent de plan de lancement SaaS** bilingue (FR/EN
 ## 📋 Architecture du Projet
 
 ```
-product-launch-planner/
+velocity-launch/
 ├── frontend/
 │   ├── src/
 │   │   ├── components/
@@ -239,7 +239,7 @@ product-launch-planner/
 ### 1. Frontend/package.json
 ```json
 {
-  "name": "product-launch-planner-frontend",
+  "name": "velocity-launch-frontend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -261,17 +261,17 @@ product-launch-planner/
 
 ### 2. Backend/wrangler.toml
 ```toml
-name = "product-launch-planner"
+name = "velocity-launch"
 main = "src/workers/generate.js"
 type = "service"
 
 [env.production]
-name = "product-launch-planner-prod"
+name = "velocity-launch-prod"
 ```
 
 ### 3. Frontend/.env.local
 ```
-VITE_BACKEND_URL=https://product-launch-planner.your-domain.workers.dev
+VITE_BACKEND_URL=https://velocity-launch.your-domain.workers.dev
 VITE_APP_ENV=development
 ```
 
@@ -356,8 +356,8 @@ export const translations = {
 
 ```bash
 # Create Vite project
-npm create vite@latest product-launch-planner -- --template react
-cd product-launch-planner
+npm create vite@latest velocity-launch -- --template react
+cd velocity-launch
 
 # Install dependencies
 npm install

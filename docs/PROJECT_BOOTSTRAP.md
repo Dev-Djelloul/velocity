@@ -17,8 +17,8 @@
 
 #### Étape 1 : Créer la structure de base
 ```bash
-mkdir -p product-launch-planner
-cd product-launch-planner
+mkdir -p velocity-launch
+cd velocity-launch
 
 # Frontend
 mkdir -p frontend/src/{components,lib,assets}
@@ -52,7 +52,7 @@ npm install wrangler
 ### frontend/package.json
 ```json
 {
-  "name": "product-launch-planner-frontend",
+  "name": "velocity-launch-frontend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -311,16 +311,16 @@ export default function PlanViewer({ plan, onReset }) {
 
 ### backend/wrangler.toml
 ```toml
-name = "product-launch-planner"
+name = "velocity-launch"
 main = "src/workers/generate.js"
 type = "service"
 compatibility_date = "2024-01-01"
 
 [env.production]
-name = "product-launch-planner-prod"
+name = "velocity-launch-prod"
 
 [env.development]
-name = "product-launch-planner-dev"
+name = "velocity-launch-dev"
 
 [[env.development.triggers.crons]]
 cron = "0 0 * * *"

@@ -9,7 +9,7 @@ echo "🚀 Product Launch Planner - Claude Code Setup"
 echo "=============================================="
 
 # Configuration
-PROJECT_DIR="$HOME/projects/product-launch-planner"
+PROJECT_DIR="$HOME/projects/velocity-launch"
 DOCS_DIR="$HOME/claude"
 
 # Step 1: Create project directory
@@ -36,7 +36,7 @@ echo "📄 Setting up base files..."
 # Frontend package.json
 cat > frontend/package.json << 'EOF'
 {
-  "name": "product-launch-planner-frontend",
+  "name": "velocity-launch-frontend",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -165,16 +165,16 @@ EOF
 
 # Backend wrangler.toml
 cat > backend/wrangler.toml << 'EOF'
-name = "product-launch-planner"
+name = "velocity-launch"
 main = "src/workers/generate.js"
 type = "service"
 compatibility_date = "2024-01-01"
 
 [env.production]
-name = "product-launch-planner-prod"
+name = "velocity-launch-prod"
 
 [env.development]
-name = "product-launch-planner-dev"
+name = "velocity-launch-dev"
 EOF
 
 # Backend generate.js
