@@ -399,6 +399,14 @@ export function IconProviderSlack(props) {
   )
 }
 
+export function IconPlus(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  )
+}
+
 export function IconLogin(props) {
   return (
     <svg {...base} {...props}>

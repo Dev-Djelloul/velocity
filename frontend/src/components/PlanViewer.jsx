@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import PlanSidebar from './PlanSidebar'
 import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
@@ -29,23 +29,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
   const captureRef = useRef(null)
-  const gridRef = useRef(null)
-  const [spacerHeight, setSpacerHeight] = useState(0)
-
-  // Espaceur calculé dynamiquement : juste assez pour que la dernière section
-  // du sommaire puisse atteindre le haut du viewport en cliquant dessus (limite
-  // physique de tout scroll d'ancrage), sans laisser un vide fixe disproportionné.
-  useEffect(() => {
-    const recompute = () => {
-      const lastSection = gridRef.current?.lastElementChild
-      if (!lastSection) return
-      const needed = window.innerHeight - lastSection.getBoundingClientRect().height - 64
-      setSpacerHeight(Math.max(0, needed))
-    }
-    recompute()
-    window.addEventListener('resize', recompute)
-    return () => window.removeEventListener('resize', recompute)
-  }, [plan])
 
   const budgetKeyFor = (value) => {
     if (value <= 3500) return 'b2k'
@@ -91,7 +74,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   return (
     <div className="plan-viewer-layout">
-      <PlanSidebar lang={lang} />
+      <PlanSidebar lang={lang} onNewPlan={onReset} />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
@@ -133,7 +116,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           onChange={e => setBudget(Number(e.target.value))} />
       </div>
 
-      <div className="plan-grid" ref={gridRef}>
+      <div className="plan-grid">
         <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
         <div id="section-persona" className="plan-section-anchor"><PersonaCard persona={plan.persona} lang={lang} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
@@ -148,8 +131,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
       </div>
-
-      <div className="plan-scroll-spacer" style={{ height: spacerHeight }} aria-hidden="true" />
 
       {showExport && (
         <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} onClose={() => setShowExport(false)} captureRef={captureRef} />

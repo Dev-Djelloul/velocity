@@ -74,6 +74,35 @@
   color: #0a0a0f;
 }
 
+.plan-sidebar-new-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 100%);
+  border: none;
+  color: #fff;
+  height: 34px;
+  padding: 0 0.4rem;
+  margin-bottom: 0.6rem;
+  border-radius: 7px;
+  cursor: pointer;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.plan-sidebar-new-btn:hover {
+  filter: brightness(1.1);
+}
+
+.plan-sidebar.collapsed .plan-sidebar-new-btn {
+  justify-content: center;
+  padding: 0;
+}
+
 .plan-sidebar-nav {
   display: flex;
   flex-direction: column;
@@ -132,6 +161,15 @@
   padding: 0;
 }
 
+.plan-sidebar-brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.9rem 0 0.3rem;
+  flex-shrink: 0;
+  opacity: 0.55;
+}
+
 .plan-sidebar-resize-handle {
   position: absolute;
   top: 0;
@@ -162,10 +200,6 @@
 .plan-viewer-main {
   flex: 1;
   min-width: 0;
-}
-
-.plan-scroll-spacer {
-  width: 100%;
 }
 
 .plan-section-anchor {

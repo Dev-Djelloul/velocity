@@ -1,9 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
+import VelocityLaunchLogo from './VelocityLaunchLogo'
 import {
   IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
-  IconTarget, IconCoin, IconShield, IconSparkle, IconSave
+  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
@@ -28,7 +29,7 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 232
 
-export default function PlanSidebar({ lang }) {
+export default function PlanSidebar({ lang, onNewPlan }) {
   const [collapsed, setCollapsed] = useState(false)
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(SECTIONS[0].id)
@@ -85,6 +86,15 @@ export default function PlanSidebar({ lang }) {
         </button>
       </div>
 
+      <button
+        className="plan-sidebar-new-btn"
+        onClick={onNewPlan}
+        title={collapsed ? t(lang, 'app.newPlan') : undefined}
+      >
+        <span className="plan-sidebar-icon"><IconPlus width={16} height={16} /></span>
+        {!collapsed && <span className="plan-sidebar-label">{t(lang, 'app.newPlan')}</span>}
+      </button>
+
       <nav className="plan-sidebar-nav">
         {SECTIONS.map(({ id, labelKey, Icon }) => (
           <a
@@ -99,6 +109,10 @@ export default function PlanSidebar({ lang }) {
           </a>
         ))}
       </nav>
+
+      <div className="plan-sidebar-brand">
+        <VelocityLaunchLogo width={collapsed ? 22 : 26} height={collapsed ? 22 : 26} variant="mono" />
+      </div>
 
       {!collapsed && (
         <div className="plan-sidebar-resize-handle" onMouseDown={startResize} />
