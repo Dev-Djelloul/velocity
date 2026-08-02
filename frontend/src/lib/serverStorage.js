@@ -73,6 +73,14 @@ export function resolveShare(shareId) {
   return safeFetch(`/shares/${encodeURIComponent(shareId)}`)
 }
 
+export function generateTable(prompt, plan, lang) {
+  return safeFetch('/generate-table', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ prompt, plan, lang })
+  })
+}
+
 export function createCheckoutSession(userId, email) {
   return safeFetch('/checkout', {
     method: 'POST',

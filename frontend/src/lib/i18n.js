@@ -108,7 +108,11 @@ export const translations = {
       subtitle: 'Décris le tableau dont tu as besoin, il se construit automatiquement',
       placeholder: 'ex : tableau de suivi des influenceurs à contacter',
       generate: 'Générer le tableau',
-      addRow: '+ Ajouter une ligne'
+      generating: 'Génération…',
+      addRow: '+ Ajouter une ligne',
+      removeRow: 'Supprimer la ligne',
+      removeColumn: 'Supprimer la colonne',
+      exportCsv: 'Exporter en CSV'
     },
     roadmapIssues: {
       title: 'Alertes roadmap',
@@ -642,7 +646,11 @@ export const translations = {
       subtitle: 'Describe the table you need, it builds itself automatically',
       placeholder: 'e.g. tracking table for influencers to contact',
       generate: 'Generate table',
-      addRow: '+ Add row'
+      generating: 'Generating…',
+      addRow: '+ Add row',
+      removeRow: 'Remove row',
+      removeColumn: 'Remove column',
+      exportCsv: 'Export as CSV'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

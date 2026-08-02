@@ -1,5 +1,7 @@
 import * as db from '../lib/db'
 import { createCheckoutSession, verifyWebhookSignature } from '../lib/stripe'
+import { generateTableWithAI } from '../lib/ai/tableClient'
+import { generateTableFromPrompt } from '../lib/generator/tableFallback'
 
 export const CORS_HEADERS = {
   'Content-Type': 'application/json',
@@ -85,6 +87,17 @@ export async function handleApi(request, env, url) {
     const resolved = await db.resolveShare(env, shareMatch[1])
     if (!resolved) return json({ error: 'not found or expired' }, 404)
     return json(resolved)
+  }
+
+  if (pathname === '/generate-table' && method === 'POST') {
+    const { prompt, plan, lang } = await request.json()
+    if (!prompt) return json({ error: 'prompt required' }, 400)
+    try {
+      const table = await generateTableWithAI(prompt, plan, lang || 'fr', env)
+      return json({ ...table, source: 'ai' })
+    } catch {
+      return json({ ...generateTableFromPrompt(prompt), source: 'rules' })
+    }
   }
 
   if (pathname === '/checkout' && method === 'POST') {

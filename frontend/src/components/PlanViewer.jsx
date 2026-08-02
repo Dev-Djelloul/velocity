@@ -119,7 +119,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <FinancialsCard financials={plan.financials} lang={lang} />
         <StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} />
         <AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} />
-        <GeneratedTable lang={lang} />
+        <GeneratedTable lang={lang} plan={plan} />
       </div>
 
       {showExport && (
