@@ -38,8 +38,9 @@ export default function PlanSidebar({ lang }) {
   const goTo = (id) => {
     setActiveId(id)
     const wrapper = document.getElementById(id)
-    const target = wrapper?.firstElementChild || wrapper
-    target?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    const card = wrapper?.firstElementChild || wrapper
+    const heading = card?.querySelector('h1, h2, h3, h4')
+    ;(heading || card)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const startResize = (e) => {
