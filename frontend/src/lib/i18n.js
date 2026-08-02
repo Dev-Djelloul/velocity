@@ -246,6 +246,19 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '2 août 2026',
+            title: 'Progression en temps réel et internationalisation complète',
+            items: [
+              'Barre de progression organique pendant la génération du plan, bouton conservé à l\'écran',
+              'Bannière de bienvenue animée sur la page du plan, différente selon génération ou rechargement',
+              'Dashboard KPI repensé avec mise en avant du KPI principal',
+              'Traduction anglaise complète des modales du footer, des brouillons et des plans sauvegardés',
+              'Modale de confirmation dédiée pour la suppression des plans, pattern léger pour les brouillons',
+              'Corrections : chargement de brouillon réparé, formulaire vide sur "Nouveau plan", remontée en haut de page',
+              'Header et hero retravaillés : bouton d\'accueil, titre agrandi, alignement à gauche cohérent avec le reste du site'
+            ]
+          },
+          {
             date: '31 juillet 2026',
             title: 'Nouvelle identité visuelle',
             items: [
@@ -711,6 +724,19 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 2, 2026',
+            title: 'Real-time progress and full internationalization',
+            items: [
+              'Organic progress bar during plan generation, button stays visible on screen',
+              'Animated welcome banner on the plan page, different wording for generation vs. reload',
+              'Redesigned KPI dashboard highlighting the primary metric',
+              'Full English translation of footer modals, drafts and saved plans',
+              'Dedicated confirmation modal for deleting saved plans, lightweight pattern for drafts',
+              'Fixes: draft loading, empty form on "New plan", scroll to top everywhere',
+              'Reworked header and hero: home button, larger title, left alignment consistent with the rest of the site'
+            ]
+          },
           {
             date: 'July 31, 2026',
             title: 'New visual identity',

@@ -138,7 +138,14 @@ export default function App() {
     <div className="app">
       <header className="header">
         <div className="header-top">
-          <div className="header-brand-group">
+          <button className="header-brand-btn" onClick={() => {
+            setCurrentPage('landing')
+            window.scrollTo(0, 0)
+          }}>
+            <Wordmark size={34} animated />
+          </button>
+
+          <nav className="header-nav">
             <button
               className="header-home-btn"
               aria-label={lang === 'fr' ? 'Accueil' : 'Home'}
@@ -148,18 +155,8 @@ export default function App() {
                 window.scrollTo(0, 0)
               }}
             >
-              <IconHome width={20} height={20} />
+              <IconHome width={16} height={16} />
             </button>
-
-            <button className="header-brand-btn" onClick={() => {
-              setCurrentPage('landing')
-              window.scrollTo(0, 0)
-            }}>
-              <Wordmark size={34} animated />
-            </button>
-          </div>
-
-          <nav className="header-nav">
             <button className="header-nav-link" onClick={() => handleNavAnchor('features')}>
               {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
             </button>
