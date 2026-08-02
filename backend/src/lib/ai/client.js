@@ -42,7 +42,7 @@ export async function generatePlanWithAI(data, env) {
   }
 
   const lang = data.language || 'fr'
-  const model = env.AI_MODEL || DEFAULT_MODEL
+  const model = env.OPENROUTER_MODEL || DEFAULT_MODEL
 
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
