@@ -14,6 +14,8 @@ import CalendarView from './CalendarView'
 import AskChart from './AskChart'
 import GeneratedTable from './GeneratedTable'
 import AgentActivity from './AgentActivity'
+import PostLaunchTracking from './PostLaunchTracking'
+import WhatIfScenarios from './WhatIfScenarios'
 import ExportModal from './ExportModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
@@ -61,6 +63,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   const updateKpis = (nextKpis) => {
     const nextPlan = { ...plan, kpis: nextKpis }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
+  const updateMetricsHistory = (nextHistory) => {
+    const nextPlan = { ...plan, metricsHistory: nextHistory }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
+  const updateScenarios = (nextScenarios) => {
+    const nextPlan = { ...plan, scenarios: nextScenarios }
     setPlan(nextPlan)
     if (plan.id) savePlan(nextPlan)
   }
@@ -134,6 +148,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
         <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
+        <div id="section-tracking" className="plan-section-anchor"><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} /></div>
+        <div id="section-whatif" className="plan-section-anchor"><WhatIfScenarios plan={plan} lang={lang} onScenariosChange={updateScenarios} /></div>
       </div>
 
       {showExport && (

@@ -172,6 +172,27 @@ export const translations = {
         error: 'Erreur'
       }
     },
+    tracking: {
+      title: 'Suivi post-lancement',
+      subtitle: (kpiName) => `Prévisionnel vs réel sur "${kpiName}"`,
+      actualValue: 'Valeur réelle',
+      addSnapshot: 'Ajouter',
+      target: 'Cible',
+      actual: 'Réel',
+      onTrack: 'Dans les objectifs',
+      behind: 'En dessous',
+      empty: 'Ajoute ta première mesure réelle pour démarrer le suivi.'
+    },
+    whatif: {
+      title: 'Scénarios what-if',
+      subtitle: 'Compare des hypothèses de budget/timeline sans modifier le plan initial',
+      namePlaceholder: 'Nom du scénario (optionnel)',
+      compute: 'Calculer',
+      baseline: 'Plan actuel',
+      burnLabel: 'Burn/mois :',
+      runwayLabel: 'Runway :',
+      breakEvenLabel: 'Seuil (clients) :'
+    },
     roadmapIssues: {
       title: 'Alertes roadmap',
       bottleneck: 'Goulot de capacité',
@@ -767,6 +788,27 @@ export const translations = {
         done: 'Done',
         error: 'Error'
       }
+    },
+    tracking: {
+      title: 'Post-launch tracking',
+      subtitle: (kpiName) => `Target vs actual on "${kpiName}"`,
+      actualValue: 'Actual value',
+      addSnapshot: 'Add',
+      target: 'Target',
+      actual: 'Actual',
+      onTrack: 'On target',
+      behind: 'Below target',
+      empty: 'Add your first real measurement to start tracking.'
+    },
+    whatif: {
+      title: 'What-if scenarios',
+      subtitle: 'Compare budget/timeline assumptions without changing the original plan',
+      namePlaceholder: 'Scenario name (optional)',
+      compute: 'Compute',
+      baseline: 'Current plan',
+      burnLabel: 'Burn/month:',
+      runwayLabel: 'Runway:',
+      breakEvenLabel: 'Break-even (users):'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',

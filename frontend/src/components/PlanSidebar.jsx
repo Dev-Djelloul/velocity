@@ -4,7 +4,7 @@ import VelocityLaunchLogo from './VelocityLaunchLogo'
 import {
   IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
-  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus
+  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
@@ -22,7 +22,9 @@ const SECTIONS = [
   { id: 'section-strategy', labelKey: 'outputs.strategy.title', Icon: IconShield },
   { id: 'section-askchart', labelKey: 'askChart.title', Icon: IconSparkle },
   { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave },
-  { id: 'section-agents', labelKey: 'agents.title', Icon: IconSparkle }
+  { id: 'section-agents', labelKey: 'agents.title', Icon: IconSparkle },
+  { id: 'section-tracking', labelKey: 'tracking.title', Icon: IconTrendingUp },
+  { id: 'section-whatif', labelKey: 'whatif.title', Icon: IconCompass }
 ]
 
 const RAIL_WIDTH = 60
