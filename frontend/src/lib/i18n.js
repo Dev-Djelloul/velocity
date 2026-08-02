@@ -491,7 +491,7 @@ export const translations = {
       confirmDelete: 'Confirmer ?'
     },
     plans: {
-      title: 'Vos plans de lancement',
+      title: 'Mes plans',
       emptyTitle: 'Historique des plans',
       emptyText: "Vous n'avez pas encore généré de plan. Commencez par en créer un !",
       intro: 'Gérez vos plans générés et partagez-les avec votre équipe',
@@ -1066,7 +1066,7 @@ export const translations = {
       confirmDelete: 'Confirm?'
     },
     plans: {
-      title: 'Your launch plans',
+      title: 'My plans',
       emptyTitle: 'Plan history',
       emptyText: "You haven't generated a plan yet. Start by creating one!",
       intro: 'Manage your generated plans and share them with your team',

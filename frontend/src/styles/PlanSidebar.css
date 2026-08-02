@@ -75,32 +75,18 @@
 }
 
 .plan-sidebar-new-btn {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
   background: linear-gradient(135deg, #9184d9 0%, #6366f1 100%);
-  border: none;
   color: #fff;
-  height: 34px;
-  padding: 0 0.4rem;
-  margin-bottom: 0.6rem;
-  border-radius: 7px;
-  cursor: pointer;
-  font-size: 0.8rem;
   font-weight: 600;
-  white-space: nowrap;
-  overflow: hidden;
+  margin-bottom: 0.6rem;
   flex-shrink: 0;
-  transition: filter 0.15s ease, transform 0.15s ease;
+  transition: filter 0.15s ease;
 }
 
 .plan-sidebar-new-btn:hover {
-  filter: brightness(1.1);
-}
-
-.plan-sidebar.collapsed .plan-sidebar-new-btn {
-  justify-content: center;
-  padding: 0;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 100%);
+  filter: brightness(1.12);
+  color: #fff;
 }
 
 .plan-sidebar-nav {
@@ -121,14 +107,17 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
+  width: 100%;
   height: 34px;
   padding: 0 0.4rem;
   border-radius: 7px;
   cursor: pointer;
   font-size: 0.8rem;
+  font-family: inherit;
   text-align: left;
   white-space: nowrap;
   overflow: hidden;
+  flex-shrink: 0;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
@@ -165,9 +154,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0.9rem 0 0.3rem;
+  padding: 1rem 0 0.4rem;
   flex-shrink: 0;
-  opacity: 0.55;
 }
 
 .plan-sidebar-resize-handle {

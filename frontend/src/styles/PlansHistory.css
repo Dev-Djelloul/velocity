@@ -24,15 +24,17 @@
   align-items: center;
   gap: 16px;
   padding: 16px 20px;
-  border: 1px solid rgba(145, 132, 217, 0.15);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
-  background: var(--color-bg-tertiary);
-  transition: all 0.2s ease;
+  background:
+    linear-gradient(var(--color-bg-tertiary), var(--color-bg-tertiary)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .plan-item:hover {
-  border-color: var(--color-primary);
-  box-shadow: 0 4px 16px rgba(145, 132, 217, 0.12);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(145, 132, 217, 0.22);
 }
 
 .plan-info h3 {

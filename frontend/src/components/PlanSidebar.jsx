@@ -87,7 +87,7 @@ export default function PlanSidebar({ lang, onNewPlan }) {
       </div>
 
       <button
-        className="plan-sidebar-new-btn"
+        className="plan-sidebar-item plan-sidebar-new-btn"
         onClick={onNewPlan}
         title={collapsed ? t(lang, 'app.newPlan') : undefined}
       >
@@ -111,7 +111,7 @@ export default function PlanSidebar({ lang, onNewPlan }) {
       </nav>
 
       <div className="plan-sidebar-brand">
-        <VelocityLaunchLogo width={collapsed ? 22 : 26} height={collapsed ? 22 : 26} variant="mono" />
+        <VelocityLaunchLogo width={collapsed ? 32 : 40} height={collapsed ? 32 : 40} variant="gradient" />
       </div>
 
       {!collapsed && (
