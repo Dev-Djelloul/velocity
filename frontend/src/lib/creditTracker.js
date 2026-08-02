@@ -1,5 +1,10 @@
 // Compteur de crédits de génération — palier gratuit à 3 plans, illimité en Pro.
 // Stocké par utilisateur (userId Clerk ou mock) pour ne pas mélanger les comptes.
+// Le cache local (localStorage) sert de source instantanée pour l'UI ; il est
+// hydraté depuis le serveur au login (syncCreditsFromServer) et répliqué vers le
+// serveur à chaque consommation (best-effort), pour un compte fiable multi-appareil.
+import { fetchCredits, pushConsumeCredit } from './serverStorage'
+
 export const FREE_PLAN_LIMIT = 3
 
 function storageKey(userId) {
@@ -35,10 +40,19 @@ export function consumeCredit(userId) {
   if (!userId || isPro(userId)) return
   const used = getUsedCredits(userId)
   localStorage.setItem(storageKey(userId), String(used + 1))
+  pushConsumeCredit(userId)
 }
 
 export function remainingCredits(userId) {
   if (!userId) return 0
   if (isPro(userId)) return Infinity
   return Math.max(0, FREE_PLAN_LIMIT - getUsedCredits(userId))
+}
+
+// Hydrate le cache local depuis le serveur (multi-appareil) — appelé au login.
+export async function syncCreditsFromServer(userId) {
+  const server = await fetchCredits(userId)
+  if (!server) return
+  localStorage.setItem(storageKey(userId), String(server.used))
+  localStorage.setItem(proKey(userId), server.isPro ? 'true' : 'false')
 }

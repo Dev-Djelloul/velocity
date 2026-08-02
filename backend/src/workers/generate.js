@@ -5,6 +5,7 @@ import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary }
 import { generatePersona, classifyProduct, classificationLabel } from '../lib/engine'
 import { generatePlanWithAI } from '../lib/ai/client'
 import { recordUsage } from '../lib/ai/usageTracker'
+import { handleApi } from './api'
 
 const CORS_HEADERS = {
   'Content-Type': 'application/json',
@@ -32,6 +33,13 @@ export default {
     if (request.method === 'OPTIONS') {
       return new Response(null, { headers: CORS_HEADERS })
     }
+
+    const url = new URL(request.url)
+    if (url.pathname !== '/' && url.pathname !== '') {
+      const apiResponse = await handleApi(request, env, url)
+      if (apiResponse) return apiResponse
+    }
+
     if (request.method !== 'POST') {
       return new Response('Method not allowed', { status: 405 })
     }

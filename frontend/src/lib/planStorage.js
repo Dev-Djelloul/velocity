@@ -1,12 +1,22 @@
+import { fetchPlans, pushPlan, removePlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
+
 const PLANS_KEY = 'plp_saved_plans'
 const SHARES_KEY = 'plp_plan_shares'
+
+// Défini par App.jsx au login/logout — quand présent, chaque écriture locale est
+// répliquée vers le stockage serveur (best-effort, fire-and-forget).
+let activeUserId = null
+
+export function setActiveUser(userId) {
+  activeUserId = userId
+}
 
 export function savePlan(plan) {
   const plans = getAllPlans()
   const planWithMeta = {
     ...plan,
     id: plan.id || generateId(),
-    savedAt: new Date().toISOString(),
+    savedAt: plan.savedAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
 
@@ -18,7 +28,16 @@ export function savePlan(plan) {
   }
 
   localStorage.setItem(PLANS_KEY, JSON.stringify(plans))
+  if (activeUserId) pushPlan(activeUserId, planWithMeta)
   return planWithMeta
+}
+
+// Hydrate le cache local depuis le serveur (multi-appareil) — appelé au login.
+export async function syncPlansFromServer(userId) {
+  const serverPlans = await fetchPlans(userId)
+  if (serverPlans.length) {
+    localStorage.setItem(PLANS_KEY, JSON.stringify(serverPlans))
+  }
 }
 
 export function getAllPlans() {
@@ -39,9 +58,16 @@ export function deletePlan(id) {
   const plans = getAllPlans()
   const filtered = plans.filter(p => p.id !== id)
   localStorage.setItem(PLANS_KEY, JSON.stringify(filtered))
+  if (activeUserId) removePlan(activeUserId, id)
 }
 
-export function createShareLink(planId) {
+export async function createShareLink(planId) {
+  // Un lien de partage n'a de sens que côté serveur (consultable depuis un autre
+  // appareil/navigateur). Repli local si le backend est indisponible — le lien ne
+  // fonctionnera alors que sur ce même navigateur.
+  const server = await serverCreateShare(planId)
+  if (server?.shareId) return server.shareId
+
   const shares = getShares()
   const shareId = generateId()
   const shareData = {
@@ -65,7 +91,10 @@ export function getShares() {
   }
 }
 
-export function getShareLink(shareId) {
+export async function getShareLink(shareId) {
+  const server = await resolveShare(shareId)
+  if (server?.plan) return server
+
   const shares = getShares()
   const share = shares.find(s => s.id === shareId)
   if (!share) return null

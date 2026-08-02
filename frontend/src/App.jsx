@@ -16,9 +16,10 @@ import { PricingModal, ChangelogModal, RoadmapModal } from './components/Product
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getShareLink } from './lib/planStorage'
+import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, syncPlansFromServer } from './lib/planStorage'
+import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { useUser, useAuth, useSignIn, UserButton } from './lib/auth'
-import { canGenerate, consumeCredit, remainingCredits, isPro } from './lib/creditTracker'
+import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
@@ -36,8 +37,10 @@ export default function App() {
   const [showHistory, setShowHistory] = useState(false)
   const [showDrafts, setShowDrafts] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
+  const [isSharedView, setIsSharedView] = useState(false)
+  const [dataVersion, setDataVersion] = useState(0)
 
-  const { isSignedIn, isLoaded, user } = useUser()
+  const { isSignedIn, isLoaded } = useUser()
   const { userId, signOut } = useAuth()
   const { open: openSignIn } = useSignIn()
   const wasSignedIn = useRef(isSignedIn)
@@ -50,33 +53,49 @@ export default function App() {
     const params = new URLSearchParams(window.location.search)
     const shareId = params.get('share')
     if (shareId) {
-      const shared = getShareLink(shareId)
-      if (shared?.plan) {
-        setPlan(shared.plan)
-        setJustGenerated(false)
-        setCurrentPage('result')
-      }
+      (async () => {
+        const shared = await getShareLink(shareId)
+        if (shared?.plan) {
+          setPlan(shared.plan)
+          setJustGenerated(false)
+          setIsSharedView(true)
+          setCurrentPage('result')
+        }
+      })()
     }
   }, [])
 
   // Flux demandé : Get Started -> connexion -> atterrit sur "Mon compte" -> l'utilisateur
-  // revient ensuite lui-même vers la génération. Détecte toute transition signed-out -> signed-in.
+  // revient ensuite lui-même vers la génération. Détecte toute transition signed-out -> signed-in,
+  // et hydrate le cache local (plans/brouillons/crédits) depuis le stockage serveur.
   useEffect(() => {
     if (!isLoaded) return
-    if (!wasSignedIn.current && isSignedIn) {
+    if (!wasSignedIn.current && isSignedIn && userId) {
+      setPlanActiveUser(userId)
+      setDraftActiveUser(userId)
+      Promise.all([
+        syncPlansFromServer(userId),
+        syncDraftsFromServer(userId),
+        syncCreditsFromServer(userId)
+      ]).then(() => setDataVersion(v => v + 1))
       setCurrentPage('account')
       window.scrollTo(0, 0)
     }
+    if (wasSignedIn.current && !isSignedIn) {
+      setPlanActiveUser(null)
+      setDraftActiveUser(null)
+    }
     wasSignedIn.current = isSignedIn
-  }, [isSignedIn, isLoaded])
+  }, [isSignedIn, isLoaded, userId])
 
   // Garde-fou : les pages compte/questionnaire/résultat exigent une session active.
   useEffect(() => {
     if (!isLoaded) return
+    if (currentPage === 'result' && isSharedView) return // lien de partage : consultable sans compte
     if (AUTH_ONLY_PAGES.includes(currentPage) && !isSignedIn) {
       setCurrentPage('landing')
     }
-  }, [currentPage, isSignedIn, isLoaded])
+  }, [currentPage, isSignedIn, isLoaded, isSharedView])
 
   const handleGenerate = async (data) => {
     setLoading(true)
@@ -101,6 +120,7 @@ export default function App() {
       consumeCredit(userId)
       setPlan(generatedPlan)
       setJustGenerated(true)
+      setIsSharedView(false)
       setCurrentPage('result')
       window.scrollTo(0, 0)
     } catch (e) {
@@ -110,6 +130,7 @@ export default function App() {
         consumeCredit(userId)
         setPlan(generatedPlan)
         setJustGenerated(true)
+        setIsSharedView(false)
         setCurrentPage('result')
         window.scrollTo(0, 0)
       } catch {
@@ -153,6 +174,7 @@ export default function App() {
   const handleLoadFromHistory = (loadedPlan) => {
     setPlan(loadedPlan)
     setJustGenerated(false)
+    setIsSharedView(false)
     setShowHistory(false)
     setCurrentPage('result')
     window.scrollTo(0, 0)
@@ -263,11 +285,12 @@ export default function App() {
         {currentPage === 'questionnaire' && isSignedIn && (
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
-        {currentPage === 'result' && plan && isSignedIn && (
+        {currentPage === 'result' && plan && (isSignedIn || isSharedView) && (
           <PlanViewer plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />
         )}
         {currentPage === 'account' && isSignedIn && (
           <AccountPage
+            key={dataVersion}
             lang={lang}
             onBack={() => setCurrentPage('landing')}
             onLoadPlan={handleLoadFromHistory}

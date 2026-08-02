@@ -1,0 +1,96 @@
+// Accès D1 pour le stockage serveur des plans/brouillons/crédits par utilisateur.
+//
+// ⚠️ Le userId est actuellement fourni tel quel par le client (aucune clé secrète
+// Clerk n'est encore configurée côté Worker pour vérifier le token de session).
+// À durcir dès que CLERK_SECRET_KEY est disponible : vérifier le JWT Clerk et en
+// extraire le userId côté serveur plutôt que de faire confiance au body de la requête.
+
+function genId() {
+  return crypto.randomUUID().replace(/-/g, '').slice(0, 20)
+}
+
+export async function listPlans(env, userId) {
+  const { results } = await env.DB.prepare(
+    'SELECT id, data, created_at, updated_at FROM plans WHERE user_id = ? ORDER BY updated_at DESC'
+  ).bind(userId).all()
+  return results.map(row => ({ ...JSON.parse(row.data), id: row.id, savedAt: row.created_at, updatedAt: row.updated_at }))
+}
+
+export async function upsertPlan(env, userId, plan) {
+  const id = plan.id || genId()
+  const now = new Date().toISOString()
+  await env.DB.prepare(
+    `INSERT INTO plans (id, user_id, data, product_name, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET data = excluded.data, product_name = excluded.product_name, updated_at = excluded.updated_at`
+  ).bind(id, userId, JSON.stringify({ ...plan, id }), plan.product?.name || null, now, now).run()
+  return { ...plan, id, savedAt: now, updatedAt: now }
+}
+
+export async function deletePlan(env, userId, id) {
+  await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ?').bind(id, userId).run()
+}
+
+export async function getPlan(env, id) {
+  const row = await env.DB.prepare('SELECT data FROM plans WHERE id = ?').bind(id).first()
+  return row ? JSON.parse(row.data) : null
+}
+
+export async function listDrafts(env, userId) {
+  const { results } = await env.DB.prepare(
+    'SELECT id, name, data, created_at, updated_at FROM drafts WHERE user_id = ? ORDER BY updated_at DESC'
+  ).bind(userId).all()
+  return results.map(row => ({ id: row.id, name: row.name, data: JSON.parse(row.data), savedAt: row.created_at, updatedAt: row.updated_at }))
+}
+
+export async function upsertDraft(env, userId, draft) {
+  const id = draft.id || genId()
+  const now = new Date().toISOString()
+  await env.DB.prepare(
+    `INSERT INTO drafts (id, user_id, name, data, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET name = excluded.name, data = excluded.data, updated_at = excluded.updated_at`
+  ).bind(id, userId, draft.name || null, JSON.stringify(draft.data), now, now).run()
+  return { id, name: draft.name, data: draft.data, savedAt: now, updatedAt: now }
+}
+
+export async function deleteDraft(env, userId, id) {
+  await env.DB.prepare('DELETE FROM drafts WHERE id = ? AND user_id = ?').bind(id, userId).run()
+}
+
+export async function createShare(env, planId) {
+  const id = genId()
+  const expiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+  await env.DB.prepare(
+    'INSERT INTO shares (id, plan_id, expires_at) VALUES (?, ?, ?)'
+  ).bind(id, planId, expiresAt).run()
+  return id
+}
+
+export async function resolveShare(env, shareId) {
+  const share = await env.DB.prepare('SELECT * FROM shares WHERE id = ?').bind(shareId).first()
+  if (!share) return null
+  if (new Date(share.expires_at) < new Date()) return null
+  await env.DB.prepare('UPDATE shares SET access_count = access_count + 1 WHERE id = ?').bind(shareId).run()
+  const plan = await getPlan(env, share.plan_id)
+  return plan ? { plan, share } : null
+}
+
+export async function getCredits(env, userId) {
+  const row = await env.DB.prepare('SELECT used, is_pro FROM credits WHERE user_id = ?').bind(userId).first()
+  return row ? { used: row.used, isPro: !!row.is_pro } : { used: 0, isPro: false }
+}
+
+export async function consumeCredit(env, userId) {
+  await env.DB.prepare(
+    `INSERT INTO credits (user_id, used, updated_at) VALUES (?, 1, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET used = used + 1, updated_at = datetime('now')`
+  ).bind(userId).run()
+}
+
+export async function setPro(env, userId, isPro, stripeCustomerId) {
+  await env.DB.prepare(
+    `INSERT INTO credits (user_id, is_pro, stripe_customer_id, updated_at) VALUES (?, ?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET is_pro = excluded.is_pro, stripe_customer_id = excluded.stripe_customer_id, updated_at = datetime('now')`
+  ).bind(userId, isPro ? 1 : 0, stripeCustomerId || null).run()
+}

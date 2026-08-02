@@ -1,4 +1,12 @@
+import { fetchDrafts, pushDraft, removeDraft } from './serverStorage'
+
 const DRAFTS_KEY = 'plp_drafts'
+
+let activeUserId = null
+
+export function setActiveUser(userId) {
+  activeUserId = userId
+}
 
 export function saveDraft(formData, draftName = 'Brouillon') {
   const drafts = getAllDrafts()
@@ -19,7 +27,16 @@ export function saveDraft(formData, draftName = 'Brouillon') {
   }
 
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts))
+  if (activeUserId) pushDraft(activeUserId, draft)
   return draft
+}
+
+// Hydrate le cache local depuis le serveur (multi-appareil) — appelé au login.
+export async function syncDraftsFromServer(userId) {
+  const serverDrafts = await fetchDrafts(userId)
+  if (serverDrafts.length) {
+    localStorage.setItem(DRAFTS_KEY, JSON.stringify(serverDrafts))
+  }
 }
 
 export function getAllDrafts() {
@@ -40,6 +57,7 @@ export function deleteDraft(id) {
   const drafts = getAllDrafts()
   const filtered = drafts.filter(d => d.id !== id)
   localStorage.setItem(DRAFTS_KEY, JSON.stringify(filtered))
+  if (activeUserId) removeDraft(activeUserId, id)
 }
 
 export function renameDraft(id, newName) {
@@ -49,6 +67,7 @@ export function renameDraft(id, newName) {
     draft.name = newName
     draft.updatedAt = new Date().toISOString()
     localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts))
+    if (activeUserId) pushDraft(activeUserId, draft)
   }
   return draft
 }

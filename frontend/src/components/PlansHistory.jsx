@@ -22,8 +22,8 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
     setDeleteTarget(null)
   }
 
-  const handleShare = (planId) => {
-    const shareId = createShareLink(planId)
+  const handleShare = async (planId) => {
+    const shareId = await createShareLink(planId)
     const url = `${window.location.origin}${window.location.pathname}?share=${shareId}`
     setShareLink({ planId, shareId, url })
   }
