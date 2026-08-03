@@ -287,6 +287,11 @@
   margin: 3rem auto 0;
 }
 
+.preview-grid-4 {
+  grid-template-columns: repeat(2, 1fr);
+  max-width: 900px;
+}
+
 .preview-card {
   position: relative;
   border-radius: var(--border-radius);
@@ -302,6 +307,7 @@
 .preview-card:nth-child(1) { animation-delay: 0.1s; }
 .preview-card:nth-child(2) { animation-delay: 0.2s; }
 .preview-card:nth-child(3) { animation-delay: 0.3s; }
+.preview-card:nth-child(4) { animation-delay: 0.4s; }
 
 .preview-card:hover {
   transform: translateY(-6px);
@@ -806,7 +812,7 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .preview-card:nth-child(3) {
+  .preview-grid:not(.preview-grid-4) .preview-card:nth-child(3) {
     grid-column: span 2;
     aspect-ratio: 16 / 9;
   }

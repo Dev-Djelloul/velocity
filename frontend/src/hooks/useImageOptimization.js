@@ -132,6 +132,12 @@ export function useAiImages() {
     dashboardPreviewAlt: '/assets/ai-images/modern-saas-dashboard-dark-mode-ui-preview--isomet (1).png',
     dashboardMockup: '/assets/ai-images/gpt-image-2_professional_photo_of_Dashboard_interface_mockup_for_product_launch_platform_col-0.jpg',
 
+    // Aperçu produit v2 (4 cartes) - remplace les 3 précédentes dans Landing.jsx
+    productPreview1: '/assets/ai-images/high-level-description-a-3d-render-of-a-_JMY8FI9FVQ-JUFFq7E1RjQ_dfn8eFbnRgmWLvCn2EZSYw.jpg',
+    productPreview2: '/assets/ai-images/high-level-description-a-3d-render-of-a-_QEvFEFjVXDGbQyI5bRy5LQ_dfn8eFbnRgmWLvCn2EZSYw.jpg',
+    productPreview3: '/assets/ai-images/high-level-description-a-3d-render-of-a-_iZJBZ9C4WfeRBz8TrqJEEw_dfn8eFbnRgmWLvCn2EZSYw.jpg',
+    productPreview4: '/assets/ai-images/high-level-description-a-3d-render-of-a-_zpMrbERYWWal--c2PYMVhA_dfn8eFbnRgmWLvCn2EZSYw_cover.jpg',
+
     industriesSplit: '/assets/ai-images/gpt-image-2_exquisite_high_fashion_photography_of_Split-screen_showing_different_industries_-0.jpg',
     industriesAlt: '/assets/ai-images/gpt-image-2_professional_photo_of_Split-screen_showing_different_industries_using_launch_pla-0.jpg',
 

@@ -157,30 +157,36 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
         </div>
       </section>
 
-      {/* Product Preview - 3 vues distinctes de l'interface */}
+      {/* Product Preview - 4 vues distinctes de l'interface */}
       <section className="product-preview" id="product-preview">
         <div className="section-header">
           <h2>{lang === 'fr' ? 'Aperçu du produit' : 'Product Preview'}</h2>
-          <p>{lang === 'fr' ? 'Trois vues de l\'interface : pilotage, sprints et vision exécutive' : 'Three views of the interface: planning, sprints and executive overview'}</p>
+          <p>{lang === 'fr' ? 'Roadmap, sprints, KPIs et pilotage exécutif' : 'Roadmap, sprints, KPIs and executive overview'}</p>
         </div>
 
-        <div className="preview-grid">
+        <div className="preview-grid preview-grid-4">
           <div className="preview-card">
-            <img src={images.dashboardPreview} alt="Gantt, Kanban et KPIs" loading="lazy" />
+            <img src={images.productPreview1} alt="Roadmap et sprint Kanban" loading="lazy" />
             <div className="preview-card-caption">
-              <span>{lang === 'fr' ? 'Gantt, Kanban & KPIs' : 'Gantt, Kanban & KPIs'}</span>
+              <span>{lang === 'fr' ? 'Roadmap & Sprint' : 'Roadmap & Sprint'}</span>
             </div>
           </div>
           <div className="preview-card">
-            <img src={images.dashboardPreviewAlt} alt="Suivi des sprints" loading="lazy" />
+            <img src={images.productPreview2} alt="Activité d'équipe et KPIs" loading="lazy" />
             <div className="preview-card-caption">
-              <span>{lang === 'fr' ? 'Suivi des sprints' : 'Sprint tracking'}</span>
+              <span>{lang === 'fr' ? 'Activité d\'équipe' : 'Team activity'}</span>
             </div>
           </div>
           <div className="preview-card">
-            <img src={images.dashboardMockup} alt="Dashboard exécutif" loading="lazy" />
+            <img src={images.productPreview3} alt="Analytics et widgets" loading="lazy" />
             <div className="preview-card-caption">
-              <span>{lang === 'fr' ? 'Dashboard exécutif' : 'Executive dashboard'}</span>
+              <span>{lang === 'fr' ? 'Analytics' : 'Analytics'}</span>
+            </div>
+          </div>
+          <div className="preview-card">
+            <img src={images.productPreview4} alt="Gantt et suivi de vélocité" loading="lazy" />
+            <div className="preview-card-caption">
+              <span>{lang === 'fr' ? 'Gantt & Vélocité' : 'Gantt & Velocity'}</span>
             </div>
           </div>
         </div>
