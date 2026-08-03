@@ -3,11 +3,15 @@ import DemoModal from './DemoModal'
 import { IconClipboard, IconTarget, IconBarChart, IconTrendingUp, IconSparkle, IconDownload } from './Icons'
 import { t } from '../lib/i18n'
 import { tLanding } from '../lib/landingI18n'
+import { useImageOptimization, useScrollReveal, useAiImages } from '../hooks/useImageOptimization'
 import '../styles/Landing.css'
 
 export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClick }) {
   const [hoveredFeature, setHoveredFeature] = useState(null)
   const [showDemo, setShowDemo] = useState(false)
+  const images = useAiImages()
+  const heroImage = useImageOptimization(images.heroIsometric)
+  const { ref: statsRef, isVisible: statsVisible } = useScrollReveal()
 
   const features = [
     {
@@ -71,34 +75,44 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
 
   return (
     <div className="landing">
-      {/* Hero Section */}
-      <section className="hero">
-        <div className="hero-content">
-          <div className="hero-badge">
+      {/* Hero Section - Amélioré avec Image IA */}
+      <section className="hero hero-enhanced">
+        <div className="hero-background">
+          <div className="hero-gradient-overlay" />
+          <img
+            src={images.heroIsometric}
+            alt="VelocityLaunch Hero"
+            className={`hero-image ${heroImage.imageClass}`}
+            loading="eager"
+          />
+        </div>
+
+        <div className="hero-content hero-content-enhanced">
+          <div className="hero-badge hero-badge-animated">
             <span className="hero-badge-dot" />
             {tLanding(lang, 'hero.badge')}
           </div>
 
-          <h1 className="hero-title">
+          <h1 className="hero-title hero-title-animated">
             {tLanding(lang, 'hero.title')}
             <span className="hero-highlight"> {tLanding(lang, 'hero.titleHighlight')}</span>
           </h1>
 
-          <p className="hero-subtitle">
+          <p className="hero-subtitle hero-subtitle-animated">
             {tLanding(lang, 'hero.subtitle')}
           </p>
 
-          <div className="hero-cta-group">
-            <button className="btn-cta-primary" onClick={onStartClick}>
+          <div className="hero-cta-group hero-cta-animated">
+            <button className="btn-cta-primary btn-cta-primary-enhanced" onClick={onStartClick}>
               {tLanding(lang, 'hero.ctaPrimary')}
               <span className="arrow">→</span>
             </button>
-            <button className="btn-cta-secondary" onClick={onDiscoverClick}>
+            <button className="btn-cta-secondary btn-cta-secondary-enhanced" onClick={onDiscoverClick}>
               {tLanding(lang, 'hero.ctaSecondary')}
             </button>
           </div>
 
-          <p className="hero-footnote">
+          <p className="hero-footnote hero-footnote-animated">
             {tLanding(lang, 'hero.footnote')}
             {' '}•{' '}
             <button className="link-demo" onClick={() => setShowDemo(true)}>
@@ -143,6 +157,35 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
         </div>
       </section>
 
+      {/* Product Preview - 3 vues distinctes de l'interface */}
+      <section className="product-preview" id="product-preview">
+        <div className="section-header">
+          <h2>{lang === 'fr' ? 'Aperçu du produit' : 'Product Preview'}</h2>
+          <p>{lang === 'fr' ? 'Trois vues de l\'interface : pilotage, sprints et vision exécutive' : 'Three views of the interface: planning, sprints and executive overview'}</p>
+        </div>
+
+        <div className="preview-grid">
+          <div className="preview-card">
+            <img src={images.dashboardPreview} alt="Gantt, Kanban et KPIs" loading="lazy" />
+            <div className="preview-card-caption">
+              <span>{lang === 'fr' ? 'Gantt, Kanban & KPIs' : 'Gantt, Kanban & KPIs'}</span>
+            </div>
+          </div>
+          <div className="preview-card">
+            <img src={images.dashboardPreviewAlt} alt="Suivi des sprints" loading="lazy" />
+            <div className="preview-card-caption">
+              <span>{lang === 'fr' ? 'Suivi des sprints' : 'Sprint tracking'}</span>
+            </div>
+          </div>
+          <div className="preview-card">
+            <img src={images.dashboardMockup} alt="Dashboard exécutif" loading="lazy" />
+            <div className="preview-card-caption">
+              <span>{lang === 'fr' ? 'Dashboard exécutif' : 'Executive dashboard'}</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="how-it-works" id="how-it-works">
         <div className="section-header">
@@ -174,12 +217,59 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
         </button>
       </section>
 
+      {/* Industries & Use Cases */}
+      <section className="industries-section" id="industries">
+        <div className="section-header">
+          <h2>{lang === 'fr' ? 'Pour tous les secteurs' : 'For Every Industry'}</h2>
+          <p>{lang === 'fr' ? 'VelocityLaunch s\'adapte à votre domaine d\'activité' : 'VelocityLaunch adapts to your industry'}</p>
+        </div>
+
+        <div className="industries-container">
+          <img
+            src={images.industriesSplit}
+            alt="Industries showcase"
+            className="industries-image"
+            loading="lazy"
+          />
+          <div className="industries-overlay">
+            <div className="industries-grid">
+              <div className="industry-tag">
+                <span className="industry-icon">💼</span>
+                <span>{lang === 'fr' ? 'SaaS' : 'SaaS'}</span>
+              </div>
+              <div className="industry-tag">
+                <span className="industry-icon">🛒</span>
+                <span>{lang === 'fr' ? 'E-commerce' : 'E-commerce'}</span>
+              </div>
+              <div className="industry-tag">
+                <span className="industry-icon">💰</span>
+                <span>{lang === 'fr' ? 'FinTech' : 'FinTech'}</span>
+              </div>
+              <div className="industry-tag">
+                <span className="industry-icon">📱</span>
+                <span>{lang === 'fr' ? 'MobileTech' : 'MobileTech'}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Testimonials */}
       <section className="testimonials-section">
         <div className="section-header">
           <h2>{tLanding(lang, 'testimonials.title')}</h2>
           <p>{tLanding(lang, 'testimonials.subtitle')}</p>
         </div>
+
+        {images.teamFounders && (
+          <div className="testimonials-hero-image">
+            <img
+              src={images.teamFounders}
+              alt="Founders celebrating"
+              loading="lazy"
+            />
+          </div>
+        )}
 
         <div className="testimonials-grid">
           {testimonials.map((testimonial, i) => (
