@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { tLanding } from '../lib/landingI18n'
-import { IconClock, IconSparkle, IconTarget, IconDownload } from './Icons'
+import { useAiImages, useScrollReveal } from '../hooks/useImageOptimization'
 import heroImg from '../../assets/img/hiw-hero-tablets-purple.webp'
 import step1Img from '../../assets/img/hiw-step1-brainstorm.webp'
 import step2Img from '../../assets/img/hiw-step2-dashboard.webp'
@@ -16,12 +16,14 @@ import '../styles/HowItWorksPage.css'
 
 export default function HowItWorksPage({ lang, onStartClick }) {
   const [openFaq, setOpenFaq] = useState(0)
+  const images = useAiImages()
+  const { ref: valuesRef, isVisible: valuesVisible } = useScrollReveal()
 
   const values = [
-    { Icon: IconClock, title: tLanding(lang, 'hiw.value1.title'), desc: tLanding(lang, 'hiw.value1.desc') },
-    { Icon: IconSparkle, title: tLanding(lang, 'hiw.value2.title'), desc: tLanding(lang, 'hiw.value2.desc') },
-    { Icon: IconTarget, title: tLanding(lang, 'hiw.value3.title'), desc: tLanding(lang, 'hiw.value3.desc') },
-    { Icon: IconDownload, title: tLanding(lang, 'hiw.value4.title'), desc: tLanding(lang, 'hiw.value4.desc') }
+    { img: images.valueFast, title: tLanding(lang, 'hiw.value1.title'), desc: tLanding(lang, 'hiw.value1.desc') },
+    { img: images.valueBrain, title: tLanding(lang, 'hiw.value2.title'), desc: tLanding(lang, 'hiw.value2.desc') },
+    { img: images.valueCustom, title: tLanding(lang, 'hiw.value3.title'), desc: tLanding(lang, 'hiw.value3.desc') },
+    { img: images.valueActionable, title: tLanding(lang, 'hiw.value4.title'), desc: tLanding(lang, 'hiw.value4.desc') }
   ]
 
   const steps = [
@@ -62,15 +64,17 @@ export default function HowItWorksPage({ lang, onStartClick }) {
       </section>
 
       {/* Value props */}
-      <section className="hiw-values">
+      <section className="hiw-values" ref={valuesRef}>
         <div className="section-header">
           <h2>{tLanding(lang, 'hiw.valuesTitle')}</h2>
           <p>{tLanding(lang, 'hiw.valuesSubtitle')}</p>
         </div>
         <div className="hiw-values-grid">
           {values.map((v, i) => (
-            <div key={i} className="hiw-value-card">
-              <div className="hiw-value-icon"><v.Icon width={22} height={22} /></div>
+            <div key={i} className={`hiw-value-card ${valuesVisible ? 'animated' : ''}`} style={{ animationDelay: `${i * 0.1}s` }}>
+              <div className="hiw-value-icon">
+                <img src={v.img} alt="" loading="lazy" />
+              </div>
               <h3>{v.title}</h3>
               <p>{v.desc}</p>
             </div>

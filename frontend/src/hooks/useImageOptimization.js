@@ -138,6 +138,12 @@ export function useAiImages() {
     productPreview3: '/assets/ai-images/high-level-description-a-3d-render-of-a-_iZJBZ9C4WfeRBz8TrqJEEw_dfn8eFbnRgmWLvCn2EZSYw.jpg',
     productPreview4: '/assets/ai-images/high-level-description-a-3d-render-of-a-_zpMrbERYWWal--c2PYMVhA_dfn8eFbnRgmWLvCn2EZSYw_cover.jpg',
 
+    // Icônes 3D pour les 4 cartes "Pensé pour les founders pressés" (HowItWorksPage)
+    valueFast: '/assets/ai-images/fast.jpg',
+    valueBrain: '/assets/ai-images/brain-ai.jpg',
+    valueCustom: '/assets/ai-images/custom-ai.jpg',
+    valueActionable: '/assets/ai-images/actionnable.jpg',
+
     industriesSplit: '/assets/ai-images/gpt-image-2_exquisite_high_fashion_photography_of_Split-screen_showing_different_industries_-0.jpg',
     industriesAlt: '/assets/ai-images/gpt-image-2_professional_photo_of_Split-screen_showing_different_industries_using_launch_pla-0.jpg',
 
