@@ -128,6 +128,19 @@
   width: 100%;
 }
 
+/* Filet de sécurité : le widget Clerk fixe parfois une largeur intrinsèque (ex: 400px)
+   sur sa racine et sur la rangée de boutons sociaux (Apple/Google/Slack), ce qui la fait
+   déborder d'une carte plus étroite comme la nôtre (420px max-width, padding compris). */
+.auth-clerk-widget .cl-rootBox,
+.auth-clerk-widget .cl-cardBox,
+.auth-clerk-widget .cl-card,
+.auth-clerk-widget .cl-socialButtonsRoot,
+.auth-clerk-widget .cl-socialButtons {
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
 .auth-switch-btn {
   background: none;
   border: none;

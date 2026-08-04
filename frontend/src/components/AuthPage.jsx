@@ -23,6 +23,10 @@ const clerkAppearance = {
   elements: {
     rootBox: { width: '100%' },
     card: { background: 'transparent', boxShadow: 'none', padding: 0, width: '100%' },
+    cardBox: { width: '100%' },
+    socialButtonsRoot: { width: '100%' },
+    socialButtons: { width: '100%', justifyContent: 'center' },
+    socialButtonsIconButton: { flex: '1 1 0' },
     footer: { display: 'none' },
     header: { display: 'none' }
   }

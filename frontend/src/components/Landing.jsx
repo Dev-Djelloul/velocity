@@ -53,26 +53,6 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
     { number: '15min', label: tLanding(lang, 'stats.avgTime') }
   ]
 
-  const testimonials = [
-    {
-      quote: tLanding(lang, 'testimonials.testimonial1.quote'),
-      author: tLanding(lang, 'testimonials.testimonial1.author'),
-      role: tLanding(lang, 'testimonials.testimonial1.role')
-    },
-    {
-      quote: tLanding(lang, 'testimonials.testimonial2.quote'),
-      author: tLanding(lang, 'testimonials.testimonial2.author'),
-      role: tLanding(lang, 'testimonials.testimonial2.role')
-    },
-    {
-      quote: tLanding(lang, 'testimonials.testimonial3.quote'),
-      author: tLanding(lang, 'testimonials.testimonial3.author'),
-      role: tLanding(lang, 'testimonials.testimonial3.role')
-    }
-  ]
-
-  const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-
   return (
     <div className="landing">
       {/* Hero Section - Amélioré avec Image IA */}
@@ -157,24 +137,18 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
         </div>
       </section>
 
-      {/* Product Preview - 4 vues distinctes de l'interface */}
+      {/* Product Preview - 3 vues distinctes de l'interface */}
       <section className="product-preview" id="product-preview">
         <div className="section-header">
           <h2>{lang === 'fr' ? 'Aperçu du produit' : 'Product Preview'}</h2>
-          <p>{lang === 'fr' ? 'Roadmap, sprints, KPIs et pilotage exécutif' : 'Roadmap, sprints, KPIs and executive overview'}</p>
+          <p>{lang === 'fr' ? 'Roadmap, sprints et pilotage exécutif' : 'Roadmap, sprints and executive overview'}</p>
         </div>
 
-        <div className="preview-grid preview-grid-4">
+        <div className="preview-grid">
           <div className="preview-card">
             <img src={images.productPreview1} alt="Roadmap et sprint Kanban" loading="lazy" />
             <div className="preview-card-caption">
               <span>{lang === 'fr' ? 'Roadmap & Sprint' : 'Roadmap & Sprint'}</span>
-            </div>
-          </div>
-          <div className="preview-card">
-            <img src={images.productPreview2} alt="Activité d'équipe et KPIs" loading="lazy" />
-            <div className="preview-card-caption">
-              <span>{lang === 'fr' ? 'Activité d\'équipe' : 'Team activity'}</span>
             </div>
           </div>
           <div className="preview-card">
@@ -257,20 +231,6 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
           </div>
         )}
 
-        <div className="testimonials-grid">
-          {testimonials.map((testimonial, i) => (
-            <div key={i} className="testimonial-card">
-              <div className="testimonial-quote">"{testimonial.quote}"</div>
-              <div className="testimonial-author">
-                <span className="testimonial-avatar">{initials(testimonial.author)}</span>
-                <div>
-                  <div className="testimonial-name">{testimonial.author}</div>
-                  <div className="testimonial-role">{testimonial.role}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
       </section>
 
       {/* CTA Section - Mid Page */}
