@@ -232,31 +232,11 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
 
         <div className="industries-container">
           <img
-            src={images.industriesSplit}
-            alt="Industries showcase"
+            src={images.industriesSaas}
+            alt="SaaS, E-commerce, FinTech, MarTech"
             className="industries-image"
             loading="lazy"
           />
-          <div className="industries-overlay">
-            <div className="industries-grid">
-              <div className="industry-tag">
-                <span className="industry-icon">💼</span>
-                <span>{lang === 'fr' ? 'SaaS' : 'SaaS'}</span>
-              </div>
-              <div className="industry-tag">
-                <span className="industry-icon">🛒</span>
-                <span>{lang === 'fr' ? 'E-commerce' : 'E-commerce'}</span>
-              </div>
-              <div className="industry-tag">
-                <span className="industry-icon">💰</span>
-                <span>{lang === 'fr' ? 'FinTech' : 'FinTech'}</span>
-              </div>
-              <div className="industry-tag">
-                <span className="industry-icon">📱</span>
-                <span>{lang === 'fr' ? 'MobileTech' : 'MobileTech'}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </section>
 

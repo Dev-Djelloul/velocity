@@ -146,6 +146,7 @@ export function useAiImages() {
 
     industriesSplit: '/assets/ai-images/gpt-image-2_exquisite_high_fashion_photography_of_Split-screen_showing_different_industries_-0.jpg',
     industriesAlt: '/assets/ai-images/gpt-image-2_professional_photo_of_Split-screen_showing_different_industries_using_launch_pla-0.jpg',
+    industriesSaas: '/assets/ai-images/industry-saas.jpg',
 
     speedProductivity: '/assets/ai-images/lucid-origin_Abstract_3D_isometric_illustration_representing_speed_and_productivity_for_a_Saa-0.jpg',
 
