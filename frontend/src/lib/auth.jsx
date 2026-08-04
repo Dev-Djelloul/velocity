@@ -161,6 +161,15 @@ export function SignInButton({ children }) {
 
 // API impérative pour ouvrir la modale de connexion depuis un handler (ex: CTA "Get Started"
 // qui n'est pas lui-même un bouton d'auth) — même usage que useClerk().openSignIn() côté réel.
+// Expose la liste des providers + l'action de connexion pour un rendu en PLEINE PAGE
+// (AuthPage) plutôt qu'en modale — utilisé quand aucune clé Clerk n'est configurée.
+// Retourne null en mode réel : AuthPage rend alors <SignIn>/<SignUp> de Clerk directement.
+export function useAuthProviders() {
+  if (!isMockAuth) return null
+  const { signIn } = useMockAuthContext()
+  return { providers: MOCK_PROVIDERS, signIn }
+}
+
 export function useSignIn() {
   if (isMockAuth) {
     const { openModal } = useMockAuthContext()

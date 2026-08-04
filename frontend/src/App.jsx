@@ -11,6 +11,7 @@ import DraftsModal from './components/DraftsModal'
 import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
 import AccountPage from './components/AccountPage'
+import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
 import { PricingModal, ChangelogModal, RoadmapModal } from './components/ProductModals'
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
@@ -18,7 +19,7 @@ import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
 import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, syncPlansFromServer } from './lib/planStorage'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
-import { useUser, useAuth, useSignIn, useSignUp } from './lib/auth'
+import { useUser, useAuth } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import './styles/design-system.css'
 import './styles/accessibility.css'
@@ -39,12 +40,19 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null)
   const [isSharedView, setIsSharedView] = useState(false)
   const [dataVersion, setDataVersion] = useState(0)
+  const [authMode, setAuthMode] = useState('signup')
+  const [authIntent, setAuthIntent] = useState(null)
 
   const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
-  const { open: openSignIn } = useSignIn()
-  const { open: openSignUp } = useSignUp()
   const wasSignedIn = useRef(isSignedIn)
+
+  const goToAuth = (mode, intent = null) => {
+    setAuthMode(mode)
+    setAuthIntent(intent)
+    setCurrentPage('auth')
+    window.scrollTo(0, 0)
+  }
 
   useEffect(() => {
     localStorage.setItem('plp_lang', lang)
@@ -66,9 +74,10 @@ export default function App() {
     }
   }, [])
 
-  // Flux demandé : Get Started -> connexion -> atterrit sur "Mon compte" -> l'utilisateur
-  // revient ensuite lui-même vers la génération. Détecte toute transition signed-out -> signed-in,
-  // et hydrate le cache local (plans/brouillons/crédits) depuis le stockage serveur.
+  // Flux demandé : Commencer -> page de connexion dédiée -> atterrit directement sur le
+  // formulaire (questionnaire). Un simple "Se connecter" depuis le header ramène vers "Mon
+  // compte" par défaut. Détecte toute transition signed-out -> signed-in, et hydrate le cache
+  // local (plans/brouillons/crédits) depuis le stockage serveur.
   useEffect(() => {
     if (!isLoaded) return
     if (!wasSignedIn.current && isSignedIn && userId) {
@@ -79,7 +88,8 @@ export default function App() {
         syncDraftsFromServer(userId),
         syncCreditsFromServer(userId)
       ]).then(() => setDataVersion(v => v + 1))
-      setCurrentPage('account')
+      setCurrentPage(authIntent || 'account')
+      setAuthIntent(null)
       window.scrollTo(0, 0)
     }
     if (wasSignedIn.current && !isSignedIn) {
@@ -87,7 +97,7 @@ export default function App() {
       setDraftActiveUser(null)
     }
     wasSignedIn.current = isSignedIn
-  }, [isSignedIn, isLoaded, userId])
+  }, [isSignedIn, isLoaded, userId, authIntent])
 
   // Retour depuis Stripe Checkout : le webhook a normalement déjà activé le Pro
   // côté serveur, on resynchronise le cache local et on nettoie l'URL.
@@ -102,10 +112,14 @@ export default function App() {
   }, [isLoaded, isSignedIn, userId])
 
   // Garde-fou : les pages compte/questionnaire/résultat exigent une session active.
+  // Inversement, une session déjà active n'a rien à faire sur la page de connexion.
   useEffect(() => {
     if (!isLoaded) return
     if (currentPage === 'result' && isSharedView) return // lien de partage : consultable sans compte
     if (AUTH_ONLY_PAGES.includes(currentPage) && !isSignedIn) {
+      setCurrentPage('landing')
+    }
+    if (currentPage === 'auth' && isSignedIn) {
       setCurrentPage('landing')
     }
   }, [currentPage, isSignedIn, isLoaded, isSharedView])
@@ -156,7 +170,7 @@ export default function App() {
 
   const handleStartClick = () => {
     if (!isSignedIn) {
-      openSignUp()
+      goToAuth('signup', 'questionnaire')
       return
     }
     if (!canGenerate(userId)) {
@@ -178,7 +192,7 @@ export default function App() {
 
   const handleLoadDemo = (demoData) => {
     if (!isSignedIn) {
-      openSignIn()
+      goToAuth('signin')
       return
     }
     handleGenerate(demoData)
@@ -278,7 +292,7 @@ export default function App() {
                 {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
               </button>
             ) : (
-              <button className="btn-header-signin" onClick={openSignIn} title={t(lang, 'auth.signIn')}>
+              <button className="btn-header-signin" onClick={() => goToAuth('signin')} title={t(lang, 'auth.signIn')}>
                 <IconLogin width={18} height={18} />
               </button>
             )}
@@ -294,6 +308,14 @@ export default function App() {
         )}
         {currentPage === 'howItWorks' && (
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
+        )}
+        {currentPage === 'auth' && !isSignedIn && (
+          <AuthPage
+            mode={authMode}
+            lang={lang}
+            onBack={() => setCurrentPage('landing')}
+            onSwitchMode={() => setAuthMode(m => m === 'signup' ? 'signin' : 'signup')}
+          />
         )}
         {currentPage === 'questionnaire' && isSignedIn && (
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />

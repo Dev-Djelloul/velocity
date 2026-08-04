@@ -585,7 +585,15 @@ export const translations = {
       signOut: 'Se déconnecter',
       myAccount: 'Mon compte',
       plansGate: 'Connecte-toi pour accéder à tes plans et brouillons.',
-      demoModeNotice: 'Mode démo — aucune clé Clerk configurée, la connexion est simulée en local.'
+      demoModeNotice: 'Mode démo — aucune clé Clerk configurée, la connexion est simulée en local.',
+      backToHome: 'Retour',
+      signUpTitle: 'Créez votre compte',
+      signUpSubtitle: 'Générez votre premier plan de lancement en 5 minutes.',
+      signInTitle: 'Content de vous revoir',
+      signInSubtitle: 'Connectez-vous pour retrouver vos plans.',
+      switchToSignIn: 'Déjà un compte ? Se connecter',
+      switchToSignUp: "Pas encore de compte ? S'inscrire",
+      continueWith: 'Continuer avec'
     },
     account: {
       title: 'Mon compte',
@@ -1202,7 +1210,15 @@ export const translations = {
       signOut: 'Sign out',
       myAccount: 'My account',
       plansGate: 'Sign in to access your plans and drafts.',
-      demoModeNotice: 'Demo mode — no Clerk key configured, sign-in is simulated locally.'
+      demoModeNotice: 'Demo mode — no Clerk key configured, sign-in is simulated locally.',
+      backToHome: 'Back',
+      signUpTitle: 'Create your account',
+      signUpSubtitle: 'Generate your first launch plan in 5 minutes.',
+      signInTitle: 'Welcome back',
+      signInSubtitle: 'Sign in to find your plans.',
+      switchToSignIn: 'Already have an account? Sign in',
+      switchToSignUp: 'No account yet? Sign up',
+      continueWith: 'Continue with'
     },
     account: {
       title: 'My account',
