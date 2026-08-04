@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import Landing from './components/Landing'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconHome, IconUser, IconLogin } from './components/Icons'
+import { IconClipboard, IconHome, IconUser, IconLogin, IconLock } from './components/Icons'
+import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -42,6 +43,7 @@ export default function App() {
   const [dataVersion, setDataVersion] = useState(0)
   const [authMode, setAuthMode] = useState('signup')
   const [authIntent, setAuthIntent] = useState(null)
+  const [showLimitModal, setShowLimitModal] = useState(false)
 
   const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
@@ -145,6 +147,8 @@ export default function App() {
       }
       savePlan(generatedPlan)
       consumeCredit(userId)
+      localStorage.removeItem('plp_form')
+      setInitialFormData(null)
       setPlan(generatedPlan)
       setJustGenerated(true)
       setIsSharedView(false)
@@ -155,6 +159,8 @@ export default function App() {
         const generatedPlan = generatePlan(payload)
         savePlan(generatedPlan)
         consumeCredit(userId)
+        localStorage.removeItem('plp_form')
+        setInitialFormData(null)
         setPlan(generatedPlan)
         setJustGenerated(true)
         setIsSharedView(false)
@@ -174,10 +180,13 @@ export default function App() {
       return
     }
     if (!canGenerate(userId)) {
-      setCurrentPage('account')
-      window.scrollTo(0, 0)
+      setShowLimitModal(true)
       return
     }
+    // Départ volontaire d'un nouveau plan : on efface tout brouillon auto-sauvegardé
+    // pour ne pas faire réapparaître un ancien formulaire déjà généré.
+    localStorage.removeItem('plp_form')
+    setInitialFormData(null)
     setCurrentPage('questionnaire')
     window.scrollTo(0, 0)
   }
@@ -364,6 +373,26 @@ export default function App() {
       {activeModal === 'privacy' && <PrivacyModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'terms' && <TermsModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'cookies' && <CookiesModal lang={lang} onClose={() => setActiveModal(null)} />}
+
+      {showLimitModal && (
+        <InfoModal icon={<IconLock width={22} height={22} />} title={t(lang, 'account.limitModalTitle')} onClose={() => setShowLimitModal(false)}>
+          <p className="limit-modal-body">{t(lang, 'account.limitModalBody')}</p>
+          <div className="limit-modal-actions">
+            <button
+              className="btn-secondary"
+              onClick={() => { setShowLimitModal(false); setCurrentPage('account'); window.scrollTo(0, 0) }}
+            >
+              {t(lang, 'account.limitModalManage')}
+            </button>
+            <button
+              className="btn-primary"
+              onClick={() => { setShowLimitModal(false); setCurrentPage('account'); window.scrollTo(0, 0) }}
+            >
+              {t(lang, 'account.upgradeCta')}
+            </button>
+          </div>
+        </InfoModal>
+      )}
     </div>
   )
 }

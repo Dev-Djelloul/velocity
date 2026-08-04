@@ -175,6 +175,13 @@
   color: #fca5a5;
 }
 
+.limit-modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
 .info-modal-note {
   font-size: 12px;
   color: var(--color-text-muted);

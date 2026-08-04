@@ -1,6 +1,5 @@
 import { fetchPlans, pushPlan, removePlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
 
-const PLANS_KEY = 'plp_saved_plans'
 const SHARES_KEY = 'plp_plan_shares'
 
 // Défini par App.jsx au login/logout — quand présent, chaque écriture locale est
@@ -11,7 +10,15 @@ export function setActiveUser(userId) {
   activeUserId = userId
 }
 
+// Clé scopée par utilisateur (même principe que creditTracker.js) — sans ça, tous
+// les comptes qui se connectent sur ce même navigateur partagent la même liste de
+// plans dans localStorage, et voient les plans des uns et des autres.
+function plansKey(userId) {
+  return `plp_saved_plans_${userId}`
+}
+
 export function savePlan(plan) {
+  if (!activeUserId) return plan
   const plans = getAllPlans()
   const planWithMeta = {
     ...plan,
@@ -27,22 +34,23 @@ export function savePlan(plan) {
     plans.push(planWithMeta)
   }
 
-  localStorage.setItem(PLANS_KEY, JSON.stringify(plans))
-  if (activeUserId) pushPlan(activeUserId, planWithMeta)
+  localStorage.setItem(plansKey(activeUserId), JSON.stringify(plans))
+  pushPlan(activeUserId, planWithMeta)
   return planWithMeta
 }
 
 // Hydrate le cache local depuis le serveur (multi-appareil) — appelé au login.
+// Écrase toujours le cache local (même si le serveur renvoie une liste vide) pour
+// qu'un nouveau compte ne se retrouve jamais avec les plans d'un compte précédent.
 export async function syncPlansFromServer(userId) {
   const serverPlans = await fetchPlans(userId)
-  if (serverPlans.length) {
-    localStorage.setItem(PLANS_KEY, JSON.stringify(serverPlans))
-  }
+  localStorage.setItem(plansKey(userId), JSON.stringify(serverPlans || []))
 }
 
 export function getAllPlans() {
+  if (!activeUserId) return []
   try {
-    const stored = localStorage.getItem(PLANS_KEY)
+    const stored = localStorage.getItem(plansKey(activeUserId))
     return stored ? JSON.parse(stored) : []
   } catch {
     return []
@@ -55,10 +63,11 @@ export function getPlanById(id) {
 }
 
 export function deletePlan(id) {
+  if (!activeUserId) return
   const plans = getAllPlans()
   const filtered = plans.filter(p => p.id !== id)
-  localStorage.setItem(PLANS_KEY, JSON.stringify(filtered))
-  if (activeUserId) removePlan(activeUserId, id)
+  localStorage.setItem(plansKey(activeUserId), JSON.stringify(filtered))
+  removePlan(activeUserId, id)
 }
 
 export async function createShareLink(planId) {

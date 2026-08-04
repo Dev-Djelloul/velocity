@@ -549,7 +549,10 @@ export const translations = {
       deleteConfirmTitle: 'Supprimer ce plan ?',
       deleteConfirmSuffix: 'sera définitivement supprimé. Cette action est irréversible.',
       cancel: 'Annuler',
-      defaultPlanName: 'Ce plan'
+      defaultPlanName: 'Ce plan',
+      deleteDraftConfirmTitle: 'Supprimer ce brouillon ?',
+      deleteDraftConfirmSuffix: 'sera définitivement supprimé. Cette action est irréversible.',
+      defaultDraftName: 'Ce brouillon'
     },
     footer: {
       tagline: 'Générateur intelligent de plan de lancement pour startups',
@@ -603,6 +606,9 @@ export const translations = {
       creditsFree: (used, limit) => `${used} / ${limit} plans gratuits utilisés`,
       creditsPro: 'Abonnement Pro actif — générations illimitées',
       creditsExhausted: 'Tu as utilisé tes 3 plans gratuits.',
+      limitModalTitle: 'Limite de plans gratuits atteinte',
+      limitModalBody: 'Tu as utilisé tes 3 plans gratuits. Passe en Pro pour générer des plans illimités, ou supprime un plan existant depuis ton compte si tu veux simplement faire de la place — attention, supprimer un plan ne te redonne pas de crédit.',
+      limitModalManage: 'Voir mes plans',
       upgradeCta: 'Passer en Pro',
       upgradeTitle: 'Passer en Pro',
       upgradeBody: 'Débloque des générations de plans illimitées et les futures fonctionnalités Pro.',
@@ -1174,7 +1180,10 @@ export const translations = {
       deleteConfirmTitle: 'Delete this plan?',
       deleteConfirmSuffix: 'will be permanently deleted. This action cannot be undone.',
       cancel: 'Cancel',
-      defaultPlanName: 'This plan'
+      defaultPlanName: 'This plan',
+      deleteDraftConfirmTitle: 'Delete this draft?',
+      deleteDraftConfirmSuffix: 'will be permanently deleted. This action cannot be undone.',
+      defaultDraftName: 'This draft'
     },
     footer: {
       tagline: 'Intelligent SaaS launch plan generator',
@@ -1228,6 +1237,9 @@ export const translations = {
       creditsFree: (used, limit) => `${used} / ${limit} free plans used`,
       creditsPro: 'Pro subscription active — unlimited generations',
       creditsExhausted: "You've used your 3 free plans.",
+      limitModalTitle: 'Free plan limit reached',
+      limitModalBody: "You've used your 3 free plans. Upgrade to Pro to generate unlimited plans, or delete an existing plan from your account if you just want to make room — note that deleting a plan does not refund a credit.",
+      limitModalManage: 'View my plans',
       upgradeCta: 'Upgrade to Pro',
       upgradeTitle: 'Upgrade to Pro',
       upgradeBody: 'Unlock unlimited plan generations and future Pro features.',

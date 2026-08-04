@@ -5,7 +5,7 @@ import { getAllPlans, deletePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
-import { IconUser, IconClipboard, IconSave, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack } from './Icons'
+import { IconUser, IconClipboard, IconSave, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle } from './Icons'
 
 const PROVIDER_ICONS = {
   google: IconProviderGoogle,
@@ -27,6 +27,8 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState(false)
+  const [deletePlanTarget, setDeletePlanTarget] = useState(null)
+  const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
 
   const startCheckout = async () => {
     setCheckoutLoading(true)
@@ -44,14 +46,16 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
   const used = getUsedCredits(userId)
   const remaining = remainingCredits(userId)
 
-  const removePlan = (id) => {
-    deletePlan(id)
+  const confirmRemovePlan = () => {
+    deletePlan(deletePlanTarget.id)
     setPlans(getAllPlans())
+    setDeletePlanTarget(null)
   }
 
-  const removeDraft = (id) => {
-    deleteDraft(id)
+  const confirmRemoveDraft = () => {
+    deleteDraft(deleteDraftTarget.id)
     setDrafts(getAllDrafts())
+    setDeleteDraftTarget(null)
   }
 
   const displayName = user?.fullName || user?.firstName || user?.primaryEmailAddress?.emailAddress || 'User'
@@ -119,7 +123,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
                   <span className="account-list-item-name">{p.product?.name}</span>
                   <span className="account-list-item-meta">{p.classification}</span>
                 </button>
-                <button className="account-list-item-delete" onClick={() => removePlan(p.id)} title="Delete">
+                <button className="account-list-item-delete" onClick={() => setDeletePlanTarget(p)} title="Delete">
                   <IconTrash width={14} height={14} />
                 </button>
               </div>
@@ -139,7 +143,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
                 <button className="account-list-item-main" onClick={() => onLoadDraft(d.data)}>
                   <span className="account-list-item-name">{d.name}</span>
                 </button>
-                <button className="account-list-item-delete" onClick={() => removeDraft(d.id)} title="Delete">
+                <button className="account-list-item-delete" onClick={() => setDeleteDraftTarget(d)} title="Delete">
                   <IconTrash width={14} height={14} />
                 </button>
               </div>
@@ -175,6 +179,34 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
             <button className="btn-secondary close-btn" onClick={() => setShowUpgrade(false)}>
               {t(lang, 'export.close')}
             </button>
+          </div>
+        </div>
+      )}
+
+      {deletePlanTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setDeletePlanTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>{t(lang, 'plans.deleteConfirmTitle')}</h3>
+            <p><strong>{deletePlanTarget.product?.name || t(lang, 'plans.defaultPlanName')}</strong> {t(lang, 'plans.deleteConfirmSuffix')}</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setDeletePlanTarget(null)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-danger" onClick={confirmRemovePlan}>{t(lang, 'plans.delete')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteDraftTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setDeleteDraftTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>{t(lang, 'plans.deleteDraftConfirmTitle')}</h3>
+            <p><strong>{deleteDraftTarget.name || t(lang, 'plans.defaultDraftName')}</strong> {t(lang, 'plans.deleteDraftConfirmSuffix')}</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteDraftTarget(null)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-danger" onClick={confirmRemoveDraft}>{t(lang, 'plans.delete')}</button>
+            </div>
           </div>
         </div>
       )}
