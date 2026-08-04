@@ -32,15 +32,30 @@ function buildSeries(sprints, generatedAt, scope) {
     value: Math.max(0, totalEffort - (totalEffort / totalDays) * day)
   }))
 
-  const actual = Array.from({ length: totalDays + 1 }, (_, day) => {
+  const doneEffortAsOf = (cursor) => allStories
+    .filter(s => s.status === 'done' && s.completedAt && new Date(s.completedAt) <= cursor)
+    .reduce((sum, s) => sum + s.effort, 0)
+
+  const now = new Date()
+  const daysElapsed = Math.max(0, Math.min(totalDays, (now - start) / 86400000))
+  const wholeDaysElapsed = Math.min(totalDays, Math.floor(daysElapsed))
+
+  // Ancre toujours la courbe "réel" au même point de départ que l'idéal (jour 0,
+  // effort total restant) : un sprint tout juste démarré n'a sinon qu'un seul point
+  // possible (aujourd'hui) et aucune ligne ne peut être tracée, ce qui rendait le
+  // graphique figé quel que soit le nombre de stories cochées.
+  const actual = [{ day: 0, value: totalEffort }]
+  for (let day = 1; day <= wholeDaysElapsed; day++) {
     const cursor = new Date(start)
     cursor.setDate(cursor.getDate() + day)
-    if (cursor > new Date()) return null
-    const doneEffort = allStories
-      .filter(s => s.status === 'done' && s.completedAt && new Date(s.completedAt) <= cursor)
-      .reduce((sum, s) => sum + s.effort, 0)
-    return { day, value: Math.max(0, totalEffort - doneEffort) }
-  }).filter(Boolean)
+    actual.push({ day, value: Math.max(0, totalEffort - doneEffortAsOf(cursor)) })
+  }
+  // Point "maintenant" en position fractionnaire (pas seulement en jours entiers) :
+  // reflète l'état courant en plein milieu d'une journée, pour que cocher une story
+  // fasse bouger la ligne visiblement, même sans attendre le lendemain.
+  if (daysElapsed > wholeDaysElapsed || wholeDaysElapsed === 0) {
+    actual.push({ day: daysElapsed, value: Math.max(0, totalEffort - doneEffortAsOf(now)) })
+  }
 
   return { totalDays, totalEffort, ideal, actual, start }
 }
@@ -66,8 +81,10 @@ export default function BurndownChart({ roadmap, lang, generatedAt }) {
   const maxEffort = Math.max(totalEffort, 1)
   const idealPath = toPath(ideal, totalDays, maxEffort)
   const actualPath = toPath(actual, totalDays, maxEffort)
-  const currentRemaining = actual.length ? actual[actual.length - 1].value : totalEffort
-  const onTrack = currentRemaining <= (ideal.find(p => p.day === (actual.length - 1))?.value ?? totalEffort)
+  const lastActual = actual[actual.length - 1]
+  const currentRemaining = lastActual.value
+  const idealNow = Math.max(0, totalEffort - (totalEffort / totalDays) * lastActual.day)
+  const onTrack = currentRemaining <= idealNow
 
   return (
     <div className="burndown-card card">
