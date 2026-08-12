@@ -4,6 +4,7 @@ import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
 import VeilleCard from './VeilleCard'
 import BenchmarksCard from './BenchmarksCard'
+import EditorialCalendarCard from './EditorialCalendarCard'
 import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
 import MarketingCard from './MarketingCard'
@@ -93,6 +94,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateEditorial = (nextEditorial) => {
+    const nextPlan = { ...plan, editorial: nextEditorial }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const copySummary = async () => {
     try {
       await navigator.clipboard.writeText(plan.executiveSummary)
@@ -157,6 +164,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} /></div>
         <div id="section-calendar" className="plan-section-anchor"><CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} /></div>
         <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} /></div>
+        <div id="section-editorial" className="plan-section-anchor"><EditorialCalendarCard plan={plan} lang={lang} onEditorialChange={updateEditorial} /></div>
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
         <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>

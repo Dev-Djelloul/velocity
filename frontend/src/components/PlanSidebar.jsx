@@ -18,6 +18,7 @@ const SECTIONS = [
   { id: 'section-burndown', labelKey: 'burndown.title', Icon: IconTrendingUp },
   { id: 'section-calendar', labelKey: 'calendar.title', Icon: IconClock },
   { id: 'section-marketing', labelKey: 'outputs.marketing', Icon: IconRocket },
+  { id: 'section-editorial', labelKey: 'editorial.title', Icon: IconCalendar },
   { id: 'section-kpis', labelKey: 'outputs.kpis', Icon: IconTarget },
   { id: 'section-benchmarks', labelKey: 'benchmarks.title', Icon: IconGauge },
   { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin },

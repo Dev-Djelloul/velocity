@@ -6,6 +6,8 @@ import { generateVeilleWithAI } from '../lib/ai/veilleClient'
 import { generateVeilleFallback } from '../lib/generator/veilleFallback'
 import { generateBenchmarksWithAI } from '../lib/ai/benchmarksClient'
 import { generateBenchmarksFallback } from '../lib/generator/benchmarksFallback'
+import { generateEditorialWithAI } from '../lib/ai/editorialClient'
+import { generateEditorialFallback } from '../lib/generator/editorialFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -128,6 +130,16 @@ export async function handleApi(request, env, url) {
       return json({ ...benchmarks, source: 'ai' })
     } catch {
       return json({ ...generateBenchmarksFallback(plan, lang || 'fr'), source: 'rules' })
+    }
+  }
+
+  if (pathname === '/generate-editorial' && method === 'POST') {
+    const { plan, lang } = await request.json()
+    try {
+      const editorial = await generateEditorialWithAI(plan, lang || 'fr', env)
+      return json({ ...editorial, source: 'ai' })
+    } catch {
+      return json({ ...generateEditorialFallback(plan, lang || 'fr'), source: 'rules' })
     }
   }
 

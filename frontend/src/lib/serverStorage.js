@@ -97,6 +97,14 @@ export function generateBenchmarks(plan, lang) {
   })
 }
 
+export function generateEditorial(plan, lang) {
+  return safeFetch('/generate-editorial', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan, lang })
+  })
+}
+
 export function enqueueAgentTask(planId, userId, type, input) {
   return safeFetch('/agents/enqueue', {
     method: 'POST',
