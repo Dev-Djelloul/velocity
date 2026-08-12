@@ -105,6 +105,14 @@ export function generateEditorial(plan, lang) {
   })
 }
 
+export function generateAdvertising(plan, lang) {
+  return safeFetch('/generate-advertising', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan, lang })
+  })
+}
+
 export function enqueueAgentTask(planId, userId, type, input) {
   return safeFetch('/agents/enqueue', {
     method: 'POST',

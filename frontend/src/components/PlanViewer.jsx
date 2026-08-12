@@ -5,6 +5,7 @@ import PersonaCard from './PersonaCard'
 import VeilleCard from './VeilleCard'
 import BenchmarksCard from './BenchmarksCard'
 import EditorialCalendarCard from './EditorialCalendarCard'
+import AdvertisingCalendarCard from './AdvertisingCalendarCard'
 import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
 import MarketingCard from './MarketingCard'
@@ -100,6 +101,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateAdvertising = (nextAdvertising) => {
+    const nextPlan = { ...plan, advertising: nextAdvertising }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const copySummary = async () => {
     try {
       await navigator.clipboard.writeText(plan.executiveSummary)
@@ -165,6 +172,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-calendar" className="plan-section-anchor"><CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} /></div>
         <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} /></div>
         <div id="section-editorial" className="plan-section-anchor"><EditorialCalendarCard plan={plan} lang={lang} onEditorialChange={updateEditorial} /></div>
+        <div id="section-advertising" className="plan-section-anchor"><AdvertisingCalendarCard plan={plan} lang={lang} onAdvertisingChange={updateAdvertising} /></div>
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
         <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>

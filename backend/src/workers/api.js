@@ -8,6 +8,8 @@ import { generateBenchmarksWithAI } from '../lib/ai/benchmarksClient'
 import { generateBenchmarksFallback } from '../lib/generator/benchmarksFallback'
 import { generateEditorialWithAI } from '../lib/ai/editorialClient'
 import { generateEditorialFallback } from '../lib/generator/editorialFallback'
+import { generateAdvertisingWithAI } from '../lib/ai/advertisingClient'
+import { generateAdvertisingFallback } from '../lib/generator/advertisingFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -140,6 +142,16 @@ export async function handleApi(request, env, url) {
       return json({ ...editorial, source: 'ai' })
     } catch {
       return json({ ...generateEditorialFallback(plan, lang || 'fr'), source: 'rules' })
+    }
+  }
+
+  if (pathname === '/generate-advertising' && method === 'POST') {
+    const { plan, lang } = await request.json()
+    try {
+      const advertising = await generateAdvertisingWithAI(plan, lang || 'fr', env)
+      return json({ ...advertising, source: 'ai' })
+    } catch {
+      return json({ ...generateAdvertisingFallback(plan, lang || 'fr'), source: 'rules' })
     }
   }
 

@@ -49,6 +49,16 @@ export function IconGauge(props) {
   )
 }
 
+export function IconMegaphone(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 11v2a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1Z" />
+      <path d="M14 8a4 4 0 0 1 0 8" />
+      <path d="M10 18v2a1 1 0 0 0 1 1h1" />
+    </svg>
+  )
+}
+
 export function IconBarChart(props) {
   return (
     <svg {...base} {...props}>
