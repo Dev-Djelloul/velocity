@@ -39,6 +39,16 @@ export function IconRadar(props) {
   )
 }
 
+export function IconGauge(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 14 16 10" />
+      <path d="M4 20a8 8 0 1 1 16 0" />
+      <circle cx="12" cy="14" r="1" />
+    </svg>
+  )
+}
+
 export function IconBarChart(props) {
   return (
     <svg {...base} {...props}>

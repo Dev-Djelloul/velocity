@@ -4,6 +4,8 @@ import { generateTableWithAI } from '../lib/ai/tableClient'
 import { generateTableFromPrompt } from '../lib/generator/tableFallback'
 import { generateVeilleWithAI } from '../lib/ai/veilleClient'
 import { generateVeilleFallback } from '../lib/generator/veilleFallback'
+import { generateBenchmarksWithAI } from '../lib/ai/benchmarksClient'
+import { generateBenchmarksFallback } from '../lib/generator/benchmarksFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -116,6 +118,16 @@ export async function handleApi(request, env, url) {
       return json({ ...veille, source: 'ai' })
     } catch {
       return json({ ...generateVeilleFallback(plan, lang || 'fr'), source: 'rules' })
+    }
+  }
+
+  if (pathname === '/generate-benchmarks' && method === 'POST') {
+    const { plan, lang } = await request.json()
+    try {
+      const benchmarks = await generateBenchmarksWithAI(plan, lang || 'fr', env)
+      return json({ ...benchmarks, source: 'ai' })
+    } catch {
+      return json({ ...generateBenchmarksFallback(plan, lang || 'fr'), source: 'rules' })
     }
   }
 

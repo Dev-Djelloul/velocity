@@ -4,7 +4,7 @@ import VelocityLaunchLogo from './VelocityLaunchLogo'
 import {
   IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
-  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar
+  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
@@ -19,6 +19,7 @@ const SECTIONS = [
   { id: 'section-calendar', labelKey: 'calendar.title', Icon: IconClock },
   { id: 'section-marketing', labelKey: 'outputs.marketing', Icon: IconRocket },
   { id: 'section-kpis', labelKey: 'outputs.kpis', Icon: IconTarget },
+  { id: 'section-benchmarks', labelKey: 'benchmarks.title', Icon: IconGauge },
   { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin },
   { id: 'section-strategy', labelKey: 'outputs.strategy.title', Icon: IconShield },
   { id: 'section-askchart', labelKey: 'askChart.title', Icon: IconSparkle },

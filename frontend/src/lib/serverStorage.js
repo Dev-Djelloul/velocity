@@ -89,6 +89,14 @@ export function generateVeille(plan, lang) {
   })
 }
 
+export function generateBenchmarks(plan, lang) {
+  return safeFetch('/generate-benchmarks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan, lang })
+  })
+}
+
 export function enqueueAgentTask(planId, userId, type, input) {
   return safeFetch('/agents/enqueue', {
     method: 'POST',

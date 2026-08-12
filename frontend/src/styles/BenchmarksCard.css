@@ -1,0 +1,173 @@
+.benchmarks-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.benchmarks-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.benchmarks-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.benchmarks-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: 0.25rem;
+}
+
+.benchmarks-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.benchmarks-empty {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  background: rgba(145, 132, 217, 0.06);
+  border: 1px dashed rgba(145, 132, 217, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.benchmarks-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.benchmarks-table-scroll {
+  overflow-x: auto;
+}
+
+.benchmarks-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.benchmarks-table th,
+.benchmarks-table td {
+  text-align: left;
+  padding: 0.6rem 0.75rem;
+  border-bottom: 1px solid rgba(145, 132, 217, 0.12);
+}
+
+.benchmarks-table th {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.benchmarks-table td {
+  color: var(--color-text-secondary);
+}
+
+.benchmarks-table td:first-child {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.benchmark-verdict {
+  display: inline-block;
+  padding: 0.15rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.verdict-below {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.verdict-onpar {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+}
+
+.verdict-above {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.benchmarks-channels h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+}
+
+.benchmarks-channel-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.benchmarks-channel {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 0.9rem;
+}
+
+.benchmarks-channel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+}
+
+.benchmarks-channel-name {
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.benchmarks-channel-value {
+  font-size: 0.8rem;
+  color: var(--color-primary);
+  font-weight: var(--font-weight-semibold);
+}
+
+.benchmarks-channel-note {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+}
+
+.benchmarks-takeaway {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(145, 132, 217, 0.08);
+  border-left: 3px solid var(--color-primary);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.benchmarks-origin {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 0.25rem;
+}
