@@ -350,7 +350,7 @@ export default function App() {
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
         {currentPage === 'result' && plan && (isSignedIn || isSharedView) && (
-          <PlanViewer plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />
+          <PlanViewer key={plan.id || plan.generatedAt} plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />
         )}
         {currentPage === 'account' && isSignedIn && (
           <AccountPage
