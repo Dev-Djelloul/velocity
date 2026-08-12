@@ -63,11 +63,12 @@
   gap: 0.3rem;
   background: rgba(6, 182, 212, 0.12);
   color: var(--color-cyan, #06b6d4);
-  font-size: 0.78rem;
+  font-size: 0.72rem;
   font-weight: var(--font-weight-semibold);
-  height: 38px;
+  height: 34px;
   box-sizing: border-box;
-  padding: 0 0.9rem;
+  padding: 0 0.7rem;
   border-radius: 999px;
+  white-space: nowrap;
   border: 1px solid rgba(6, 182, 212, 0.3);
 }

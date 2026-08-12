@@ -345,6 +345,19 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '12 août 2026',
+            title: 'Suite analytique complète, agents IA et formulaire enrichi',
+            items: [
+              'Nouveaux modules du plan : backlog priorisé, Gantt interactif, burndown chart, calendrier, dashboard BI et panneau de navigation latéral',
+              'Agents IA asynchrones (brief de story, recalcul de KPIs) via Cloudflare Queues',
+              'Suivi post-lancement avec scénarios what-if',
+              'Persona, sprints, marketing, KPIs et prévisions financières enrichis, plus des tableaux générés par IA',
+              'Formulaire retravaillé : bien plus de choix par catégorie sur les 4 phases, câblés au moteur de génération',
+              'Bouton "Voir une démo" accessible depuis le header, démos instantanées',
+              "Corrections : section Agents IA de nouveau visible, chargement d'un autre plan réparé, header compacté"
+            ]
+          },
+          {
             date: '2 août 2026',
             title: 'Progression en temps réel et internationalisation complète',
             items: [
@@ -397,15 +410,15 @@ export const translations = {
         columns: [
           {
             label: 'Disponible',
-            items: ['Questionnaire guidé', 'Roadmap générée par sprints', 'Stratégie marketing et KPIs', 'Export PDF / CSV', 'Partage par lien privé', 'FR / EN']
+            items: ['Questionnaire guidé multi-phases', 'Roadmap, sprints & backlog priorisé', 'Gantt interactif & burndown', 'Stratégie marketing, KPIs & prévisions financières', 'Dashboard BI & tableaux générés par IA', 'Agents IA asynchrones', 'Suivi post-lancement & scénarios what-if', 'Export PDF / CSV, partage par lien', 'FR / EN']
           },
           {
             label: 'En cours',
-            items: ['Tableau de bord de suivi post-lancement', 'Comparateur A/B test intégré', 'Modèles de plan par secteur']
+            items: ['Auto-scheduling dynamique de la roadmap', 'Priorisation par signaux externes', 'Modèles de plan par secteur']
           },
           {
             label: 'Envisagé',
-            items: ["Comptes et espaces d'équipe", 'Intégrations Notion / Slack', 'API publique', 'Historique cloud synchronisé']
+            items: ["Comptes et espaces d'équipe", 'Historique cloud synchronisé', 'API publique', 'Collaboration en temps réel']
           }
         ]
       },
@@ -981,6 +994,19 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: 'August 12, 2026',
+            title: 'Full analytics suite, AI agents and richer questionnaire',
+            items: [
+              'New plan modules: prioritized backlog, interactive Gantt, burndown chart, calendar, BI dashboard and side navigation panel',
+              'Asynchronous AI agents (story brief, KPI recalculation) via Cloudflare Queues',
+              'Post-launch tracking with what-if scenarios',
+              'Enriched persona, sprints, marketing, KPIs and financial forecasts, plus AI-generated tables',
+              'Reworked questionnaire: many more choices per category across the 4 phases, wired into the generation engine',
+              '"Watch a demo" button available from the header, instant demos',
+              'Fixes: AI Agents section visible again, loading another plan repaired, compacted header'
+            ]
+          },
+          {
             date: 'August 2, 2026',
             title: 'Real-time progress and full internationalization',
             items: [
@@ -1033,15 +1059,15 @@ export const translations = {
         columns: [
           {
             label: 'Available',
-            items: ['Guided questionnaire', 'Sprint-generated roadmap', 'Marketing strategy and KPIs', 'PDF / CSV export', 'Private link sharing', 'FR / EN']
+            items: ['Guided multi-phase questionnaire', 'Roadmap, sprints & prioritized backlog', 'Interactive Gantt & burndown', 'Marketing strategy, KPIs & financial forecasts', 'BI dashboard & AI-generated tables', 'Asynchronous AI agents', 'Post-launch tracking & what-if scenarios', 'PDF / CSV export, link sharing', 'FR / EN']
           },
           {
             label: 'In progress',
-            items: ['Post-launch tracking dashboard', 'Built-in A/B test comparator', 'Sector-specific plan templates']
+            items: ['Dynamic roadmap auto-scheduling', 'Prioritization from external signals', 'Sector-specific plan templates']
           },
           {
             label: 'Considered',
-            items: ['Accounts and team spaces', 'Notion / Slack integrations', 'Public API', 'Synced cloud history']
+            items: ['Accounts and team spaces', 'Synced cloud history', 'Public API', 'Real-time collaboration']
           }
         ]
       },
