@@ -45,13 +45,8 @@ export function planToBlocks(plan, lang = 'fr') {
     if (v.sources?.length) blocks.push(p(`${_('Sources', 'Sources')} : ${v.sources.join(' · ')}`))
   }
 
-  if (plan.roadmap?.sprints?.length) {
-    blocks.push(h2(_('Roadmap & sprints', 'Roadmap & sprints')))
-    plan.roadmap.sprints.forEach(sp => {
-      blocks.push(h3(`${_('Sprint', 'Sprint')} ${sp.sprintId} — ${sp.estimatedCost} €`))
-      ;(sp.stories || []).forEach(s => blocks.push(bullet(`${s.id}: ${s.title} — ${s.assignee} (${s.effort} pts)`)))
-    })
-  }
+  // Roadmap, calendrier éditorial et calendrier publicitaire sont rendus comme
+  // des bases de données Notion (voir notionClient), pas comme des listes ici.
 
   if (plan.marketing?.channels?.length) {
     blocks.push(h2(`${_('Stratégie marketing', 'Marketing strategy')} — ${plan.marketing.totalBudget} €`))
@@ -67,16 +62,6 @@ export function planToBlocks(plan, lang = 'fr') {
     blocks.push(h2(_('Benchmarks', 'Benchmarks')))
     ;(plan.benchmarks.metrics || []).forEach(m => blocks.push(bullet(`${m.metric}: ${_('secteur', 'industry')} ${m.industry} / ${_('vous', 'yours')} ${m.yours} (${m.verdict})`)))
     if (plan.benchmarks.takeaway) blocks.push(quote(plan.benchmarks.takeaway))
-  }
-
-  if (plan.editorial?.items?.length) {
-    blocks.push(h2(_('Calendrier éditorial', 'Editorial calendar')))
-    plan.editorial.items.forEach(it => blocks.push(bullet(`S${it.week} · ${it.channel} · ${it.format} — ${it.title} (${it.cta})`)))
-  }
-
-  if (plan.advertising?.campaigns?.length) {
-    blocks.push(h2(_('Calendrier publicitaire', 'Advertising calendar')))
-    plan.advertising.campaigns.forEach(c => blocks.push(bullet(`S${c.week} · ${c.channel} · ${c.objective} — ${c.format} — ${c.budget} € (${c.kpi})`)))
   }
 
   if (plan.financials) {
