@@ -6,6 +6,7 @@ import VeilleCard from './VeilleCard'
 import BenchmarksCard from './BenchmarksCard'
 import EditorialCalendarCard from './EditorialCalendarCard'
 import AdvertisingCalendarCard from './AdvertisingCalendarCard'
+import RgpdCard from './RgpdCard'
 import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
 import MarketingCard from './MarketingCard'
@@ -107,6 +108,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateRgpd = (nextRgpd) => {
+    const nextPlan = { ...plan, rgpd: nextRgpd }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const copySummary = async () => {
     try {
       await navigator.clipboard.writeText(plan.executiveSummary)
@@ -177,6 +184,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
         <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>
         <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
+        <div id="section-rgpd" className="plan-section-anchor"><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} /></div>
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
         <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>

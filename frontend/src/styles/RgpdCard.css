@@ -1,0 +1,232 @@
+.rgpd-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rgpd-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rgpd-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.rgpd-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: 0.25rem;
+}
+
+.rgpd-generate-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.rgpd-empty {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.6;
+  background: rgba(145, 132, 217, 0.06);
+  border: 1px dashed rgba(145, 132, 217, 0.25);
+  border-radius: var(--radius-md);
+  padding: 1rem 1.15rem;
+}
+
+.rgpd-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.rgpd-applicability {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(245, 158, 11, 0.08);
+  border-left: 3px solid #f59e0b;
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.rgpd-block-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+}
+
+.rgpd-block h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--color-text-primary);
+  font-size: 0.95rem;
+  margin-bottom: 0.6rem;
+}
+
+.rgpd-block-head h4 {
+  margin-bottom: 0;
+}
+
+.rgpd-progress {
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-primary);
+  background: rgba(145, 132, 217, 0.12);
+  border-radius: 999px;
+  padding: 0.15rem 0.65rem;
+}
+
+.rgpd-checklist {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rgpd-checklist label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.12);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.8rem;
+}
+
+.rgpd-checklist input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+
+.rgpd-check-item {
+  flex: 1;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.4;
+}
+
+.rgpd-checklist li.done .rgpd-check-item {
+  text-decoration: line-through;
+  color: var(--color-text-muted);
+}
+
+.rgpd-priority {
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-semibold);
+  border-radius: 999px;
+  padding: 0.12rem 0.55rem;
+  white-space: nowrap;
+}
+
+.prio-high {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+.prio-medium {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.prio-low {
+  background: rgba(148, 163, 184, 0.15);
+  color: #94a3b8;
+}
+
+.rgpd-table-scroll {
+  overflow-x: auto;
+}
+
+.rgpd-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.rgpd-table th,
+.rgpd-table td {
+  text-align: left;
+  padding: 0.55rem 0.75rem;
+  border-bottom: 1px solid rgba(145, 132, 217, 0.12);
+}
+
+.rgpd-table th {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-semibold);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.rgpd-table td {
+  color: var(--color-text-secondary);
+}
+
+.rgpd-table td:first-child {
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-medium);
+}
+
+.rgpd-reco {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.rgpd-reco li {
+  position: relative;
+  padding-left: 1.1rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+}
+
+.rgpd-reco li::before {
+  content: '';
+  position: absolute;
+  left: 0.15rem;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-primary);
+}
+
+.rgpd-disclaimer {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  line-height: 1.5;
+  border-top: 1px solid rgba(145, 132, 217, 0.12);
+  padding-top: 0.75rem;
+}
+
+.rgpd-origin {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+}

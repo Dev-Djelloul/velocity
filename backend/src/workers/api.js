@@ -10,6 +10,8 @@ import { generateEditorialWithAI } from '../lib/ai/editorialClient'
 import { generateEditorialFallback } from '../lib/generator/editorialFallback'
 import { generateAdvertisingWithAI } from '../lib/ai/advertisingClient'
 import { generateAdvertisingFallback } from '../lib/generator/advertisingFallback'
+import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
+import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -152,6 +154,16 @@ export async function handleApi(request, env, url) {
       return json({ ...advertising, source: 'ai' })
     } catch {
       return json({ ...generateAdvertisingFallback(plan, lang || 'fr'), source: 'rules' })
+    }
+  }
+
+  if (pathname === '/generate-rgpd' && method === 'POST') {
+    const { plan, lang } = await request.json()
+    try {
+      const rgpd = await generateRgpdWithAI(plan, lang || 'fr', env)
+      return json({ ...rgpd, source: 'ai' })
+    } catch {
+      return json({ ...generateRgpdFallback(plan, lang || 'fr'), source: 'rules' })
     }
   }
 
