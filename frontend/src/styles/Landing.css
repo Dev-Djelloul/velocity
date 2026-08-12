@@ -225,18 +225,26 @@
 }
 
 .link-demo {
-  background: none;
-  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0.75rem auto 0;
+  background: rgba(145, 132, 217, 0.1);
+  border: 1px solid rgba(145, 132, 217, 0.35);
+  border-radius: 999px;
   color: var(--color-primary);
   cursor: pointer;
   font-weight: var(--font-weight-semibold);
-  text-decoration: underline;
+  font-size: var(--font-size-sm);
+  padding: 0.55rem 1.1rem;
   transition: all 0.2s ease;
 }
 
 .link-demo:hover {
+  background: rgba(145, 132, 217, 0.2);
+  border-color: var(--color-accent-light);
   color: var(--color-accent-light);
-  text-decoration-thickness: 2px;
+  transform: translateY(-1px);
 }
 
 /* ===== ANIMATIONS ===== */

@@ -92,7 +92,7 @@ export default function App() {
         syncCreditsFromServer(userId)
       ]).then(() => setDataVersion(v => v + 1))
       if (pendingDemoData) {
-        handleGenerate(pendingDemoData)
+        loadDemoPlan(pendingDemoData)
         setPendingDemoData(null)
       } else {
         setCurrentPage(authIntent || 'account')
@@ -131,6 +131,17 @@ export default function App() {
       setCurrentPage('landing')
     }
   }, [currentPage, isSignedIn, isLoaded, isSharedView])
+
+  // Une démo est un aperçu illustratif, pas un vrai plan : génération locale instantanée
+  // (moteur à règles, aucun appel IA), sans consommer de crédit ni polluer "Mes plans".
+  const loadDemoPlan = (demoData) => {
+    const generatedPlan = generatePlan({ ...demoData, language: lang })
+    setPlan(generatedPlan)
+    setJustGenerated(true)
+    setIsSharedView(false)
+    setCurrentPage('result')
+    window.scrollTo(0, 0)
+  }
 
   const handleGenerate = async (data) => {
     setLoading(true)
@@ -211,7 +222,7 @@ export default function App() {
       goToAuth('signin')
       return
     }
-    handleGenerate(demoData)
+    loadDemoPlan(demoData)
   }
 
   const handleLoadFromHistory = (loadedPlan) => {

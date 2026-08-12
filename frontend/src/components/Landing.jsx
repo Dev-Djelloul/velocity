@@ -94,11 +94,11 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
 
           <p className="hero-footnote hero-footnote-animated">
             {tLanding(lang, 'hero.footnote')}
-            {' '}•{' '}
-            <button className="link-demo" onClick={() => setShowDemo(true)}>
-              {tLanding(lang, 'hero.demoLink')}
-            </button>
           </p>
+
+          <button className="link-demo hero-footnote-animated" onClick={() => setShowDemo(true)}>
+            <IconSparkle width={14} height={14} /> {tLanding(lang, 'hero.demoLink')}
+          </button>
         </div>
       </section>
 
