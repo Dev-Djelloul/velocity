@@ -28,6 +28,17 @@ export function IconTarget(props) {
   )
 }
 
+export function IconRadar(props) {
+  return (
+    <svg {...base} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="5" />
+      <path d="M12 12 21 6" />
+      <path d="M12 12v-9" />
+    </svg>
+  )
+}
+
 export function IconBarChart(props) {
   return (
     <svg {...base} {...props}>

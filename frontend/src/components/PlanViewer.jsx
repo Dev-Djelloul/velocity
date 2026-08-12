@@ -2,6 +2,7 @@ import { useState, useRef } from 'react'
 import PlanSidebar from './PlanSidebar'
 import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
+import VeilleCard from './VeilleCard'
 import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
 import MarketingCard from './MarketingCard'
@@ -79,6 +80,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateVeille = (nextVeille) => {
+    const nextPlan = { ...plan, veille: nextVeille }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const copySummary = async () => {
     try {
       await navigator.clipboard.writeText(plan.executiveSummary)
@@ -136,6 +143,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       <div className="plan-grid">
         <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
         <div id="section-persona" className="plan-section-anchor"><PersonaCard persona={plan.persona} lang={lang} /></div>
+        <div id="section-veille" className="plan-section-anchor"><VeilleCard plan={plan} lang={lang} onVeilleChange={updateVeille} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>

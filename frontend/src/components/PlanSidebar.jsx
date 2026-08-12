@@ -4,13 +4,14 @@ import VelocityLaunchLogo from './VelocityLaunchLogo'
 import {
   IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
-  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass
+  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
 const SECTIONS = [
   { id: 'section-dashboard', labelKey: 'dashboardBi.title', Icon: IconBarChart },
   { id: 'section-persona', labelKey: 'sidebar.persona', Icon: IconUser },
+  { id: 'section-veille', labelKey: 'veille.title', Icon: IconRadar },
   { id: 'section-roadmap', labelKey: 'outputs.roadmap', Icon: IconClipboard },
   { id: 'section-backlog', labelKey: 'backlog.title', Icon: IconCircleDot },
   { id: 'section-gantt', labelKey: 'gantt.title', Icon: IconCalendar },

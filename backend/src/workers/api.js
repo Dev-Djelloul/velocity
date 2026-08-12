@@ -2,6 +2,8 @@ import * as db from '../lib/db'
 import { createCheckoutSession, verifyWebhookSignature } from '../lib/stripe'
 import { generateTableWithAI } from '../lib/ai/tableClient'
 import { generateTableFromPrompt } from '../lib/generator/tableFallback'
+import { generateVeilleWithAI } from '../lib/ai/veilleClient'
+import { generateVeilleFallback } from '../lib/generator/veilleFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -104,6 +106,16 @@ export async function handleApi(request, env, url) {
       return json({ ...table, source: 'ai' })
     } catch {
       return json({ ...generateTableFromPrompt(prompt), source: 'rules' })
+    }
+  }
+
+  if (pathname === '/generate-veille' && method === 'POST') {
+    const { plan, lang } = await request.json()
+    try {
+      const veille = await generateVeilleWithAI(plan, lang || 'fr', env)
+      return json({ ...veille, source: 'ai' })
+    } catch {
+      return json({ ...generateVeilleFallback(plan, lang || 'fr'), source: 'rules' })
     }
   }
 
