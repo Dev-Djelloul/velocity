@@ -66,6 +66,54 @@ export function exportCSV(plan, lang) {
     rows.push([t(lang, 'outputs.strategy.positioning'), competitivePositioning])
   }
 
+  if (plan.veille) {
+    const v = plan.veille
+    rows.push([])
+    rows.push([t(lang, 'veille.title')])
+    rows.push([t(lang, 'veille.competitors')])
+    ;(v.competitors || []).forEach(c => rows.push([c.name, c.positioning, c.watch]))
+    rows.push([t(lang, 'veille.trends'), ...(v.trends || [])])
+    rows.push([t(lang, 'veille.signals'), ...(v.signals || [])])
+    rows.push([t(lang, 'veille.opportunities'), ...(v.opportunities || [])])
+    rows.push([t(lang, 'veille.threats'), ...(v.threats || [])])
+    rows.push([t(lang, 'veille.sources'), ...(v.sources || [])])
+  }
+
+  if (plan.benchmarks) {
+    const b = plan.benchmarks
+    rows.push([])
+    rows.push([t(lang, 'benchmarks.title')])
+    rows.push([t(lang, 'benchmarks.metric'), t(lang, 'benchmarks.industry'), t(lang, 'benchmarks.yours'), t(lang, 'benchmarks.verdictLabel')])
+    ;(b.metrics || []).forEach(mrow => rows.push([mrow.metric, mrow.industry, mrow.yours, t(lang, `benchmarks.verdict.${mrow.verdict}`) || mrow.verdict]))
+    if (b.takeaway) rows.push([b.takeaway])
+  }
+
+  if (plan.editorial) {
+    rows.push([])
+    rows.push([t(lang, 'editorial.title')])
+    rows.push([t(lang, 'editorial.week'), t(lang, 'outputs.channel'), 'Format', t(lang, 'genTable.title'), 'Angle', t(lang, 'editorial.cta')])
+    ;(plan.editorial.items || []).forEach(it => rows.push([it.week, it.channel, it.format, it.title, it.angle, it.cta]))
+  }
+
+  if (plan.advertising) {
+    rows.push([])
+    rows.push([t(lang, 'advertising.title')])
+    rows.push([t(lang, 'advertising.week'), t(lang, 'outputs.channel'), t(lang, 'advertising.objective.awareness'), 'Format', 'Audience', t(lang, 'outputs.estimatedCostEur'), 'KPI'])
+    ;(plan.advertising.campaigns || []).forEach(c => rows.push([c.week, c.channel, t(lang, `advertising.objective.${c.objective}`) || c.objective, c.format, c.audience, c.budget, c.kpi]))
+  }
+
+  if (plan.rgpd) {
+    const r = plan.rgpd
+    rows.push([])
+    rows.push([t(lang, 'rgpd.title')])
+    rows.push([r.applicability])
+    rows.push([t(lang, 'rgpd.checklist')])
+    ;(r.checklist || []).forEach(it => rows.push([it.done ? '[x]' : '[ ]', it.item, t(lang, `rgpd.priority.${it.priority}`) || it.priority]))
+    rows.push([t(lang, 'rgpd.register')])
+    rows.push([t(lang, 'rgpd.data'), t(lang, 'rgpd.purpose'), t(lang, 'rgpd.basis')])
+    ;(r.register || []).forEach(reg => rows.push([reg.data, reg.purpose, reg.basis]))
+  }
+
   const blob = new Blob(['﻿' + toCSV(rows)], { type: 'text/csv;charset=utf-8' })
   downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.csv`)
 }
@@ -126,6 +174,54 @@ export async function exportPDF(plan, lang) {
       { text: `${t(lang, 'outputs.strategy.opportunities')}: ${swot.opportunities.join('; ')}`, margin: [0, 1, 0, 1] },
       { text: `${t(lang, 'outputs.strategy.threats')}: ${swot.threats.join('; ')}`, margin: [0, 1, 0, 1] },
       { text: `${t(lang, 'outputs.strategy.positioning')}: ${competitivePositioning}`, margin: [0, 4, 0, 0], italics: true }
+    )
+  }
+
+  if (plan.veille) {
+    const v = plan.veille
+    content.push(
+      { text: t(lang, 'veille.title'), style: 'section' },
+      { text: `${t(lang, 'veille.competitors')}:`, bold: true, margin: [0, 2, 0, 1] },
+      ...(v.competitors || []).map(c => ({ text: `• ${c.name} — ${c.positioning} (${c.watch})`, margin: [0, 1, 0, 1] })),
+      { text: `${t(lang, 'veille.trends')}: ${(v.trends || []).join('; ')}`, margin: [0, 2, 0, 1] },
+      { text: `${t(lang, 'veille.signals')}: ${(v.signals || []).join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'veille.opportunities')}: ${(v.opportunities || []).join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'veille.threats')}: ${(v.threats || []).join('; ')}`, margin: [0, 1, 0, 1] },
+      { text: `${t(lang, 'veille.sources')}: ${(v.sources || []).join('; ')}`, margin: [0, 1, 0, 1] }
+    )
+  }
+
+  if (plan.benchmarks) {
+    const b = plan.benchmarks
+    content.push(
+      { text: t(lang, 'benchmarks.title'), style: 'section' },
+      ...(b.metrics || []).map(mrow => ({ text: `${mrow.metric}: ${t(lang, 'benchmarks.industry')} ${mrow.industry} — ${t(lang, 'benchmarks.yours')} ${mrow.yours} (${t(lang, `benchmarks.verdict.${mrow.verdict}`) || mrow.verdict})`, margin: [0, 1, 0, 1] })),
+      ...(b.takeaway ? [{ text: b.takeaway, margin: [0, 3, 0, 0], italics: true }] : [])
+    )
+  }
+
+  if (plan.editorial) {
+    content.push(
+      { text: t(lang, 'editorial.title'), style: 'section' },
+      ...(plan.editorial.items || []).map(it => ({ text: `S${it.week} · ${it.channel} · ${it.format} — ${it.title} (${it.cta})`, margin: [0, 1, 0, 1] }))
+    )
+  }
+
+  if (plan.advertising) {
+    content.push(
+      { text: t(lang, 'advertising.title'), style: 'section' },
+      ...(plan.advertising.campaigns || []).map(c => ({ text: `S${c.week} · ${c.channel} · ${t(lang, `advertising.objective.${c.objective}`) || c.objective} — ${c.format} — ${c.budget} € (${c.kpi})`, margin: [0, 1, 0, 1] }))
+    )
+  }
+
+  if (plan.rgpd) {
+    const r = plan.rgpd
+    content.push(
+      { text: t(lang, 'rgpd.title'), style: 'section' },
+      { text: r.applicability, margin: [0, 0, 0, 3], italics: true },
+      { text: `${t(lang, 'rgpd.checklist')}:`, bold: true, margin: [0, 2, 0, 1] },
+      ...(r.checklist || []).map(it => ({ text: `${it.done ? '☑' : '☐'} ${it.item} [${t(lang, `rgpd.priority.${it.priority}`) || it.priority}]`, margin: [0, 1, 0, 1] })),
+      { text: t(lang, 'rgpd.disclaimer'), margin: [0, 3, 0, 0], italics: true, fontSize: 8 }
     )
   }
 
