@@ -43,6 +43,7 @@ export default function App() {
   const [dataVersion, setDataVersion] = useState(0)
   const [authMode, setAuthMode] = useState('signup')
   const [authIntent, setAuthIntent] = useState(null)
+  const [pendingDemoData, setPendingDemoData] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
 
   const { isSignedIn, isLoaded, user } = useUser()
@@ -90,7 +91,12 @@ export default function App() {
         syncDraftsFromServer(userId),
         syncCreditsFromServer(userId)
       ]).then(() => setDataVersion(v => v + 1))
-      setCurrentPage(authIntent || 'account')
+      if (pendingDemoData) {
+        handleGenerate(pendingDemoData)
+        setPendingDemoData(null)
+      } else {
+        setCurrentPage(authIntent || 'account')
+      }
       setAuthIntent(null)
       window.scrollTo(0, 0)
     }
@@ -201,6 +207,7 @@ export default function App() {
 
   const handleLoadDemo = (demoData) => {
     if (!isSignedIn) {
+      setPendingDemoData(demoData)
       goToAuth('signin')
       return
     }
