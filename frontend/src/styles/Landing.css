@@ -224,27 +224,31 @@
   animation: slideInUp 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
 }
 
-.link-demo {
+.btn-cta-demo {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  margin: 0.75rem auto 0;
+  gap: 0.5rem;
   background: rgba(145, 132, 217, 0.1);
   border: 1px solid rgba(145, 132, 217, 0.35);
-  border-radius: 999px;
+  border-radius: var(--radius-lg);
   color: var(--color-primary);
   cursor: pointer;
   font-weight: var(--font-weight-semibold);
-  font-size: var(--font-size-sm);
-  padding: 0.55rem 1.1rem;
+  font-size: var(--font-size-base);
+  padding: 0.85rem 2rem;
   transition: all 0.2s ease;
 }
 
-.link-demo:hover {
+.btn-cta-demo:hover {
   background: rgba(145, 132, 217, 0.2);
   border-color: var(--color-accent-light);
   color: var(--color-accent-light);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+}
+
+.btn-cta-demo-enhanced {
+  padding: 1rem 2.5rem;
+  font-size: var(--font-size-lg);
 }
 
 /* ===== ANIMATIONS ===== */
@@ -754,8 +758,10 @@
 
   .btn-cta-primary,
   .btn-cta-secondary,
+  .btn-cta-demo,
   .btn-cta-primary-enhanced,
-  .btn-cta-secondary-enhanced {
+  .btn-cta-secondary-enhanced,
+  .btn-cta-demo-enhanced {
     width: 100%;
     justify-content: center;
   }
@@ -846,6 +852,7 @@
 
   .btn-cta-primary,
   .btn-cta-secondary,
+  .btn-cta-demo,
   .btn-cta-large,
   .btn-cta-final {
     padding: 0.8rem 1.5rem;

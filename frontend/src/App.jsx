@@ -18,7 +18,7 @@ import { PricingModal, ChangelogModal, RoadmapModal } from './components/Product
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, syncPlansFromServer } from './lib/planStorage'
+import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, syncPlansFromServer, generateId } from './lib/planStorage'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { useUser, useAuth } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
@@ -136,6 +136,8 @@ export default function App() {
   // (moteur à règles, aucun appel IA), sans consommer de crédit ni polluer "Mes plans".
   const loadDemoPlan = (demoData) => {
     const generatedPlan = generatePlan({ ...demoData, language: lang })
+    // Id éphémère (non persisté) pour que la section Agents IA s'affiche aussi en démo
+    generatedPlan.id = `demo-${generateId()}`
     setPlan(generatedPlan)
     setJustGenerated(true)
     setIsSharedView(false)
@@ -162,11 +164,11 @@ export default function App() {
         await new Promise(r => setTimeout(r, 400))
         generatedPlan = generatePlan(payload)
       }
-      savePlan(generatedPlan)
+      const savedPlan = savePlan(generatedPlan)
       consumeCredit(userId)
       localStorage.removeItem('plp_form')
       setInitialFormData(null)
-      setPlan(generatedPlan)
+      setPlan(savedPlan)
       setJustGenerated(true)
       setIsSharedView(false)
       setCurrentPage('result')
@@ -174,11 +176,11 @@ export default function App() {
     } catch (e) {
       try {
         const generatedPlan = generatePlan(payload)
-        savePlan(generatedPlan)
+        const savedPlan = savePlan(generatedPlan)
         consumeCredit(userId)
         localStorage.removeItem('plp_form')
         setInitialFormData(null)
-        setPlan(generatedPlan)
+        setPlan(savedPlan)
         setJustGenerated(true)
         setIsSharedView(false)
         setCurrentPage('result')

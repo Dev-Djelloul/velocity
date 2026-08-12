@@ -90,15 +90,14 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
             <button className="btn-cta-secondary btn-cta-secondary-enhanced" onClick={onDiscoverClick}>
               {tLanding(lang, 'hero.ctaSecondary')}
             </button>
+            <button className="btn-cta-demo btn-cta-demo-enhanced" onClick={() => setShowDemo(true)}>
+              <IconSparkle width={16} height={16} /> {tLanding(lang, 'hero.demoLink')}
+            </button>
           </div>
 
           <p className="hero-footnote hero-footnote-animated">
             {tLanding(lang, 'hero.footnote')}
           </p>
-
-          <button className="link-demo hero-footnote-animated" onClick={() => setShowDemo(true)}>
-            <IconSparkle width={14} height={14} /> {tLanding(lang, 'hero.demoLink')}
-          </button>
         </div>
       </section>
 
