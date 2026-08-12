@@ -121,6 +121,18 @@
   color: var(--color-primary);
 }
 
+.btn-header-demo {
+  background: rgba(145, 132, 217, 0.12);
+  border-color: rgba(145, 132, 217, 0.4);
+  color: var(--color-primary);
+}
+
+.btn-header-demo:hover {
+  background: rgba(145, 132, 217, 0.22);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
 .btn-header-gradient-border {
   border: 1.5px solid transparent;
   background:

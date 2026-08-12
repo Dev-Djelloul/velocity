@@ -1,14 +1,12 @@
 import { useState } from 'react'
-import DemoModal from './DemoModal'
 import { IconClipboard, IconTarget, IconBarChart, IconTrendingUp, IconSparkle, IconDownload } from './Icons'
 import { t } from '../lib/i18n'
 import { tLanding } from '../lib/landingI18n'
 import { useImageOptimization, useScrollReveal, useAiImages } from '../hooks/useImageOptimization'
 import '../styles/Landing.css'
 
-export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClick }) {
+export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClick }) {
   const [hoveredFeature, setHoveredFeature] = useState(null)
-  const [showDemo, setShowDemo] = useState(false)
   const images = useAiImages()
   const heroImage = useImageOptimization(images.heroIsometric)
   const { ref: statsRef, isVisible: statsVisible } = useScrollReveal()
@@ -90,7 +88,7 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
             <button className="btn-cta-secondary btn-cta-secondary-enhanced" onClick={onDiscoverClick}>
               {tLanding(lang, 'hero.ctaSecondary')}
             </button>
-            <button className="btn-cta-demo btn-cta-demo-enhanced" onClick={() => setShowDemo(true)}>
+            <button className="btn-cta-demo btn-cta-demo-enhanced" onClick={onOpenDemo}>
               <IconSparkle width={16} height={16} /> {tLanding(lang, 'hero.demoLink')}
             </button>
           </div>
@@ -280,16 +278,6 @@ export default function Landing({ lang, onStartClick, onLoadDemo, onDiscoverClic
         </div>
       </section>
 
-      {showDemo && (
-        <DemoModal
-          lang={lang}
-          onClose={() => setShowDemo(false)}
-          onLoadDemo={(demoData) => {
-            if (onLoadDemo) onLoadDemo(demoData)
-            else console.log('Demo data:', demoData)
-          }}
-        />
-      )}
     </div>
   )
 }

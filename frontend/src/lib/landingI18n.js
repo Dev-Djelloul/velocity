@@ -19,7 +19,7 @@ export const landingTranslations = {
     features: {
       title: 'Tout ce dont vous avez besoin',
       subtitle: 'Un outil complet pour planifier votre lancement comme un pro',
-      plan5min: { title: 'Plan en 5 minutes', desc: 'Répondez à 12 questions et générez un plan complet' },
+      plan5min: { title: 'Plan en 5 minutes', desc: 'Répondez à une série de questions et générez un plan complet' },
       roadmap: { title: 'Roadmap détaillée', desc: 'Sprints, stories, efforts et coûts calculés automatiquement' },
       marketing: { title: 'Stratégie Marketing', desc: 'Budget alloué par canal avec objectifs et KPIs' },
       kpis: { title: 'KPIs personnalisés', desc: 'Métriques de succès adaptées à votre produit' },
@@ -113,7 +113,7 @@ export const landingTranslations = {
     features: {
       title: 'Everything you need',
       subtitle: 'A complete tool to plan your launch like a pro',
-      plan5min: { title: 'Plan in 5 minutes', desc: 'Answer 12 questions and generate a complete plan' },
+      plan5min: { title: 'Plan in 5 minutes', desc: 'Answer a series of questions and generate a complete plan' },
       roadmap: { title: 'Detailed Roadmap', desc: 'Sprints, stories, effort and costs calculated automatically' },
       marketing: { title: 'Marketing Strategy', desc: 'Budget allocated per channel with objectives and KPIs' },
       kpis: { title: 'Custom KPIs', desc: 'Success metrics tailored to your product' },

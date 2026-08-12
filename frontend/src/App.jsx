@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
 import Landing from './components/Landing'
+import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconHome, IconUser, IconLogin, IconLock } from './components/Icons'
+import { IconClipboard, IconHome, IconUser, IconLogin, IconLock, IconSparkle } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -37,6 +38,7 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [showHistory, setShowHistory] = useState(false)
+  const [showDemo, setShowDemo] = useState(false)
   const [showDrafts, setShowDrafts] = useState(false)
   const [activeModal, setActiveModal] = useState(null)
   const [isSharedView, setIsSharedView] = useState(false)
@@ -302,6 +304,9 @@ export default function App() {
           </nav>
 
           <div className="header-actions">
+            <button className="btn-header btn-header-demo" onClick={() => setShowDemo(true)} title={lang === 'fr' ? 'Voir une démo' : 'Watch a demo'}>
+              <IconSparkle width={16} height={16} /> {lang === 'fr' ? 'Voir une démo' : 'Watch a demo'}
+            </button>
             {isSignedIn && (
               <>
                 <button className="btn-header btn-header-gradient-border" onClick={() => setShowHistory(true)} title={t(lang, 'account.plansSectionTitle')}>
@@ -333,7 +338,7 @@ export default function App() {
 
       <main>
         {currentPage === 'landing' && (
-          <Landing lang={lang} onStartClick={handleStartClick} onLoadDemo={handleLoadDemo} onDiscoverClick={handleShowHowItWorks} />
+          <Landing lang={lang} onStartClick={handleStartClick} onOpenDemo={() => setShowDemo(true)} onDiscoverClick={handleShowHowItWorks} />
         )}
         {currentPage === 'howItWorks' && (
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
@@ -372,6 +377,17 @@ export default function App() {
           lang={lang}
           onLoadPlan={handleLoadFromHistory}
           onClose={() => setShowHistory(false)}
+        />
+      )}
+
+      {showDemo && (
+        <DemoModal
+          lang={lang}
+          onClose={() => setShowDemo(false)}
+          onLoadDemo={(demoData) => {
+            setShowDemo(false)
+            handleLoadDemo(demoData)
+          }}
         />
       )}
 

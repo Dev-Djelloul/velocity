@@ -397,7 +397,7 @@ export const translations = {
         columns: [
           {
             label: 'Disponible',
-            items: ['Questionnaire guidé 12 questions', 'Roadmap générée par sprints', 'Stratégie marketing et KPIs', 'Export PDF / CSV', 'Partage par lien privé', 'FR / EN']
+            items: ['Questionnaire guidé', 'Roadmap générée par sprints', 'Stratégie marketing et KPIs', 'Export PDF / CSV', 'Partage par lien privé', 'FR / EN']
           },
           {
             label: 'En cours',
@@ -1033,7 +1033,7 @@ export const translations = {
         columns: [
           {
             label: 'Available',
-            items: ['Guided 12-question questionnaire', 'Sprint-generated roadmap', 'Marketing strategy and KPIs', 'PDF / CSV export', 'Private link sharing', 'FR / EN']
+            items: ['Guided questionnaire', 'Sprint-generated roadmap', 'Marketing strategy and KPIs', 'PDF / CSV export', 'Private link sharing', 'FR / EN']
           },
           {
             label: 'In progress',
