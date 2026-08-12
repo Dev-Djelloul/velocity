@@ -388,6 +388,14 @@ export const translations = {
       jira: 'Export Jira (CSV)',
       pptx: 'Export pitch deck (PPTX)',
       image: 'Export image (PNG)',
+      notion: 'Exporter vers Notion',
+      notionExporting: 'Export vers Notion...',
+      notionConnecting: 'Connexion à Notion...',
+      notionOpen: 'Ouvrir la page Notion →',
+      notionNoParent: "Aucune page partagée avec l'intégration. Dans Notion, partage une page avec VelocityLaunch puis réessaie.",
+      notionSignIn: 'Connecte-toi pour exporter vers Notion.',
+      notionCancelled: 'Connexion Notion annulée.',
+      notionUnavailable: "Export Notion indisponible pour le moment.",
       close: 'Fermer'
     },
     errors: {
@@ -1115,6 +1123,14 @@ export const translations = {
       jira: 'Export Jira (CSV)',
       pptx: 'Export pitch deck (PPTX)',
       image: 'Export image (PNG)',
+      notion: 'Export to Notion',
+      notionExporting: 'Exporting to Notion...',
+      notionConnecting: 'Connecting to Notion...',
+      notionOpen: 'Open Notion page →',
+      notionNoParent: 'No page shared with the integration. In Notion, share a page with VelocityLaunch and try again.',
+      notionSignIn: 'Sign in to export to Notion.',
+      notionCancelled: 'Notion connection cancelled.',
+      notionUnavailable: 'Notion export is unavailable right now.',
       close: 'Close'
     },
     errors: {

@@ -193,7 +193,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       {showExport && (
-        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} onClose={() => setShowExport(false)} captureRef={captureRef} />
+        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} userId={userId} onClose={() => setShowExport(false)} captureRef={captureRef} />
       )}
       </div>
     </div>

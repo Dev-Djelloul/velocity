@@ -121,6 +121,22 @@ export function generateRgpd(plan, lang) {
   })
 }
 
+export function notionStatus(userId) {
+  return safeFetch(`/notion/status?userId=${encodeURIComponent(userId)}`)
+}
+
+export function notionAuthorizeUrl(userId) {
+  return safeFetch(`/notion/authorize-url?userId=${encodeURIComponent(userId)}`)
+}
+
+export function notionExport(userId, plan, lang) {
+  return safeFetch('/notion/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
 export function enqueueAgentTask(planId, userId, type, input) {
   return safeFetch('/agents/enqueue', {
     method: 'POST',

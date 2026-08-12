@@ -155,3 +155,22 @@ export async function setPro(env, userId, isPro, stripeCustomerId) {
      ON CONFLICT(user_id) DO UPDATE SET is_pro = excluded.is_pro, stripe_customer_id = excluded.stripe_customer_id, updated_at = datetime('now')`
   ).bind(userId, isPro ? 1 : 0, stripeCustomerId || null).run()
 }
+
+// --- Jetons OAuth Notion ---
+
+export async function saveNotionToken(env, userId, { accessToken, workspaceName, workspaceId, botId }) {
+  await env.DB.prepare(
+    `INSERT INTO notion_tokens (user_id, access_token, workspace_name, workspace_id, bot_id, created_at)
+     VALUES (?, ?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET access_token = excluded.access_token, workspace_name = excluded.workspace_name,
+       workspace_id = excluded.workspace_id, bot_id = excluded.bot_id, created_at = datetime('now')`
+  ).bind(userId, accessToken, workspaceName || null, workspaceId || null, botId || null).run()
+}
+
+export async function getNotionToken(env, userId) {
+  return env.DB.prepare('SELECT access_token, workspace_name FROM notion_tokens WHERE user_id = ?').bind(userId).first()
+}
+
+export async function deleteNotionToken(env, userId) {
+  await env.DB.prepare('DELETE FROM notion_tokens WHERE user_id = ?').bind(userId).run()
+}

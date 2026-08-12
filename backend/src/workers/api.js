@@ -13,6 +13,7 @@ import { generateAdvertisingFallback } from '../lib/generator/advertisingFallbac
 import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
 import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
+import { buildAuthorizeUrl, exchangeCode, createPlanPage } from '../lib/notion/notionClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
 
@@ -164,6 +165,59 @@ export async function handleApi(request, env, url) {
       return json({ ...rgpd, source: 'ai' })
     } catch {
       return json({ ...generateRgpdFallback(plan, lang || 'fr'), source: 'rules' })
+    }
+  }
+
+  // --- Intégration Notion (OAuth + export de page) ---
+
+  if (pathname === '/notion/status' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getNotionToken(env, userId)
+    return json({ connected: !!token, workspace: token?.workspace_name || null })
+  }
+
+  if (pathname === '/notion/authorize-url' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    if (!env.NOTION_CLIENT_ID) return json({ error: 'notion_not_configured' }, 500)
+    return json({ url: buildAuthorizeUrl(env, userId) })
+  }
+
+  if (pathname === '/notion/callback' && method === 'GET') {
+    const code = searchParams.get('code')
+    const state = searchParams.get('state') // = userId
+    const appUrl = env.APP_URL || '/'
+    if (!code || !state) {
+      return Response.redirect(`${appUrl}?notion=error`, 302)
+    }
+    try {
+      const tokenData = await exchangeCode(env, code)
+      await db.saveNotionToken(env, state, tokenData)
+      return Response.redirect(`${appUrl}?notion=connected`, 302)
+    } catch {
+      return Response.redirect(`${appUrl}?notion=error`, 302)
+    }
+  }
+
+  if (pathname === '/notion/disconnect' && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteNotionToken(env, userId)
+    return json({ ok: true })
+  }
+
+  if (pathname === '/notion/export' && method === 'POST') {
+    const { userId, plan, lang } = await request.json()
+    if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    const token = await db.getNotionToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    try {
+      const url = await createPlanPage(token.access_token, plan, lang || 'fr')
+      return json({ url })
+    } catch (e) {
+      if (String(e.message).includes('no_parent')) return json({ error: 'no_parent' }, 400)
+      return json({ error: 'export_failed' }, 500)
     }
   }
 
