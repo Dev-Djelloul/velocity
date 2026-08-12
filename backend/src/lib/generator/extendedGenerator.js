@@ -2,8 +2,8 @@
 // executiveSummary. Moins riches que la génération IA, mais gardent le filet de sécurité complet :
 // aucune section ne doit manquer selon que le plan vient de l'IA ou des règles.
 
-const BUDGET = { b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000 }
-const TIMELINE_WEEKS = { w4: 4, w8: 8, w12: 12, w26: 26 }
+const BUDGET = { b500: 500, b1k: 1000, b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000, b100k: 100000 }
+const TIMELINE_WEEKS = { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }
 const ARPU_BY_MODEL = { b2b: 99, b2c: 15, hybrid: 40 }
 
 const MODEL_LABEL = {

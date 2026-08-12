@@ -1,7 +1,7 @@
 import { selectMarketingStrategy, strategyLabel, allocateBudget } from '../engine'
 import { c } from '../contentI18n'
 
-const BUDGET = { b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000 }
+const BUDGET = { b500: 500, b1k: 1000, b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000, b100k: 100000 }
 
 export function generateMarketingStrategy(market, priorities, budgetKey, lang) {
   const budget = BUDGET[budgetKey] ?? 5000

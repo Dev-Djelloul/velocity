@@ -1,4 +1,4 @@
-import { classifyProduct, classificationLabel, selectMarketingStrategy, strategyLabel, allocateBudget, sprintCapacity, sprintCount, kpiFocus, primaryTarget } from './engine'
+import { classifyProduct, classificationLabel, selectMarketingStrategy, strategyLabel, allocateBudget, sprintCapacity, sprintCount, kpiFocus, primaryTarget, resolveAssignee } from './engine'
 import { costFor } from './costMatrix'
 import { generatePersona } from './personaGenerator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
@@ -22,7 +22,12 @@ const STORY_TEMPLATES = [
 const RULE_PRIORITY = {
   marketingFirst: { marketing: -1, product: 0, ops: 0 },
   designFirst: { design: -1 },
-  devFirst: { backend: -1, frontend: -1 }
+  devFirst: { backend: -1, frontend: -1 },
+  mobileFirst: { frontend: -1, design: -1 },
+  dataDriven: { ops: -1, analytics: -1 },
+  salesLed: { marketing: -1, content: -1 },
+  plg: { product: -1, frontend: -1 },
+  complianceFirst: { backend: -1, qa: -1 }
 }
 
 function applyRules(templates, rulesFlags) {
@@ -36,11 +41,11 @@ function applyRules(templates, rulesFlags) {
 }
 
 function timelineWeeksFromKey(key) {
-  return { w4: 4, w8: 8, w12: 12, w26: 26 }[key] ?? 8
+  return { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }[key] ?? 8
 }
 
 function budgetFromKey(key) {
-  return { b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000 }[key] ?? 5000
+  return { b500: 500, b1k: 1000, b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000, b100k: 100000 }[key] ?? 5000
 }
 
 export function generateRoadmap(resources, product, priorities, lang) {
@@ -67,7 +72,7 @@ export function generateRoadmap(resources, product, priorities, lang) {
         title: dict.stories[tmpl.key],
         description: dict.storyDescriptions[tmpl.key],
         acceptanceCriteria: dict.storyAcceptance[tmpl.key],
-        assignee: dict.assignees[tmpl.assignee] || tmpl.assignee,
+        assignee: (who => dict.assignees[who] || who)(resolveAssignee(tmpl.assignee, resources?.rolesPresent)),
         effort: tmpl.effort,
         cost: costFor(tmpl.category, tmpl.type),
         dependsOn: stories.length > 0 && templateIdx % 3 === 1 ? [stories[stories.length - 1].id] : []
@@ -153,11 +158,20 @@ export function calculateKPIs(priorities, resources, market, lang) {
   const monthly = lang === 'en' ? 'Monthly' : 'Mensuel'
   const weekly = lang === 'en' ? 'Weekly' : 'Hebdomadaire'
 
+  // La métrique de succès choisie remplace le KPI principal (cible neutralisée pour les métriques monétaires).
+  const override = dict.successMetrics?.[priorities?.successMetric]
+  const primaryKpi = override
+    ? { name: override.name, formula: override.formula, unit: override.unit, target: override.unit === '€' ? null : target, baseline: 0, timeframe: monthly }
+    : { name: focus.primary.name, formula: focus.primary.formula, unit: focus.primary.unit, target, baseline: 0, timeframe: monthly }
+
+  // L'engagement requis module l'objectif de contenus publiés.
+  const contentTarget = { minimal: 8, moderate: 12, high: 20, community: 24, whiteglove: 14 }[priorities?.engagement] ?? 12
+
   return [
-    { name: focus.primary.name, formula: focus.primary.formula, unit: focus.primary.unit, target, baseline: 0, timeframe: monthly },
+    primaryKpi,
     { name: focus.secondary.name, formula: focus.secondary.formula, unit: focus.secondary.unit, target: focus.secondary.name === 'CAC' ? Math.round(budget / target) : null, baseline: 0, timeframe: monthly },
     { name: focus.tertiary.name, formula: focus.tertiary.formula, unit: focus.tertiary.unit, target: null, baseline: 0, timeframe: weekly },
-    { name: dict.contentPiecesKpi, formula: dict.contentPiecesFormula, unit: '#', target: 12, baseline: 0, timeframe: weekly }
+    { name: dict.contentPiecesKpi, formula: dict.contentPiecesFormula, unit: '#', target: contentTarget, baseline: 0, timeframe: weekly }
   ]
 }
 

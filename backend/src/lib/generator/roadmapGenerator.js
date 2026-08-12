@@ -1,4 +1,4 @@
-import { costFor, sprintCapacity, sprintCount } from '../engine'
+import { costFor, sprintCapacity, sprintCount, resolveAssignee } from '../engine'
 import { c } from '../contentI18n'
 
 const STORY_TEMPLATES = [
@@ -16,7 +16,7 @@ const STORY_TEMPLATES = [
   { key: 'feedback', category: 'product', type: 'frontend', effort: 8, assignee: 'Dev' }
 ]
 
-const TIMELINE_WEEKS = { w4: 4, w8: 8, w12: 12, w26: 26 }
+const TIMELINE_WEEKS = { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }
 
 export function generateRoadmap(resources, product, priorities, lang) {
   const dict = c(lang)
@@ -41,7 +41,7 @@ export function generateRoadmap(resources, product, priorities, lang) {
         title: dict.stories[tmpl.key],
         description: dict.storyDescriptions[tmpl.key],
         acceptanceCriteria: dict.storyAcceptance[tmpl.key],
-        assignee: dict.assignees[tmpl.assignee] || tmpl.assignee,
+        assignee: (who => dict.assignees[who] || who)(resolveAssignee(tmpl.assignee, resources?.rolesPresent)),
         effort: tmpl.effort,
         cost: costFor(tmpl.category, tmpl.type),
         dependsOn: stories.length > 0 && templateIdx % 3 === 1 ? [stories[stories.length - 1].id] : []

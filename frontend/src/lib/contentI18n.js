@@ -62,7 +62,12 @@ export const content = {
     riskLabels: {
       notready: { risk: 'Produit pas encore totalement prêt', mitigation: 'Ajouter un sprint tampon de QA avant le lancement' },
       pmf: { risk: 'Adéquation produit-marché incertaine', mitigation: 'Valider avec 10 utilisateurs béta avant d\'augmenter les dépenses' },
-      budget: { risk: 'Limite de budget atteinte', mitigation: 'Prioriser le canal au meilleur ROI' }
+      budget: { risk: 'Limite de budget atteinte', mitigation: 'Prioriser le canal au meilleur ROI' },
+      regulatory: { risk: 'Contraintes réglementaires ou de conformité', mitigation: 'Cadrer les exigences légales tôt et prévoir une revue conformité avant lancement' },
+      techdebt: { risk: 'Dette technique susceptible de ralentir les itérations', mitigation: 'Réserver ~20% de la capacité de chaque sprint au refactoring' },
+      platform: { risk: 'Dépendance forte à une plateforme tierce', mitigation: 'Prévoir une alternative et isoler les intégrations derrière une couche d\'abstraction' },
+      timing: { risk: 'Fenêtre de marché incertaine', mitigation: 'Lancer un MVP rapidement pour tester la traction avant d\'investir davantage' },
+      hiring: { risk: 'Recrutement des rôles clés non finalisé', mitigation: 'Prioriser les stories réalisables par l\'équipe actuelle et externaliser le reste' }
     },
     channelUnits: {
       TikTok: 'k vues',
@@ -114,6 +119,16 @@ export const content = {
         secondary: { name: 'CAC', formula: 'budget_total / total_inscriptions', unit: '€/inscription' },
         tertiary: { name: 'Taux de conversion', formula: '(inscriptions / visiteurs) × 100', unit: '%' }
       }
+    },
+    successMetrics: {
+      arr: { name: 'ARR', formula: 'Σ(valeur_abonnement × 12)', unit: '€' },
+      mrr: { name: 'MRR', formula: 'Σ(abonnements_mensuels)', unit: '€' },
+      retention: { name: 'Taux de rétention', formula: '(utilisateurs_restants / cohorte) × 100', unit: '%' },
+      community: { name: 'Taille de la communauté', formula: 'membres_actifs', unit: 'membres' },
+      nps: { name: 'NPS', formula: '% promoteurs − % détracteurs', unit: 'pts' },
+      ltv: { name: 'LTV', formula: 'ARPU × durée_de_vie_moyenne', unit: '€' },
+      conversion: { name: 'Taux de conversion', formula: '(conversions / visiteurs) × 100', unit: '%' },
+      activeUsers: { name: 'DAU/MAU', formula: 'actifs_jour / actifs_mois', unit: '%' }
     },
     contentPiecesKpi: 'Contenus publiés',
     contentPiecesFormula: 'articles + vidéos publiés',
@@ -233,7 +248,12 @@ export const content = {
     riskLabels: {
       notready: { risk: 'Product not fully ready', mitigation: 'Add QA buffer sprint before launch' },
       pmf: { risk: 'Market fit unclear', mitigation: 'Validate with 10 beta users before scaling spend' },
-      budget: { risk: 'Budget limits reach', mitigation: 'Prioritize highest-ROI channel first' }
+      budget: { risk: 'Budget limits reach', mitigation: 'Prioritize highest-ROI channel first' },
+      regulatory: { risk: 'Regulatory or compliance constraints', mitigation: 'Scope legal requirements early and plan a compliance review before launch' },
+      techdebt: { risk: 'Technical debt may slow iterations', mitigation: 'Reserve ~20% of each sprint capacity for refactoring' },
+      platform: { risk: 'Heavy dependency on a third-party platform', mitigation: 'Plan a fallback and isolate integrations behind an abstraction layer' },
+      timing: { risk: 'Uncertain market timing', mitigation: 'Ship an MVP quickly to test traction before investing further' },
+      hiring: { risk: 'Key roles not yet hired', mitigation: 'Prioritize stories the current team can deliver and outsource the rest' }
     },
     channelUnits: {
       TikTok: 'k views',
@@ -285,6 +305,16 @@ export const content = {
         secondary: { name: 'CAC', formula: 'total_budget / total_signups', unit: '€/signup' },
         tertiary: { name: 'Conversion Rate', formula: '(signups / visitors) × 100', unit: '%' }
       }
+    },
+    successMetrics: {
+      arr: { name: 'ARR', formula: 'Σ(subscription_value × 12)', unit: '€' },
+      mrr: { name: 'MRR', formula: 'Σ(monthly_subscriptions)', unit: '€' },
+      retention: { name: 'Retention rate', formula: '(retained_users / cohort) × 100', unit: '%' },
+      community: { name: 'Community size', formula: 'active_members', unit: 'members' },
+      nps: { name: 'NPS', formula: '% promoters − % detractors', unit: 'pts' },
+      ltv: { name: 'LTV', formula: 'ARPU × average_lifetime', unit: '€' },
+      conversion: { name: 'Conversion rate', formula: '(conversions / visitors) × 100', unit: '%' },
+      activeUsers: { name: 'DAU/MAU', formula: 'daily_active / monthly_active', unit: '%' }
     },
     contentPiecesKpi: 'Content Pieces',
     contentPiecesFormula: 'published articles + videos',
