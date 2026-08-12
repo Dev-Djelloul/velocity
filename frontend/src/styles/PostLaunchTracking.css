@@ -31,7 +31,75 @@
   font-size: var(--font-size-sm);
 }
 
-.tracking-form input[type="number"] { flex: 1; min-width: 140px; }
+.tracking-date-input {
+  color-scheme: dark;
+}
+
+.tracking-date-input::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) brightness(1.3);
+  cursor: pointer;
+  border-radius: 4px;
+  transition: filter 0.15s ease, background 0.15s ease;
+}
+
+.tracking-date-input::-webkit-calendar-picker-indicator:hover {
+  filter: invert(0.9) brightness(1.6);
+  background: rgba(145, 132, 217, 0.15);
+}
+
+.tracking-number-stepper {
+  position: relative;
+  flex: 1;
+  min-width: 140px;
+  display: flex;
+}
+
+.tracking-number-stepper input[type="number"] {
+  flex: 1;
+  width: 100%;
+  padding-right: 2.1rem;
+  -moz-appearance: textfield;
+}
+
+.tracking-number-stepper input[type="number"]::-webkit-outer-spin-button,
+.tracking-number-stepper input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.tracking-stepper-arrows {
+  position: absolute;
+  right: 1px;
+  top: 1px;
+  bottom: 1px;
+  display: flex;
+  flex-direction: column;
+  width: 1.9rem;
+  border-left: 1px solid rgba(145, 132, 217, 0.2);
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+  overflow: hidden;
+}
+
+.tracking-stepper-arrows button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(145, 132, 217, 0.06);
+  border: none;
+  border-bottom: 1px solid rgba(145, 132, 217, 0.15);
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.tracking-stepper-arrows button:last-child { border-bottom: none; }
+
+.tracking-stepper-arrows button:hover {
+  background: rgba(145, 132, 217, 0.18);
+  color: var(--color-accent);
+}
 
 .tracking-svg { width: 100%; height: auto; margin-bottom: var(--spacing-sm); }
 

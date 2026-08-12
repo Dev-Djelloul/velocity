@@ -303,6 +303,22 @@ export function IconChevronRight(props) {
   )
 }
 
+export function IconChevronUp(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M5 15l7-7 7 7" />
+    </svg>
+  )
+}
+
+export function IconChevronDown(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M5 9l7 7 7-7" />
+    </svg>
+  )
+}
+
 export function IconCalendar(props) {
   return (
     <svg {...base} {...props}>

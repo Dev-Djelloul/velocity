@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
-import { IconTrendingUp, IconPlus } from './Icons'
+import { IconTrendingUp, IconPlus, IconChevronUp, IconChevronDown } from './Icons'
 import '../styles/PostLaunchTracking.css'
 
 const CHART_W = 640
@@ -60,13 +60,23 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange }) {
       </div>
 
       <div className="tracking-form">
-        <input type="date" value={date} onChange={e => setDate(e.target.value)} max={todayStr()} />
-        <input
-          type="number"
-          placeholder={`${t(lang, 'tracking.actualValue')} (${primaryKpi.unit})`}
-          value={actualValue}
-          onChange={e => setActualValue(e.target.value)}
-        />
+        <input type="date" className="tracking-date-input" value={date} onChange={e => setDate(e.target.value)} max={todayStr()} />
+        <div className="tracking-number-stepper">
+          <input
+            type="number"
+            placeholder={`${t(lang, 'tracking.actualValue')} (${primaryKpi.unit})`}
+            value={actualValue}
+            onChange={e => setActualValue(e.target.value)}
+          />
+          <div className="tracking-stepper-arrows">
+            <button type="button" onClick={() => setActualValue(String((Number(actualValue) || 0) + 1))} title="+1">
+              <IconChevronUp width={11} height={11} />
+            </button>
+            <button type="button" onClick={() => setActualValue(String((Number(actualValue) || 0) - 1))} title="-1">
+              <IconChevronDown width={11} height={11} />
+            </button>
+          </div>
+        </div>
         <button className="btn-primary" onClick={addSnapshot}>
           <IconPlus width={14} height={14} /> {t(lang, 'tracking.addSnapshot')}
         </button>
