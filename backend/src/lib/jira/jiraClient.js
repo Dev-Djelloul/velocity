@@ -2,23 +2,14 @@ import * as db from '../db'
 
 const AUTH_BASE = 'https://auth.atlassian.com'
 const API_BASE = 'https://api.atlassian.com'
-// Scopes 3LO. Les scopes classiques (jira-work/jira-user) couvrent l'API REST v3.
-// L'API Jira Software (Agile : boards & sprints) exige en plus des scopes GRANULAIRES
-// dédiés — sinon 401 sur /rest/agile/1.0. offline_access = refresh token.
-const SCOPES = [
-  'read:jira-work',
-  'write:jira-work',
-  'read:jira-user',
-  'offline_access',
-  'read:board-scope:jira-software',
-  'read:sprint:jira-software',
-  'write:sprint:jira-software'
-].join(' ')
+// Scopes classiques 3LO (couvrent l'API REST v3) + offline_access pour le refresh token.
+// NB : l'API Agile (sprints natifs) exigerait une migration complète en scopes granulaires
+// — non retenue ; le regroupement par Phase (Epic) + label vl-sprint:N joue ce rôle.
+const SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access'
 
 // --- OAuth ---
 
 export function buildAuthorizeUrl(env, state) {
-  console.log(`[jira] authorize scopes: ${SCOPES}`)
   const params = new URLSearchParams({
     audience: 'api.atlassian.com',
     client_id: env.JIRA_CLIENT_ID,
@@ -91,19 +82,6 @@ export async function listProjects(accessToken, cloudId) {
 
 // --- Export ---
 
-// Appel à l'API Agile (sprints, boards) : base différente de l'API REST v3.
-function agileFetch(accessToken, cloudId, path, options = {}) {
-  return fetch(`${API_BASE}/ex/jira/${cloudId}/rest/agile/1.0${path}`, {
-    ...options,
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      ...(options.headers || {})
-    }
-  })
-}
-
 // accountId de l'utilisateur connecté (pour l'auto-assignation).
 async function getMyAccountId(accessToken, cloudId) {
   try {
@@ -111,75 +89,6 @@ async function getMyAccountId(accessToken, cloudId) {
     if (!res.ok) return null
     return (await res.json()).accountId || null
   } catch { return null }
-}
-
-// Datetime ISO complet décalé de N semaines (requis par l'API Agile pour les sprints).
-function isoDateTimePlusWeeks(baseIso, weeks) {
-  const d = baseIso ? new Date(baseIso) : new Date()
-  if (isNaN(d.getTime())) return null
-  d.setUTCDate(d.getUTCDate() + Math.round(weeks * 7))
-  return d.toISOString()
-}
-
-// Récupère l'id du board Scrum du projet.
-async function getBoardId(accessToken, cloudId, projectKey) {
-  try {
-    const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=5`)
-    if (!res.ok) { console.log(`[jira] board lookup failed: ${res.status} — ${(await res.text()).slice(0, 300)}`); return null }
-    const boards = (await res.json()).values || []
-    const scrum = boards.find(b => b.type === 'scrum') || boards[0]
-    console.log(`[jira] boards=${boards.length} -> boardId=${scrum?.id} type=${scrum?.type}`)
-    return scrum?.id || null
-  } catch (e) { console.log(`[jira] board error: ${e.message}`); return null }
-}
-
-// Crée (ou réutilise) de vrais Sprints Jira avec dates. Retourne { [sprintNum]: sprintId }.
-async function ensureSprints(accessToken, cloudId, boardId, plan, base) {
-  const byNum = {}
-  if (!boardId) return byNum
-  let existing = []
-  try {
-    const res = await agileFetch(accessToken, cloudId, `/board/${boardId}/sprint?maxResults=50`)
-    if (res.ok) existing = (await res.json()).values || []
-  } catch { /* pas de sprints listés → on tentera de créer */ }
-
-  for (const sprint of plan.roadmap?.sprints || []) {
-    const name = `Sprint ${sprint.sprintId}`
-    const found = existing.find(s => s.name === name)
-    if (found) { byNum[sprint.sprintId] = found.id; continue }
-    try {
-      const res = await agileFetch(accessToken, cloudId, '/sprint', {
-        method: 'POST',
-        body: JSON.stringify({
-          name,
-          startDate: isoDateTimePlusWeeks(base, (sprint.sprintId - 1) * 2),
-          endDate: isoDateTimePlusWeeks(base, sprint.sprintId * 2),
-          originBoardId: boardId,
-          goal: `${(sprint.stories || []).length} stories — ${sprint.estimatedCost} €`
-        })
-      })
-      if (res.ok) byNum[sprint.sprintId] = (await res.json()).id
-      else console.log(`[jira] sprint "${name}" create failed: ${res.status} ${(await res.text()).slice(0, 200)}`)
-    } catch (e) { console.log(`[jira] sprint create error: ${e.message}`) }
-  }
-  console.log(`[jira] sprints ready: ${Object.keys(byNum).length}`)
-  return byNum
-}
-
-// Range les issues dans leur sprint (batch de 50 max par appel Agile).
-async function assignIssuesToSprints(accessToken, cloudId, keysBySprint, sprintIdByNum) {
-  for (const [num, sprintId] of Object.entries(sprintIdByNum)) {
-    const keys = keysBySprint[num] || []
-    for (let i = 0; i < keys.length; i += 50) {
-      try {
-        const res = await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
-          method: 'POST',
-          body: JSON.stringify({ issues: keys.slice(i, i + 50) })
-        })
-        if (!res.ok) console.log(`[jira] assign to sprint ${sprintId} failed: ${res.status} ${(await res.text()).slice(0, 200)}`)
-      } catch (e) { console.log(`[jira] assign error: ${e.message}`) }
-    }
-  }
 }
 
 // ADF (Atlassian Document Format) minimal : un paragraphe par ligne non vide.
@@ -202,13 +111,11 @@ async function discoverFields(accessToken, cloudId) {
     if (!res.ok) return {}
     const fields = await res.json()
     const find = (re) => (fields.find(f => re.test(f.name)) || {}).id
-    const result = {
+    return {
       storyPoints: find(/story point estimate/i) || find(/story points?/i),
       startDate: find(/^start date$/i) || find(/start date/i) || find(/date de début/i)
     }
-    console.log(`[jira] fields: storyPoints=${result.storyPoints} startDate=${result.startDate}`)
-    return result
-  } catch (e) { console.log(`[jira] fields error: ${e.message}`); return {} }
+  } catch { return {} }
 }
 
 // Date au format YYYY-MM-DD, décalée de N semaines depuis la base (generatedAt). 2 semaines/sprint.
@@ -233,15 +140,14 @@ async function fetchManagedIssues(accessToken, cloudId, projectKey) {
       // Fallback ancien endpoint si le nouveau n'est pas dispo.
       res = await jiraFetch(accessToken, cloudId, `/search?jql=${encodeURIComponent(jql)}&maxResults=200&fields=labels`)
     }
-    if (!res.ok) { console.log(`[jira] search failed: ${res.status}`); return map }
+    if (!res.ok) return map
     const data = await res.json()
     for (const issue of data.issues || []) {
       for (const label of issue.fields?.labels || []) {
         if (label.startsWith('vl-id:') || label.startsWith('vl-epic:')) map[label] = issue.key
       }
     }
-    console.log(`[jira] managed issues found: ${Object.keys(map).length}`)
-  } catch (e) { console.log(`[jira] search error: ${e.message}`) }
+  } catch { /* pas de sync possible → tout sera créé */ }
   return map
 }
 
@@ -290,7 +196,6 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
   const { storyPoints: spField, startDate: startField } = await discoverFields(accessToken, cloudId)
   const managed = await fetchManagedIssues(accessToken, cloudId, projectKey)
   const myAccountId = await getMyAccountId(accessToken, cloudId)
-  const boardId = await getBoardId(accessToken, cloudId, projectKey)
   const base = plan.generatedAt
 
   // Dates du sprint (calendrier réel) : début = base + (n-1)*2 sem., échéance = base + n*2 sem.
@@ -308,12 +213,10 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
   let updated = 0
   const links = {} // vlId -> { key, url }
   const epicKeyBySprint = {}
-  const keysBySprint = {} // sprintNum -> [issueKeys] (pour l'assignation aux sprints)
 
   const browse = (key) => (siteUrl ? `${siteUrl}/browse/${key}` : null)
-  const track = (sprintNum, key) => { (keysBySprint[sprintNum] ||= []).push(key) }
 
-  // 1) Epics par phase (= lot de livraison avec budget ; les vrais Sprints Jira gèrent le temps)
+  // 1) Epics par phase (= lot de livraison, avec budget ; le regroupement par phase + label vl-sprint:N joue le rôle de sprint)
   for (const sprint of plan.roadmap?.sprints || []) {
     const epicLabel = `vl-epic:${sprint.sprintId}`
     const summary = `${lang === 'en' ? 'Phase' : 'Phase'} ${sprint.sprintId} — ${sprint.estimatedCost} €`
@@ -366,7 +269,6 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       if (existing) {
         await updateIssue(accessToken, cloudId, existing, baseFields)
         links[story.id] = { key: existing, url: browse(existing) }
-        track(sprint.sprintId, existing)
         updated++
         continue
       }
@@ -378,7 +280,6 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       try {
         const issue = await createIssue(accessToken, cloudId, createFields)
         links[story.id] = { key: issue.key, url: browse(issue.key) }
-        track(sprint.sprintId, issue.key)
         created++
       } catch (e) {
         // Le rattachement à l'Epic (parent) ou le champ story points peuvent être refusés selon le projet.
@@ -388,25 +289,19 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
         try {
           const issue = await createIssue(accessToken, cloudId, fallback)
           links[story.id] = { key: issue.key, url: browse(issue.key) }
-          track(sprint.sprintId, issue.key)
           created++
         } catch { /* on saute cette story sans casser l'export */ }
       }
     }
   }
 
-  // 3) Vrais Sprints Jira (dates réelles) + assignation des stories à leur sprint
-  const sprintIdByNum = await ensureSprints(accessToken, cloudId, boardId, plan, base)
-  await assignIssuesToSprints(accessToken, cloudId, keysBySprint, sprintIdByNum)
-
-  const boardUrl = resolveBoardUrl(siteUrl, projectKey, boardId, links)
+  const boardUrl = resolveBoardUrl(siteUrl, projectKey, links)
   return { created, updated, links, boardUrl, projectKey, siteUrl }
 }
 
-// URL fiable vers le board (id déjà récupéré). Fallbacks : board → 1er ticket → page projet.
-function resolveBoardUrl(siteUrl, projectKey, boardId, links) {
+// URL d'ouverture dans Jira : 1er ticket créé (fiable), sinon page projet.
+function resolveBoardUrl(siteUrl, projectKey, links) {
   if (!siteUrl) return null
-  if (boardId) return `${siteUrl}/jira/software/projects/${projectKey}/boards/${boardId}`
   const firstKey = Object.values(links)[0]?.key
   if (firstKey) return `${siteUrl}/browse/${firstKey}`
   return `${siteUrl}/jira/software/projects/${projectKey}/summary`
