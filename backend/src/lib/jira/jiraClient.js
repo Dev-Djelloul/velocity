@@ -18,6 +18,7 @@ const SCOPES = [
 // --- OAuth ---
 
 export function buildAuthorizeUrl(env, state) {
+  console.log(`[jira] authorize scopes: ${SCOPES}`)
   const params = new URLSearchParams({
     audience: 'api.atlassian.com',
     client_id: env.JIRA_CLIENT_ID,
@@ -124,7 +125,7 @@ function isoDateTimePlusWeeks(baseIso, weeks) {
 async function getBoardId(accessToken, cloudId, projectKey) {
   try {
     const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=5`)
-    if (!res.ok) { console.log(`[jira] board lookup failed: ${res.status}`); return null }
+    if (!res.ok) { console.log(`[jira] board lookup failed: ${res.status} — ${(await res.text()).slice(0, 300)}`); return null }
     const boards = (await res.json()).values || []
     const scrum = boards.find(b => b.type === 'scrum') || boards[0]
     console.log(`[jira] boards=${boards.length} -> boardId=${scrum?.id} type=${scrum?.type}`)
