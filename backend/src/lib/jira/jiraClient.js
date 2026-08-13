@@ -80,6 +80,91 @@ export async function listProjects(accessToken, cloudId) {
 
 // --- Export ---
 
+// Appel à l'API Agile (sprints, boards) : base différente de l'API REST v3.
+function agileFetch(accessToken, cloudId, path, options = {}) {
+  return fetch(`${API_BASE}/ex/jira/${cloudId}/rest/agile/1.0${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  })
+}
+
+// accountId de l'utilisateur connecté (pour l'auto-assignation).
+async function getMyAccountId(accessToken, cloudId) {
+  try {
+    const res = await jiraFetch(accessToken, cloudId, '/myself')
+    if (!res.ok) return null
+    return (await res.json()).accountId || null
+  } catch { return null }
+}
+
+// Datetime ISO complet décalé de N semaines (requis par l'API Agile pour les sprints).
+function isoDateTimePlusWeeks(baseIso, weeks) {
+  const d = baseIso ? new Date(baseIso) : new Date()
+  if (isNaN(d.getTime())) return null
+  d.setUTCDate(d.getUTCDate() + Math.round(weeks * 7))
+  return d.toISOString()
+}
+
+// Récupère l'id du board Scrum du projet.
+async function getBoardId(accessToken, cloudId, projectKey) {
+  try {
+    const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=1`)
+    if (!res.ok) return null
+    return (await res.json()).values?.[0]?.id || null
+  } catch { return null }
+}
+
+// Crée (ou réutilise) de vrais Sprints Jira avec dates. Retourne { [sprintNum]: sprintId }.
+async function ensureSprints(accessToken, cloudId, boardId, plan, base) {
+  const byNum = {}
+  if (!boardId) return byNum
+  let existing = []
+  try {
+    const res = await agileFetch(accessToken, cloudId, `/board/${boardId}/sprint?maxResults=50`)
+    if (res.ok) existing = (await res.json()).values || []
+  } catch { /* pas de sprints listés → on tentera de créer */ }
+
+  for (const sprint of plan.roadmap?.sprints || []) {
+    const name = `Sprint ${sprint.sprintId}`
+    const found = existing.find(s => s.name === name)
+    if (found) { byNum[sprint.sprintId] = found.id; continue }
+    try {
+      const res = await agileFetch(accessToken, cloudId, '/sprint', {
+        method: 'POST',
+        body: JSON.stringify({
+          name,
+          startDate: isoDateTimePlusWeeks(base, (sprint.sprintId - 1) * 2),
+          endDate: isoDateTimePlusWeeks(base, sprint.sprintId * 2),
+          originBoardId: boardId,
+          goal: `${(sprint.stories || []).length} stories — ${sprint.estimatedCost} €`
+        })
+      })
+      if (res.ok) byNum[sprint.sprintId] = (await res.json()).id
+    } catch { /* board non-scrum : on saute, les Epics font le regroupement */ }
+  }
+  return byNum
+}
+
+// Range les issues dans leur sprint (batch de 50 max par appel Agile).
+async function assignIssuesToSprints(accessToken, cloudId, keysBySprint, sprintIdByNum) {
+  for (const [num, sprintId] of Object.entries(sprintIdByNum)) {
+    const keys = keysBySprint[num] || []
+    for (let i = 0; i < keys.length; i += 50) {
+      try {
+        await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
+          method: 'POST',
+          body: JSON.stringify({ issues: keys.slice(i, i + 50) })
+        })
+      } catch { /* best-effort */ }
+    }
+  }
+}
+
 // ADF (Atlassian Document Format) minimal : un paragraphe par ligne non vide.
 function adf(text) {
   const lines = String(text || '').split('\n').filter(l => l.trim())
@@ -145,16 +230,39 @@ async function createIssue(accessToken, cloudId, fields) {
 
 async function updateIssue(accessToken, cloudId, key, fields) {
   const res = await jiraFetch(accessToken, cloudId, `/issue/${key}`, { method: 'PUT', body: JSON.stringify({ fields }) })
-  return res.ok
+  if (res.ok) return true
+  // Certains champs (priorité, assigné, start date, story points) peuvent être refusés selon le projet.
+  // On retente avec un sous-ensemble sûr pour ne jamais perdre la mise à jour.
+  const { priority, assignee, ...safe } = fields
+  const safe2 = { ...safe }
+  for (const k of Object.keys(safe2)) {
+    if (/^customfield_/.test(k)) delete safe2[k]
+  }
+  const res2 = await jiraFetch(accessToken, cloudId, `/issue/${key}`, { method: 'PUT', body: JSON.stringify({ fields: safe2 }) })
+  return res2.ok
 }
 
 const CATEGORY_LABELS = { product: 'produit', marketing: 'marketing', ops: 'ops' }
+
+// Priorité dérivée de l'ordre des sprints (les plus tôt = les plus urgents).
+function priorityForSprint(n) {
+  if (n <= 1) return 'High'
+  if (n <= 2) return 'Medium'
+  return 'Low'
+}
+
+// Étiquette de label sûre (Jira interdit les espaces).
+function labelize(prefix, value) {
+  return `${prefix}:${String(value || '').replace(/\s+/g, '-')}`
+}
 
 // Crée/met à jour les Epics (1/sprint) puis les Stories rattachées. Retourne la carte des liens.
 export async function exportPlanToJira(accessToken, target, plan, lang) {
   const { cloud_id: cloudId, site_url: siteUrl, project_key: projectKey } = target
   const { storyPoints: spField, startDate: startField } = await discoverFields(accessToken, cloudId)
   const managed = await fetchManagedIssues(accessToken, cloudId, projectKey)
+  const myAccountId = await getMyAccountId(accessToken, cloudId)
+  const boardId = await getBoardId(accessToken, cloudId, projectKey)
   const base = plan.generatedAt
 
   // Dates du sprint (calendrier réel) : début = base + (n-1)*2 sem., échéance = base + n*2 sem.
@@ -172,13 +280,15 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
   let updated = 0
   const links = {} // vlId -> { key, url }
   const epicKeyBySprint = {}
+  const keysBySprint = {} // sprintNum -> [issueKeys] (pour l'assignation aux sprints)
 
   const browse = (key) => (siteUrl ? `${siteUrl}/browse/${key}` : null)
+  const track = (sprintNum, key) => { (keysBySprint[sprintNum] ||= []).push(key) }
 
-  // 1) Epics par sprint
+  // 1) Epics par phase (= lot de livraison avec budget ; les vrais Sprints Jira gèrent le temps)
   for (const sprint of plan.roadmap?.sprints || []) {
     const epicLabel = `vl-epic:${sprint.sprintId}`
-    const summary = `${lang === 'en' ? 'Sprint' : 'Sprint'} ${sprint.sprintId} — ${sprint.estimatedCost} €`
+    const summary = `${lang === 'en' ? 'Phase' : 'Phase'} ${sprint.sprintId} — ${sprint.estimatedCost} €`
     const fields = withDates({
       project: { key: projectKey },
       summary: summary.slice(0, 240),
@@ -213,18 +323,22 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       const labels = ['velocitylaunch', vlLabel, `vl-sprint:${sprint.sprintId}`]
       const cat = CATEGORY_LABELS[story.category]
       if (cat) labels.push(cat)
+      if (story.assignee) labels.push(labelize('equipe', story.assignee)) // rôle / équipe concernée
 
       const baseFields = withDates({
         summary: `${story.id}: ${story.title}`.slice(0, 240),
         description: adf(descParts.join('')),
-        labels
+        labels,
+        priority: { name: priorityForSprint(sprint.sprintId) }
       }, sprint.sprintId)
       if (spField && Number.isFinite(story.effort)) baseFields[spField] = story.effort
+      if (myAccountId) baseFields.assignee = { accountId: myAccountId }
 
       const existing = managed[vlLabel]
       if (existing) {
         await updateIssue(accessToken, cloudId, existing, baseFields)
         links[story.id] = { key: existing, url: browse(existing) }
+        track(sprint.sprintId, existing)
         updated++
         continue
       }
@@ -236,6 +350,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       try {
         const issue = await createIssue(accessToken, cloudId, createFields)
         links[story.id] = { key: issue.key, url: browse(issue.key) }
+        track(sprint.sprintId, issue.key)
         created++
       } catch (e) {
         // Le rattachement à l'Epic (parent) ou le champ story points peuvent être refusés selon le projet.
@@ -245,31 +360,25 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
         try {
           const issue = await createIssue(accessToken, cloudId, fallback)
           links[story.id] = { key: issue.key, url: browse(issue.key) }
+          track(sprint.sprintId, issue.key)
           created++
         } catch { /* on saute cette story sans casser l'export */ }
       }
     }
   }
 
-  const boardUrl = await resolveBoardUrl(accessToken, cloudId, siteUrl, projectKey, links)
+  // 3) Vrais Sprints Jira (dates réelles) + assignation des stories à leur sprint
+  const sprintIdByNum = await ensureSprints(accessToken, cloudId, boardId, plan, base)
+  await assignIssuesToSprints(accessToken, cloudId, keysBySprint, sprintIdByNum)
+
+  const boardUrl = resolveBoardUrl(siteUrl, projectKey, boardId, links)
   return { created, updated, links, boardUrl, projectKey, siteUrl }
 }
 
-// Construit une URL fiable vers le board du projet. Le format dépend du type de projet
-// (team-managed vs company-managed) et requiert l'id du board, récupéré via l'API Agile.
-// Fallbacks successifs : board → 1er ticket créé → page projet.
-async function resolveBoardUrl(accessToken, cloudId, siteUrl, projectKey, links) {
+// URL fiable vers le board (id déjà récupéré). Fallbacks : board → 1er ticket → page projet.
+function resolveBoardUrl(siteUrl, projectKey, boardId, links) {
   if (!siteUrl) return null
-  try {
-    const res = await fetch(`${API_BASE}/ex/jira/${cloudId}/rest/agile/1.0/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=1`, {
-      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' }
-    })
-    if (res.ok) {
-      const data = await res.json()
-      const board = data.values?.[0]
-      if (board?.id) return `${siteUrl}/jira/software/projects/${projectKey}/boards/${board.id}`
-    }
-  } catch { /* on tombe sur un fallback */ }
+  if (boardId) return `${siteUrl}/jira/software/projects/${projectKey}/boards/${boardId}`
   const firstKey = Object.values(links)[0]?.key
   if (firstKey) return `${siteUrl}/browse/${firstKey}`
   return `${siteUrl}/jira/software/projects/${projectKey}/summary`
