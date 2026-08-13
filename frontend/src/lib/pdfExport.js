@@ -252,60 +252,132 @@ export async function exportPPTX(plan, lang) {
   pptx.defineLayout({ name: 'VL', width: 10, height: 5.63 })
   pptx.layout = 'VL'
 
-  const titleSlide = pptx.addSlide()
-  titleSlide.background = { color: BRAND_DARK }
-  titleSlide.addText(plan.product?.name || 'Launch Plan', { x: 0.5, y: 1.8, w: 9, h: 1, fontSize: 32, bold: true, color: 'FFFFFF' })
-  titleSlide.addText(plan.classification || '', { x: 0.5, y: 2.7, w: 9, h: 0.6, fontSize: 16, color: BRAND_VIOLET })
-  titleSlide.addText(plan.product?.pitch || '', { x: 0.5, y: 3.3, w: 9, h: 1, fontSize: 12, color: 'C2C3C9' })
-  titleSlide.addText('VelocityLaunch', { x: 0.5, y: 5.2, w: 4, h: 0.3, fontSize: 9, color: BRAND_VIOLET, bold: true })
+  const en = lang === 'en'
+  const BRAND_GRAY = 'C2C3C9'
+  const BRAND_CARD = '1E2530'
 
-  if (plan.executiveSummary) {
-    const s = pptx.addSlide()
+  // En-tête de section réutilisable : barre d'accent + titre + pied de page marque
+  const header = (s, title) => {
     s.background = { color: BRAND_DARK }
-    s.addText(t(lang, 'outputs.executiveSummary'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
-    s.addText(plan.executiveSummary, { x: 0.5, y: 1.3, w: 9, h: 3.5, fontSize: 14, color: 'FFFFFF', italic: true })
+    s.addShape(pptx.ShapeType.rect, { x: 0.5, y: 0.48, w: 0.1, h: 0.5, fill: { color: BRAND_VIOLET } })
+    s.addText(title, { x: 0.72, y: 0.4, w: 8.6, h: 0.65, fontSize: 22, bold: true, color: 'FFFFFF' })
+    s.addText('VelocityLaunch', { x: 6.5, y: 5.28, w: 3, h: 0.25, fontSize: 8, color: BRAND_VIOLET, bold: true, align: 'right' })
+  }
+  const bullets = (items) => items.filter(Boolean).map(text => ({ text, options: { bullet: { code: '2022' }, color: 'FFFFFF', fontSize: 13, paraSpaceAfter: 8 } }))
+  const brandTable = (s, head, rows, colW) => s.addTable(
+    [
+      head.map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10, fill: { color: BRAND_CARD } } })),
+      ...rows.map(r => r.map(text => ({ text: String(text), options: { color: 'FFFFFF', fontSize: 9 } })))
+    ],
+    { x: 0.5, y: 1.25, w: 9, colW, border: { type: 'solid', color: '2C3340', pt: 0.5 }, rowH: 0.3, valign: 'middle' }
+  )
+
+  // 1. Couverture
+  const cover = pptx.addSlide()
+  cover.background = { color: BRAND_DARK }
+  cover.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.18, h: 5.63, fill: { color: BRAND_VIOLET } })
+  cover.addText(plan.product?.name || 'Launch Plan', { x: 0.6, y: 1.7, w: 8.8, h: 1, fontSize: 36, bold: true, color: 'FFFFFF' })
+  cover.addText(plan.classification || '', { x: 0.6, y: 2.65, w: 8.8, h: 0.5, fontSize: 15, color: BRAND_VIOLET, bold: true })
+  cover.addText(plan.product?.pitch || '', { x: 0.6, y: 3.2, w: 8.8, h: 1, fontSize: 13, color: BRAND_GRAY })
+  if (plan.product?.usp) cover.addText(`${en ? 'USP' : 'USP'} — ${plan.product.usp}`, { x: 0.6, y: 4.2, w: 8.8, h: 0.5, fontSize: 11, color: 'FFFFFF', italic: true })
+  cover.addText('VelocityLaunch', { x: 0.6, y: 5.1, w: 4, h: 0.3, fontSize: 10, color: BRAND_VIOLET, bold: true })
+
+  // 2. Le problème (persona)
+  if (plan.persona) {
+    const s = pptx.addSlide()
+    header(s, en ? 'The problem' : 'Le problème')
+    if (plan.persona.name || plan.persona.title) {
+      s.addText(`${plan.persona.name || ''}${plan.persona.title ? ' — ' + plan.persona.title : ''}`, { x: 0.5, y: 1.2, w: 9, h: 0.4, fontSize: 13, bold: true, color: BRAND_VIOLET })
+    }
+    if (plan.persona.quote) s.addText(`" ${plan.persona.quote} "`, { x: 0.5, y: 1.65, w: 9, h: 0.7, fontSize: 13, italic: true, color: BRAND_GRAY })
+    s.addText(bullets(plan.persona.painPoints || []), { x: 0.6, y: 2.5, w: 8.8, h: 2.5 })
   }
 
-  const roadmapSlide = pptx.addSlide()
-  roadmapSlide.background = { color: BRAND_DARK }
-  roadmapSlide.addText(t(lang, 'outputs.roadmap'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
-  roadmapSlide.addTable(
-    [
-      [t(lang, 'outputs.sprint'), t(lang, 'outputs.summary'), t(lang, 'outputs.estimatedCostEur')].map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10 } })),
-      ...plan.roadmap.sprints.map(sp => [
-        { text: `${sp.sprintId}` },
-        { text: sp.stories.map(s => s.title).join(', ') },
-        { text: `${sp.estimatedCost} €` }
-      ].map(cell => ({ ...cell, options: { color: 'FFFFFF', fontSize: 9 } })))
-    ],
-    { x: 0.5, y: 1.2, w: 9, colW: [1, 6, 2], border: { type: 'solid', color: BRAND_VIOLET, pt: 0.5 } }
-  )
+  // 3. La solution
+  const sol = pptx.addSlide()
+  header(sol, en ? 'The solution' : 'La solution')
+  sol.addText(plan.product?.pitch || '', { x: 0.5, y: 1.3, w: 9, h: 1.2, fontSize: 15, color: 'FFFFFF' })
+  if (plan.product?.usp) {
+    sol.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 2.8, w: 9, h: 1.1, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.08 })
+    sol.addText(en ? 'What sets us apart' : 'Ce qui nous différencie', { x: 0.8, y: 2.95, w: 8.4, h: 0.35, fontSize: 11, bold: true, color: BRAND_VIOLET })
+    sol.addText(plan.product.usp, { x: 0.8, y: 3.3, w: 8.4, h: 0.5, fontSize: 13, color: 'FFFFFF' })
+  }
 
-  const marketingSlide = pptx.addSlide()
-  marketingSlide.background = { color: BRAND_DARK }
-  marketingSlide.addText(t(lang, 'outputs.marketing'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
-  marketingSlide.addTable(
-    [
-      [t(lang, 'outputs.channel'), t(lang, 'outputs.estimatedCostEur'), t(lang, 'outputs.goal')].map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10 } })),
-      ...plan.marketing.channels.map(ch => [
-        { text: ch.name }, { text: `${ch.budget} €` }, { text: ch.goal }
-      ].map(cell => ({ ...cell, options: { color: 'FFFFFF', fontSize: 9 } })))
-    ],
-    { x: 0.5, y: 1.2, w: 9, colW: [2, 2, 5], border: { type: 'solid', color: BRAND_VIOLET, pt: 0.5 } }
-  )
+  // 4. Marché cible
+  if (plan.persona || plan.market) {
+    const s = pptx.addSlide()
+    header(s, en ? 'Target market' : 'Marché cible')
+    const rows = [
+      plan.persona?.title && [en ? 'Profile' : 'Profil', plan.persona.title],
+      plan.market?.segment && [en ? 'Segment' : 'Segment', plan.market.segment],
+      plan.persona?.preferredChannel && [en ? 'Preferred channel' : 'Canal privilégié', plan.persona.preferredChannel],
+      plan.persona?.context && [en ? 'Context' : 'Contexte', plan.persona.context]
+    ].filter(Boolean)
+    if (rows.length) brandTable(s, [en ? 'Dimension' : 'Dimension', ''], rows, [3, 6])
+    if (plan.persona?.buyingTrigger) s.addText(`${en ? 'Buying trigger' : 'Déclencheur d\'achat'} : ${plan.persona.buyingTrigger}`, { x: 0.5, y: 4.4, w: 9, h: 0.6, fontSize: 11, italic: true, color: BRAND_GRAY })
+  }
 
-  const kpiSlide = pptx.addSlide()
-  kpiSlide.background = { color: BRAND_DARK }
-  kpiSlide.addText(t(lang, 'outputs.kpis'), { x: 0.5, y: 0.4, w: 9, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET })
-  kpiSlide.addTable(
-    [
-      [t(lang, 'outputs.name'), t(lang, 'outputs.target'), t(lang, 'outputs.unit')].map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10 } })),
-      ...plan.kpis.map(k => [
-        { text: k.name }, { text: `${k.target ?? '—'}` }, { text: k.unit }
-      ].map(cell => ({ ...cell, options: { color: 'FFFFFF', fontSize: 9 } })))
-    ],
-    { x: 0.5, y: 1.2, w: 9, colW: [4, 3, 2], border: { type: 'solid', color: BRAND_VIOLET, pt: 0.5 } }
-  )
+  // 5. Roadmap
+  if (plan.roadmap?.sprints?.length) {
+    const s = pptx.addSlide()
+    header(s, t(lang, 'outputs.roadmap'))
+    brandTable(s,
+      [t(lang, 'outputs.sprint'), t(lang, 'outputs.summary'), t(lang, 'outputs.estimatedCostEur')],
+      plan.roadmap.sprints.map(sp => [sp.sprintId, sp.stories.map(x => x.title).join(', '), `${sp.estimatedCost} €`]),
+      [1, 6, 2]
+    )
+  }
+
+  // 6. Go-to-market
+  if (plan.marketing?.channels?.length) {
+    const s = pptx.addSlide()
+    header(s, `${t(lang, 'outputs.marketing')} — ${plan.marketing.totalBudget} €`)
+    brandTable(s,
+      [t(lang, 'outputs.channel'), t(lang, 'outputs.estimatedCostEur'), t(lang, 'outputs.goal')],
+      plan.marketing.channels.map(ch => [ch.name, `${ch.budget} €`, ch.goal]),
+      [2, 2, 5]
+    )
+  }
+
+  // 7. KPIs
+  if (plan.kpis?.length) {
+    const s = pptx.addSlide()
+    header(s, t(lang, 'outputs.kpis'))
+    brandTable(s,
+      [t(lang, 'outputs.name'), t(lang, 'outputs.target'), t(lang, 'outputs.unit')],
+      plan.kpis.map(k => [k.name, k.target ?? '—', k.unit || '']),
+      [4, 3, 2]
+    )
+  }
+
+  // 8. Finances (panneaux + répartition)
+  if (plan.financials) {
+    const f = plan.financials
+    const s = pptx.addSlide()
+    header(s, t(lang, 'outputs.financials.title'))
+    const stats = [
+      [`${f.monthlyBurn} €`, t(lang, 'outputs.financials.monthlyBurn')],
+      [`${f.runwayMonths} ${t(lang, 'outputs.financials.months')}`, t(lang, 'outputs.financials.runway')],
+      [`${f.breakEvenUsers}`, t(lang, 'outputs.financials.breakEven')]
+    ]
+    stats.forEach(([value, label], i) => {
+      const x = 0.5 + i * 3.05
+      s.addShape(pptx.ShapeType.roundRect, { x, y: 1.3, w: 2.8, h: 1.3, fill: { color: BRAND_CARD }, line: { color: '2C3340', width: 1 }, rectRadius: 0.08 })
+      s.addText(value, { x, y: 1.5, w: 2.8, h: 0.6, fontSize: 22, bold: true, color: BRAND_VIOLET, align: 'center' })
+      s.addText(label, { x, y: 2.1, w: 2.8, h: 0.4, fontSize: 10, color: BRAND_GRAY, align: 'center' })
+    })
+    if (f.costBreakdown?.length) {
+      s.addText(bullets(f.costBreakdown.map(l => `${l.category}: ${l.amount} € (${l.pct}%)`)), { x: 0.6, y: 3, w: 8.8, h: 2 })
+    }
+  }
+
+  // 9. Clôture
+  const closing = pptx.addSlide()
+  closing.background = { color: BRAND_DARK }
+  closing.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.18, h: 5.63, fill: { color: BRAND_VIOLET } })
+  closing.addText(en ? 'Ready to launch' : 'Prêt à lancer', { x: 0.6, y: 2.2, w: 8.8, h: 0.9, fontSize: 30, bold: true, color: 'FFFFFF' })
+  closing.addText(plan.product?.name ? `${plan.product.name} — ${plan.classification || ''}` : '', { x: 0.6, y: 3.1, w: 8.8, h: 0.5, fontSize: 14, color: BRAND_VIOLET })
+  closing.addText(en ? 'Generated with VelocityLaunch' : 'Généré avec VelocityLaunch', { x: 0.6, y: 5.1, w: 5, h: 0.3, fontSize: 10, color: BRAND_GRAY })
 
   await pptx.writeFile({ fileName: `${slug(plan.product?.name)}-pitch-deck.pptx` })
 }

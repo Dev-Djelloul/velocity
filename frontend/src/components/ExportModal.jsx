@@ -3,7 +3,6 @@ import { t } from '../lib/i18n'
 import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../lib/pdfExport'
 import { exportGithubIssues, exportJira } from '../lib/issueExport'
 import { notionExport, notionAuthorizeUrl, notionStatus } from '../lib/serverStorage'
-import { IconSparkle } from './Icons'
 import '../styles/ExportModal.css'
 
 export default function ExportModal({ plan, lang, userId, onClose, captureRef }) {
@@ -85,13 +84,17 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef })
           <button className="btn-primary" onClick={() => exportCSV(plan, lang)}>{t(lang, 'export.csv')}</button>
           <button className="btn-secondary" onClick={() => exportJSON(plan)}>{t(lang, 'export.json')}</button>
           <button className="btn-secondary" onClick={() => exportImage(captureRef?.current, plan)}>{t(lang, 'export.image')}</button>
-          <button className="btn-secondary" onClick={() => exportGithubIssues(plan)}>{t(lang, 'export.github')}</button>
+          <button className="btn-secondary export-btn-with-icon" onClick={() => exportGithubIssues(plan)}>
+            <img className="export-btn-icon" src="/assets/icons/icons8-github-logo-32.png" alt="" aria-hidden="true" />
+            {t(lang, 'export.github')}
+          </button>
           <button className="btn-secondary" onClick={() => exportJira(plan)}>{t(lang, 'export.jira')}</button>
         </div>
 
         <div className="export-notion">
           <button className="btn-notion" onClick={handleNotion} disabled={notionState === 'working' || notionState === 'connecting'}>
-            <IconSparkle width={15} height={15} /> {notionLabel}
+            <img className="btn-notion-icon" src="/assets/icons/icons8-notion-32.png" alt="" aria-hidden="true" />
+            {notionLabel}
           </button>
           {notionState === 'done' && notionUrl && (
             <a className="export-notion-link" href={notionUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.notionOpen')}</a>
