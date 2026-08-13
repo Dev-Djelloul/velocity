@@ -227,6 +227,26 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
     }
   }
 
-  const boardUrl = siteUrl ? `${siteUrl}/jira/software/projects/${projectKey}/boards` : null
+  const boardUrl = await resolveBoardUrl(accessToken, cloudId, siteUrl, projectKey, links)
   return { created, updated, links, boardUrl, projectKey, siteUrl }
+}
+
+// Construit une URL fiable vers le board du projet. Le format dépend du type de projet
+// (team-managed vs company-managed) et requiert l'id du board, récupéré via l'API Agile.
+// Fallbacks successifs : board → 1er ticket créé → page projet.
+async function resolveBoardUrl(accessToken, cloudId, siteUrl, projectKey, links) {
+  if (!siteUrl) return null
+  try {
+    const res = await fetch(`${API_BASE}/ex/jira/${cloudId}/rest/agile/1.0/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=1`, {
+      headers: { Authorization: `Bearer ${accessToken}`, Accept: 'application/json' }
+    })
+    if (res.ok) {
+      const data = await res.json()
+      const board = data.values?.[0]
+      if (board?.id) return `${siteUrl}/jira/software/projects/${projectKey}/boards/${board.id}`
+    }
+  } catch { /* on tombe sur un fallback */ }
+  const firstKey = Object.values(links)[0]?.key
+  if (firstKey) return `${siteUrl}/browse/${firstKey}`
+  return `${siteUrl}/jira/software/projects/${projectKey}/summary`
 }
