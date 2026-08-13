@@ -113,10 +113,13 @@ function isoDateTimePlusWeeks(baseIso, weeks) {
 // Récupère l'id du board Scrum du projet.
 async function getBoardId(accessToken, cloudId, projectKey) {
   try {
-    const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=1`)
-    if (!res.ok) return null
-    return (await res.json()).values?.[0]?.id || null
-  } catch { return null }
+    const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=5`)
+    if (!res.ok) { console.log(`[jira] board lookup failed: ${res.status}`); return null }
+    const boards = (await res.json()).values || []
+    const scrum = boards.find(b => b.type === 'scrum') || boards[0]
+    console.log(`[jira] boards=${boards.length} -> boardId=${scrum?.id} type=${scrum?.type}`)
+    return scrum?.id || null
+  } catch (e) { console.log(`[jira] board error: ${e.message}`); return null }
 }
 
 // Crée (ou réutilise) de vrais Sprints Jira avec dates. Retourne { [sprintNum]: sprintId }.
@@ -145,8 +148,10 @@ async function ensureSprints(accessToken, cloudId, boardId, plan, base) {
         })
       })
       if (res.ok) byNum[sprint.sprintId] = (await res.json()).id
-    } catch { /* board non-scrum : on saute, les Epics font le regroupement */ }
+      else console.log(`[jira] sprint "${name}" create failed: ${res.status} ${(await res.text()).slice(0, 200)}`)
+    } catch (e) { console.log(`[jira] sprint create error: ${e.message}`) }
   }
+  console.log(`[jira] sprints ready: ${Object.keys(byNum).length}`)
   return byNum
 }
 
@@ -156,11 +161,12 @@ async function assignIssuesToSprints(accessToken, cloudId, keysBySprint, sprintI
     const keys = keysBySprint[num] || []
     for (let i = 0; i < keys.length; i += 50) {
       try {
-        await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
+        const res = await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
           method: 'POST',
           body: JSON.stringify({ issues: keys.slice(i, i + 50) })
         })
-      } catch { /* best-effort */ }
+        if (!res.ok) console.log(`[jira] assign to sprint ${sprintId} failed: ${res.status} ${(await res.text()).slice(0, 200)}`)
+      } catch (e) { console.log(`[jira] assign error: ${e.message}`) }
     }
   }
 }
@@ -185,11 +191,13 @@ async function discoverFields(accessToken, cloudId) {
     if (!res.ok) return {}
     const fields = await res.json()
     const find = (re) => (fields.find(f => re.test(f.name)) || {}).id
-    return {
+    const result = {
       storyPoints: find(/story point estimate/i) || find(/story points?/i),
-      startDate: find(/^start date$/i) || find(/start date/i)
+      startDate: find(/^start date$/i) || find(/start date/i) || find(/date de début/i)
     }
-  } catch { return {} }
+    console.log(`[jira] fields: storyPoints=${result.storyPoints} startDate=${result.startDate}`)
+    return result
+  } catch (e) { console.log(`[jira] fields error: ${e.message}`); return {} }
 }
 
 // Date au format YYYY-MM-DD, décalée de N semaines depuis la base (generatedAt). 2 semaines/sprint.
@@ -203,17 +211,26 @@ function isoDatePlusWeeks(baseIso, weeks) {
 // Récupère les issues déjà créées par VelocityLaunch dans ce projet, indexées par leur label vl-id / vl-epic.
 async function fetchManagedIssues(accessToken, cloudId, projectKey) {
   const map = {}
+  const jql = `project = "${projectKey}" AND labels = velocitylaunch ORDER BY created ASC`
   try {
-    const jql = encodeURIComponent(`project = "${projectKey}" AND labels = velocitylaunch ORDER BY created ASC`)
-    const res = await jiraFetch(accessToken, cloudId, `/search?jql=${jql}&maxResults=200&fields=labels`)
-    if (!res.ok) return map
+    // Nouvel endpoint de recherche (l'ancien /search est déprécié par Atlassian).
+    let res = await jiraFetch(accessToken, cloudId, '/search/jql', {
+      method: 'POST',
+      body: JSON.stringify({ jql, maxResults: 200, fields: ['labels'] })
+    })
+    if (!res.ok) {
+      // Fallback ancien endpoint si le nouveau n'est pas dispo.
+      res = await jiraFetch(accessToken, cloudId, `/search?jql=${encodeURIComponent(jql)}&maxResults=200&fields=labels`)
+    }
+    if (!res.ok) { console.log(`[jira] search failed: ${res.status}`); return map }
     const data = await res.json()
     for (const issue of data.issues || []) {
       for (const label of issue.fields?.labels || []) {
         if (label.startsWith('vl-id:') || label.startsWith('vl-epic:')) map[label] = issue.key
       }
     }
-  } catch { /* pas de sync possible → tout sera créé */ }
+    console.log(`[jira] managed issues found: ${Object.keys(map).length}`)
+  } catch (e) { console.log(`[jira] search error: ${e.message}`) }
   return map
 }
 
