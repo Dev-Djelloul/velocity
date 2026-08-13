@@ -19,10 +19,84 @@
   text-align: center;
 }
 
-.modal h3 { color: var(--color-text-primary); margin-bottom: 1rem; }
-.modal-actions { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 1rem; }
-.close-btn { width: 100%; }
+/* Dégradé wordmark VelocityLaunch, réutilisé sur tous les boutons du modal */
+.export-modal {
+  --vl-gradient: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+}
 
+.export-modal h3 {
+  background: var(--vl-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+/* Boutons "primaires" (PDF, PPTX, CSV) : fond dégradé plein */
+.export-modal .modal-actions .btn-primary {
+  background: var(--vl-gradient);
+  border: none;
+  color: #0a0c12;
+  font-weight: 700;
+  padding: 0.75rem 1rem;
+  border-radius: var(--radius-lg, 10px);
+  box-shadow: 0 6px 18px rgba(99, 102, 241, 0.28);
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+.export-modal .modal-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow: 0 10px 26px rgba(99, 102, 241, 0.4);
+}
+
+/* Boutons "secondaires" (JSON, PNG, GitHub, Jira) : bordure dégradée sur fond sombre */
+.export-modal .modal-actions .btn-secondary {
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-lg, 10px);
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-secondary, #1a1f2b), var(--color-bg-secondary, #1a1f2b)) padding-box,
+    var(--vl-gradient) border-box;
+  color: var(--color-text-primary, #fff);
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.export-modal .modal-actions .btn-secondary:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+/* Bouton "Fermer" : sobre pour rester neutre */
+.export-modal .close-btn {
+  width: 100%;
+  padding: 0.55rem 1rem;
+  border-radius: var(--radius-lg, 10px);
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--color-text-muted, #9ca3af);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.export-modal .close-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--color-text-primary, #fff);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* Section Notion */
 .export-notion {
   display: flex;
   flex-direction: column;
@@ -32,25 +106,34 @@
   border-top: 1px solid rgba(145, 132, 217, 0.2);
 }
 
+/* Bouton Notion : bordure dégradée + léger halo de couleur */
 .btn-notion {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.45rem;
+  gap: 0.5rem;
   width: 100%;
-  padding: 0.7rem 1rem;
+  padding: 0.75rem 1rem;
   border-radius: var(--radius-lg, 10px);
-  background: rgba(145, 132, 217, 0.12);
-  border: 1px solid rgba(145, 132, 217, 0.4);
-  color: var(--color-primary, #9184d9);
-  font-weight: 600;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-secondary, #1a1f2b), var(--color-bg-secondary, #1a1f2b)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  color: #fff;
+  font-weight: 700;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: filter 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
 .btn-notion:hover:not(:disabled) {
-  background: rgba(145, 132, 217, 0.22);
-  border-color: var(--color-primary, #9184d9);
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+  box-shadow: 0 8px 22px rgba(99, 102, 241, 0.3);
+}
+
+.btn-notion:disabled {
+  opacity: 0.7;
+  cursor: default;
 }
 
 .btn-notion-icon {
@@ -74,14 +157,12 @@
   flex-shrink: 0;
 }
 
-.btn-notion:disabled {
-  opacity: 0.7;
-  cursor: default;
-}
-
 .export-notion-link {
-  color: var(--color-primary, #9184d9);
-  font-weight: 600;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-weight: 700;
   font-size: 0.85rem;
   text-align: center;
   text-decoration: none;

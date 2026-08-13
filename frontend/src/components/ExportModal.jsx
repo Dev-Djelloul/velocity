@@ -76,7 +76,7 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef })
 
   return (
     <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal card" onClick={e => e.stopPropagation()}>
+      <div className="modal card export-modal" onClick={e => e.stopPropagation()}>
         <h3>{t(lang, 'export.title')}</h3>
         <div className="modal-actions">
           <button className="btn-primary" onClick={() => exportPDF(plan, lang)}>{t(lang, 'export.pdf')}</button>
