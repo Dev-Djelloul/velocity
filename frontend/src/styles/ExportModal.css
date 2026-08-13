@@ -96,18 +96,27 @@
   border-color: rgba(255, 255, 255, 0.25);
 }
 
-/* Section Notion */
-.export-notion {
+/* Section Intégrations (Notion, Jira) */
+.export-integrations {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
   margin-bottom: 1rem;
   padding-top: 0.85rem;
   border-top: 1px solid rgba(145, 132, 217, 0.2);
 }
 
-/* Bouton Notion : bordure dégradée + léger halo de couleur */
-.btn-notion {
+.export-integrations-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted, #9ca3af);
+  text-align: left;
+}
+
+/* Boutons d'intégration : bordure dégradée + halo de couleur au hover */
+.btn-integration {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -125,15 +134,55 @@
   transition: filter 0.2s ease, transform 0.15s ease, box-shadow 0.2s ease;
 }
 
-.btn-notion:hover:not(:disabled) {
+.btn-integration:hover:not(:disabled) {
   filter: brightness(1.15);
   transform: translateY(-1px);
   box-shadow: 0 8px 22px rgba(99, 102, 241, 0.3);
 }
 
-.btn-notion:disabled {
+.btn-integration:disabled {
   opacity: 0.7;
   cursor: default;
+}
+
+/* Sélecteur de projet Jira */
+.jira-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  border-radius: var(--radius-lg, 10px);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(145, 132, 217, 0.2);
+}
+
+.jira-picker-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  text-align: left;
+}
+
+.jira-picker-field span {
+  font-size: 0.72rem;
+  color: var(--color-text-muted, #9ca3af);
+  font-weight: 600;
+}
+
+.jira-picker-field select {
+  padding: 0.5rem 0.6rem;
+  border-radius: 8px;
+  background: var(--color-bg-primary, #0f1319);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--color-text-primary, #fff);
+  font-family: inherit;
+  font-size: 0.85rem;
+}
+
+.jira-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .btn-notion-icon {

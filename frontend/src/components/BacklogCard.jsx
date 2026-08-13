@@ -3,7 +3,7 @@ import { t } from '../lib/i18n'
 import { IconClipboard, IconCheckCircle, IconCircleDot, IconUser, IconCoin, IconTarget } from './Icons'
 import '../styles/BacklogCard.css'
 
-export default function BacklogCard({ roadmap, lang, onRoadmapChange }) {
+export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [search, setSearch] = useState('')
@@ -99,6 +99,11 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange }) {
             <span className="backlog-meta"><IconTarget width={12} height={12} /> {story.effort}pts</span>
             <span className="backlog-meta"><IconUser width={12} height={12} /> {story.assignee}</span>
             <span className="backlog-meta"><IconCoin width={12} height={12} /> {story.cost}€</span>
+            {jira?.links?.[story.id]?.url && (
+              <a className="backlog-jira-link" href={jira.links[story.id].url} target="_blank" rel="noopener noreferrer" title={jira.links[story.id].key}>
+                <img src="/assets/icons/icons8-jira-32.png" alt="Jira" width={13} height={13} /> {jira.links[story.id].key}
+              </a>
+            )}
             <select
               className="backlog-sprint-select"
               value={story.sprintId}

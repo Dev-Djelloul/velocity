@@ -137,6 +137,34 @@ export function notionExport(userId, plan, lang) {
   })
 }
 
+export function jiraStatus(userId) {
+  return safeFetch(`/jira/status?userId=${encodeURIComponent(userId)}`)
+}
+
+export function jiraAuthorizeUrl(userId) {
+  return safeFetch(`/jira/authorize-url?userId=${encodeURIComponent(userId)}`)
+}
+
+export function jiraProjects(userId) {
+  return safeFetch(`/jira/projects?userId=${encodeURIComponent(userId)}`)
+}
+
+export function jiraSelect(userId, target) {
+  return safeFetch('/jira/select', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, ...target })
+  })
+}
+
+export function jiraExport(userId, plan, lang) {
+  return safeFetch('/jira/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
 export function enqueueAgentTask(planId, userId, type, input) {
   return safeFetch('/agents/enqueue', {
     method: 'POST',

@@ -14,6 +14,7 @@ import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
 import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage } from '../lib/notion/notionClient'
+import * as jira from '../lib/jira/jiraClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
 
@@ -218,6 +219,90 @@ export async function handleApi(request, env, url) {
     } catch (e) {
       if (String(e.message).includes('no_parent')) return json({ error: 'no_parent' }, 400)
       return json({ error: 'export_failed' }, 500)
+    }
+  }
+
+  // --- Intégration Jira (OAuth 3LO + création Epics/Stories) ---
+
+  if (pathname === '/jira/status' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getJiraToken(env, userId)
+    return json({
+      connected: !!token,
+      site: token?.site_name || null,
+      project: token?.project_key ? { key: token.project_key, name: token.project_name } : null
+    })
+  }
+
+  if (pathname === '/jira/authorize-url' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    if (!env.JIRA_CLIENT_ID) return json({ error: 'jira_not_configured' }, 500)
+    return json({ url: jira.buildAuthorizeUrl(env, userId) })
+  }
+
+  if (pathname === '/jira/callback' && method === 'GET') {
+    const code = searchParams.get('code')
+    const state = searchParams.get('state') // = userId
+    const appUrl = env.APP_URL || '/'
+    if (!code || !state) return Response.redirect(`${appUrl}?jira=error`, 302)
+    try {
+      const tokenData = await jira.exchangeCode(env, code)
+      await db.saveJiraToken(env, state, tokenData)
+      return Response.redirect(`${appUrl}?jira=connected`, 302)
+    } catch {
+      return Response.redirect(`${appUrl}?jira=error`, 302)
+    }
+  }
+
+  if (pathname === '/jira/disconnect' && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteJiraToken(env, userId)
+    return json({ ok: true })
+  }
+
+  // Liste les sites + projets accessibles, pour que l'utilisateur choisisse sa cible.
+  if (pathname === '/jira/projects' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getJiraToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    try {
+      const accessToken = await jira.ensureAccessToken(env, userId, token)
+      const sites = await jira.listAccessibleResources(accessToken)
+      const result = []
+      for (const site of sites) {
+        const projects = await jira.listProjects(accessToken, site.id)
+        result.push({ cloudId: site.id, siteUrl: site.url, siteName: site.name, projects })
+      }
+      return json({ sites: result })
+    } catch {
+      return json({ error: 'jira_projects_failed' }, 500)
+    }
+  }
+
+  // Mémorise le site + projet choisis.
+  if (pathname === '/jira/select' && method === 'POST') {
+    const { userId, cloudId, siteUrl, siteName, projectKey, projectName } = await request.json()
+    if (!userId || !cloudId || !projectKey) return json({ error: 'userId, cloudId and projectKey required' }, 400)
+    await db.setJiraTarget(env, userId, { cloudId, siteUrl, siteName, projectKey, projectName })
+    return json({ ok: true })
+  }
+
+  if (pathname === '/jira/export' && method === 'POST') {
+    const { userId, plan, lang } = await request.json()
+    if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    const token = await db.getJiraToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    if (!token.project_key) return json({ needsProject: true })
+    try {
+      const accessToken = await jira.ensureAccessToken(env, userId, token)
+      const result = await jira.exportPlanToJira(accessToken, token, plan, lang || 'fr')
+      return json(result)
+    } catch {
+      return json({ error: 'jira_export_failed' }, 500)
     }
   }
 

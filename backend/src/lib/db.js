@@ -174,3 +174,37 @@ export async function getNotionToken(env, userId) {
 export async function deleteNotionToken(env, userId) {
   await env.DB.prepare('DELETE FROM notion_tokens WHERE user_id = ?').bind(userId).run()
 }
+
+// --- Jetons OAuth Jira/Atlassian ---
+
+// Écrit/écrase le token après OAuth (cloud/projet non encore choisis à ce stade).
+export async function saveJiraToken(env, userId, { accessToken, refreshToken, expiresAt }) {
+  await env.DB.prepare(
+    `INSERT INTO jira_tokens (user_id, access_token, refresh_token, expires_at, created_at)
+     VALUES (?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET access_token = excluded.access_token,
+       refresh_token = excluded.refresh_token, expires_at = excluded.expires_at, created_at = datetime('now')`
+  ).bind(userId, accessToken, refreshToken, expiresAt).run()
+}
+
+// Met à jour uniquement les tokens (après un refresh), sans toucher au site/projet choisi.
+export async function updateJiraTokens(env, userId, { accessToken, refreshToken, expiresAt }) {
+  await env.DB.prepare(
+    'UPDATE jira_tokens SET access_token = ?, refresh_token = ?, expires_at = ? WHERE user_id = ?'
+  ).bind(accessToken, refreshToken, expiresAt, userId).run()
+}
+
+// Mémorise le site + projet Jira sélectionnés par l'utilisateur.
+export async function setJiraTarget(env, userId, { cloudId, siteUrl, siteName, projectKey, projectName }) {
+  await env.DB.prepare(
+    `UPDATE jira_tokens SET cloud_id = ?, site_url = ?, site_name = ?, project_key = ?, project_name = ? WHERE user_id = ?`
+  ).bind(cloudId || null, siteUrl || null, siteName || null, projectKey || null, projectName || null, userId).run()
+}
+
+export async function getJiraToken(env, userId) {
+  return env.DB.prepare('SELECT * FROM jira_tokens WHERE user_id = ?').bind(userId).first()
+}
+
+export async function deleteJiraToken(env, userId) {
+  await env.DB.prepare('DELETE FROM jira_tokens WHERE user_id = ?').bind(userId).run()
+}
