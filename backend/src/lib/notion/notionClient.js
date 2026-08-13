@@ -65,6 +65,15 @@ const propTitle = (v) => ({ title: [{ text: { content: String(v ?? '').slice(0, 
 const propText = (v) => ({ rich_text: [{ text: { content: String(v ?? '').slice(0, 1900) } }] })
 const propNumber = (v) => { const n = Number(v); return { number: Number.isFinite(n) ? n : null } }
 const propSelect = (v) => (v ? { select: { name: String(v).slice(0, 100).replace(/,/g, ' ') } } : { select: null })
+const propDate = (iso) => (iso ? { date: { start: iso } } : { date: null })
+
+// Date = base (generatedAt) décalée de N semaines, au format YYYY-MM-DD (pour vues calendrier/timeline).
+function isoDatePlusWeeks(baseIso, weeks) {
+  const d = baseIso ? new Date(baseIso) : new Date()
+  if (isNaN(d.getTime())) return null
+  d.setUTCDate(d.getUTCDate() + Math.round(weeks * 7))
+  return d.toISOString().slice(0, 10)
+}
 
 async function notionFetch(accessToken, path, body) {
   const res = await fetch(`${NOTION_API}${path}`, {
@@ -96,8 +105,9 @@ async function createDatabaseWithRows(accessToken, parentPageId, titleText, prop
 async function buildDatabases(accessToken, parentPageId, plan, lang) {
   const en = lang === 'en'
   const _ = (fr, eng) => (en ? eng : fr)
+  const base = plan.generatedAt
 
-  // Roadmap → base de tâches
+  // Roadmap → base de tâches (Date = début du sprint : 2 semaines/sprint)
   if (plan.roadmap?.sprints?.length) {
     const stories = plan.roadmap.sprints.flatMap(sp => (sp.stories || []).map(s => ({ ...s, sprint: sp.sprintId })))
     if (stories.length) {
@@ -106,6 +116,7 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
         {
           [_('Story', 'Story')]: { title: {} },
           Sprint: { number: {} },
+          [_('Début', 'Start')]: { date: {} },
           [_('Responsable', 'Assignee')]: { rich_text: {} },
           [_('Effort', 'Effort')]: { number: {} },
           [_('Coût (€)', 'Cost (€)')]: { number: {} },
@@ -114,6 +125,7 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
         stories.map(s => ({
           [_('Story', 'Story')]: propTitle(`${s.id ? s.id + ': ' : ''}${s.title}`),
           Sprint: propNumber(s.sprint),
+          [_('Début', 'Start')]: propDate(isoDatePlusWeeks(base, ((s.sprint || 1) - 1) * 2)),
           [_('Responsable', 'Assignee')]: propText(s.assignee),
           [_('Effort', 'Effort')]: propNumber(s.effort),
           [_('Coût (€)', 'Cost (€)')]: propNumber(s.cost),
@@ -123,12 +135,13 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
     }
   }
 
-  // Calendrier éditorial → base datée par semaine
+  // Calendrier éditorial → base datée (Date = semaine réelle, pour vue calendrier)
   if (plan.editorial?.items?.length) {
     await createDatabaseWithRows(
       accessToken, parentPageId, _('Calendrier éditorial', 'Editorial calendar'),
       {
         [_('Contenu', 'Content')]: { title: {} },
+        Date: { date: {} },
         [_('Semaine', 'Week')]: { number: {} },
         [_('Canal', 'Channel')]: { select: {} },
         [_('Format', 'Format')]: { rich_text: {} },
@@ -137,6 +150,7 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
       },
       plan.editorial.items.map(it => ({
         [_('Contenu', 'Content')]: propTitle(it.title),
+        Date: propDate(isoDatePlusWeeks(base, (it.week || 1) - 1)),
         [_('Semaine', 'Week')]: propNumber(it.week),
         [_('Canal', 'Channel')]: propSelect(it.channel),
         [_('Format', 'Format')]: propText(it.format),
@@ -146,12 +160,13 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
     )
   }
 
-  // Calendrier publicitaire → base des campagnes
+  // Calendrier publicitaire → base des campagnes datée
   if (plan.advertising?.campaigns?.length) {
     await createDatabaseWithRows(
       accessToken, parentPageId, _('Calendrier publicitaire', 'Advertising calendar'),
       {
         [_('Campagne', 'Campaign')]: { title: {} },
+        Date: { date: {} },
         [_('Semaine', 'Week')]: { number: {} },
         [_('Canal', 'Channel')]: { select: {} },
         [_('Objectif', 'Objective')]: { select: {} },
@@ -160,6 +175,7 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
       },
       plan.advertising.campaigns.map(c => ({
         [_('Campagne', 'Campaign')]: propTitle(`${c.channel} — ${c.format}`),
+        Date: propDate(isoDatePlusWeeks(base, (c.week || 1) - 1)),
         [_('Semaine', 'Week')]: propNumber(c.week),
         [_('Canal', 'Channel')]: propSelect(c.channel),
         [_('Objectif', 'Objective')]: propSelect(c.objective),
@@ -184,11 +200,21 @@ async function appendChildren(accessToken, pageId, children) {
 }
 
 // Crée une page structurée du plan dans l'espace Notion de l'utilisateur. Retourne l'URL.
-export async function createPlanPage(accessToken, plan, lang) {
+export async function createPlanPage(accessToken, plan, lang, coverUrl) {
   const parentId = await findParentPageId(accessToken)
   const blocks = planToBlocks(plan, lang)
   const first = blocks.slice(0, 100)
   const rest = blocks.slice(100)
+
+  const body = {
+    parent: { page_id: parentId },
+    icon: { type: 'emoji', emoji: '🚀' },
+    properties: {
+      title: [{ type: 'text', text: { content: `${plan.product?.name || 'Launch plan'} — VelocityLaunch` } }]
+    },
+    children: first
+  }
+  if (coverUrl) body.cover = { type: 'external', external: { url: coverUrl } }
 
   const res = await fetch(`${NOTION_API}/pages`, {
     method: 'POST',
@@ -197,14 +223,7 @@ export async function createPlanPage(accessToken, plan, lang) {
       'Content-Type': 'application/json',
       'Notion-Version': NOTION_VERSION
     },
-    body: JSON.stringify({
-      parent: { page_id: parentId },
-      icon: { type: 'emoji', emoji: '🚀' },
-      properties: {
-        title: [{ type: 'text', text: { content: `${plan.product?.name || 'Launch plan'} — VelocityLaunch` } }]
-      },
-      children: first
-    })
+    body: JSON.stringify(body)
   })
   if (!res.ok) throw new Error(`Notion page creation failed: ${res.status}`)
   const page = await res.json()

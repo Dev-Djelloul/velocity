@@ -213,7 +213,7 @@ export async function handleApi(request, env, url) {
     const token = await db.getNotionToken(env, userId)
     if (!token) return json({ needsAuth: true })
     try {
-      const url = await createPlanPage(token.access_token, plan, lang || 'fr')
+      const url = await createPlanPage(token.access_token, plan, lang || 'fr', env.NOTION_COVER_URL)
       return json({ url })
     } catch (e) {
       if (String(e.message).includes('no_parent')) return json({ error: 'no_parent' }, 400)
