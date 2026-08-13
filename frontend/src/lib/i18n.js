@@ -155,7 +155,17 @@ export const translations = {
       persona: 'Persona',
       collapse: 'Réduire le panneau',
       expand: 'Déplier le panneau',
-      createPlan: 'Créer un plan'
+      createPlan: 'Créer un plan',
+      groups: {
+        synthese: 'Synthèse',
+        market: 'Marché & stratégie',
+        execution: 'Roadmap & exécution',
+        gtm: 'Go-to-market',
+        performance: 'Performance & finances',
+        compliance: 'Conformité',
+        aitools: 'Outils IA',
+        postlaunch: 'Suivi post-lancement'
+      }
     },
     rgpd: {
       title: 'Conformité RGPD',
@@ -890,7 +900,17 @@ export const translations = {
       persona: 'Persona',
       collapse: 'Collapse panel',
       expand: 'Expand panel',
-      createPlan: 'Create a plan'
+      createPlan: 'Create a plan',
+      groups: {
+        synthese: 'Overview',
+        market: 'Market & strategy',
+        execution: 'Roadmap & delivery',
+        gtm: 'Go-to-market',
+        performance: 'Performance & finance',
+        compliance: 'Compliance',
+        aitools: 'AI tools',
+        postlaunch: 'Post-launch tracking'
+      }
     },
     rgpd: {
       title: 'GDPR compliance',

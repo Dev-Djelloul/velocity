@@ -84,6 +84,61 @@
   overflow-x: hidden;
 }
 
+.plan-sidebar-group {
+  display: flex;
+  flex-direction: column;
+  margin-top: 0.35rem;
+}
+
+.plan-sidebar-group:first-child {
+  margin-top: 0;
+}
+
+.plan-sidebar-group-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.35rem 0.4rem 0.2rem;
+  font-family: inherit;
+  color: var(--color-text-muted);
+  font-size: 0.64rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: color 0.15s ease;
+}
+
+.plan-sidebar-group-header:hover {
+  color: var(--color-text-secondary);
+}
+
+.plan-sidebar-group-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.plan-sidebar-group-chevron {
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+  opacity: 0.7;
+}
+
+.plan-sidebar-group-header.collapsed .plan-sidebar-group-chevron {
+  transform: rotate(-90deg);
+}
+
+.plan-sidebar-group-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
 .plan-sidebar-item {
   text-decoration: none;
   display: flex;

@@ -2,49 +2,93 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import VelocityLaunchLogo from './VelocityLaunchLogo'
 import {
-  IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
+  IconChevronLeft, IconChevronRight, IconChevronDown, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
   IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge, IconMegaphone, IconLock
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
-const SECTIONS = [
-  { id: 'section-dashboard', labelKey: 'dashboardBi.title', Icon: IconBarChart },
-  { id: 'section-persona', labelKey: 'sidebar.persona', Icon: IconUser },
-  { id: 'section-veille', labelKey: 'veille.title', Icon: IconRadar },
-  { id: 'section-roadmap', labelKey: 'outputs.roadmap', Icon: IconClipboard },
-  { id: 'section-backlog', labelKey: 'backlog.title', Icon: IconCircleDot },
-  { id: 'section-gantt', labelKey: 'gantt.title', Icon: IconCalendar },
-  { id: 'section-burndown', labelKey: 'burndown.title', Icon: IconTrendingUp },
-  { id: 'section-calendar', labelKey: 'calendar.title', Icon: IconClock },
-  { id: 'section-marketing', labelKey: 'outputs.marketing', Icon: IconRocket },
-  { id: 'section-editorial', labelKey: 'editorial.title', Icon: IconCalendar },
-  { id: 'section-advertising', labelKey: 'advertising.title', Icon: IconMegaphone },
-  { id: 'section-kpis', labelKey: 'outputs.kpis', Icon: IconTarget },
-  { id: 'section-benchmarks', labelKey: 'benchmarks.title', Icon: IconGauge },
-  { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin },
-  { id: 'section-strategy', labelKey: 'outputs.strategy.title', Icon: IconShield },
-  { id: 'section-rgpd', labelKey: 'rgpd.title', Icon: IconLock },
-  { id: 'section-askchart', labelKey: 'askChart.title', Icon: IconSparkle },
-  { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave },
-  { id: 'section-agents', labelKey: 'agents.title', Icon: IconSparkle },
-  { id: 'section-tracking', labelKey: 'tracking.title', Icon: IconTrendingUp },
-  { id: 'section-whatif', labelKey: 'whatif.title', Icon: IconCompass }
+const GROUPS = [
+  {
+    key: 'synthese',
+    sections: [
+      { id: 'section-dashboard', labelKey: 'dashboardBi.title', Icon: IconBarChart }
+    ]
+  },
+  {
+    key: 'market',
+    sections: [
+      { id: 'section-persona', labelKey: 'sidebar.persona', Icon: IconUser },
+      { id: 'section-veille', labelKey: 'veille.title', Icon: IconRadar },
+      { id: 'section-strategy', labelKey: 'outputs.strategy.title', Icon: IconShield }
+    ]
+  },
+  {
+    key: 'execution',
+    sections: [
+      { id: 'section-roadmap', labelKey: 'outputs.roadmap', Icon: IconClipboard },
+      { id: 'section-backlog', labelKey: 'backlog.title', Icon: IconCircleDot },
+      { id: 'section-gantt', labelKey: 'gantt.title', Icon: IconCalendar },
+      { id: 'section-burndown', labelKey: 'burndown.title', Icon: IconTrendingUp },
+      { id: 'section-calendar', labelKey: 'calendar.title', Icon: IconClock }
+    ]
+  },
+  {
+    key: 'gtm',
+    sections: [
+      { id: 'section-marketing', labelKey: 'outputs.marketing', Icon: IconRocket },
+      { id: 'section-editorial', labelKey: 'editorial.title', Icon: IconCalendar },
+      { id: 'section-advertising', labelKey: 'advertising.title', Icon: IconMegaphone }
+    ]
+  },
+  {
+    key: 'performance',
+    sections: [
+      { id: 'section-kpis', labelKey: 'outputs.kpis', Icon: IconTarget },
+      { id: 'section-benchmarks', labelKey: 'benchmarks.title', Icon: IconGauge },
+      { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin }
+    ]
+  },
+  {
+    key: 'compliance',
+    sections: [
+      { id: 'section-rgpd', labelKey: 'rgpd.title', Icon: IconLock }
+    ]
+  },
+  {
+    key: 'aitools',
+    sections: [
+      { id: 'section-askchart', labelKey: 'askChart.title', Icon: IconSparkle },
+      { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave },
+      { id: 'section-agents', labelKey: 'agents.title', Icon: IconSparkle }
+    ]
+  },
+  {
+    key: 'postlaunch',
+    sections: [
+      { id: 'section-tracking', labelKey: 'tracking.title', Icon: IconTrendingUp },
+      { id: 'section-whatif', labelKey: 'whatif.title', Icon: IconCompass }
+    ]
+  }
 ]
+
+const FIRST_ID = GROUPS[0].sections[0].id
 
 const RAIL_WIDTH = 60
 const MIN_WIDTH = 180
 const MAX_WIDTH = 340
-const DEFAULT_WIDTH = 232
+const DEFAULT_WIDTH = 244
 
 export default function PlanSidebar({ lang, onNewPlan }) {
   const [collapsed, setCollapsed] = useState(false)
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
-  const [activeId, setActiveId] = useState(SECTIONS[0].id)
+  const [activeId, setActiveId] = useState(FIRST_ID)
   const [resizing, setResizing] = useState(false)
+  const [collapsedGroups, setCollapsedGroups] = useState({})
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
 
   const goTo = (id) => setActiveId(id)
+  const toggleGroup = (key) => setCollapsedGroups(prev => ({ ...prev, [key]: !prev[key] }))
 
   const startResize = (e) => {
     e.preventDefault()
@@ -78,6 +122,19 @@ export default function PlanSidebar({ lang, onNewPlan }) {
 
   const currentWidth = collapsed ? RAIL_WIDTH : width
 
+  const renderItem = ({ id, labelKey, Icon }) => (
+    <a
+      key={id}
+      href={`#${id}`}
+      className={`plan-sidebar-item ${activeId === id ? 'active' : ''}`}
+      onClick={() => goTo(id)}
+      title={collapsed ? t(lang, labelKey) : undefined}
+    >
+      <span className="plan-sidebar-icon"><Icon width={16} height={16} /></span>
+      {!collapsed && <span className="plan-sidebar-label">{t(lang, labelKey)}</span>}
+    </a>
+  )
+
   return (
     <div
       className={`plan-sidebar ${collapsed ? 'collapsed' : ''} ${resizing ? 'resizing' : ''}`}
@@ -104,18 +161,27 @@ export default function PlanSidebar({ lang, onNewPlan }) {
       </button>
 
       <nav className="plan-sidebar-nav">
-        {SECTIONS.map(({ id, labelKey, Icon }) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            className={`plan-sidebar-item ${activeId === id ? 'active' : ''}`}
-            onClick={() => goTo(id)}
-            title={collapsed ? t(lang, labelKey) : undefined}
-          >
-            <span className="plan-sidebar-icon"><Icon width={16} height={16} /></span>
-            {!collapsed && <span className="plan-sidebar-label">{t(lang, labelKey)}</span>}
-          </a>
-        ))}
+        {collapsed
+          ? GROUPS.flatMap(g => g.sections).map(renderItem)
+          : GROUPS.map(group => {
+              const isCollapsed = collapsedGroups[group.key]
+              return (
+                <div key={group.key} className="plan-sidebar-group">
+                  <button
+                    className={`plan-sidebar-group-header ${isCollapsed ? 'collapsed' : ''}`}
+                    onClick={() => toggleGroup(group.key)}
+                  >
+                    <span className="plan-sidebar-group-title">{t(lang, `sidebar.groups.${group.key}`)}</span>
+                    <IconChevronDown width={12} height={12} className="plan-sidebar-group-chevron" />
+                  </button>
+                  {!isCollapsed && (
+                    <div className="plan-sidebar-group-items">
+                      {group.sections.map(renderItem)}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
       </nav>
 
       <div className="plan-sidebar-brand">

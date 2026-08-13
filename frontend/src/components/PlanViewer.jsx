@@ -172,6 +172,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
         <div id="section-persona" className="plan-section-anchor"><PersonaCard persona={plan.persona} lang={lang} /></div>
         <div id="section-veille" className="plan-section-anchor"><VeilleCard plan={plan} lang={lang} onVeilleChange={updateVeille} /></div>
+        <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
@@ -183,7 +184,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
         <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>
-        <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
         <div id="section-rgpd" className="plan-section-anchor"><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} /></div>
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
