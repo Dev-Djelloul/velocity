@@ -1,7 +1,14 @@
 
 .roadmap-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--spacing-lg);
   margin-bottom: var(--spacing-lg);
+  flex-wrap: wrap;
 }
+
+.roadmap-header-title { flex: 1; min-width: 200px; }
 
 .roadmap-header h3 {
   font-size: var(--font-size-xl);
@@ -12,6 +19,62 @@
 .roadmap-subtitle {
   color: var(--color-text-secondary);
   font-size: var(--font-size-xs);
+}
+
+.roadmap-start-date {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md);
+  background: rgba(145, 132, 217, 0.06);
+  border: 1px solid rgba(145, 132, 217, 0.2);
+  border-radius: var(--border-radius-sm);
+  min-width: 200px;
+}
+
+.roadmap-start-date-display {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  width: 100%;
+  justify-content: space-between;
+}
+
+.roadmap-start-date-label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.roadmap-start-date-value {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: monospace;
+}
+
+.roadmap-start-date-edit {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.roadmap-start-date-edit input[type="date"] {
+  flex: 1;
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.2);
+  border-radius: 4px;
+  padding: 6px 10px;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  color-scheme: dark;
+}
+
+.roadmap-start-date-edit input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) brightness(1.3);
+  cursor: pointer;
 }
 
 .roadmap-metrics {

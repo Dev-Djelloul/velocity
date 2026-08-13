@@ -203,6 +203,7 @@ export function generatePlan(formData) {
     executiveSummary,
     language,
     generatedAt: now,
+    planStartDate: now,
     launchDate: now
   }
 }

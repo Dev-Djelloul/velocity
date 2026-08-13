@@ -6,8 +6,12 @@ import '../styles/RoadmapCard.css'
 
 const SPRINT_DAYS = 14
 
-function sprintDates(generatedAt, sprintId) {
-  const start = new Date(generatedAt || Date.now())
+function todayStr() {
+  return new Date().toISOString().slice(0, 10)
+}
+
+function sprintDates(planStartDate, sprintId) {
+  const start = new Date(planStartDate || Date.now())
   start.setDate(start.getDate() + (sprintId - 1) * SPRINT_DAYS)
   const end = new Date(start)
   end.setDate(end.getDate() + SPRINT_DAYS)
@@ -20,9 +24,11 @@ function formatRange(start, end, lang) {
   return `${start.toLocaleDateString(locale, opts)} → ${end.toLocaleDateString(locale, opts)}`
 }
 
-export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChange }) {
+export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartDateChange, onRoadmapChange }) {
   const [issuesExpanded, setIssuesExpanded] = useState(false)
   const [expandedStories, setExpandedStories] = useState(() => new Set())
+  const [isEditingStartDate, setIsEditingStartDate] = useState(false)
+  const [tempStartDate, setTempStartDate] = useState((planStartDate || todayStr()).split('T')[0])
 
   const toggleStoryDetails = (storyId) => {
     setExpandedStories(prev => {
@@ -34,11 +40,18 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
 
   if (!roadmap) return null
 
+  const startDateStr = (planStartDate || todayStr()).split('T')[0]
+
+  const saveStartDate = () => {
+    if (tempStartDate && onPlanStartDateChange) onPlanStartDateChange(tempStartDate)
+    setIsEditingStartDate(false)
+  }
+
   const { sprints, totalDuration, estimatedCost } = roadmap
   const now = new Date()
   const issues = validateRoadmap(roadmap)
 
-  const currentSprint = sprints.find(sp => sprintDates(generatedAt, sp.sprintId).end >= now) || sprints[sprints.length - 1]
+  const currentSprint = sprints.find(sp => sprintDates(planStartDate, sp.sprintId).end >= now) || sprints[sprints.length - 1]
 
   const overdue = []
   sprints.forEach(sp => {
@@ -75,8 +88,25 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
   return (
     <div className="roadmap-card card">
       <div className="roadmap-header">
-        <h3>{t(lang, 'outputs.roadmap')}</h3>
-        <p className="roadmap-subtitle">{t(lang, 'outputs.roadmapSubtitle')}</p>
+        <div className="roadmap-header-title">
+          <h3>{t(lang, 'outputs.roadmap')}</h3>
+          <p className="roadmap-subtitle">{t(lang, 'outputs.roadmapSubtitle')}</p>
+        </div>
+        <div className="roadmap-start-date">
+          {isEditingStartDate ? (
+            <div className="roadmap-start-date-edit">
+              <input type="date" value={tempStartDate} onChange={e => setTempStartDate(e.target.value)} />
+              <button className="btn-sm" onClick={saveStartDate}>✓</button>
+              <button className="btn-sm" onClick={() => setIsEditingStartDate(false)}>✕</button>
+            </div>
+          ) : (
+            <div className="roadmap-start-date-display">
+              <span className="roadmap-start-date-label">{t(lang, 'outputs.prepStartLabel')}</span>
+              <span className="roadmap-start-date-value">{startDateStr}</span>
+              <button className="btn-sm" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>✎</button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="roadmap-metrics">
@@ -143,7 +173,7 @@ export default function RoadmapCard({ roadmap, lang, generatedAt, onRoadmapChang
 
       <div className="roadmap-timeline">
         {sprints.map((sprint, idx) => {
-          const { start, end } = sprintDates(generatedAt, sprint.sprintId)
+          const { start, end } = sprintDates(planStartDate, sprint.sprintId)
           const isCurrent = sprint.sprintId === currentSprint.sprintId
           const doneEffort = sprint.stories.filter(s => s.status === 'done').reduce((s, x) => s + x.effort, 0)
           const totalEffort = sprint.stories.reduce((s, x) => s + x.effort, 0)
