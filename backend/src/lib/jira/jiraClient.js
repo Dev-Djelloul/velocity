@@ -93,15 +93,26 @@ function adf(text) {
   }
 }
 
-// Trouve l'id du champ "Story Points" (varie selon le type de projet). Best-effort.
-async function findStoryPointsField(accessToken, cloudId) {
+// Découvre les ids des champs dynamiques (varient selon le type de projet). Best-effort.
+async function discoverFields(accessToken, cloudId) {
   try {
     const res = await jiraFetch(accessToken, cloudId, '/field')
-    if (!res.ok) return null
+    if (!res.ok) return {}
     const fields = await res.json()
-    const match = fields.find(f => /story point estimate/i.test(f.name)) || fields.find(f => /story points?/i.test(f.name))
-    return match ? match.id : null
-  } catch { return null }
+    const find = (re) => (fields.find(f => re.test(f.name)) || {}).id
+    return {
+      storyPoints: find(/story point estimate/i) || find(/story points?/i),
+      startDate: find(/^start date$/i) || find(/start date/i)
+    }
+  } catch { return {} }
+}
+
+// Date au format YYYY-MM-DD, décalée de N semaines depuis la base (generatedAt). 2 semaines/sprint.
+function isoDatePlusWeeks(baseIso, weeks) {
+  const d = baseIso ? new Date(baseIso) : new Date()
+  if (isNaN(d.getTime())) return null
+  d.setUTCDate(d.getUTCDate() + Math.round(weeks * 7))
+  return d.toISOString().slice(0, 10)
 }
 
 // Récupère les issues déjà créées par VelocityLaunch dans ce projet, indexées par leur label vl-id / vl-epic.
@@ -142,8 +153,20 @@ const CATEGORY_LABELS = { product: 'produit', marketing: 'marketing', ops: 'ops'
 // Crée/met à jour les Epics (1/sprint) puis les Stories rattachées. Retourne la carte des liens.
 export async function exportPlanToJira(accessToken, target, plan, lang) {
   const { cloud_id: cloudId, site_url: siteUrl, project_key: projectKey } = target
-  const spField = await findStoryPointsField(accessToken, cloudId)
+  const { storyPoints: spField, startDate: startField } = await discoverFields(accessToken, cloudId)
   const managed = await fetchManagedIssues(accessToken, cloudId, projectKey)
+  const base = plan.generatedAt
+
+  // Dates du sprint (calendrier réel) : début = base + (n-1)*2 sem., échéance = base + n*2 sem.
+  const sprintStart = (n) => isoDatePlusWeeks(base, (n - 1) * 2)
+  const sprintDue = (n) => isoDatePlusWeeks(base, n * 2)
+  const withDates = (fields, n) => {
+    const due = sprintDue(n)
+    const start = sprintStart(n)
+    if (due) fields.duedate = due
+    if (startField && start) fields[startField] = start
+    return fields
+  }
 
   let created = 0
   let updated = 0
@@ -156,15 +179,15 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
   for (const sprint of plan.roadmap?.sprints || []) {
     const epicLabel = `vl-epic:${sprint.sprintId}`
     const summary = `${lang === 'en' ? 'Sprint' : 'Sprint'} ${sprint.sprintId} — ${sprint.estimatedCost} €`
-    const fields = {
+    const fields = withDates({
       project: { key: projectKey },
       summary: summary.slice(0, 240),
       issuetype: { name: 'Epic' },
       labels: ['velocitylaunch', epicLabel]
-    }
+    }, sprint.sprintId)
     const existing = managed[epicLabel]
     if (existing) {
-      await updateIssue(accessToken, cloudId, existing, { summary: fields.summary })
+      await updateIssue(accessToken, cloudId, existing, withDates({ summary: fields.summary }, sprint.sprintId))
       epicKeyBySprint[sprint.sprintId] = existing
       updated++
     } else {
@@ -191,11 +214,11 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       const cat = CATEGORY_LABELS[story.category]
       if (cat) labels.push(cat)
 
-      const baseFields = {
+      const baseFields = withDates({
         summary: `${story.id}: ${story.title}`.slice(0, 240),
         description: adf(descParts.join('')),
         labels
-      }
+      }, sprint.sprintId)
       if (spField && Number.isFinite(story.effort)) baseFields[spField] = story.effort
 
       const existing = managed[vlLabel]
@@ -218,6 +241,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
         // Le rattachement à l'Epic (parent) ou le champ story points peuvent être refusés selon le projet.
         // On retente sans parent ni story points pour garantir la création.
         const fallback = { project: { key: projectKey }, summary: baseFields.summary, description: baseFields.description, labels, issuetype: { name: 'Story' } }
+        if (baseFields.duedate) fallback.duedate = baseFields.duedate
         try {
           const issue = await createIssue(accessToken, cloudId, fallback)
           links[story.id] = { key: issue.key, url: browse(issue.key) }
