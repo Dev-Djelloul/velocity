@@ -176,6 +176,22 @@ async function updateIssue(accessToken, cloudId, key, fields) {
   return res2.ok
 }
 
+// Transitionne un ticket vers une catégorie de statut donnée ('done' ou 'new'/'indeterminate').
+// Dans Jira le statut ne se met pas via un champ mais via une transition disponible.
+async function transitionTo(accessToken, cloudId, key, targetCategory) {
+  try {
+    const res = await jiraFetch(accessToken, cloudId, `/issue/${key}/transitions`)
+    if (!res.ok) return
+    const { transitions = [] } = await res.json()
+    const match = transitions.find(tr => tr.to?.statusCategory?.key === targetCategory)
+    if (!match) return
+    await jiraFetch(accessToken, cloudId, `/issue/${key}/transitions`, {
+      method: 'POST',
+      body: JSON.stringify({ transition: { id: match.id } })
+    })
+  } catch { /* transition best-effort */ }
+}
+
 const CATEGORY_LABELS = { product: 'produit', marketing: 'marketing', ops: 'ops' }
 
 // Priorité dérivée de l'ordre des sprints (les plus tôt = les plus urgents).
@@ -269,6 +285,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       if (existing) {
         await updateIssue(accessToken, cloudId, existing, baseFields)
         links[story.id] = { key: existing, url: browse(existing) }
+        if (story.status === 'done') await transitionTo(accessToken, cloudId, existing, 'done')
         updated++
         continue
       }
@@ -280,6 +297,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       try {
         const issue = await createIssue(accessToken, cloudId, createFields)
         links[story.id] = { key: issue.key, url: browse(issue.key) }
+        if (story.status === 'done') await transitionTo(accessToken, cloudId, issue.key, 'done')
         created++
       } catch (e) {
         // Le rattachement à l'Epic (parent) ou le champ story points peuvent être refusés selon le projet.
@@ -289,6 +307,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
         try {
           const issue = await createIssue(accessToken, cloudId, fallback)
           links[story.id] = { key: issue.key, url: browse(issue.key) }
+          if (story.status === 'done') await transitionTo(accessToken, cloudId, issue.key, 'done')
           created++
         } catch { /* on saute cette story sans casser l'export */ }
       }

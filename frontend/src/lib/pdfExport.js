@@ -438,7 +438,13 @@ export async function exportPPTX(plan, lang) {
 export async function exportImage(node, plan) {
   if (!node) return
   const { default: html2canvas } = await import('html2canvas')
-  const canvas = await html2canvas(node, { backgroundColor: '#0f1419', scale: 2, useCORS: true })
+  const canvas = await html2canvas(node, {
+    backgroundColor: '#0f1419',
+    scale: 2,
+    useCORS: true,
+    // Exclut la pop-up d'export (et tout overlay fixe) de la capture.
+    ignoreElements: (el) => el.classList?.contains('modal-backdrop') || el.classList?.contains('export-modal')
+  })
   canvas.toBlob(blob => downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.png`))
 }
 
