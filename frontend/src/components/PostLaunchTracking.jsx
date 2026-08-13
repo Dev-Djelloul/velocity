@@ -21,13 +21,23 @@ function buildPath(points, minX, maxX, maxY) {
   return points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${x(p.t).toFixed(1)} ${y(p.v).toFixed(1)}`).join(' ')
 }
 
-export default function PostLaunchTracking({ plan, lang, onMetricsChange }) {
+export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaunchDateChange }) {
   const primaryKpi = plan.kpis?.[0]
   const history = plan.metricsHistory || []
+  const launchDate = plan.launchDate || plan.generatedAt || todayStr()
   const [date, setDate] = useState(todayStr())
   const [actualValue, setActualValue] = useState('')
+  const [isEditingLaunchDate, setIsEditingLaunchDate] = useState(false)
+  const [tempLaunchDate, setTempLaunchDate] = useState(launchDate.split('T')[0])
 
   if (!primaryKpi) return null
+
+  const saveLaunchDate = () => {
+    if (tempLaunchDate && onLaunchDateChange) {
+      onLaunchDateChange(tempLaunchDate)
+    }
+    setIsEditingLaunchDate(false)
+  }
 
   const addSnapshot = () => {
     if (actualValue === '') return
@@ -40,9 +50,10 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange }) {
     onMetricsChange(history.filter((_, i) => i !== idx))
   }
 
+  const launchDateStr = launchDate.split('T')[0]
   const target = primaryKpi.target || 0
   const times = history.map(h => new Date(h.date).getTime())
-  const minT = times.length ? Math.min(...times) : Date.now()
+  const minT = times.length ? Math.min(...times) : new Date(launchDateStr).getTime()
   const maxT = times.length ? Math.max(...times, Date.now()) : Date.now()
   const maxY = Math.max(target, ...history.map(h => h.value), 1)
 
@@ -55,12 +66,34 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange }) {
   return (
     <div className="tracking-card card">
       <div className="tracking-header">
-        <h3><IconTrendingUp width={16} height={16} /> {t(lang, 'tracking.title')}</h3>
-        <p className="tracking-subtitle">{t(lang, 'tracking.subtitle')(primaryKpi.name)}</p>
+        <div className="tracking-header-title">
+          <h3><IconTrendingUp width={16} height={16} /> {t(lang, 'tracking.title')}</h3>
+          <p className="tracking-subtitle">{t(lang, 'tracking.subtitle')(primaryKpi.name)}</p>
+        </div>
+        <div className="tracking-launch-date">
+          {isEditingLaunchDate ? (
+            <div className="tracking-launch-date-edit">
+              <input
+                type="date"
+                value={tempLaunchDate}
+                onChange={e => setTempLaunchDate(e.target.value)}
+                max={todayStr()}
+              />
+              <button className="btn-sm" onClick={saveLaunchDate}>✓</button>
+              <button className="btn-sm" onClick={() => setIsEditingLaunchDate(false)}>✕</button>
+            </div>
+          ) : (
+            <div className="tracking-launch-date-display">
+              <span className="tracking-launch-label">{t(lang, 'tracking.launchLabel')}</span>
+              <span className="tracking-launch-value">{launchDateStr}</span>
+              <button className="btn-sm" onClick={() => setIsEditingLaunchDate(true)} title={t(lang, 'tracking.editLaunchDate')}>✎</button>
+            </div>
+          )}
+        </div>
       </div>
 
       <div className="tracking-form">
-        <input type="date" className="tracking-date-input" value={date} onChange={e => setDate(e.target.value)} max={todayStr()} />
+        <input type="date" className="tracking-date-input" value={date} onChange={e => setDate(e.target.value)} min={launchDateStr} max={todayStr()} />
         <div className="tracking-number-stepper">
           <input
             type="number"

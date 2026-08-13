@@ -187,6 +187,7 @@ export function generatePlan(formData) {
   const strategyToolkit = generateStrategyToolkit(product, market, lang)
   const executiveSummary = generateExecutiveSummary(product, classification, resources, lang)
 
+  const now = new Date().toISOString()
   return {
     product,
     market,
@@ -201,6 +202,7 @@ export function generatePlan(formData) {
     strategyToolkit,
     executiveSummary,
     language,
-    generatedAt: new Date().toISOString()
+    generatedAt: now,
+    launchDate: now
   }
 }

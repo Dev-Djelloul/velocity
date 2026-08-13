@@ -78,6 +78,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateLaunchDate = (dateStr) => {
+    const nextPlan = { ...plan, launchDate: dateStr + 'T00:00:00Z' }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const updateScenarios = (nextScenarios) => {
     const nextPlan = { ...plan, scenarios: nextScenarios }
     setPlan(nextPlan)
@@ -194,7 +200,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
         <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
-        <div id="section-tracking" className="plan-section-anchor"><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} /></div>
+        <div id="section-tracking" className="plan-section-anchor"><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
         <div id="section-whatif" className="plan-section-anchor"><WhatIfScenarios plan={plan} lang={lang} onScenariosChange={updateScenarios} /></div>
       </div>
 

@@ -274,7 +274,9 @@ export const translations = {
       actual: 'Réel',
       onTrack: 'Dans les objectifs',
       behind: 'En dessous',
-      empty: 'Ajoute ta première mesure réelle pour démarrer le suivi.'
+      empty: 'Ajoute ta première mesure réelle pour démarrer le suivi.',
+      launchLabel: 'Lancement:',
+      editLaunchDate: 'Modifier la date de lancement'
     },
     whatif: {
       title: 'Scénarios what-if',
@@ -1032,7 +1034,9 @@ export const translations = {
       actual: 'Actual',
       onTrack: 'On target',
       behind: 'Below target',
-      empty: 'Add your first real measurement to start tracking.'
+      empty: 'Add your first real measurement to start tracking.',
+      launchLabel: 'Launch:',
+      editLaunchDate: 'Edit launch date'
     },
     whatif: {
       title: 'What-if scenarios',
