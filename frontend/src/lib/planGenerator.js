@@ -187,7 +187,11 @@ export function generatePlan(formData) {
   const strategyToolkit = generateStrategyToolkit(product, market, lang)
   const executiveSummary = generateExecutiveSummary(product, classification, resources, lang)
 
-  const now = new Date().toISOString()
+  const now = new Date()
+  const nowIso = now.toISOString()
+  // Date de lancement cible = début de prépa + durée choisie au questionnaire (pas "maintenant" :
+  // à la génération, le lancement est encore une intention future, pas un fait accompli).
+  const targetLaunchMs = now.getTime() + (roadmap.totalDuration || 0) * 7 * 24 * 60 * 60 * 1000
   return {
     product,
     market,
@@ -202,8 +206,8 @@ export function generatePlan(formData) {
     strategyToolkit,
     executiveSummary,
     language,
-    generatedAt: now,
-    planStartDate: now,
-    launchDate: now
+    generatedAt: nowIso,
+    planStartDate: nowIso,
+    launchDate: new Date(targetLaunchMs).toISOString()
   }
 }

@@ -142,7 +142,9 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
     projectionLabel = t(lang, 'tracking.needMorePoints')
   }
 
+  const isFutureLaunch = launchMs > Date.now()
   const daysSinceLaunch = Math.max(0, Math.floor((Date.now() - launchMs) / DAY_MS))
+  const daysUntilLaunch = Math.max(1, Math.ceil((launchMs - Date.now()) / DAY_MS))
   const pctOfTarget = target && latest ? Math.round((latest.value / target) * 100) : null
 
   return (
@@ -159,7 +161,6 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
                 type="date"
                 value={tempLaunchDate}
                 onChange={e => setTempLaunchDate(e.target.value)}
-                max={todayStr()}
               />
               <button className="btn-sm" onClick={saveLaunchDate}>✓</button>
               <button className="btn-sm" onClick={() => setIsEditingLaunchDate(false)}>✕</button>
@@ -174,6 +175,13 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
         </div>
       </div>
 
+      {isFutureLaunch ? (
+        <div className="tracking-prelaunch">
+          <p className="tracking-prelaunch-text">{t(lang, 'tracking.notLaunchedYet')(formatShortDate(launchMs, lang))}</p>
+          <p className="tracking-prelaunch-sub">{t(lang, 'tracking.daysUntilLaunch')(daysUntilLaunch)}</p>
+        </div>
+      ) : (
+      <>
       {kpis.length > 1 && (
         <div className="tracking-kpi-tabs">
           {kpis.map((k, idx) => {
@@ -290,6 +298,8 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
         </>
       ) : (
         <p className="tracking-empty">{t(lang, 'tracking.empty')}</p>
+      )}
+      </>
       )}
     </div>
   )

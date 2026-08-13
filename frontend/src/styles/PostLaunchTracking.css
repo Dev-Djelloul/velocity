@@ -180,6 +180,26 @@
   font-size: 0.65rem;
 }
 
+.tracking-prelaunch {
+  text-align: center;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: rgba(145, 132, 217, 0.05);
+  border: 1px dashed rgba(145, 132, 217, 0.25);
+  border-radius: var(--border-radius-sm);
+}
+
+.tracking-prelaunch-text {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.tracking-prelaunch-sub {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+}
+
 .tracking-form {
   display: flex;
   gap: var(--spacing-sm);
