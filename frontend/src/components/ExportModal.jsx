@@ -4,7 +4,7 @@ import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../li
 import { exportGithubIssues } from '../lib/issueExport'
 import {
   notionExport, notionAuthorizeUrl, notionStatus,
-  jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect
+  jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect
 } from '../lib/serverStorage'
 import '../styles/ExportModal.css'
 
@@ -131,6 +131,13 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
     } catch { setJiraMsg(t(lang, 'export.jiraUnavailable')); setJiraState('error') }
   }
 
+  const reconnectJira = async () => {
+    if (!userId) return
+    setJiraState('working'); setJiraMsg('')
+    try { await jiraDisconnect(userId) } catch { /* ignore */ }
+    await handleJira()
+  }
+
   const jiraLabel = jiraState === 'working' ? t(lang, 'export.jiraExporting')
     : jiraState === 'connecting' ? t(lang, 'export.jiraConnecting')
     : t(lang, 'export.jira')
@@ -200,6 +207,9 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
             </div>
           )}
           {jiraState === 'error' && jiraMsg && <span className="export-notion-error">{jiraMsg}</span>}
+          <button className="export-reconnect-link" onClick={reconnectJira} disabled={jiraState === 'working' || jiraState === 'connecting'}>
+            {t(lang, 'export.jiraReconnect')}
+          </button>
         </div>
 
         <button className="btn-secondary close-btn" onClick={onClose}>{t(lang, 'export.close')}</button>

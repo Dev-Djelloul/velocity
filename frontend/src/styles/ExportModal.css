@@ -225,3 +225,17 @@
   line-height: 1.4;
   text-align: center;
 }
+
+.export-reconnect-link {
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #9ca3af);
+  font-size: 0.72rem;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0.15rem;
+  text-align: center;
+}
+
+.export-reconnect-link:hover:not(:disabled) { color: var(--color-primary, #9184d9); }
+.export-reconnect-link:disabled { opacity: 0.5; cursor: default; }

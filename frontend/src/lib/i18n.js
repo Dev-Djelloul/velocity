@@ -418,6 +418,7 @@ export const translations = {
       jiraCancelled: 'Connexion Jira annulée.',
       jiraNoProjects: 'Aucun projet Jira accessible. Vérifie tes droits sur un projet.',
       jiraUnavailable: 'Export Jira indisponible pour le moment.',
+      jiraReconnect: 'Reconnecter Jira (nouveaux droits)',
       close: 'Fermer'
     },
     errors: {
@@ -1175,6 +1176,7 @@ export const translations = {
       jiraCancelled: 'Jira connection cancelled.',
       jiraNoProjects: 'No accessible Jira project. Check your permissions on a project.',
       jiraUnavailable: 'Jira export is unavailable right now.',
+      jiraReconnect: 'Reconnect Jira (new permissions)',
       close: 'Close'
     },
     errors: {

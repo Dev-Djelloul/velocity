@@ -157,6 +157,14 @@ export function jiraSelect(userId, target) {
   })
 }
 
+export function jiraDisconnect(userId) {
+  return safeFetch('/jira/disconnect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
 export function jiraExport(userId, plan, lang) {
   return safeFetch('/jira/export', {
     method: 'POST',

@@ -2,8 +2,18 @@ import * as db from '../db'
 
 const AUTH_BASE = 'https://auth.atlassian.com'
 const API_BASE = 'https://api.atlassian.com'
-// Scopes classiques 3LO + offline_access pour obtenir un refresh token.
-const SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access'
+// Scopes 3LO. Les scopes classiques (jira-work/jira-user) couvrent l'API REST v3.
+// L'API Jira Software (Agile : boards & sprints) exige en plus des scopes GRANULAIRES
+// dédiés — sinon 401 sur /rest/agile/1.0. offline_access = refresh token.
+const SCOPES = [
+  'read:jira-work',
+  'write:jira-work',
+  'read:jira-user',
+  'offline_access',
+  'read:board-scope:jira-software',
+  'read:sprint:jira-software',
+  'write:sprint:jira-software'
+].join(' ')
 
 // --- OAuth ---
 
