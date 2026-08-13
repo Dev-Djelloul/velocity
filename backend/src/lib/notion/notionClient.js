@@ -1,4 +1,4 @@
-import { planToBlocks } from './notionBlocks'
+import { planToBlocks, footerBlocks } from './notionBlocks'
 
 const NOTION_API = 'https://api.notion.com/v1'
 const NOTION_VERSION = '2022-06-28'
@@ -199,6 +199,7 @@ export async function createPlanPage(accessToken, plan, lang) {
     },
     body: JSON.stringify({
       parent: { page_id: parentId },
+      icon: { type: 'emoji', emoji: '🚀' },
       properties: {
         title: [{ type: 'text', text: { content: `${plan.product?.name || 'Launch plan'} — VelocityLaunch` } }]
       },
@@ -217,6 +218,11 @@ export async function createPlanPage(accessToken, plan, lang) {
   try {
     await buildDatabases(accessToken, page.id, plan, lang)
   } catch { /* les bases sont un bonus ; la page reste valide sans elles */ }
+
+  // Pied de page ajouté en dernier, après les bases
+  try {
+    await appendChildren(accessToken, page.id, footerBlocks(lang))
+  } catch { /* cosmétique */ }
 
   return page.url
 }

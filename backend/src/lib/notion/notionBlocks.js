@@ -91,8 +91,11 @@ export function planToBlocks(plan, lang = 'fr') {
     if (r.recommendations?.length) { blocks.push(h3(_('Recommandations', 'Recommendations'))); r.recommendations.forEach(x => blocks.push(bullet(x))) }
   }
 
-  blocks.push(divider())
-  blocks.push(p(_('Généré avec VelocityLaunch', 'Generated with VelocityLaunch')))
-
   return blocks
+}
+
+// Pied de page ajouté APRÈS les bases de données (voir notionClient).
+export function footerBlocks(lang = 'fr') {
+  const _ = L(lang)
+  return [divider(), p(_('Généré avec VelocityLaunch', 'Generated with VelocityLaunch'))]
 }
