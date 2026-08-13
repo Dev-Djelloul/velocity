@@ -1,7 +1,7 @@
 import { t } from '../lib/i18n'
 import '../styles/MarketingCard.css'
 
-export default function MarketingCard({ marketing, lang, disabledChannels = [], onToggleChannel }) {
+export default function MarketingCard({ marketing, lang, disabledChannels = [], onToggleChannel, budget, onBudgetChange }) {
   if (!marketing) return null
 
   const { strategy, channels, totalBudget } = marketing
@@ -15,10 +15,20 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
         <p className="marketing-subtitle">{t(lang, 'outputs.strategyLabel')}: {strategy}</p>
       </div>
 
+      {onBudgetChange && (
+        <div className="marketing-budget-control">
+          <label>
+            {t(lang, 'outputs.marketingBudgetLabel')}: <strong>{budget.toLocaleString()} €</strong>
+          </label>
+          <input type="range" min="2000" max="50000" step="500" value={budget}
+            onChange={e => onBudgetChange(Number(e.target.value))} />
+        </div>
+      )}
+
       <div className="marketing-budget">
         <div className="gauge">
           <div className="gauge-header">
-            <span className="gauge-title">{t(lang, 'outputs.totalBudget')}</span>
+            <span className="gauge-title">{t(lang, 'outputs.allocatedLabel')}</span>
             <span className="gauge-value">{totalAllocated.toLocaleString()} €</span>
           </div>
           <div className="gauge-bar">

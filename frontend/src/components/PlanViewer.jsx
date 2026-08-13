@@ -171,20 +171,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       {plan.executiveSummary && (
         <div className="executive-summary card">
           <div className="executive-summary-icon"><IconSparkle width={18} height={18} /></div>
-          <p>{plan.executiveSummary}</p>
+          <div className="executive-summary-body">
+            <h3 className="executive-summary-title">{t(lang, 'outputs.executiveSummaryTitle')}</h3>
+            <p>{plan.executiveSummary}</p>
+          </div>
           <button className="executive-summary-copy" onClick={copySummary} title={t(lang, 'outputs.copySummary')}>
             {summaryCopied ? <IconCheckCircle width={16} height={16} /> : <IconCopy width={16} height={16} />}
           </button>
         </div>
       )}
-
-      <div className="budget-control card">
-        <label>
-          {t(lang, 'outputs.totalBudget')}: <strong>{budget.toLocaleString()} €</strong>
-        </label>
-        <input type="range" min="2000" max="50000" step="500" value={budget}
-          onChange={e => setBudget(Number(e.target.value))} />
-      </div>
 
       <div className="plan-grid">
         <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
@@ -196,7 +191,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
         <div id="section-calendar" className="plan-section-anchor"><CalendarView roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
-        <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} /></div>
+        <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={setBudget} /></div>
         <div id="section-editorial" className="plan-section-anchor"><EditorialCalendarCard plan={plan} lang={lang} onEditorialChange={updateEditorial} /></div>
         <div id="section-advertising" className="plan-section-anchor"><AdvertisingCalendarCard plan={plan} lang={lang} onAdvertisingChange={updateAdvertising} /></div>
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
