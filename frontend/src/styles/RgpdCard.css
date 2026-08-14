@@ -91,6 +91,21 @@
   padding: 0.15rem 0.65rem;
 }
 
+.rgpd-progress-bar {
+  height: 5px;
+  background: rgba(145, 132, 217, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 0.7rem;
+}
+
+.rgpd-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #9184d9, #4ade80);
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
 .rgpd-checklist {
   list-style: none;
   padding: 0;
@@ -105,7 +120,7 @@
   align-items: center;
   gap: 0.6rem;
   cursor: pointer;
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg-primary);
   border: 1px solid rgba(145, 132, 217, 0.12);
   border-radius: var(--radius-md);
   padding: 0.6rem 0.8rem;
@@ -156,6 +171,9 @@
 
 .rgpd-table-scroll {
   overflow-x: auto;
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(145, 132, 217, 0.12);
+  border-radius: var(--radius-md);
 }
 
 .rgpd-table {
@@ -214,6 +232,44 @@
   height: 5px;
   border-radius: 50%;
   background: var(--color-primary);
+}
+
+.rgpd-resources-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.78rem;
+  margin: -0.35rem 0 0.7rem;
+}
+
+.rgpd-resources-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 0.6rem;
+}
+
+.rgpd-resource-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--radius-md);
+  padding: 0.65rem 0.85rem;
+  color: var(--color-text-secondary);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.rgpd-resource-link svg {
+  flex-shrink: 0;
+  color: var(--color-accent);
+}
+
+.rgpd-resource-link:hover {
+  border-color: var(--color-accent);
+  color: var(--color-text-primary);
+  background: rgba(145, 132, 217, 0.06);
 }
 
 .rgpd-disclaimer {

@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { generateRgpd } from '../lib/serverStorage'
 import { generateRgpdFallback } from '../lib/rgpdFallback'
-import { IconLock, IconSparkle, IconCheckCircle, IconAlertTriangle } from './Icons'
+import { IconLock, IconSparkle, IconCheckCircle, IconAlertTriangle, IconExternalLink } from './Icons'
 import '../styles/RgpdCard.css'
 
 export default function RgpdCard({ plan, lang, onRgpdChange }) {
@@ -56,6 +56,11 @@ export default function RgpdCard({ plan, lang, onRgpdChange }) {
               <h4><IconCheckCircle width={15} height={15} /> {t(lang, 'rgpd.checklist')}</h4>
               <span className="rgpd-progress">{doneCount}/{total}</span>
             </div>
+            {total > 0 && (
+              <div className="rgpd-progress-bar">
+                <div className="rgpd-progress-fill" style={{ width: `${(doneCount / total) * 100}%` }} />
+              </div>
+            )}
             <ul className="rgpd-checklist">
               {(rgpd.checklist || []).map((it, i) => (
                 <li key={i} className={it.done ? 'done' : ''}>
@@ -101,6 +106,19 @@ export default function RgpdCard({ plan, lang, onRgpdChange }) {
               </ul>
             </div>
           )}
+
+          <div className="rgpd-block">
+            <h4>{t(lang, 'rgpd.officialResources')}</h4>
+            <p className="rgpd-resources-subtitle">{t(lang, 'rgpd.officialResourcesSubtitle')}</p>
+            <div className="rgpd-resources-list">
+              {t(lang, 'rgpd.resources').map((r, i) => (
+                <a key={i} href={r.url} target="_blank" rel="noopener noreferrer" className="rgpd-resource-link">
+                  <IconExternalLink width={13} height={13} />
+                  <span>{r.label}</span>
+                </a>
+              ))}
+            </div>
+          </div>
 
           <p className="rgpd-disclaimer">{t(lang, 'rgpd.disclaimer')}</p>
           {rgpd.source && (
