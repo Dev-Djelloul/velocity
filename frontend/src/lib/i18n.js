@@ -508,6 +508,20 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '14 août 2026',
+            title: 'Sync Notion & Jira enrichie, calendrier GTM unifié, refonte visuelle',
+            items: [
+              'Statut tri-état des stories (à faire / en cours / terminé) partagé entre Roadmap, Backlog, Gantt, Calendrier, et synchronisé vers Jira et Notion',
+              'Sync Notion par story dans une base dédiée, déclenchée depuis le Backlog',
+              'Gantt refondu en swim-lanes par responsable, Burndown chart avec dates réelles et marqueur "Aujourd\'hui"',
+              'Calendrier d\'exécution enrichi (marqueur de lancement, statuts colorés, export .ics) et remonté en tête de la section Roadmap & exécution',
+              'Calendrier éditorial et calendrier publicitaire fusionnés en un calendrier de contenu & publicité unique, semaine par semaine',
+              'Budgets marketing par canal repensés : barre d\'allocation visuelle, couleurs par canal, contenus prêts à l\'emploi repliables',
+              'Sommaire latéral du plan avec suivi actif de la section en cours de lecture (scroll-spy) et titres de section aérés entre chaque grand groupe',
+              'Cartes de présentation et résumé exécutif en fond noir profond pour faire ressortir le texte en dégradé, vignettes recolorées selon leur nature'
+            ]
+          },
+          {
             date: '12 août 2026',
             title: 'Suite analytique complète, agents IA et formulaire enrichi',
             items: [
@@ -573,7 +587,7 @@ export const translations = {
         columns: [
           {
             label: 'Disponible',
-            items: ['Questionnaire guidé multi-phases', 'Roadmap, sprints & backlog priorisé', 'Gantt interactif & burndown', 'Stratégie marketing, KPIs & prévisions financières', 'Dashboard BI & tableaux générés par IA', 'Agents IA asynchrones', 'Suivi post-lancement & scénarios what-if', 'Export PDF / CSV, partage par lien', 'FR / EN']
+            items: ['Questionnaire guidé multi-phases', 'Roadmap, sprints & backlog priorisé', 'Gantt en swim-lanes & burndown à dates réelles', 'Statut tri-état des stories, synchronisé Jira & Notion', 'Calendrier de contenu & publicité unifié, export .ics', 'Stratégie marketing, KPIs & prévisions financières', 'Dashboard BI & tableaux générés par IA', 'Agents IA asynchrones', 'Suivi post-lancement & scénarios what-if', 'Sommaire actif avec suivi de lecture', 'Export PDF / CSV, partage par lien', 'FR / EN']
           },
           {
             label: 'En cours',
@@ -1327,6 +1341,20 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: 'August 14, 2026',
+            title: 'Richer Notion & Jira sync, unified GTM calendar, visual refresh',
+            items: [
+              'Tri-state story status (to do / in progress / done) shared across Roadmap, Backlog, Gantt, Calendar, and synced to Jira and Notion',
+              'Per-story Notion sync into a dedicated database, triggered from the Backlog',
+              'Gantt redesigned as responsibility swim-lanes, burndown chart with real dates and a "Today" marker',
+              'Execution calendar enriched (launch marker, colored statuses, .ics export) and moved to the top of the Roadmap & execution section',
+              'Editorial and advertising calendars merged into a single content & advertising calendar, week by week',
+              'Marketing budgets per channel redesigned: visual allocation bar, per-channel colors, collapsible ready-to-use content',
+              'Plan sidebar now tracks the section you\'re reading (scroll-spy) with breathing room between section titles',
+              'Plan header and executive summary cards on a deep black background to make the gradient text pop, badges recolored by type'
+            ]
+          },
+          {
             date: 'August 12, 2026',
             title: 'Full analytics suite, AI agents and richer questionnaire',
             items: [
@@ -1392,7 +1420,7 @@ export const translations = {
         columns: [
           {
             label: 'Available',
-            items: ['Guided multi-phase questionnaire', 'Roadmap, sprints & prioritized backlog', 'Interactive Gantt & burndown', 'Marketing strategy, KPIs & financial forecasts', 'BI dashboard & AI-generated tables', 'Asynchronous AI agents', 'Post-launch tracking & what-if scenarios', 'PDF / CSV export, link sharing', 'FR / EN']
+            items: ['Guided multi-phase questionnaire', 'Roadmap, sprints & prioritized backlog', 'Swim-lane Gantt & real-date burndown', 'Tri-state story status, synced with Jira & Notion', 'Unified content & advertising calendar, .ics export', 'Marketing strategy, KPIs & financial forecasts', 'BI dashboard & AI-generated tables', 'Asynchronous AI agents', 'Post-launch tracking & what-if scenarios', 'Active reading sidebar with scroll tracking', 'PDF / CSV export, link sharing', 'FR / EN']
           },
           {
             label: 'In progress',
