@@ -155,6 +155,13 @@
   overflow: visible !important;
 }
 
+.auth-clerk-widget .cl-formFieldLabelRow,
+.auth-clerk-widget .cl-formFieldLabel {
+  width: 100% !important;
+  text-align: center !important;
+  justify-content: center !important;
+}
+
 /* Filet de sécurité : le widget Clerk fixe parfois une largeur intrinsèque (ex: 400px)
    sur sa racine et sur la rangée de boutons sociaux (Apple/Google/Slack), ce qui la fait
    déborder d'une carte plus étroite comme la nôtre (420px max-width, padding compris). */

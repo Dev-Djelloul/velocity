@@ -75,6 +75,7 @@ export default function App() {
 
   useEffect(() => {
     localStorage.setItem('plp_lang', lang)
+    window.dispatchEvent(new CustomEvent('plp-langchange', { detail: lang }))
   }, [lang])
 
   useEffect(() => {
@@ -398,6 +399,7 @@ export default function App() {
           <AuthPage
             mode={authMode}
             lang={lang}
+            theme={theme}
             onBack={() => setCurrentPage('landing')}
             onSwitchMode={() => setAuthMode(m => m === 'signup' ? 'signin' : 'signup')}
           />

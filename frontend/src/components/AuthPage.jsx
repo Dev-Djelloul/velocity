@@ -7,34 +7,41 @@ import '../styles/AuthPage.css'
 
 // Thème Clerk aligné sur le design system du site (fond transparent, accents violets) —
 // on masque le footer natif de Clerk ("Already have an account?") pour ne garder qu'un
-// seul lien de bascule signin/signup, celui rendu par AuthPage elle-même.
-const clerkAppearance = {
-  variables: {
-    colorPrimary: '#9184d9',
-    colorBackground: 'transparent',
-    colorText: '#e9e9ed',
-    colorTextSecondary: '#a3a3ad',
-    colorInputBackground: 'rgba(20, 22, 30, 0.6)',
-    colorInputText: '#e9e9ed',
-    colorNeutral: '#e9e9ed',
-    borderRadius: '10px',
-    fontFamily: 'inherit'
-  },
-  elements: {
-    rootBox: { width: '100%' },
-    card: { background: 'transparent', boxShadow: 'none', padding: 0, width: '100%' },
-    cardBox: { width: '100%' },
-    socialButtonsRoot: { width: '100%' },
-    socialButtons: { width: '100%', justifyContent: 'center' },
-    socialButtonsIconButton: { flex: '1 1 0' },
-    footer: { display: 'none' },
-    header: { display: 'none' }
+// seul lien de bascule signin/signup, celui rendu par AuthPage elle-même. Les couleurs de
+// texte/fond des champs sont dérivées du thème clair/sombre de l'app : Clerk ne suit pas
+// automatiquement nos tokens CSS, donc un thème clair avec des variables restées sombres
+// rendait le texte illisible (blanc sur blanc).
+function getClerkAppearance(theme) {
+  const isLight = theme === 'light'
+  return {
+    variables: {
+      colorPrimary: '#9184d9',
+      colorBackground: 'transparent',
+      colorText: isLight ? '#1a1f2e' : '#e9e9ed',
+      colorTextSecondary: isLight ? '#5a5f6e' : '#a3a3ad',
+      colorInputBackground: isLight ? 'rgba(15, 20, 30, 0.04)' : 'rgba(20, 22, 30, 0.6)',
+      colorInputText: isLight ? '#1a1f2e' : '#e9e9ed',
+      colorNeutral: isLight ? '#1a1f2e' : '#e9e9ed',
+      borderRadius: '10px',
+      fontFamily: 'inherit'
+    },
+    elements: {
+      rootBox: { width: '100%' },
+      card: { background: 'transparent', boxShadow: 'none', padding: 0, width: '100%' },
+      cardBox: { width: '100%' },
+      socialButtonsRoot: { width: '100%' },
+      socialButtons: { width: '100%', justifyContent: 'center' },
+      socialButtonsIconButton: { flex: '1 1 0' },
+      footer: { display: 'none' },
+      header: { display: 'none' }
+    }
   }
 }
 
-export default function AuthPage({ mode, onSwitchMode, onBack, lang }) {
+export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme }) {
   const isSignUp = mode === 'signup'
   const mock = useAuthProviders()
+  const clerkAppearance = getClerkAppearance(theme)
 
   return (
     <div className="auth-page">
