@@ -27,7 +27,7 @@ import { savePlan } from '../lib/planStorage'
 import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -159,8 +159,45 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       )}
 
       <div className="plan-header card">
-        <div>
-          <h2>{plan.product?.name} — {plan.classification}</h2>
+        <div className="plan-header-main">
+          <div className="plan-header-top">
+            <h2>{plan.product?.name}</h2>
+            <div className="plan-badges">
+              {plan.classification && <span className="plan-badge plan-badge-accent">{plan.classification}</span>}
+              {plan.product?.stage && <span className="plan-badge">{t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}</span>}
+              {plan.product?.category && <span className="plan-badge">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
+            </div>
+          </div>
+
+          {plan.product?.pitch && <p className="plan-header-pitch">{plan.product.pitch}</p>}
+
+          <div className="plan-header-stats">
+            {plan.market?.b2bVsB2c && (
+              <span className="plan-stat">
+                <IconCompass width={13} height={13} />
+                {t(lang, 'market.b2bVsB2cOptions')[plan.market.b2bVsB2c] || plan.market.b2bVsB2c}
+                {plan.market?.geography && ` · ${t(lang, 'market.geographyOptions')[plan.market.geography] || plan.market.geography}`}
+              </span>
+            )}
+            {plan.resources?.budgetEur && (
+              <span className="plan-stat">
+                <IconCoin width={13} height={13} />
+                {t(lang, 'resources.budgetOptions')[plan.resources.budgetEur] || plan.resources.budgetEur}
+              </span>
+            )}
+            {plan.resources?.timelineWeeks && (
+              <span className="plan-stat">
+                <IconClock width={13} height={13} />
+                {t(lang, 'resources.timelineOptions')[plan.resources.timelineWeeks] || plan.resources.timelineWeeks}
+              </span>
+            )}
+            {plan.resources?.teamSize && (
+              <span className="plan-stat">
+                <IconUser width={13} height={13} />
+                {t(lang, 'resources.teamSizeOptions')[plan.resources.teamSize] || plan.resources.teamSize}
+              </span>
+            )}
+          </div>
         </div>
         <div className="plan-actions">
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
