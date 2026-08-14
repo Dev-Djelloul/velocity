@@ -85,6 +85,7 @@ export default function PlanSidebar({ lang, onNewPlan }) {
   const [resizing, setResizing] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState({})
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
+  const itemRefs = useRef({})
 
   const goTo = (id) => setActiveId(id)
   const toggleGroup = (key) => setCollapsedGroups(prev => ({ ...prev, [key]: !prev[key] }))
@@ -112,6 +113,10 @@ export default function PlanSidebar({ lang, onNewPlan }) {
     targets.forEach(el => observer.observe(el))
     return () => observer.disconnect()
   }, [groupOf])
+
+  useEffect(() => {
+    itemRefs.current[activeId]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
+  }, [activeId])
 
   const startResize = (e) => {
     e.preventDefault()
@@ -148,6 +153,7 @@ export default function PlanSidebar({ lang, onNewPlan }) {
   const renderItem = ({ id, labelKey, Icon }) => (
     <a
       key={id}
+      ref={el => { itemRefs.current[id] = el }}
       href={`#${id}`}
       className={`plan-sidebar-item ${activeId === id ? 'active' : ''}`}
       onClick={() => goTo(id)}

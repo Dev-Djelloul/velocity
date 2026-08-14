@@ -33,31 +33,35 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.3rem 0.4rem 0.7rem;
-  min-height: 22px;
+  padding: 0.2rem 0.3rem 0.7rem 0.5rem;
+  margin-bottom: 0.3rem;
+  min-height: 24px;
+  border-bottom: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .plan-sidebar.collapsed .plan-sidebar-top {
   justify-content: center;
+  padding: 0.2rem 0 0.7rem;
 }
 
 .plan-sidebar-title {
   color: var(--color-text-muted);
-  font-size: 0.66rem;
+  font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-height: 24px;
 }
 
 .plan-sidebar-toggle {
   background: rgba(145, 132, 217, 0.1);
   border: 1px solid rgba(145, 132, 217, 0.2);
   color: var(--color-text-muted);
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   border-radius: 6px;
   cursor: pointer;
   display: flex;
