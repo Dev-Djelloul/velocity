@@ -149,7 +149,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
           <span className="plan-confirmation-icon" aria-hidden="true">
-            {justGenerated ? <IconRocket width={22} height={22} /> : <IconClock width={22} height={22} />}
+            {justGenerated ? <IconRocket width={22} height={22} /> : <img src="/assets/icons/icons8-clock.gif" width={22} height={22} alt="" />}
           </span>
           <div className="plan-confirmation-text">
             <h3>{justGenerated ? t(lang, 'outputs.planReadyTitle') : t(lang, 'outputs.planLoadedTitle')}</h3>
@@ -168,8 +168,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
               {plan.product?.category && <span className="plan-badge">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
             </div>
           </div>
-
-          {plan.product?.pitch && <p className="plan-header-pitch">{plan.product.pitch}</p>}
 
           <div className="plan-header-stats">
             {plan.market?.b2bVsB2c && (

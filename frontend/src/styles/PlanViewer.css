@@ -121,15 +121,6 @@
   color: var(--color-accent);
 }
 
-.plan-header-pitch {
-  color: var(--color-text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.5;
-  font-style: italic;
-  margin-bottom: 0.75rem;
-  max-width: 60ch;
-}
-
 .plan-header-stats {
   display: flex;
   align-items: center;
