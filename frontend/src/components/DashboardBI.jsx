@@ -37,10 +37,18 @@ function Donut({ segments, centerLabel, centerValue }) {
   )
 }
 
+// Dernière mesure trackée pour un KPI donné (même logique que PostLaunchTracking.historyFor) —
+// les entrées sans kpiIndex (anciennes données) sont rattachées au KPI principal (index 0).
+function latestTrackedValue(metricsHistory, idx) {
+  const entries = (metricsHistory || []).filter(h => (h.kpiIndex ?? 0) === idx)
+  if (!entries.length) return 0
+  return entries.reduce((latest, h) => (!latest || h.date > latest.date ? h : latest), null).value
+}
+
 export default function DashboardBI({ plan, lang }) {
   if (!plan) return null
 
-  const { roadmap, marketing, kpis, financials } = plan
+  const { roadmap, marketing, kpis, financials, metricsHistory } = plan
 
   const budgetSegments = (marketing?.channels || []).map(ch => ({
     name: ch.name,
@@ -91,8 +99,19 @@ export default function DashboardBI({ plan, lang }) {
           </div>
         )}
 
+        {financials && (
+          <div className="dashboard-bi-tile">
+            <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
+            <Donut
+              segments={financials.costBreakdown.map(c => ({ name: c.category, value: c.amount, display: `${c.pct}%` }))}
+              centerValue={`${(financials.monthlyBurn).toLocaleString()} €`}
+              centerLabel={t(lang, 'dashboardBi.monthlyBurn')}
+            />
+          </div>
+        )}
+
         {sprints.length > 0 && (
-          <div className="dashboard-bi-tile dashboard-bi-tile-wide">
+          <div className="dashboard-bi-tile dashboard-bi-tile-full">
             <h4>{t(lang, 'dashboardBi.velocityBySprint')}</h4>
             <div className="velocity-bars">
               {sprints.map(sp => {
@@ -114,29 +133,30 @@ export default function DashboardBI({ plan, lang }) {
         )}
 
         {kpis?.length > 0 && (
-          <div className="dashboard-bi-tile dashboard-bi-tile-wide">
+          <div className="dashboard-bi-tile dashboard-bi-tile-full">
             <h4>{t(lang, 'dashboardBi.kpiTargets')}</h4>
+            <p className="dashboard-bi-tile-hint">{t(lang, 'dashboardBi.kpiTargetsHint')}</p>
             <div className="dashboard-bi-kpis">
               {primaryKpi && (
-                <CircularGauge value={0} max={primaryKpi.target || 100} label={primaryKpi.name} unit={primaryKpi.unit} />
+                <CircularGauge
+                  value={latestTrackedValue(metricsHistory, 0)}
+                  max={primaryKpi.target || 100}
+                  label={primaryKpi.name}
+                  unit={primaryKpi.unit}
+                />
               )}
               <div className="dashboard-bi-kpi-bars">
                 {kpis.slice(1).map((k, i) => (
-                  <GaugeProgress key={i} label={k.name} value={0} max={k.target || 100} unit={k.unit} />
+                  <GaugeProgress
+                    key={i}
+                    label={k.name}
+                    value={latestTrackedValue(metricsHistory, i + 1)}
+                    max={k.target || 100}
+                    unit={k.unit}
+                  />
                 ))}
               </div>
             </div>
-          </div>
-        )}
-
-        {financials && (
-          <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
-            <Donut
-              segments={financials.costBreakdown.map(c => ({ name: c.category, value: c.amount, display: `${c.pct}%` }))}
-              centerValue={`${(financials.monthlyBurn).toLocaleString()} €`}
-              centerLabel={t(lang, 'dashboardBi.monthlyBurn')}
-            />
           </div>
         )}
       </div>
