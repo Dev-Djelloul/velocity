@@ -14,6 +14,7 @@ import {
   SignInButton as ClerkSignInButton,
   UserButton as ClerkUserButton
 } from '@clerk/clerk-react'
+import { frFR, enUS } from '@clerk/localizations'
 import { IconUser } from '../components/Icons'
 import '../styles/Auth.css'
 
@@ -111,15 +112,12 @@ function useMockAuthContext() {
 }
 
 // Clerk ne traduit pas automatiquement ses libellés avec le sélecteur FR/EN de l'app (ce
-// sont deux systèmes de langue indépendants) — on ne surcharge que le libellé "Email
-// address or username" plutôt que d'importer @clerk/localization pour une traduction
-// complète, qui n'a pas été demandée. On écoute l'événement 'plp-langchange' (émis par
-// App.jsx à chaque changement de langue) car ClerkProvider est monté au-dessus d'App
-// dans l'arbre React et n'a donc pas accès direct à son state.
-const CLERK_LOCALIZATION_OVERRIDES = {
-  fr: { formFieldLabel__emailAddress_username: "Adresse e-mail ou nom d'utilisateur" },
-  en: { formFieldLabel__emailAddress_username: 'Email address or username' }
-}
+// sont deux systèmes de langue indépendants) : on branche les traductions officielles de
+// @clerk/localizations ("Continuer avec Google", "Dernière utilisation", placeholders...).
+// On écoute l'événement 'plp-langchange' (émis par App.jsx à chaque changement de langue)
+// car ClerkProvider est monté au-dessus d'App dans l'arbre React et n'a donc pas accès
+// direct à son state.
+const CLERK_LOCALIZATIONS = { fr: frFR, en: enUS }
 
 function useAppLang() {
   const [lang, setLang] = useState(() => localStorage.getItem('plp_lang') || 'fr')
@@ -135,7 +133,7 @@ export function AuthProvider({ children }) {
   const lang = useAppLang()
   if (isMockAuth) return <MockAuthProvider>{children}</MockAuthProvider>
   return (
-    <ClerkProvider publishableKey={CLERK_KEY} localization={CLERK_LOCALIZATION_OVERRIDES[lang]}>
+    <ClerkProvider publishableKey={CLERK_KEY} localization={CLERK_LOCALIZATIONS[lang]}>
       {children}
     </ClerkProvider>
   )

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.61.9",
+    "@clerk/localizations": "^4.15.2",
     "html2canvas": "^1.4.1",
     "pdfmake": "^0.2.10",
     "pptxgenjs": "^4.0.1",
