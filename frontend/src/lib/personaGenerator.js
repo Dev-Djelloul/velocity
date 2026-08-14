@@ -1,10 +1,13 @@
 import { c } from './contentI18n'
 
 const NAMES = ['Marie', 'Thomas', 'Sophie', 'Lucas', 'Emma', 'Nathan', 'Chloé', 'Hugo']
+const GENDERS = ['female', 'male', 'female', 'male', 'female', 'male', 'female', 'male']
 
 export function generatePersona(market, product, priorities, lang) {
   const persona = c(lang).persona
-  const name = NAMES[Math.abs(hashCode(`${product?.name || ''}${market?.segment || ''}`)) % NAMES.length]
+  const nameIdx = Math.abs(hashCode(`${product?.name || ''}${market?.segment || ''}`)) % NAMES.length
+  const name = NAMES[nameIdx]
+  const gender = GENDERS[nameIdx]
   const targetUser = product?.targetUser
   const focus = priorities?.focus
   const title = persona.titles[targetUser] || persona.titles.smb
@@ -16,7 +19,7 @@ export function generatePersona(market, product, priorities, lang) {
   const quote = persona.quotes[focus] || persona.quotes.acquire
   const buyingTrigger = persona.buyingTriggers[focus] || persona.buyingTriggers.acquire
 
-  return { name, title, ageRange, context, painPoints, goals, quote, preferredChannel, buyingTrigger }
+  return { name, gender, title, ageRange, context, painPoints, goals, quote, preferredChannel, buyingTrigger }
 }
 
 function hashCode(str) {

@@ -10,8 +10,8 @@
 }
 
 .persona-avatar {
-  width: 44px;
-  height: 44px;
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
   background: rgba(145, 132, 217, 0.14);
   color: var(--color-accent);
@@ -19,6 +19,20 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
+}
+
+.persona-avatar-photo {
+  padding: 2px;
+  background: var(--wordmark-gradient);
+}
+
+.persona-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--color-bg-tertiary);
 }
 
 .persona-card-header h3 {

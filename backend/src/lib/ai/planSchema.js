@@ -133,6 +133,7 @@ export const PLAN_GENERATION_TOOL = {
         description: 'Persona utilisateur cible, incarné et actionnable — pas un profil générique',
         properties: {
           name: { type: 'string', description: 'Prénom réaliste' },
+          gender: { type: 'string', enum: ['male', 'female'], description: 'Genre du persona, cohérent avec le prénom choisi — sert à illustrer le persona avec une photo adaptée' },
           title: { type: 'string', description: 'Titre/rôle du persona' },
           ageRange: { type: 'string', description: 'Tranche d\'âge plausible, ex: "30-42 ans"' },
           context: { type: 'string', description: 'Une phrase de contexte situationnel : sa journée type, ses contraintes, ce qui pèse sur ses décisions' },
@@ -142,7 +143,7 @@ export const PLAN_GENERATION_TOOL = {
           preferredChannel: { type: 'string', description: 'Où il/elle passe du temps et comment le/la toucher efficacement' },
           buyingTrigger: { type: 'string', description: 'L\'événement ou déclic précis qui le/la pousse à chercher activement une solution' }
         },
-        required: ['name', 'title', 'ageRange', 'context', 'painPoints', 'goals', 'quote', 'preferredChannel', 'buyingTrigger']
+        required: ['name', 'gender', 'title', 'ageRange', 'context', 'painPoints', 'goals', 'quote', 'preferredChannel', 'buyingTrigger']
       },
       classification: {
         type: 'string',
