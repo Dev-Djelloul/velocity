@@ -89,12 +89,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
-  const updateScenarios = (nextScenarios) => {
-    const nextPlan = { ...plan, scenarios: nextScenarios }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
-  }
-
   const updateVeille = (nextVeille) => {
     const nextPlan = { ...plan, veille: nextVeille }
     setPlan(nextPlan)
@@ -259,7 +253,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.postlaunch')}</h2>
         <div id="section-tracking" className="plan-section-anchor"><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
-        <div id="section-whatif" className="plan-section-anchor"><WhatIfScenarios plan={plan} lang={lang} onScenariosChange={updateScenarios} /></div>
+        <div id="section-whatif" className="plan-section-anchor"><WhatIfScenarios plan={plan} lang={lang} /></div>
       </div>
 
       {showExport && (

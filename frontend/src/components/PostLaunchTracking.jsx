@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
-import { IconTrendingUp, IconPlus, IconChevronUp, IconChevronDown } from './Icons'
+import { IconTrendingUp, IconPlus, IconChevronUp, IconChevronDown, IconCheckCircle, IconX, IconPencil } from './Icons'
 import '../styles/PostLaunchTracking.css'
 
 const CHART_W = 640
@@ -68,6 +68,7 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
   const [note, setNote] = useState('')
   const [isEditingLaunchDate, setIsEditingLaunchDate] = useState(false)
   const [tempLaunchDate, setTempLaunchDate] = useState(launchDateStr)
+  const [showHistory, setShowHistory] = useState(false)
 
   if (!kpis.length) return null
   const kpi = kpis[selectedKpi] || kpis[0]
@@ -162,14 +163,14 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
                 value={tempLaunchDate}
                 onChange={e => setTempLaunchDate(e.target.value)}
               />
-              <button className="btn-sm" onClick={saveLaunchDate}>✓</button>
-              <button className="btn-sm" onClick={() => setIsEditingLaunchDate(false)}>✕</button>
+              <button className="btn-sm" onClick={saveLaunchDate}><IconCheckCircle width={13} height={13} /></button>
+              <button className="btn-sm" onClick={() => setIsEditingLaunchDate(false)}><IconX width={13} height={13} /></button>
             </div>
           ) : (
             <div className="tracking-launch-date-display">
               <span className="tracking-launch-label">{t(lang, 'tracking.launchLabel')}</span>
               <span className="tracking-launch-value">{launchDateStr}</span>
-              <button className="btn-sm" onClick={() => setIsEditingLaunchDate(true)} title={t(lang, 'tracking.editLaunchDate')}>✎</button>
+              <button className="btn-sm" onClick={() => setIsEditingLaunchDate(true)} title={t(lang, 'tracking.editLaunchDate')}><IconPencil width={12} height={12} /></button>
             </div>
           )}
         </div>
@@ -183,46 +184,25 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
       ) : (
       <>
       {kpis.length > 1 && (
-        <div className="tracking-kpi-tabs">
-          {kpis.map((k, idx) => {
-            const h = historyFor(idx)
-            const lastVal = h[h.length - 1]?.value
-            const pct = k.target && lastVal != null ? Math.round((lastVal / k.target) * 100) : null
-            return (
-              <button
-                key={idx}
-                className={`tracking-kpi-tab ${idx === selectedKpi ? 'active' : ''}`}
-                onClick={() => setSelectedKpi(idx)}
-              >
-                <span className="tracking-kpi-tab-name">{k.name}</span>
-                <span className="tracking-kpi-tab-pct">{pct != null ? `${pct}%` : (h.length ? h[h.length - 1].value : '—')}</span>
-              </button>
-            )
-          })}
-        </div>
+        <label className="tracking-kpi-select">
+          <span>{t(lang, 'tracking.selectKpi')}</span>
+          <select value={selectedKpi} onChange={e => setSelectedKpi(Number(e.target.value))}>
+            {kpis.map((k, idx) => <option key={idx} value={idx}>{k.name}</option>)}
+          </select>
+        </label>
       )}
 
-      <div className="tracking-scorecard">
-        <div className="tracking-stat">
-          <span className="tracking-stat-label">{t(lang, 'tracking.currentValue')}</span>
-          <span className="tracking-stat-value">{latest ? `${latest.value} ${kpi.unit}` : t(lang, 'tracking.noHistoryYet')}</span>
-          {pctOfTarget != null && <span className="tracking-stat-sub">{t(lang, 'tracking.ofTargetPct')(pctOfTarget)}</span>}
+      <div className={`tracking-hero tracking-hero-${projectionState}`}>
+        <div className="tracking-hero-value">
+          {latest ? `${latest.value} ${kpi.unit}` : t(lang, 'tracking.noHistoryYet')}
+          {pctOfTarget != null && <span className="tracking-hero-pct">{t(lang, 'tracking.ofTargetPct')(pctOfTarget)}</span>}
         </div>
-        <div className="tracking-stat">
-          <span className="tracking-stat-label">{t(lang, 'tracking.trend')}</span>
-          <span className={`tracking-stat-value ${weeklyTrend > 0 ? 'positive' : weeklyTrend < 0 ? 'negative' : ''}`}>
-            {weeklyTrend != null ? `${weeklyTrend >= 0 ? '+' : ''}${weeklyTrend.toFixed(1)}` : '—'}
-          </span>
-          <span className="tracking-stat-sub">{t(lang, 'tracking.perWeek')}</span>
-        </div>
-        <div className="tracking-stat">
-          <span className="tracking-stat-label">{t(lang, 'tracking.projection')}</span>
-          <span className={`tracking-stat-value tracking-stat-value-text tracking-projection-${projectionState}`}>{projectionLabel}</span>
-        </div>
-        <div className="tracking-stat">
-          <span className="tracking-stat-label">{t(lang, 'tracking.daysSinceLaunch')}</span>
-          <span className="tracking-stat-value">{daysSinceLaunch}</span>
-        </div>
+        <div className="tracking-hero-verdict">{projectionLabel}</div>
+      </div>
+
+      <div className="tracking-substats">
+        <span>{t(lang, 'tracking.trend')} : <strong className={weeklyTrend > 0 ? 'positive' : weeklyTrend < 0 ? 'negative' : ''}>{weeklyTrend != null ? `${weeklyTrend >= 0 ? '+' : ''}${weeklyTrend.toFixed(1)}` : '—'}</strong> {t(lang, 'tracking.perWeek')}</span>
+        <span>{t(lang, 'tracking.daysSinceLaunch')} : <strong>{daysSinceLaunch}</strong></span>
       </div>
 
       <div className="tracking-form">
@@ -285,16 +265,22 @@ export default function PostLaunchTracking({ plan, lang, onMetricsChange, onLaun
             )}
           </div>
 
-          <div className="tracking-history">
-            {history.slice().reverse().map((h, i) => (
-              <div key={i} className="tracking-history-row">
-                <span>{h.date}</span>
-                <span>{h.value} {kpi.unit}</span>
-                {h.note && <span className="tracking-history-note">{h.note}</span>}
-                <button onClick={() => removeSnapshot(h)}>×</button>
-              </div>
-            ))}
-          </div>
+          <button className="tracking-history-toggle" onClick={() => setShowHistory(s => !s)}>
+            {showHistory ? t(lang, 'tracking.hideHistory') : t(lang, 'tracking.viewHistory')(history.length)}
+          </button>
+
+          {showHistory && (
+            <div className="tracking-history">
+              {history.slice().reverse().map((h, i) => (
+                <div key={i} className="tracking-history-row">
+                  <span>{h.date}</span>
+                  <span>{h.value} {kpi.unit}</span>
+                  {h.note && <span className="tracking-history-note">{h.note}</span>}
+                  <button onClick={() => removeSnapshot(h)}><IconX width={12} height={12} /></button>
+                </div>
+              ))}
+            </div>
+          )}
         </>
       ) : (
         <p className="tracking-empty">{t(lang, 'tracking.empty')}</p>

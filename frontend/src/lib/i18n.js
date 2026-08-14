@@ -334,17 +334,26 @@ export const translations = {
       projectionNoTarget: 'Pas d\'objectif chiffré',
       needMorePoints: 'Ajoute 2 mesures pour voir la tendance',
       daysSinceLaunch: 'Jours depuis le lancement',
-      noHistoryYet: 'Aucune mesure'
+      noHistoryYet: 'Aucune mesure',
+      selectKpi: 'KPI suivi',
+      viewHistory: (n) => `Voir l'historique (${n})`,
+      hideHistory: 'Masquer l\'historique',
+      quickAddLabel: 'Ajouter une mesure'
     },
     whatif: {
-      title: 'Scénarios what-if',
-      subtitle: 'Compare des hypothèses de budget/timeline sans modifier le plan initial',
-      namePlaceholder: 'Nom du scénario (optionnel)',
-      compute: 'Calculer',
-      baseline: 'Plan actuel',
-      burnLabel: 'Burn/mois :',
-      runwayLabel: 'Runway :',
-      breakEvenLabel: 'Seuil (clients) :'
+      title: 'Simulateur budget & timeline',
+      subtitle: 'Ajuste le budget et la durée pour voir l\'impact en direct sur tes finances, ta roadmap et ton marketing — sans rien modifier au plan initial',
+      budgetLabel: 'Budget',
+      timelineLabel: 'Durée',
+      currentPlan: 'Plan actuel',
+      simulated: 'Simulation',
+      burnLabel: 'Burn/mois',
+      runwayLabel: 'Runway',
+      breakEvenLabel: 'Seuil (clients)',
+      sprintsLabel: 'Sprints',
+      channelsTitle: 'Répartition marketing simulée',
+      weeksUnit: 'semaines',
+      vsCurrent: 'vs plan actuel'
     },
     roadmapIssues: {
       title: 'Alertes roadmap',
@@ -543,6 +552,21 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: '14 août 2026',
+            title: 'Refonte visuelle complète : KPI, finances, RGPD, outils IA, suivi post-lancement',
+            items: [
+              'Dashboard KPI repensé : toutes les cartes au même niveau, vue Cartes/Tableau, une couleur par KPI, calculateur A/B test sorti en carte dédiée avec explications',
+              'Benchmarks : lignes du tableau teintées selon leur verdict, cartes canaux recolorées et réaménagées pour la lisibilité',
+              'Prévisionnel financier : graphique de trajectoire du budget jusqu\'à épuisement, pont visuel coût vs revenu requis pour l\'équilibre',
+              'Conformité RGPD : bloc de ressources officielles (CNIL, texte du RGPD, EDPB), barre de progression sur la checklist',
+              'Outils IA repensés en profondeur : agent passé de 2 à 4 capacités réelles (ajout analyse des risques et optimisation budgétaire), graphique en langage naturel et tableau généré par prompt fusionnés en un seul outil IA fiable avec suggestions et graphique automatique',
+              'Suivi post-lancement : verdict de projection mis en avant, sélecteur de KPI simplifié, historique replié',
+              'Scénarios what-if remplacés par un simulateur budget/durée en direct (curseurs, impact sur la roadmap et le budget marketing par canal)',
+              'Sommaire latéral : poignée de repli discrète centrée sur la bordure, plus besoin de remonter en haut de page',
+              'Fond noir harmonisé et couleurs par catégorie sur l\'ensemble des cartes du plan'
+            ]
+          },
           {
             date: '14 août 2026',
             title: 'Sync Notion & Jira enrichie, calendrier GTM unifié, refonte visuelle',
@@ -1203,17 +1227,26 @@ export const translations = {
       projectionNoTarget: 'No numeric target',
       needMorePoints: 'Add 2 data points to see the trend',
       daysSinceLaunch: 'Days since launch',
-      noHistoryYet: 'No data yet'
+      noHistoryYet: 'No data yet',
+      selectKpi: 'Tracked KPI',
+      viewHistory: (n) => `View history (${n})`,
+      hideHistory: 'Hide history',
+      quickAddLabel: 'Add a measurement'
     },
     whatif: {
-      title: 'What-if scenarios',
-      subtitle: 'Compare budget/timeline assumptions without changing the original plan',
-      namePlaceholder: 'Scenario name (optional)',
-      compute: 'Compute',
-      baseline: 'Current plan',
-      burnLabel: 'Burn/month:',
-      runwayLabel: 'Runway:',
-      breakEvenLabel: 'Break-even (users):'
+      title: 'Budget & timeline simulator',
+      subtitle: 'Adjust budget and duration to see the live impact on your finances, roadmap and marketing — without changing the original plan',
+      budgetLabel: 'Budget',
+      timelineLabel: 'Duration',
+      currentPlan: 'Current plan',
+      simulated: 'Simulation',
+      burnLabel: 'Burn/month',
+      runwayLabel: 'Runway',
+      breakEvenLabel: 'Break-even (users)',
+      sprintsLabel: 'Sprints',
+      channelsTitle: 'Simulated marketing split',
+      weeksUnit: 'weeks',
+      vsCurrent: 'vs current plan'
     },
     roadmapIssues: {
       title: 'Roadmap alerts',
@@ -1412,6 +1445,21 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 14, 2026',
+            title: 'Full visual overhaul: KPIs, finances, GDPR, AI tools, post-launch tracking',
+            items: [
+              'KPI dashboard redesigned: all cards on equal footing, Cards/Table view, one color per KPI, A/B test calculator pulled out into its own explained card',
+              'Benchmarks: table rows tinted by verdict, channel cards recolored and rearranged for readability',
+              'Financial forecast: budget trajectory chart down to depletion, visual bridge between monthly cost and revenue needed to break even',
+              'GDPR compliance: official resources block (CNIL, GDPR text, EDPB), progress bar on the checklist',
+              'AI tools rebuilt from the ground up: agent went from 2 to 4 real capabilities (added risk analysis and budget optimization), natural-language chart and prompt-generated table merged into one reliable AI tool with suggestions and an automatic chart',
+              'Post-launch tracking: projection verdict brought front and center, simplified KPI picker, collapsible history',
+              'What-if scenarios replaced by a live budget/duration simulator (sliders, impact on the roadmap and per-channel marketing budget)',
+              'Plan sidebar: discreet collapse handle centered on the edge, no more scrolling to the top to find it',
+              'Consistent black background and per-category colors across all plan cards'
+            ]
+          },
           {
             date: 'August 14, 2026',
             title: 'Richer Notion & Jira sync, unified GTM calendar, visual refresh',
