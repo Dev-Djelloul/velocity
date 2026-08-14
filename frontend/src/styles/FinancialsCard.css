@@ -25,15 +25,16 @@
 }
 
 .fin-tile {
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg-primary);
   border: 1px solid rgba(145, 132, 217, 0.15);
+  border-left: 3px solid var(--fin-color, var(--color-accent));
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-md);
   transition: all 0.2s ease;
 }
 
 .fin-tile:hover {
-  border-color: var(--color-accent);
+  border-color: var(--fin-color, var(--color-accent));
   box-shadow: 0 0 12px rgba(145, 132, 217, 0.15);
 }
 
@@ -44,8 +45,8 @@
   width: 30px;
   height: 30px;
   border-radius: var(--radius-lg);
-  background: rgba(145, 132, 217, 0.12);
-  color: var(--color-accent);
+  background: color-mix(in srgb, var(--fin-color, var(--color-accent)) 16%, transparent);
+  color: var(--fin-color, var(--color-accent));
   margin-bottom: var(--spacing-sm);
 }
 
@@ -58,7 +59,7 @@
 }
 
 .fin-value {
-  color: var(--color-text-primary);
+  color: var(--fin-color, var(--color-text-primary));
   font-size: var(--font-size-xl);
   font-weight: var(--font-weight-bold);
 }
@@ -73,6 +74,141 @@
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);
   margin-top: var(--spacing-xs);
+}
+
+.financials-runway,
+.financials-bridge {
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--border-radius);
+  padding: 1.1rem 1.25rem 1.25rem;
+  margin-bottom: 1.1rem;
+}
+
+.financials-runway h4,
+.financials-bridge h4 {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  margin-bottom: 0.2rem;
+}
+
+.financials-runway-subtitle {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.runway-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.4rem;
+  height: 100px;
+  overflow-x: auto;
+  padding-bottom: 0.3rem;
+}
+
+.runway-bar-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+  width: 26px;
+}
+
+.runway-bar-track {
+  width: 100%;
+  height: 76px;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(145, 132, 217, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.runway-bar-fill {
+  width: 100%;
+  min-height: 2px;
+  background: linear-gradient(180deg, #9184d9, #6366f1);
+  border-radius: 4px 4px 0 0;
+  transition: height 0.2s ease;
+}
+
+.runway-bar-fill.depleted {
+  background: #ef4444;
+}
+
+.runway-bar-label {
+  font-size: 0.62rem;
+  color: var(--color-text-muted);
+}
+
+.runway-legend {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.9rem;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+}
+
+.runway-legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  background: linear-gradient(180deg, #9184d9, #6366f1);
+  margin-right: 0.15rem;
+}
+
+.runway-legend-dot.depleted {
+  background: #ef4444;
+  margin-left: 0.9rem;
+}
+
+.bridge-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.bridge-row {
+  display: grid;
+  grid-template-columns: 110px 1fr auto;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bridge-row-label {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+}
+
+.bridge-bar-track {
+  height: 16px;
+  background: rgba(145, 132, 217, 0.08);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.bridge-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.2s ease;
+}
+
+.bridge-cost {
+  background: linear-gradient(90deg, #9184d9, #6366f1);
+}
+
+.bridge-revenue {
+  background: linear-gradient(90deg, #4ade80, #06b6d4);
+}
+
+.bridge-row-value {
+  font-size: 0.85rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  white-space: nowrap;
 }
 
 .financials-arpu-rationale {
@@ -118,6 +254,16 @@
 
 .cost-bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--color-accent), var(--color-accent-light));
+  background: var(--cost-color, var(--color-accent));
   border-radius: 3px;
+}
+
+.cost-line-header span:first-child::before {
+  content: '';
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cost-color, var(--color-accent));
+  margin-right: 0.4rem;
 }

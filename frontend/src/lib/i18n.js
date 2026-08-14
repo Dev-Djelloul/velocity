@@ -434,7 +434,14 @@ export const translations = {
         clients: 'clients payants',
         breakEvenNote: (users, revenue, arpu) => `≈ ${revenue.toLocaleString()} €/mois à ${arpu} €/client`,
         arpuLabel: 'Pourquoi cet ARPU :',
-        breakdown: 'Répartition du budget'
+        breakdown: 'Répartition du budget',
+        runwayChartTitle: 'Trajectoire du budget',
+        runwayChartSubtitle: 'Budget restant mois par mois, au rythme de dépense actuel',
+        runwayDepleted: 'Budget épuisé',
+        bridgeTitle: 'Coût vs revenu nécessaire',
+        bridgeSubtitle: 'Ce qu\'il vous en coûte par mois, face à ce qu\'il faut générer pour atteindre l\'équilibre',
+        bridgeCost: 'Dépense mensuelle',
+        bridgeRevenue: 'Revenu requis'
       },
       strategy: {
         title: 'Boîte à outils stratégique',
@@ -1280,7 +1287,14 @@ export const translations = {
         clients: 'paying customers',
         breakEvenNote: (users, revenue, arpu) => `≈ €${revenue.toLocaleString()}/month at €${arpu}/customer`,
         arpuLabel: 'Why this ARPU:',
-        breakdown: 'Budget breakdown'
+        breakdown: 'Budget breakdown',
+        runwayChartTitle: 'Budget trajectory',
+        runwayChartSubtitle: 'Remaining budget month by month, at the current burn rate',
+        runwayDepleted: 'Budget depleted',
+        bridgeTitle: 'Cost vs. required revenue',
+        bridgeSubtitle: 'What it costs you per month, versus what you need to generate to break even',
+        bridgeCost: 'Monthly burn',
+        bridgeRevenue: 'Required revenue'
       },
       strategy: {
         title: 'Strategy toolkit',

@@ -65,6 +65,18 @@
   border-bottom: 1px solid rgba(145, 132, 217, 0.12);
 }
 
+.benchmark-row td:first-child {
+  border-left: 3px solid transparent;
+}
+
+.verdict-row-below td:first-child { border-left-color: #f59e0b; }
+.verdict-row-onpar td:first-child { border-left-color: #06b6d4; }
+.verdict-row-above td:first-child { border-left-color: #22c55e; }
+
+.verdict-row-below { background: rgba(245, 158, 11, 0.05); }
+.verdict-row-onpar { background: rgba(6, 182, 212, 0.05); }
+.verdict-row-above { background: rgba(34, 197, 94, 0.05); }
+
 .benchmarks-table th {
   color: var(--color-text-muted);
   font-weight: var(--font-weight-semibold);
@@ -118,38 +130,46 @@
 .benchmarks-channel-list {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .benchmarks-channel {
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg-primary);
   border: 1px solid rgba(145, 132, 217, 0.15);
+  border-left: 3px solid var(--channel-color, var(--color-accent));
   border-radius: var(--radius-md);
-  padding: 0.75rem 0.9rem;
+  padding: 1.1rem 1.15rem;
 }
 
 .benchmarks-channel-head {
   display: flex;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem;
-  margin-bottom: 0.3rem;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-bottom: 0.7rem;
 }
 
 .benchmarks-channel-name {
   font-weight: var(--font-weight-semibold);
-  color: var(--color-text-primary);
+  color: var(--color-text-secondary);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .benchmarks-channel-value {
-  font-size: 0.8rem;
-  color: var(--color-primary);
+  font-size: 0.85rem;
+  color: var(--channel-color, var(--color-primary));
   font-weight: var(--font-weight-semibold);
+  line-height: 1.5;
+  letter-spacing: 0.01em;
 }
 
 .benchmarks-channel-note {
   font-size: 0.8rem;
   color: var(--color-text-secondary);
+  line-height: 1.6;
+  padding-top: 0.7rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .benchmarks-takeaway {
