@@ -219,7 +219,7 @@ export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange
             return (
               <Fragment key={story.id}>
                 <div className="gantt-sidebar-cell gantt-sidebar-story" style={{ gridRow, gridColumn: 1 }} title={story.title}>
-                  <span className="gantt-connector" style={{ borderColor: color }} />
+                  <span className="gantt-connector" style={{ background: color }} />
                   {story.title}
                 </div>
                 <div

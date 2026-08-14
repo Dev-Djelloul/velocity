@@ -27,8 +27,8 @@
 
 .gantt-timeline {
   display: grid;
-  grid-template-columns: 190px repeat(var(--gantt-sprint-count), minmax(96px, 1fr));
-  grid-auto-rows: 34px;
+  grid-template-columns: 260px repeat(var(--gantt-sprint-count), minmax(110px, 1fr));
+  grid-auto-rows: minmax(34px, auto);
   position: relative;
   min-width: max-content;
 }
@@ -99,11 +99,8 @@
   gap: 0.4rem;
   background: var(--color-bg-primary);
   border-bottom: 1px solid rgba(145, 132, 217, 0.06);
-  padding: 0 var(--spacing-sm) 0 var(--spacing-md);
+  padding: 0.35rem var(--spacing-sm) 0.35rem var(--spacing-md);
   font-size: var(--font-size-xs);
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
 }
 
 .gantt-sidebar-group {
@@ -111,6 +108,9 @@
   color: var(--color-text-primary);
   background: var(--color-bg-tertiary);
   margin-top: 4px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .gantt-group-dot {
@@ -121,20 +121,25 @@
 }
 
 .gantt-sidebar-story {
+  position: relative;
   color: var(--color-text-secondary);
   padding-left: 1.6rem;
+  line-height: 1.35;
+  /* Le titre peut passer sur 2 lignes plutôt que d'être tronqué (cf. leçon Dashboard). */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .gantt-connector {
   position: absolute;
   left: var(--spacing-md);
-  width: 10px;
-  height: 100%;
-  border-left: 2px solid;
-  border-bottom: 2px solid;
-  border-bottom-left-radius: 6px;
-  opacity: 0.4;
-  margin-top: -17px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: currentColor;
+  opacity: 0.35;
   pointer-events: none;
 }
 

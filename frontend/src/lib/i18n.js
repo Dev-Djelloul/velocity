@@ -135,7 +135,15 @@ export const translations = {
       ideal: 'Idéal',
       actual: 'Réel',
       onTrack: 'Dans les temps',
-      behind: 'En retard'
+      behind: 'En retard',
+      start: 'Début',
+      finish: 'Fin',
+      today: 'Aujourd\'hui',
+      remaining: 'Reste à faire',
+      gap: 'Écart vs idéal',
+      daysLeft: (n) => `${n} jour${n > 1 ? 's' : ''} restant${n > 1 ? 's' : ''}`,
+      ahead: (n) => `${n} pt${n > 1 ? 's' : ''} d'avance`,
+      late: (n) => `${n} pt${n > 1 ? 's' : ''} de retard`
     },
     dashboardBi: {
       title: 'Dashboard',
@@ -919,7 +927,15 @@ export const translations = {
       ideal: 'Ideal',
       actual: 'Actual',
       onTrack: 'On track',
-      behind: 'Behind'
+      behind: 'Behind',
+      start: 'Start',
+      finish: 'Finish',
+      today: 'Today',
+      remaining: 'Remaining',
+      gap: 'Gap vs ideal',
+      daysLeft: (n) => `${n} day${n > 1 ? 's' : ''} left`,
+      ahead: (n) => `${n} pt${n > 1 ? 's' : ''} ahead`,
+      late: (n) => `${n} pt${n > 1 ? 's' : ''} behind`
     },
     dashboardBi: {
       title: 'Dashboard',

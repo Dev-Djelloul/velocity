@@ -33,9 +33,48 @@
   margin-bottom: var(--spacing-md);
 }
 
+.burndown-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+}
+
+.burndown-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--border-radius-sm);
+  padding: 0.55rem 0.75rem;
+}
+
+.burndown-stat-label {
+  color: var(--color-text-muted);
+  font-size: 0.65rem;
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.burndown-stat-value {
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+}
+
+.burndown-stat-value.positive { color: #22c55e; }
+.burndown-stat-value.negative { color: #ef4444; }
+
 .burndown-svg {
   width: 100%;
   height: auto;
+}
+
+.burndown-gridline {
+  stroke: rgba(145, 132, 217, 0.08);
+  stroke-width: 1;
 }
 
 .burndown-axis {
@@ -48,6 +87,23 @@
   font-size: 10px;
 }
 
+.burndown-today-line {
+  stroke: #f59e0b;
+  stroke-width: 1.5;
+  stroke-dasharray: 3 3;
+}
+
+.burndown-today-label {
+  fill: #f59e0b;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+.burndown-area-actual {
+  fill: var(--color-cyan, #06b6d4);
+  opacity: 0.08;
+}
+
 .burndown-line-ideal {
   stroke: rgba(145, 132, 217, 0.5);
   stroke-width: 2;
@@ -58,6 +114,29 @@
   stroke: var(--color-cyan, #06b6d4);
   stroke-width: 2.5;
 }
+
+.burndown-dot {
+  fill: var(--color-cyan, #06b6d4);
+  stroke: var(--color-bg-tertiary);
+  stroke-width: 1;
+}
+
+.burndown-badge rect {
+  fill: rgba(15, 20, 25, 0.9);
+  stroke: currentColor;
+  stroke-width: 1;
+}
+
+.burndown-badge text {
+  fill: currentColor;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.burndown-badge-start { color: rgba(145, 132, 217, 0.9); }
+.burndown-badge-finish { color: var(--color-cyan, #06b6d4); }
 
 .burndown-legend {
   display: flex;
