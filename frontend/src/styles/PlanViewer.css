@@ -75,13 +75,14 @@
   }
 }
 
-.plan-header {
+.plan-header.card {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1rem;
+  background: #0a0a0f;
 }
 
 .plan-header-main { flex: 1; min-width: 260px; }
@@ -121,6 +122,18 @@
   color: var(--color-accent);
 }
 
+.plan-badge-stage {
+  background: rgba(251, 146, 60, 0.14);
+  border-color: rgba(251, 146, 60, 0.35);
+  color: var(--color-warning);
+}
+
+.plan-badge-category {
+  background: rgba(74, 222, 128, 0.14);
+  border-color: rgba(74, 222, 128, 0.35);
+  color: var(--color-success);
+}
+
 .plan-header-stats {
   display: flex;
   align-items: center;
@@ -140,14 +153,47 @@
 
 .plan-actions { display: flex; gap: 0.5rem; }
 
-.executive-summary {
+.plan-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  border-radius: var(--border-radius-sm);
+  padding: 0.55rem 1.1rem;
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.plan-new-btn:hover {
+  filter: brightness(1.25);
+}
+
+.plan-new-btn-icon {
+  color: #9184d9;
+  flex-shrink: 0;
+}
+
+.plan-new-btn-label {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.executive-summary.card {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
   margin-bottom: 1rem;
   padding: 1.5rem 1.75rem;
   border-radius: var(--border-radius-sm);
-  background: #000;
+  background: #0a0a0f;
   border: 1px solid rgba(145, 132, 217, 0.25);
   box-shadow: 0 0 40px rgba(99, 102, 241, 0.1);
 }

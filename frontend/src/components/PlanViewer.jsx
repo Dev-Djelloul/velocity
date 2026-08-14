@@ -26,7 +26,7 @@ import { savePlan } from '../lib/planStorage'
 import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconPlus } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -169,8 +169,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             <h2>{plan.product?.name}</h2>
             <div className="plan-badges">
               {plan.classification && <span className="plan-badge plan-badge-accent">{plan.classification}</span>}
-              {plan.product?.stage && <span className="plan-badge">{t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}</span>}
-              {plan.product?.category && <span className="plan-badge">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
+              {plan.product?.stage && <span className="plan-badge plan-badge-stage">{t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}</span>}
+              {plan.product?.category && <span className="plan-badge plan-badge-category">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
             </div>
           </div>
 
@@ -204,7 +204,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         </div>
         <div className="plan-actions">
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
-          <button className="btn-primary" onClick={onReset}>{t(lang, 'app.newPlan')}</button>
+          <button className="plan-new-btn" onClick={onReset}>
+            <IconPlus width={14} height={14} className="plan-new-btn-icon" />
+            <span className="plan-new-btn-label">{t(lang, 'app.newPlan')}</span>
+          </button>
         </div>
       </div>
 

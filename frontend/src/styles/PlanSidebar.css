@@ -33,15 +33,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.2rem 0.3rem 0.7rem 0.5rem;
-  margin-bottom: 0.3rem;
+  padding: 0.3rem 0.3rem 0.9rem 0.5rem;
+  margin-bottom: 0.6rem;
   min-height: 24px;
   border-bottom: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .plan-sidebar.collapsed .plan-sidebar-top {
   justify-content: center;
-  padding: 0.2rem 0 0.7rem;
+  padding: 0.3rem 0 0.9rem;
 }
 
 .plan-sidebar-title {
@@ -57,25 +57,33 @@
 }
 
 .plan-sidebar-toggle {
-  background: rgba(145, 132, 217, 0.1);
-  border: 1px solid rgba(145, 132, 217, 0.2);
-  color: var(--color-text-muted);
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  color: var(--color-text-secondary);
+  width: 24px;
+  height: 24px;
+  border-radius: 7px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
   padding: 0;
-  transition: background 0.15s ease, color 0.15s ease;
+  transition: filter 0.15s ease, color 0.15s ease;
 }
 
 .plan-sidebar-toggle:hover {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #0a0a0f;
+  filter: brightness(1.25);
+  color: var(--color-text-primary);
+}
+
+.plan-sidebar.collapsed .plan-sidebar-toggle {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto;
+  border-radius: 9px;
 }
 
 .plan-sidebar-nav {
@@ -232,6 +240,13 @@
 
 .plan-sidebar-new-btn:hover {
   filter: brightness(1.25);
+}
+
+.plan-sidebar.collapsed .plan-sidebar-new-btn {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 0.6rem;
+  border-radius: 9px;
 }
 
 .plan-sidebar-icon-gradient {
