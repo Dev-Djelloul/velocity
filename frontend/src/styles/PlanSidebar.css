@@ -181,8 +181,33 @@
 }
 
 .plan-sidebar-item.active {
-  background: rgba(145, 132, 217, 0.18);
-  color: var(--color-accent);
+  position: relative;
+  background: rgba(145, 132, 217, 0.14);
+  border: 1px solid transparent;
+  background:
+    linear-gradient(rgba(145, 132, 217, 0.14), rgba(145, 132, 217, 0.14)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.plan-sidebar-item.active .plan-sidebar-icon {
+  color: #9184d9;
+}
+
+.plan-sidebar-item.active::before {
+  content: '';
+  position: absolute;
+  left: -0.6rem;
+  top: 6px;
+  bottom: 6px;
+  width: 3px;
+  border-radius: 3px;
+  background: linear-gradient(180deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+}
+
+.plan-sidebar.collapsed .plan-sidebar-item.active::before {
+  left: -0.35rem;
 }
 
 .plan-sidebar.collapsed .plan-sidebar-item {

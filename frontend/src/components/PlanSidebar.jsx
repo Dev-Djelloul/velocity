@@ -90,6 +90,30 @@ export default function PlanSidebar({ lang, onNewPlan }) {
   const goTo = (id) => setActiveId(id)
   const toggleGroup = (key) => setCollapsedGroups(prev => ({ ...prev, [key]: !prev[key] }))
 
+  const groupOf = useCallback((id) => GROUPS.find(g => g.sections.some(s => s.id === id))?.key, [])
+
+  useEffect(() => {
+    const targets = GROUPS.flatMap(g => g.sections)
+      .map(s => document.getElementById(s.id))
+      .filter(Boolean)
+    if (!targets.length) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.filter(e => e.isIntersecting)
+        if (!visible.length) return
+        const top = visible.reduce((a, b) => (a.boundingClientRect.top < b.boundingClientRect.top ? a : b))
+        const id = top.target.id
+        setActiveId(id)
+        const key = groupOf(id)
+        if (key) setCollapsedGroups(prev => (prev[key] ? { ...prev, [key]: false } : prev))
+      },
+      { rootMargin: '-15% 0px -70% 0px', threshold: [0, 1] }
+    )
+    targets.forEach(el => observer.observe(el))
+    return () => observer.disconnect()
+  }, [groupOf])
+
   const startResize = (e) => {
     e.preventDefault()
     startRef.current = { x: e.clientX, width }
