@@ -55,8 +55,12 @@ export async function listRepos(accessToken) {
   const res = await ghFetch(accessToken, '/user/repos?sort=updated&per_page=100&affiliation=owner,collaborator,organization_member')
   if (!res.ok) throw new Error(`GitHub repos failed: ${res.status}`)
   const data = await res.json()
+  // Le champ `permissions` n'est pas toujours renvoyé de façon fiable par cet endpoint
+  // (dépend du contexte d'auth) — on ne filtre que les dépôts archivés. Si l'utilisateur
+  // choisit un dépôt sur lequel il n'a pas les droits d'écriture, la création d'issue
+  // échouera simplement pour cette story, sans bloquer le reste de la synchro.
   return data
-    .filter(r => !r.archived && r.permissions?.push)
+    .filter(r => !r.archived)
     .map(r => ({ owner: r.owner.login, repo: r.name, fullName: r.full_name, private: r.private, url: r.html_url }))
 }
 
