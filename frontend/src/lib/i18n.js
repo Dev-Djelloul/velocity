@@ -125,6 +125,7 @@ export const translations = {
       searchPlaceholder: 'Rechercher une story...',
       filterAll: 'Tous les statuts',
       filterTodo: 'À faire',
+      filterInProgress: 'En cours',
       filterDone: 'Terminé',
       filterAllAssignees: 'Tous les responsables',
       empty: 'Aucune story ne correspond à ces filtres.'
@@ -408,8 +409,7 @@ export const translations = {
       },
       rollover: {
         overdue: 'En retard',
-        markDone: 'Marquer comme fait',
-        markTodo: 'Rouvrir',
+        status: { todo: 'À faire', inProgress: 'En cours', done: 'Terminé' },
         moveToCurrent: 'Reporter au sprint courant',
         current: 'Sprint en cours',
         progress: 'complété'
@@ -432,10 +432,8 @@ export const translations = {
       notionSignIn: 'Connecte-toi pour exporter vers Notion.',
       notionCancelled: 'Connexion Notion annulée.',
       notionUnavailable: "Export Notion indisponible pour le moment.",
-      notionSync: 'Synchroniser le backlog vers Notion',
-      notionSyncing: 'Synchronisation vers Notion...',
-      notionSyncOpen: 'Ouvrir la base Notion →',
-      notionSyncDone: (created, updated) => `${created} story(s) créée(s)${updated ? `, ${updated} mise(s) à jour` : ''}.`,
+      notionSync: 'Synchroniser vers Notion',
+      notionSyncing: 'Synchronisation...',
       jira: 'Exporter vers Jira',
       jiraExporting: 'Export vers Jira...',
       jiraConnecting: 'Connexion à Jira...',
@@ -913,6 +911,7 @@ export const translations = {
       searchPlaceholder: 'Search a story...',
       filterAll: 'All statuses',
       filterTodo: 'To do',
+      filterInProgress: 'In progress',
       filterDone: 'Done',
       filterAllAssignees: 'All assignees',
       empty: 'No story matches these filters.'
@@ -1196,8 +1195,7 @@ export const translations = {
       },
       rollover: {
         overdue: 'Overdue',
-        markDone: 'Mark as done',
-        markTodo: 'Reopen',
+        status: { todo: 'To do', inProgress: 'In progress', done: 'Done' },
         moveToCurrent: 'Move to current sprint',
         current: 'Current sprint',
         progress: 'complete'
@@ -1220,10 +1218,8 @@ export const translations = {
       notionSignIn: 'Sign in to export to Notion.',
       notionCancelled: 'Notion connection cancelled.',
       notionUnavailable: 'Notion export is unavailable right now.',
-      notionSync: 'Sync backlog to Notion',
-      notionSyncing: 'Syncing to Notion...',
-      notionSyncOpen: 'Open Notion database →',
-      notionSyncDone: (created, updated) => `${created} stor${created === 1 ? 'y' : 'ies'} created${updated ? `, ${updated} updated` : ''}.`,
+      notionSync: 'Sync to Notion',
+      notionSyncing: 'Syncing...',
       jira: 'Export to Jira',
       jiraExporting: 'Exporting to Jira...',
       jiraConnecting: 'Connecting to Jira...',

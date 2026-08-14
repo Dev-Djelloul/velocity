@@ -1,12 +1,59 @@
 import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
-import { IconClipboard, IconCheckCircle, IconCircleDot, IconUser, IconCoin, IconTarget } from './Icons'
+import { IconClipboard, IconCheckCircle, IconCircleDot, IconClock, IconUser, IconCoin, IconTarget } from './Icons'
+import { notionSyncStories, notionAuthorizeUrl, notionStatus } from '../lib/serverStorage'
+import { waitForConnection } from '../lib/oauthConnect'
+import { nextStoryStatus } from '../lib/storyStatus'
 import '../styles/BacklogCard.css'
 
-export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, notion }) {
+const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
+const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
+
+export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, onNotionStoriesSynced }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [search, setSearch] = useState('')
+
+  // Sync Notion : une base dédiée avec une ligne par story, ouverte en un clic (pas de
+  // deep-link par story — une page Notion individuelle par ligne est peu lisible seule).
+  const [notionState, setNotionState] = useState('idle') // idle | working | connecting | error
+  const [notionMsg, setNotionMsg] = useState('')
+
+  const runNotionSync = async () => {
+    const res = await notionSyncStories(userId, plan, lang)
+    if (res && res.error === undefined && !res.needsAuth) {
+      if (onNotionStoriesSynced) onNotionStoriesSynced({ databaseId: res.databaseId, databaseUrl: res.databaseUrl, links: res.links || {} })
+      if (res.databaseUrl) window.open(res.databaseUrl, '_blank', 'noopener')
+      setNotionState('idle')
+      return true
+    }
+    if (res?.error === 'no_parent') { setNotionMsg(t(lang, 'export.notionNoParent')); setNotionState('error'); return true }
+    return res
+  }
+
+  const handleNotionSync = async () => {
+    if (!userId) { setNotionMsg(t(lang, 'export.notionSignIn')); setNotionState('error'); return }
+    setNotionState('working'); setNotionMsg('')
+    try {
+      const res = await runNotionSync()
+      if (res === true) return
+      if (res && res.needsAuth) {
+        const auth = await notionAuthorizeUrl(userId)
+        if (!auth?.url) { setNotionMsg(t(lang, 'export.notionUnavailable')); setNotionState('error'); return }
+        setNotionState('connecting')
+        const popup = window.open(auth.url, 'notion-oauth', 'width=640,height=760')
+        const connected = await waitForConnection(notionStatus, userId, popup)
+        if (!connected) { setNotionMsg(t(lang, 'export.notionCancelled')); setNotionState('error'); return }
+        setNotionState('working')
+        const done = await runNotionSync()
+        if (done !== true) { setNotionMsg(t(lang, 'export.notionUnavailable')); setNotionState('error') }
+      } else { setNotionMsg(t(lang, 'export.notionUnavailable')); setNotionState('error') }
+    } catch { setNotionMsg(t(lang, 'export.notionUnavailable')); setNotionState('error') }
+  }
+
+  const notionSyncLabel = notionState === 'working' ? t(lang, 'export.notionSyncing')
+    : notionState === 'connecting' ? t(lang, 'export.notionConnecting')
+    : t(lang, 'export.notionSync')
 
   if (!roadmap) return null
 
@@ -19,8 +66,7 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
   const assignees = useMemo(() => [...new Set(allStories.map(s => s.assignee))], [allStories])
 
   const filtered = allStories.filter(s => {
-    if (statusFilter === 'todo' && s.status === 'done') return false
-    if (statusFilter === 'done' && s.status !== 'done') return false
+    if (statusFilter !== 'all' && (s.status || 'todo') !== statusFilter) return false
     if (assigneeFilter !== 'all' && s.assignee !== assigneeFilter) return false
     if (search.trim() && !s.title.toLowerCase().includes(search.trim().toLowerCase())) return false
     return true
@@ -33,8 +79,8 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
         ...sp,
         stories: sp.stories.map(s => {
           if (s.id !== storyId) return s
-          const nowDone = s.status !== 'done'
-          return { ...s, status: nowDone ? 'done' : 'todo', completedAt: nowDone ? new Date().toISOString() : null }
+          const next = nextStoryStatus(s.status)
+          return { ...s, status: next, completedAt: next === 'done' ? new Date().toISOString() : null }
         })
       }
     })
@@ -58,7 +104,14 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
     <div className="backlog-card card">
       <div className="backlog-header">
         <h3><IconClipboard width={16} height={16} /> {t(lang, 'backlog.title')}</h3>
-        <p className="backlog-subtitle">{t(lang, 'backlog.subtitle')(doneCount, allStories.length)}</p>
+        <p className="backlog-subtitle">
+          {t(lang, 'backlog.subtitle')(doneCount, allStories.length)}
+          {' · '}
+          <button className="backlog-notion-sync-link" onClick={handleNotionSync} disabled={notionState === 'working' || notionState === 'connecting'}>
+            <img src="/assets/icons/icons8-notion-32.png" alt="" width={12} height={12} /> {notionSyncLabel}
+          </button>
+          {notionState === 'error' && notionMsg && <span className="backlog-notion-sync-error"> — {notionMsg}</span>}
+        </p>
       </div>
 
       <div className="backlog-filters">
@@ -72,6 +125,7 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
         <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
           <option value="all">{t(lang, 'backlog.filterAll')}</option>
           <option value="todo">{t(lang, 'backlog.filterTodo')}</option>
+          <option value="in_progress">{t(lang, 'backlog.filterInProgress')}</option>
           <option value="done">{t(lang, 'backlog.filterDone')}</option>
         </select>
         <select value={assigneeFilter} onChange={e => setAssigneeFilter(e.target.value)}>
@@ -82,14 +136,17 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
 
       <div className="backlog-list">
         {filtered.length === 0 && <p className="backlog-empty">{t(lang, 'backlog.empty')}</p>}
-        {filtered.map(story => (
-          <div key={story.id} className={`backlog-row ${story.status === 'done' ? 'backlog-row-done' : ''}`}>
+        {filtered.map(story => {
+          const status = story.status || 'todo'
+          const StatusIcon = STATUS_ICONS[status] || STATUS_ICONS.todo
+          return (
+          <div key={story.id} className={`backlog-row backlog-row-${status.replace('_', '-')}`}>
             <button
               className="backlog-status-toggle"
               onClick={() => toggleStatus(story.sprintId, story.id)}
-              title={t(lang, story.status === 'done' ? 'outputs.rollover.markTodo' : 'outputs.rollover.markDone')}
+              title={t(lang, `outputs.rollover.status.${STATUS_I18N_KEY[status]}`)}
             >
-              {story.status === 'done' ? <IconCheckCircle width={17} height={17} /> : <IconCircleDot width={17} height={17} />}
+              <StatusIcon width={17} height={17} />
             </button>
             <span className="backlog-id">{story.id}</span>
             <div className="backlog-title-block">
@@ -104,11 +161,6 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
                 <img src="/assets/icons/icons8-jira-32.png" alt="Jira" width={13} height={13} /> {jira.links[story.id].key}
               </a>
             )}
-            {notion?.links?.[story.id]?.url && (
-              <a className="backlog-notion-link" href={notion.links[story.id].url} target="_blank" rel="noopener noreferrer" title="Notion">
-                <img src="/assets/icons/icons8-notion-32.png" alt="Notion" width={13} height={13} />
-              </a>
-            )}
             <select
               className="backlog-sprint-select"
               value={story.sprintId}
@@ -121,7 +173,8 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, noti
               ))}
             </select>
           </div>
-        ))}
+          )
+        })}
       </div>
     </div>
   )

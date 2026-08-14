@@ -337,6 +337,8 @@
 .story-done { opacity: 0.55; }
 .story-done .story-title { text-decoration: line-through; }
 
+.story-in-progress { border-left: 2px solid #f59e0b; }
+
 .story-status-toggle {
   background: none;
   border: none;
@@ -351,6 +353,7 @@
 
 .story-status-toggle:hover { color: var(--color-accent); }
 .story-done .story-status-toggle { color: var(--color-success); }
+.story-in-progress .story-status-toggle { color: #f59e0b; }
 
 .story-id {
   background: rgba(145, 132, 217, 0.15);

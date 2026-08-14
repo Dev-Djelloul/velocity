@@ -1,8 +1,12 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { validateRoadmap } from '../lib/roadmapValidator'
-import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle, IconChevronRight, IconPencil } from './Icons'
+import { nextStoryStatus } from '../lib/storyStatus'
+import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle, IconClock, IconChevronRight, IconPencil } from './Icons'
 import '../styles/RoadmapCard.css'
+
+const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
+const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
 
 const SPRINT_DAYS = 14
 
@@ -68,8 +72,8 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
         ...sp,
         stories: sp.stories.map(s => {
           if (s.id !== storyId) return s
-          const nowDone = s.status !== 'done'
-          return { ...s, status: nowDone ? 'done' : 'todo', completedAt: nowDone ? new Date().toISOString() : null }
+          const next = nextStoryStatus(s.status)
+          return { ...s, status: next, completedAt: next === 'done' ? new Date().toISOString() : null }
         })
       }
     })
@@ -212,14 +216,16 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
                 {sprint.stories.map((story, sidx) => {
                   const expanded = expandedStories.has(story.id)
                   const hasDetails = story.description || story.acceptanceCriteria?.length > 0
+                  const status = story.status || 'todo'
+                  const StatusIcon = STATUS_ICONS[status] || STATUS_ICONS.todo
                   return (
-                    <div key={sidx} className={`story ${story.status === 'done' ? 'story-done' : ''}`}>
+                    <div key={sidx} className={`story story-${status.replace('_', '-')}`}>
                       <button
                         className="story-status-toggle"
                         onClick={() => toggleStory(sprint.sprintId, story.id)}
-                        title={t(lang, story.status === 'done' ? 'outputs.rollover.markTodo' : 'outputs.rollover.markDone')}
+                        title={t(lang, `outputs.rollover.status.${STATUS_I18N_KEY[status]}`)}
                       >
-                        {story.status === 'done' ? <IconCheckCircle width={18} height={18} /> : <IconCircleDot width={18} height={18} />}
+                        <StatusIcon width={18} height={18} />
                       </button>
                       <div className="story-id">{story.id}</div>
                       <button

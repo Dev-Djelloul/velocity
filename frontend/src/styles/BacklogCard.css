@@ -17,6 +17,28 @@
   margin-bottom: var(--spacing-lg);
 }
 
+.backlog-notion-sync-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--color-accent);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.backlog-notion-sync-link img { flex-shrink: 0; }
+
+.backlog-notion-sync-link:hover:not(:disabled) { color: var(--color-accent-light, #a89fe8); }
+.backlog-notion-sync-link:disabled { opacity: 0.6; cursor: default; }
+
+.backlog-notion-sync-error { color: #f59e0b; }
+
 .backlog-filters {
   display: flex;
   gap: var(--spacing-sm);
@@ -70,6 +92,7 @@
 
 .backlog-row-done { opacity: 0.55; }
 .backlog-row-done .backlog-title { text-decoration: line-through; }
+.backlog-row-in-progress { border-left: 2px solid #f59e0b; }
 
 .backlog-status-toggle {
   background: none;
@@ -83,6 +106,7 @@
 
 .backlog-status-toggle:hover { color: var(--color-accent); }
 .backlog-row-done .backlog-status-toggle { color: var(--color-success); }
+.backlog-row-in-progress .backlog-status-toggle { color: #f59e0b; }
 
 .backlog-id {
   background: rgba(145, 132, 217, 0.15);
@@ -161,18 +185,4 @@
 
 .backlog-jira-link:hover {
   background: rgba(6, 182, 212, 0.2);
-}
-
-.backlog-notion-link {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.1rem 0.35rem;
-  border-radius: 5px;
-  background: rgba(145, 132, 217, 0.1);
-  border: 1px solid rgba(145, 132, 217, 0.25);
-  flex-shrink: 0;
-}
-
-.backlog-notion-link:hover {
-  background: rgba(145, 132, 217, 0.2);
 }
