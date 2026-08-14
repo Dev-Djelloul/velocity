@@ -737,11 +737,18 @@ export const translations = {
     },
     calendar: {
       title: 'Calendrier',
-      subtitle: 'Vue calendrier de la roadmap, actualisée automatiquement à chaque déplacement',
+      subtitle: 'Vue calendrier de la roadmap et du marketing, actualisée automatiquement à chaque déplacement',
       prevMonth: 'Mois précédent',
       nextMonth: 'Mois suivant',
       today: "Aujourd'hui",
-      autoSyncHint: 'Ce calendrier se recalcule automatiquement dès qu\'une story est déplacée dans le Gantt ou la roadmap.'
+      autoSyncHint: 'Ce calendrier se recalcule automatiquement dès qu\'une story est déplacée dans le Gantt ou la roadmap.',
+      exportIcs: 'Exporter (.ics)',
+      launchEventTitle: (name) => `🚀 Lancement de ${name || 'votre produit'}`,
+      launchBadge: 'Lancement',
+      dayDetailEmpty: 'Rien de prévu ce jour-là.',
+      close: 'Fermer',
+      story: 'Story',
+      marketingItem: 'Marketing'
     },
     auth: {
       getStarted: 'Commencer',
@@ -1529,11 +1536,18 @@ export const translations = {
     },
     calendar: {
       title: 'Calendar',
-      subtitle: 'Calendar view of the roadmap, automatically refreshed on every move',
+      subtitle: 'Calendar view of the roadmap and marketing plan, automatically refreshed on every move',
       prevMonth: 'Previous month',
       nextMonth: 'Next month',
       today: 'Today',
-      autoSyncHint: 'This calendar recalculates automatically whenever a story is moved in the Gantt or roadmap.'
+      autoSyncHint: 'This calendar recalculates automatically whenever a story is moved in the Gantt or roadmap.',
+      exportIcs: 'Export (.ics)',
+      launchEventTitle: (name) => `🚀 Launch of ${name || 'your product'}`,
+      launchBadge: 'Launch',
+      dayDetailEmpty: 'Nothing planned this day.',
+      close: 'Close',
+      story: 'Story',
+      marketingItem: 'Marketing'
     },
     auth: {
       getStarted: 'Get Started',

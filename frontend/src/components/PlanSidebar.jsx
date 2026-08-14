@@ -26,11 +26,11 @@ const GROUPS = [
   {
     key: 'execution',
     sections: [
+      { id: 'section-calendar', labelKey: 'calendar.title', Icon: IconClock },
       { id: 'section-roadmap', labelKey: 'outputs.roadmap', Icon: IconClipboard },
       { id: 'section-backlog', labelKey: 'backlog.title', Icon: IconCircleDot },
       { id: 'section-gantt', labelKey: 'gantt.title', Icon: IconCalendar },
-      { id: 'section-burndown', labelKey: 'burndown.title', Icon: IconTrendingUp },
-      { id: 'section-calendar', labelKey: 'calendar.title', Icon: IconClock }
+      { id: 'section-burndown', labelKey: 'burndown.title', Icon: IconTrendingUp }
     ]
   },
   {
