@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { validateRoadmap } from '../lib/roadmapValidator'
-import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle, IconChevronRight } from './Icons'
+import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle, IconChevronRight, IconPencil } from './Icons'
 import '../styles/RoadmapCard.css'
 
 const SPRINT_DAYS = 14
@@ -104,7 +104,9 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
               <div className="roadmap-start-date-display">
                 <span className="roadmap-start-date-label">{t(lang, 'outputs.prepStartLabel')}</span>
                 <span className="roadmap-start-date-value">{startDateStr}</span>
-                <button className="btn-sm" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>✎</button>
+                <button className="roadmap-start-date-edit-btn" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>
+                  <IconPencil width={12} height={12} />
+                </button>
               </div>
               <p className="roadmap-start-date-hint">{t(lang, 'outputs.prepStartHint')}</p>
             </>
