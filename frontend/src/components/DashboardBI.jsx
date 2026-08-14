@@ -67,6 +67,11 @@ export default function DashboardBI({ plan, lang }) {
   const sprints = roadmap?.sprints || []
   const maxSprintEffort = Math.max(1, ...sprints.map(sp => sp.stories.reduce((s, x) => s + x.effort, 0)))
 
+  const allStories = sprints.flatMap(sp => sp.stories)
+  const totalStoryEffort = allStories.reduce((s, x) => s + x.effort, 0)
+  const doneStoryEffort = allStories.filter(s => s.status === 'done').reduce((s, x) => s + x.effort, 0)
+  const doneStoryCount = allStories.filter(s => s.status === 'done').length
+
   const primaryKpi = kpis?.[0]
 
   return (
@@ -107,6 +112,19 @@ export default function DashboardBI({ plan, lang }) {
               centerValue={`${(financials.monthlyBurn).toLocaleString()} €`}
               centerLabel={t(lang, 'dashboardBi.monthlyBurn')}
             />
+          </div>
+        )}
+
+        {allStories.length > 0 && (
+          <div className="dashboard-bi-tile">
+            <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
+            <div className="dashboard-bi-progress-wrap">
+              <CircularGauge
+                value={doneStoryEffort}
+                max={totalStoryEffort || 1}
+                label={t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, allStories.length)}
+              />
+            </div>
           </div>
         )}
 

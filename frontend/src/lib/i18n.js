@@ -147,6 +147,8 @@ export const translations = {
       kpiTargets: 'Objectifs KPIs',
       kpiTargetsHint: 'D\'après le suivi post-lancement',
       costSplit: 'Répartition des coûts',
+      overallProgress: 'Avancement global',
+      storiesCompleted: (done, total) => `${done}/${total} stories terminées`,
       total: 'Total',
       totalEffort: 'Effort total',
       monthlyBurn: 'Burn mensuel'
@@ -928,6 +930,8 @@ export const translations = {
       kpiTargets: 'KPI targets',
       kpiTargetsHint: 'From post-launch tracking',
       costSplit: 'Cost split',
+      overallProgress: 'Overall progress',
+      storiesCompleted: (done, total) => `${done}/${total} stories completed`,
       total: 'Total',
       totalEffort: 'Total effort',
       monthlyBurn: 'Monthly burn'
