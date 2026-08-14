@@ -94,7 +94,7 @@
 }
 
 [data-theme="light"] .lang-toggle,
-[data-theme="light"] .theme-toggle {
+[data-theme="light"] .header-icon-btn {
   background: rgba(15, 20, 30, 0.05);
   border-color: rgba(15, 20, 30, 0.14);
 }

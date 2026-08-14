@@ -27,7 +27,7 @@
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 480px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -35,9 +35,10 @@
   background: var(--color-bg-tertiary);
   border: 1px solid rgba(145, 132, 217, 0.2);
   border-radius: var(--border-radius);
-  padding: 2.5rem 2rem;
+  padding: 2.5rem 2.75rem 2.75rem;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
   animation: authCardIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  overflow: visible;
 }
 
 @keyframes authCardIn {
@@ -126,6 +127,32 @@
 
 .auth-clerk-widget {
   width: 100%;
+  overflow: visible;
+}
+
+/* Le badge "Last used" que Clerk affiche au-dessus du dernier provider utilisé déborde
+   du bouton. Le thème par défaut de Clerk pose overflow:hidden sur cl-card (pour rogner
+   proprement ses coins arrondis), ce qui rogne aussi ce badge : on force overflow:visible
+   sur toute la chaîne de conteneurs Clerk et on laisse de la marge au-dessus de la rangée
+   de boutons sociaux pour qu'il ait la place de s'afficher entièrement, sans coller au
+   bord de la carte. */
+.auth-clerk-widget .cl-rootBox,
+.auth-clerk-widget .cl-cardBox,
+.auth-clerk-widget .cl-card,
+.auth-clerk-widget .cl-main,
+.auth-clerk-widget .cl-header,
+.auth-clerk-widget .cl-socialButtonsRoot,
+.auth-clerk-widget .cl-socialButtons {
+  overflow: visible !important;
+}
+
+.auth-clerk-widget .cl-socialButtonsRoot {
+  margin-top: 1.5rem !important;
+}
+
+.auth-clerk-widget .cl-socialButtonsBlockButton {
+  position: relative !important;
+  overflow: visible !important;
 }
 
 /* Filet de sécurité : le widget Clerk fixe parfois une largeur intrinsèque (ex: 400px)
@@ -139,6 +166,38 @@
   width: 100% !important;
   max-width: 100% !important;
   box-sizing: border-box !important;
+}
+
+/* Le thème par défaut de Clerk n'aère pas assez ses blocs (boutons sociaux, séparateur,
+   formulaire), ce qui les fait se chevaucher visuellement dans une carte étroite comme
+   la nôtre. On force un rythme vertical régulier entre chaque bloc, quel que soit le nom
+   de classe interne généré par Clerk (susceptible de changer d'une version à l'autre). */
+.auth-clerk-widget .cl-main > * + *,
+.auth-clerk-widget .cl-card > * + * {
+  margin-top: 0.75rem !important;
+}
+
+.auth-clerk-widget .cl-socialButtons,
+.auth-clerk-widget .cl-socialButtonsBlockButton {
+  display: flex !important;
+}
+
+.auth-clerk-widget .cl-socialButtons {
+  flex-direction: column !important;
+  gap: 0.6rem !important;
+}
+
+.auth-clerk-widget .cl-socialButtonsBlockButton {
+  margin: 0 !important;
+}
+
+.auth-clerk-widget .cl-dividerRow {
+  margin: 1rem 0 !important;
+}
+
+.auth-clerk-widget .cl-header,
+.auth-clerk-widget .cl-footer {
+  text-align: center !important;
 }
 
 .auth-switch-btn {

@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconHome, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -48,6 +48,19 @@ export default function App() {
   const [authIntent, setAuthIntent] = useState(null)
   const [pendingDemoData, setPendingDemoData] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
+  const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
+  const headerMenuRef = useRef(null)
+
+  useEffect(() => {
+    if (!openHeaderMenu) return
+    const handleClickOutside = (e) => {
+      if (headerMenuRef.current && !headerMenuRef.current.contains(e.target)) {
+        setOpenHeaderMenu(null)
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
+  }, [openHeaderMenu])
 
   const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
@@ -284,17 +297,6 @@ export default function App() {
           </button>
 
           <nav className="header-nav">
-            <button
-              className="header-home-btn"
-              aria-label={lang === 'fr' ? 'Accueil' : 'Home'}
-              title={lang === 'fr' ? 'Accueil' : 'Home'}
-              onClick={() => {
-                setCurrentPage('landing')
-                window.scrollTo(0, 0)
-              }}
-            >
-              <IconHome width={20} height={20} />
-            </button>
             <button className="header-nav-link" onClick={() => handleNavAnchor('features')}>
               {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
             </button>
@@ -304,47 +306,81 @@ export default function App() {
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
-            <button className="btn-header-cta" onClick={handleStartClick}>
-              {t(lang, 'auth.getStarted')}
+            <button className="header-nav-link" onClick={() => setShowDemo(true)}>
+              {lang === 'fr' ? 'Démo' : 'Demo'}
             </button>
           </nav>
 
-          <div className="header-actions">
-            <button className="btn-header btn-header-demo" onClick={() => setShowDemo(true)} title={lang === 'fr' ? 'Voir une démo' : 'Watch a demo'}>
-              <IconSparkle width={16} height={16} /> {lang === 'fr' ? 'Voir une démo' : 'Watch a demo'}
-            </button>
-            {isSignedIn && (
-              <>
-                <button className="btn-header btn-header-gradient-border" onClick={() => setShowHistory(true)} title={t(lang, 'account.plansSectionTitle')}>
-                  <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
-                </button>
-                {!pro && (
-                  <span className="header-credits-badge">{remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}</span>
-                )}
-              </>
-            )}
-            {currentPage !== 'landing' && (
+          <div className="header-actions" ref={headerMenuRef}>
+            <div className="header-menu">
               <button
-                className="theme-toggle"
-                onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
-                title={theme === 'dark' ? (lang === 'fr' ? 'Passer au thème clair' : 'Switch to light theme') : (lang === 'fr' ? 'Passer au thème sombre' : 'Switch to dark theme')}
+                className={`header-icon-btn ${openHeaderMenu === 'settings' ? 'active' : ''}`}
+                onClick={() => setOpenHeaderMenu(m => m === 'settings' ? null : 'settings')}
+                title={lang === 'fr' ? 'Préférences' : 'Preferences'}
+                aria-label={lang === 'fr' ? 'Préférences' : 'Preferences'}
               >
-                {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
+                <IconSettings width={16} height={16} />
               </button>
-            )}
-            <div className="lang-toggle">
-              <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
-              <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+              {openHeaderMenu === 'settings' && (
+                <div className="header-dropdown header-dropdown-settings">
+                  {currentPage !== 'landing' && (
+                    <button
+                      className="header-dropdown-item"
+                      onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
+                    >
+                      {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
+                      {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
+                    </button>
+                  )}
+                  <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
+                  <div className="header-dropdown-lang">
+                    <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
+                    <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+                  </div>
+                </div>
+              )}
             </div>
+
             {isSignedIn ? (
-              <button className="header-avatar-btn" onClick={goToAccount} title={t(lang, 'auth.myAccount')}>
-                {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
-              </button>
+              <div className="header-menu">
+                <button
+                  className={`header-avatar-btn ${openHeaderMenu === 'account' ? 'active' : ''}`}
+                  onClick={() => setOpenHeaderMenu(m => m === 'account' ? null : 'account')}
+                  title={t(lang, 'auth.myAccount')}
+                >
+                  {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
+                  <IconChevronDown width={13} height={13} className="header-avatar-caret" />
+                </button>
+                {openHeaderMenu === 'account' && (
+                  <div className="header-dropdown header-dropdown-account">
+                    {!pro && (
+                      <div className="header-dropdown-credits">
+                        {remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}
+                      </div>
+                    )}
+                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
+                      <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
+                    </button>
+                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
+                      <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
+                    </button>
+                    <div className="header-dropdown-divider" />
+                    <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => { setOpenHeaderMenu(null); signOut() }}>
+                      <IconLogOut width={16} height={16} /> {t(lang, 'auth.signOut')}
+                    </button>
+                  </div>
+                )}
+              </div>
             ) : (
               <button className="btn-header-signin" onClick={() => goToAuth('signin')} title={t(lang, 'auth.signIn')}>
                 <IconLogin width={18} height={18} />
               </button>
             )}
+
+            <button className="btn-header-cta" onClick={handleStartClick}>
+              <IconSparkle width={14} height={14} />
+              <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
+            </button>
           </div>
         </div>
       </header>

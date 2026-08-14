@@ -26,6 +26,7 @@
 
 .demo-modal-header {
   margin-bottom: 1.5rem;
+  text-align: center;
 }
 
 .demo-modal-header h2 {
@@ -48,25 +49,29 @@
 
 .demo-card {
   padding: 1.25rem;
-  border: 1px solid rgba(145, 132, 217, 0.15);
+  border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
-  background: var(--color-bg-tertiary);
+  background:
+    linear-gradient(var(--color-bg-tertiary), var(--color-bg-tertiary)) padding-box,
+    var(--wordmark-gradient) border-box;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
   text-align: center;
   font-family: inherit;
   color: var(--color-text-primary);
 }
 
 .demo-card:hover {
-  border-color: var(--color-accent);
   transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(145, 132, 217, 0.12);
+  filter: brightness(1.12);
+  box-shadow: 0 6px 16px rgba(145, 132, 217, 0.18);
 }
 
 .demo-card.selected {
-  border-color: var(--color-accent);
-  background: rgba(145, 132, 217, 0.1);
+  background:
+    linear-gradient(rgba(145, 132, 217, 0.14), rgba(145, 132, 217, 0.14)) padding-box,
+    linear-gradient(var(--color-bg-tertiary), var(--color-bg-tertiary)) padding-box,
+    var(--wordmark-gradient) border-box;
   box-shadow: 0 0 0 1px var(--color-accent);
 }
 
@@ -86,7 +91,10 @@
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   margin-bottom: 0.35rem;
-  color: var(--color-text-primary);
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .demo-card p {
@@ -97,12 +105,37 @@
 .demo-actions {
   display: flex;
   gap: 0.75rem;
-  justify-content: flex-end;
+  justify-content: center;
 }
 
 .demo-actions button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.btn-demo-load {
+  background:
+    linear-gradient(var(--color-bg-primary), var(--color-bg-primary)) padding-box,
+    var(--wordmark-gradient) border-box;
+  border: 1.5px solid transparent;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  padding: 0.7rem 1.4rem;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease;
+}
+
+.btn-demo-load:hover:not(:disabled) {
+  filter: brightness(1.2);
+  transform: translateY(-1px);
+}
+
+.btn-demo-load-text {
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 @media (max-width: 640px) {

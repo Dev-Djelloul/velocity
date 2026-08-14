@@ -182,11 +182,11 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
         <div className="demo-actions">
           <button className="btn-secondary" onClick={onClose}>{t(lang, 'export.close')}</button>
           <button
-            className="btn-primary"
+            className="btn-demo-load"
             disabled={!selectedDemo}
             onClick={() => handleLoadDemo(selectedDemo)}
           >
-            Charger cet exemple
+            <span className="btn-demo-load-text">Charger cet exemple</span>
           </button>
         </div>
       </div>
