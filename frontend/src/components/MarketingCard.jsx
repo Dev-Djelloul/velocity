@@ -1,12 +1,20 @@
+import { useState } from 'react'
 import { t } from '../lib/i18n'
+import { IconChevronDown } from './Icons'
 import '../styles/MarketingCard.css'
 
+const CHANNEL_PALETTE = ['#9184d9', '#06b6d4', '#f59e0b', '#22c55e', '#ec4899', '#6366f1', '#eab308', '#f97316']
+
 export default function MarketingCard({ marketing, lang, disabledChannels = [], onToggleChannel, budget, onBudgetChange }) {
+  const [expanded, setExpanded] = useState({})
   if (!marketing) return null
 
   const { strategy, channels, totalBudget } = marketing
   const activeChannels = channels.filter(c => !disabledChannels.includes(c.name))
   const totalAllocated = activeChannels.reduce((sum, c) => sum + c.budget, 0)
+  const remaining = totalBudget - totalAllocated
+
+  const toggleExpanded = (name) => setExpanded(prev => ({ ...prev, [name]: !prev[name] }))
 
   return (
     <div className="marketing-card card">
@@ -26,63 +34,91 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
       )}
 
       <div className="marketing-budget">
-        <div className="gauge">
-          <div className="gauge-header">
-            <span className="gauge-title">{t(lang, 'outputs.allocatedLabel')}</span>
-            <span className="gauge-value">{totalAllocated.toLocaleString()} €</span>
-          </div>
-          <div className="gauge-bar">
-            <div className="gauge-fill" style={{ width: `${(totalAllocated / totalBudget) * 100}%` }} />
-          </div>
+        <div className="budget-allocation-bar" role="img" aria-label={t(lang, 'outputs.allocatedLabel')}>
+          {activeChannels.map((channel, idx) => (
+            <div
+              key={channel.name}
+              className="budget-allocation-segment"
+              style={{ width: `${(channel.budget / totalBudget) * 100}%`, background: CHANNEL_PALETTE[idx % CHANNEL_PALETTE.length] }}
+              title={`${channel.name} — ${channel.budget.toLocaleString()} € (${channel.pct}%)`}
+            />
+          ))}
+          {remaining > 0 && (
+            <div className="budget-allocation-segment budget-allocation-remaining" style={{ width: `${(remaining / totalBudget) * 100}%` }} />
+          )}
         </div>
-        <p className="budget-note">{t(lang, 'outputs.budgetAvailable')(`${totalBudget.toLocaleString()} €`)}</p>
+        <div className="budget-summary-row">
+          <span className="budget-summary-allocated">{t(lang, 'outputs.allocatedLabel')} : <strong>{totalAllocated.toLocaleString()} €</strong></span>
+          <span className="budget-summary-total">{t(lang, 'outputs.budgetAvailable')(`${totalBudget.toLocaleString()} €`)}</span>
+        </div>
       </div>
 
       <div className="marketing-channels">
         <h4>{t(lang, 'outputs.marketingChannelsTitle')}</h4>
         <div className="channels-list">
-          {channels.map((channel, idx) => (
-            <div
-              key={idx}
-              className={`channel-card ${disabledChannels.includes(channel.name) ? 'disabled' : 'active'}`}
-            >
-              <div className="channel-header">
-                <button
-                  className="channel-toggle"
-                  onClick={() => onToggleChannel(channel.name)}
-                >
-                  {disabledChannels.includes(channel.name) ? '○' : '●'}
-                </button>
-                <span className="channel-name">{channel.name}</span>
-              </div>
-
-              {!disabledChannels.includes(channel.name) && (
-                <>
-                  <div className="channel-budget">
-                    <span className="budget-amount">{channel.budget.toLocaleString()} €</span>
-                    <span className="budget-pct">{channel.pct}%</span>
+          {channels.map((channel, idx) => {
+            const isDisabled = disabledChannels.includes(channel.name)
+            const isExpanded = !!expanded[channel.name]
+            const color = CHANNEL_PALETTE[idx % CHANNEL_PALETTE.length]
+            const hasAssets = channel.assets && (channel.assets.postBrief || channel.assets.emailSubject || channel.assets.landingTagline)
+            return (
+              <div
+                key={idx}
+                className={`channel-card ${isDisabled ? 'disabled' : 'active'}`}
+                style={!isDisabled ? { '--channel-color': color } : undefined}
+              >
+                <div className="channel-row-main">
+                  <button
+                    className="channel-toggle"
+                    style={!isDisabled ? { color } : undefined}
+                    onClick={() => onToggleChannel(channel.name)}
+                    title={isDisabled ? t(lang, 'outputs.enableChannel') : t(lang, 'outputs.disableChannel')}
+                  >
+                    {isDisabled ? '○' : '●'}
+                  </button>
+                  <div className="channel-identity">
+                    <span className="channel-name">{channel.name}</span>
+                    {!isDisabled && <span className="channel-goal-inline">{channel.goal}</span>}
                   </div>
-                  <div className="channel-goal">
-                    <span className="goal-label">{t(lang, 'outputs.goal')}:</span>
-                    <span className="goal-value">{channel.goal}</span>
-                  </div>
-                  {channel.assets && (
-                    <div className="channel-assets">
-                      {channel.assets.postBrief && (
-                        <p><strong>{t(lang, 'outputs.assets.post')}:</strong> {channel.assets.postBrief}</p>
-                      )}
-                      {channel.assets.emailSubject && (
-                        <p><strong>{t(lang, 'outputs.assets.email')}:</strong> {channel.assets.emailSubject}</p>
-                      )}
-                      {channel.assets.landingTagline && (
-                        <p><strong>{t(lang, 'outputs.assets.landing')}:</strong> {channel.assets.landingTagline}</p>
-                      )}
+                  {!isDisabled && (
+                    <div className="channel-amount-block">
+                      <span className="budget-amount">{channel.budget.toLocaleString()} €</span>
+                      <span className="budget-pct" style={{ color, background: `${color}26` }}>{channel.pct}%</span>
                     </div>
                   )}
-                </>
-              )}
-            </div>
-          ))}
+                </div>
+
+                {!isDisabled && (
+                  <>
+                    <div className="channel-share-bar">
+                      <div className="channel-share-fill" style={{ width: `${channel.pct}%`, background: color }} />
+                    </div>
+
+                    {hasAssets && (
+                      <button className={`channel-assets-toggle ${isExpanded ? 'open' : ''}`} onClick={() => toggleExpanded(channel.name)}>
+                        {t(lang, 'outputs.viewAssets')}
+                        <IconChevronDown width={12} height={12} />
+                      </button>
+                    )}
+
+                    {hasAssets && isExpanded && (
+                      <div className="channel-assets">
+                        {channel.assets.postBrief && (
+                          <p><strong>{t(lang, 'outputs.assets.post')}:</strong> {channel.assets.postBrief}</p>
+                        )}
+                        {channel.assets.emailSubject && (
+                          <p><strong>{t(lang, 'outputs.assets.email')}:</strong> {channel.assets.emailSubject}</p>
+                        )}
+                        {channel.assets.landingTagline && (
+                          <p><strong>{t(lang, 'outputs.assets.landing')}:</strong> {channel.assets.landingTagline}</p>
+                        )}
+                      </div>
+                    )}
+                  </>
+                )}
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>

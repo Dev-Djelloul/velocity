@@ -37,8 +37,7 @@ const GROUPS = [
     key: 'gtm',
     sections: [
       { id: 'section-marketing', labelKey: 'outputs.marketing', Icon: IconRocket },
-      { id: 'section-editorial', labelKey: 'editorial.title', Icon: IconCalendar },
-      { id: 'section-advertising', labelKey: 'advertising.title', Icon: IconMegaphone }
+      { id: 'section-gtm-calendar', labelKey: 'gtm.title', Icon: IconMegaphone }
     ]
   },
   {

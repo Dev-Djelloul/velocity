@@ -4,8 +4,7 @@ import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
 import VeilleCard from './VeilleCard'
 import BenchmarksCard from './BenchmarksCard'
-import EditorialCalendarCard from './EditorialCalendarCard'
-import AdvertisingCalendarCard from './AdvertisingCalendarCard'
+import GtmCalendarCard from './GtmCalendarCard'
 import RgpdCard from './RgpdCard'
 import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
@@ -240,8 +239,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>
         <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={setBudget} /></div>
-        <div id="section-editorial" className="plan-section-anchor"><EditorialCalendarCard plan={plan} lang={lang} onEditorialChange={updateEditorial} /></div>
-        <div id="section-advertising" className="plan-section-anchor"><AdvertisingCalendarCard plan={plan} lang={lang} onAdvertisingChange={updateAdvertising} /></div>
+        <div id="section-gtm-calendar" className="plan-section-anchor"><GtmCalendarCard plan={plan} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.performance')}</h2>
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
