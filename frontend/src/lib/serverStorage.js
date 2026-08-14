@@ -137,6 +137,14 @@ export function notionExport(userId, plan, lang) {
   })
 }
 
+export function notionSyncStories(userId, plan, lang) {
+  return safeFetch('/notion/sync-stories', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
 export function jiraStatus(userId) {
   return safeFetch(`/jira/status?userId=${encodeURIComponent(userId)}`)
 }

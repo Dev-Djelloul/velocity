@@ -3,7 +3,7 @@ import { t } from '../lib/i18n'
 import { IconClipboard, IconCheckCircle, IconCircleDot, IconUser, IconCoin, IconTarget } from './Icons'
 import '../styles/BacklogCard.css'
 
-export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira }) {
+export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, notion }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [search, setSearch] = useState('')
@@ -102,6 +102,11 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira }) {
             {jira?.links?.[story.id]?.url && (
               <a className="backlog-jira-link" href={jira.links[story.id].url} target="_blank" rel="noopener noreferrer" title={jira.links[story.id].key}>
                 <img src="/assets/icons/icons8-jira-32.png" alt="Jira" width={13} height={13} /> {jira.links[story.id].key}
+              </a>
+            )}
+            {notion?.links?.[story.id]?.url && (
+              <a className="backlog-notion-link" href={notion.links[story.id].url} target="_blank" rel="noopener noreferrer" title="Notion">
+                <img src="/assets/icons/icons8-notion-32.png" alt="Notion" width={13} height={13} />
               </a>
             )}
             <select

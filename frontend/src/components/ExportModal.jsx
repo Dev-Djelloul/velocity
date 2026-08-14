@@ -3,7 +3,7 @@ import { t } from '../lib/i18n'
 import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../lib/pdfExport'
 import { exportGithubIssues } from '../lib/issueExport'
 import {
-  notionExport, notionAuthorizeUrl, notionStatus,
+  notionExport, notionSyncStories, notionAuthorizeUrl, notionStatus,
   jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect
 } from '../lib/serverStorage'
 import '../styles/ExportModal.css'
@@ -27,11 +27,16 @@ function waitForConnection(statusFn, userId, popup) {
   })
 }
 
-export default function ExportModal({ plan, lang, userId, onClose, captureRef, onJiraExported }) {
-  // Notion
+export default function ExportModal({ plan, lang, userId, onClose, captureRef, onJiraExported, onNotionStoriesSynced }) {
+  // Notion (export page complète)
   const [notionState, setNotionState] = useState('idle')
   const [notionUrl, setNotionUrl] = useState(null)
   const [notionMsg, setNotionMsg] = useState('')
+
+  // Notion (sync backlog — une ligne par story, indépendant de l'export page ci-dessus)
+  const [notionSyncState, setNotionSyncState] = useState('idle')
+  const [notionSyncResult, setNotionSyncResult] = useState(null)
+  const [notionSyncMsg, setNotionSyncMsg] = useState('')
 
   // Jira
   const [jiraState, setJiraState] = useState('idle') // idle | working | connecting | choosingProject | done | error
@@ -73,6 +78,42 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
   const notionLabel = notionState === 'working' ? t(lang, 'export.notionExporting')
     : notionState === 'connecting' ? t(lang, 'export.notionConnecting')
     : t(lang, 'export.notion')
+
+  // ---------- Notion : sync backlog (une ligne par story, base dédiée) ----------
+  const runNotionSync = async () => {
+    const res = await notionSyncStories(userId, plan, lang)
+    if (res && res.error === undefined && !res.needsAuth) {
+      setNotionSyncResult(res); setNotionSyncState('done')
+      if (onNotionStoriesSynced) onNotionStoriesSynced({ databaseId: res.databaseId, databaseUrl: res.databaseUrl, links: res.links || {} })
+      return true
+    }
+    if (res?.error === 'no_parent') { setNotionSyncMsg(t(lang, 'export.notionNoParent')); setNotionSyncState('error'); return true }
+    return res
+  }
+
+  const handleNotionSync = async () => {
+    if (!userId) { setNotionSyncMsg(t(lang, 'export.notionSignIn')); setNotionSyncState('error'); return }
+    setNotionSyncState('working'); setNotionSyncMsg(''); setNotionSyncResult(null)
+    try {
+      const res = await runNotionSync()
+      if (res === true) return
+      if (res && res.needsAuth) {
+        const auth = await notionAuthorizeUrl(userId)
+        if (!auth?.url) { setNotionSyncMsg(t(lang, 'export.notionUnavailable')); setNotionSyncState('error'); return }
+        setNotionSyncState('connecting')
+        const popup = window.open(auth.url, 'notion-oauth', 'width=640,height=760')
+        const connected = await waitForConnection(notionStatus, userId, popup)
+        if (!connected) { setNotionSyncMsg(t(lang, 'export.notionCancelled')); setNotionSyncState('error'); return }
+        setNotionSyncState('working')
+        const done = await runNotionSync()
+        if (done !== true) { setNotionSyncMsg(t(lang, 'export.notionUnavailable')); setNotionSyncState('error') }
+      } else { setNotionSyncMsg(t(lang, 'export.notionUnavailable')); setNotionSyncState('error') }
+    } catch { setNotionSyncMsg(t(lang, 'export.notionUnavailable')); setNotionSyncState('error') }
+  }
+
+  const notionSyncLabel = notionSyncState === 'working' ? t(lang, 'export.notionSyncing')
+    : notionSyncState === 'connecting' ? t(lang, 'export.notionConnecting')
+    : t(lang, 'export.notionSync')
 
   // ---------- Jira ----------
   const finishJiraExport = async () => {
@@ -171,6 +212,18 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
             <a className="export-notion-link" href={notionUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.notionOpen')}</a>
           )}
           {notionState === 'error' && notionMsg && <span className="export-notion-error">{notionMsg}</span>}
+
+          <button className="btn-integration btn-notion" onClick={handleNotionSync} disabled={notionSyncState === 'working' || notionSyncState === 'connecting'}>
+            <img className="btn-notion-icon" src="/assets/icons/icons8-notion-32.png" alt="" aria-hidden="true" />
+            {notionSyncLabel}
+          </button>
+          {notionSyncState === 'done' && notionSyncResult && (
+            <div className="jira-result">
+              <span className="export-notion-link">{t(lang, 'export.notionSyncDone')(notionSyncResult.created, notionSyncResult.updated)}</span>
+              {notionSyncResult.databaseUrl && <a className="export-notion-link" href={notionSyncResult.databaseUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.notionSyncOpen')}</a>}
+            </div>
+          )}
+          {notionSyncState === 'error' && notionSyncMsg && <span className="export-notion-error">{notionSyncMsg}</span>}
 
           <button className="btn-integration btn-jira" onClick={handleJira} disabled={jiraState === 'working' || jiraState === 'connecting'}>
             <img className="btn-notion-icon" src="/assets/icons/icons8-jira-32.png" alt="" aria-hidden="true" />

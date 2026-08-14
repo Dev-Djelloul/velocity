@@ -17,6 +17,15 @@ const STORY_SCHEMA = {
   required: ['id', 'title', 'description', 'acceptanceCriteria', 'assignee', 'effort', 'cost', 'dependsOn']
 }
 
+const RISK_SCHEMA = {
+  type: 'object',
+  properties: {
+    risk: { type: 'string', description: 'Description courte du risque spécifique à ce sprint' },
+    mitigation: { type: 'string', description: 'Action concrète pour réduire ce risque' }
+  },
+  required: ['risk', 'mitigation']
+}
+
 const SPRINT_SCHEMA = {
   type: 'object',
   properties: {
@@ -24,7 +33,7 @@ const SPRINT_SCHEMA = {
     duration: { type: 'string', description: 'ex: "2 weeks"' },
     stories: { type: 'array', items: STORY_SCHEMA },
     estimatedCost: { type: 'integer' },
-    risks: { type: 'array', items: { type: 'string' } }
+    risks: { type: 'array', items: RISK_SCHEMA, description: '0 à 2 risques propres à ce sprint, avec leur mitigation — laisser vide si aucun risque notable' }
   },
   required: ['sprintId', 'duration', 'stories', 'estimatedCost', 'risks']
 }

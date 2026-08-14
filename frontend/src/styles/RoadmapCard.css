@@ -23,13 +23,22 @@
 
 .roadmap-start-date {
   display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.35rem;
   padding: var(--spacing-md);
   background: rgba(145, 132, 217, 0.06);
   border: 1px solid rgba(145, 132, 217, 0.2);
   border-radius: var(--border-radius-sm);
-  min-width: 200px;
+  min-width: 220px;
+  max-width: 260px;
+}
+
+.roadmap-start-date-hint {
+  color: var(--color-text-muted);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  margin: 0;
 }
 
 .roadmap-start-date-display {

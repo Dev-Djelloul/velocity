@@ -186,6 +186,88 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
   }
 }
 
+// --- Sync par story (indépendant de l'export page complète) ---
+
+// Base "Backlog" dédiée avec une ligne par user story, avec deep-link individuel — pendant
+// Notion du badge Jira par story. Idempotent : si `existingNotion` (plan.notion) référence déjà
+// une base et des pages, on les met à jour au lieu d'en recréer à chaque sync.
+export async function syncStoriesToNotion(accessToken, plan, lang, existingNotion) {
+  const en = lang === 'en'
+  const _ = (fr, eng) => (en ? eng : fr)
+  const allStories = (plan.roadmap?.sprints || []).flatMap(sp => (sp.stories || []).map(s => ({ ...s, sprint: sp.sprintId })))
+  if (!allStories.length) return { created: 0, updated: 0, links: {}, databaseId: null, databaseUrl: null }
+
+  const properties = {
+    [_('Story', 'Story')]: { title: {} },
+    Sprint: { number: {} },
+    [_('Responsable', 'Assignee')]: { rich_text: {} },
+    [_('Effort', 'Effort')]: { number: {} },
+    [_('Coût (€)', 'Cost (€)')]: { number: {} },
+    [_('Statut', 'Status')]: { select: {} }
+  }
+
+  const rowFields = (s) => ({
+    [_('Story', 'Story')]: propTitle(`${s.id ? s.id + ': ' : ''}${s.title}`),
+    Sprint: propNumber(s.sprint),
+    [_('Responsable', 'Assignee')]: propText(s.assignee),
+    [_('Effort', 'Effort')]: propNumber(s.effort),
+    [_('Coût (€)', 'Cost (€)')]: propNumber(s.cost),
+    [_('Statut', 'Status')]: propSelect(s.status === 'done' ? _('Terminé', 'Done') : _('À faire', 'To do'))
+  })
+
+  let databaseId = existingNotion?.databaseId
+  let databaseUrl = existingNotion?.databaseUrl
+
+  // Vérifie que la base référencée existe encore côté Notion (l'utilisateur a pu la supprimer).
+  if (databaseId) {
+    const check = await fetch(`${NOTION_API}/databases/${databaseId}`, {
+      headers: { Authorization: `Bearer ${accessToken}`, 'Notion-Version': NOTION_VERSION }
+    })
+    if (!check.ok) databaseId = null
+  }
+
+  if (!databaseId) {
+    const parentId = await findParentPageId(accessToken)
+    const db = await notionFetch(accessToken, '/databases', {
+      parent: { type: 'page_id', page_id: parentId },
+      is_inline: true,
+      title: [{ text: { content: `${plan.product?.name || 'Launch plan'} — ${_('Backlog', 'Backlog')}` } }],
+      properties
+    })
+    databaseId = db.id
+    databaseUrl = db.url
+  }
+
+  let created = 0
+  let updated = 0
+  const links = { ...(existingNotion?.links || {}) }
+
+  for (const story of allStories) {
+    const fields = rowFields(story)
+    const existingLink = links[story.id]
+
+    if (existingLink?.pageId) {
+      const res = await fetch(`${NOTION_API}/pages/${existingLink.pageId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+          'Notion-Version': NOTION_VERSION
+        },
+        body: JSON.stringify({ properties: fields })
+      })
+      if (res.ok) { updated++; continue }
+      // La page a pu être supprimée côté Notion → on retombe sur une création ci-dessous.
+    }
+
+    const page = await notionFetch(accessToken, '/pages', { parent: { database_id: databaseId }, properties: fields })
+    links[story.id] = { pageId: page.id, url: page.url }
+    created++
+  }
+
+  return { created, updated, links, databaseId, databaseUrl }
+}
+
 async function appendChildren(accessToken, pageId, children) {
   const res = await fetch(`${NOTION_API}/blocks/${pageId}/children`, {
     method: 'PATCH',

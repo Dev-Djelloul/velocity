@@ -13,7 +13,7 @@ import { generateAdvertisingFallback } from '../lib/generator/advertisingFallbac
 import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
 import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
-import { buildAuthorizeUrl, exchangeCode, createPlanPage } from '../lib/notion/notionClient'
+import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -219,6 +219,21 @@ export async function handleApi(request, env, url) {
     } catch (e) {
       if (String(e.message).includes('no_parent')) return json({ error: 'no_parent' }, 400)
       return json({ error: 'export_failed' }, 500)
+    }
+  }
+
+  // Sync par story (base dédiée, deep-links individuels) — indépendant de l'export page ci-dessus.
+  if (pathname === '/notion/sync-stories' && method === 'POST') {
+    const { userId, plan, lang } = await request.json()
+    if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    const token = await db.getNotionToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    try {
+      const result = await syncStoriesToNotion(token.access_token, plan, lang || 'fr', plan.notion)
+      return json(result)
+    } catch (e) {
+      if (String(e.message).includes('no_parent')) return json({ error: 'no_parent' }, 400)
+      return json({ error: 'sync_failed' }, 500)
     }
   }
 

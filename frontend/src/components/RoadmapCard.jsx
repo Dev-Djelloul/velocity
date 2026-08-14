@@ -92,7 +92,7 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
           <h3>{t(lang, 'outputs.roadmap')}</h3>
           <p className="roadmap-subtitle">{t(lang, 'outputs.roadmapSubtitle')}</p>
         </div>
-        <div className="roadmap-start-date">
+        <div className="roadmap-start-date" title={t(lang, 'outputs.prepStartHint')}>
           {isEditingStartDate ? (
             <div className="roadmap-start-date-edit">
               <input type="date" value={tempStartDate} onChange={e => setTempStartDate(e.target.value)} />
@@ -100,11 +100,14 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
               <button className="btn-sm" onClick={() => setIsEditingStartDate(false)}>✕</button>
             </div>
           ) : (
-            <div className="roadmap-start-date-display">
-              <span className="roadmap-start-date-label">{t(lang, 'outputs.prepStartLabel')}</span>
-              <span className="roadmap-start-date-value">{startDateStr}</span>
-              <button className="btn-sm" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>✎</button>
-            </div>
+            <>
+              <div className="roadmap-start-date-display">
+                <span className="roadmap-start-date-label">{t(lang, 'outputs.prepStartLabel')}</span>
+                <span className="roadmap-start-date-value">{startDateStr}</span>
+                <button className="btn-sm" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>✎</button>
+              </div>
+              <p className="roadmap-start-date-hint">{t(lang, 'outputs.prepStartHint')}</p>
+            </>
           )}
         </div>
       </div>

@@ -162,3 +162,17 @@
 .backlog-jira-link:hover {
   background: rgba(6, 182, 212, 0.2);
 }
+
+.backlog-notion-link {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.1rem 0.35rem;
+  border-radius: 5px;
+  background: rgba(145, 132, 217, 0.1);
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  flex-shrink: 0;
+}
+
+.backlog-notion-link:hover {
+  background: rgba(145, 132, 217, 0.2);
+}
