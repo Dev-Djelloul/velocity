@@ -82,7 +82,7 @@
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 1rem;
-  background: #0a0a0f;
+  background: var(--color-dashboard);
 }
 
 .plan-header-main { flex: 1; min-width: 260px; }
@@ -159,7 +159,7 @@
   gap: 0.45rem;
   border: 1.5px solid transparent;
   background:
-    linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
     linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
   border-radius: var(--border-radius-sm);
   padding: 0.55rem 1.1rem;
@@ -193,7 +193,7 @@
   margin-bottom: 1rem;
   padding: 1.5rem 1.75rem;
   border-radius: var(--border-radius-sm);
-  background: #0a0a0f;
+  background: var(--color-dashboard);
   border: 1px solid rgba(145, 132, 217, 0.25);
   box-shadow: 0 0 40px rgba(99, 102, 241, 0.1);
 }

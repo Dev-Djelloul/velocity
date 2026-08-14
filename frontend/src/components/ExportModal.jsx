@@ -1,15 +1,15 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../lib/pdfExport'
-import { exportGithubIssues } from '../lib/issueExport'
 import {
   notionExport, notionAuthorizeUrl, notionStatus,
-  jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect
+  jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect,
+  githubExport, githubAuthorizeUrl, githubStatus, githubRepos, githubSelect, githubDisconnect
 } from '../lib/serverStorage'
 import { waitForConnection } from '../lib/oauthConnect'
 import '../styles/ExportModal.css'
 
-export default function ExportModal({ plan, lang, userId, onClose, captureRef, onJiraExported }) {
+export default function ExportModal({ plan, lang, userId, onClose, captureRef, onJiraExported, onGithubExported }) {
   // Notion (export page complète)
   const [notionState, setNotionState] = useState('idle')
   const [notionUrl, setNotionUrl] = useState(null)
@@ -21,6 +21,13 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
   const [jiraPick, setJiraPick] = useState({ cloudId: '', projectKey: '' })
   const [jiraResult, setJiraResult] = useState(null)
   const [jiraMsg, setJiraMsg] = useState('')
+
+  // GitHub
+  const [githubState, setGithubState] = useState('idle') // idle | working | connecting | choosingRepo | done | error
+  const [githubRepoList, setGithubRepoList] = useState([])
+  const [githubPick, setGithubPick] = useState('') // "owner/repo"
+  const [githubResult, setGithubResult] = useState(null)
+  const [githubMsg, setGithubMsg] = useState('')
 
   // ---------- Notion ----------
   const runNotionExport = async () => {
@@ -124,6 +131,69 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
     : jiraState === 'connecting' ? t(lang, 'export.jiraConnecting')
     : t(lang, 'export.jira')
 
+  // ---------- GitHub ----------
+  const finishGithubExport = async () => {
+    const res = await githubExport(userId, plan, lang)
+    if (res?.repoUrl !== undefined && res.error === undefined && !res.needsAuth && !res.needsRepo) {
+      setGithubResult(res); setGithubState('done')
+      if (onGithubExported) onGithubExported({ links: res.links || {} })
+      if (res.repoUrl) window.open(res.repoUrl, '_blank', 'noopener')
+      return true
+    }
+    return res
+  }
+
+  const loadRepos = async () => {
+    const res = await githubRepos(userId)
+    const repos = res?.repos || []
+    if (!repos.length) { setGithubMsg(t(lang, 'export.githubNoRepos')); setGithubState('error'); return }
+    setGithubRepoList(repos)
+    setGithubPick(repos[0].fullName)
+    setGithubState('choosingRepo')
+  }
+
+  const handleGithub = async () => {
+    if (!userId) { setGithubMsg(t(lang, 'export.githubSignIn')); setGithubState('error'); return }
+    setGithubState('working'); setGithubMsg(''); setGithubResult(null)
+    try {
+      const res = await finishGithubExport()
+      if (res === true) return
+      if (res && res.needsAuth) {
+        const auth = await githubAuthorizeUrl(userId)
+        if (!auth?.url) { setGithubMsg(t(lang, 'export.githubUnavailable')); setGithubState('error'); return }
+        setGithubState('connecting')
+        const popup = window.open(auth.url, 'github-oauth', 'width=720,height=800')
+        const connected = await waitForConnection(githubStatus, userId, popup)
+        if (!connected) { setGithubMsg(t(lang, 'export.githubCancelled')); setGithubState('error'); return }
+        await loadRepos()
+      } else if (res && res.needsRepo) {
+        await loadRepos()
+      } else { setGithubMsg(t(lang, 'export.githubUnavailable')); setGithubState('error') }
+    } catch { setGithubMsg(t(lang, 'export.githubUnavailable')); setGithubState('error') }
+  }
+
+  const confirmRepo = async () => {
+    const repo = githubRepoList.find(r => r.fullName === githubPick)
+    if (!repo) return
+    setGithubState('working')
+    try {
+      await githubSelect(userId, { owner: repo.owner, repo: repo.repo })
+      const done = await finishGithubExport()
+      if (done !== true) { setGithubMsg(t(lang, 'export.githubUnavailable')); setGithubState('error') }
+    } catch { setGithubMsg(t(lang, 'export.githubUnavailable')); setGithubState('error') }
+  }
+
+  const reconnectGithub = async () => {
+    if (!userId) return
+    setGithubState('working'); setGithubMsg('')
+    try { await githubDisconnect(userId) } catch { /* ignore */ }
+    await handleGithub()
+  }
+
+  const githubLabel = githubState === 'working' ? t(lang, 'export.githubSyncing')
+    : githubState === 'connecting' ? t(lang, 'export.githubConnecting')
+    : t(lang, 'export.github')
+
   const currentSite = jiraSites.find(s => s.cloudId === jiraPick.cloudId)
 
   return (
@@ -134,12 +204,8 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
           <button className="btn-primary" onClick={() => exportPDF(plan, lang)}>{t(lang, 'export.pdf')}</button>
           <button className="btn-primary" onClick={() => exportPPTX(plan, lang)}>{t(lang, 'export.pptx')}</button>
           <button className="btn-primary" onClick={() => exportCSV(plan, lang)}>{t(lang, 'export.csv')}</button>
-          <button className="btn-secondary" onClick={() => exportJSON(plan)}>{t(lang, 'export.json')}</button>
-          <button className="btn-secondary" onClick={() => exportImage(captureRef?.current, plan)}>{t(lang, 'export.image')}</button>
-          <button className="btn-secondary export-btn-with-icon" onClick={() => exportGithubIssues(plan)}>
-            <img className="export-btn-icon" src="/assets/icons/icons8-github-logo-32.png" alt="" aria-hidden="true" />
-            {t(lang, 'export.github')}
-          </button>
+          <button className="btn-primary" onClick={() => exportJSON(plan)}>{t(lang, 'export.json')}</button>
+          <button className="btn-primary" onClick={() => exportImage(captureRef?.current, plan)}>{t(lang, 'export.image')}</button>
         </div>
 
         <div className="export-integrations">
@@ -191,6 +257,36 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
           {jiraState === 'error' && jiraMsg && <span className="export-notion-error">{jiraMsg}</span>}
           <button className="export-reconnect-link" onClick={reconnectJira} disabled={jiraState === 'working' || jiraState === 'connecting'}>
             {t(lang, 'export.jiraReconnect')}
+          </button>
+
+          <button className="btn-integration btn-github" onClick={handleGithub} disabled={githubState === 'working' || githubState === 'connecting'}>
+            <img className="btn-notion-icon" src="/assets/icons/icons8-github-logo-32.png" alt="" aria-hidden="true" />
+            {githubLabel}
+          </button>
+
+          {githubState === 'choosingRepo' && (
+            <div className="jira-picker">
+              <label className="jira-picker-field">
+                <span>{t(lang, 'export.githubRepo')}</span>
+                <select value={githubPick} onChange={e => setGithubPick(e.target.value)}>
+                  {githubRepoList.map(r => <option key={r.fullName} value={r.fullName}>{r.fullName}</option>)}
+                </select>
+              </label>
+              <button className="btn-integration btn-github" onClick={confirmRepo} disabled={!githubPick}>
+                {t(lang, 'export.githubConfirm')}
+              </button>
+            </div>
+          )}
+
+          {githubState === 'done' && githubResult && (
+            <div className="jira-result">
+              <span className="export-notion-link">{t(lang, 'export.githubDone')(githubResult.created, githubResult.updated)}</span>
+              {githubResult.repoUrl && <a className="export-notion-link" href={githubResult.repoUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.githubOpen')}</a>}
+            </div>
+          )}
+          {githubState === 'error' && githubMsg && <span className="export-notion-error">{githubMsg}</span>}
+          <button className="export-reconnect-link" onClick={reconnectGithub} disabled={githubState === 'working' || githubState === 'connecting'}>
+            {t(lang, 'export.githubReconnect')}
           </button>
         </div>
 

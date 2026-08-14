@@ -15,6 +15,7 @@ import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
+import * as github from '../lib/github/githubClient'
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
 
@@ -318,6 +319,80 @@ export async function handleApi(request, env, url) {
       return json(result)
     } catch {
       return json({ error: 'jira_export_failed' }, 500)
+    }
+  }
+
+  // --- Intégration GitHub (OAuth + création/mise à jour d'issues) ---
+
+  if (pathname === '/github/status' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getGithubToken(env, userId)
+    return json({
+      connected: !!token,
+      repo: token?.repo_full_name ? { fullName: token.repo_full_name, owner: token.owner, repo: token.repo } : null
+    })
+  }
+
+  if (pathname === '/github/authorize-url' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    if (!env.GITHUB_CLIENT_ID) return json({ error: 'github_not_configured' }, 500)
+    return json({ url: github.buildAuthorizeUrl(env, userId) })
+  }
+
+  if (pathname === '/github/callback' && method === 'GET') {
+    const code = searchParams.get('code')
+    const state = searchParams.get('state') // = userId
+    const appUrl = env.APP_URL || '/'
+    if (!code || !state) return Response.redirect(`${appUrl}?github=error`, 302)
+    try {
+      const accessToken = await github.exchangeCode(env, code)
+      await db.saveGithubToken(env, state, accessToken)
+      return Response.redirect(`${appUrl}?github=connected`, 302)
+    } catch {
+      return Response.redirect(`${appUrl}?github=error`, 302)
+    }
+  }
+
+  if (pathname === '/github/disconnect' && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteGithubToken(env, userId)
+    return json({ ok: true })
+  }
+
+  if (pathname === '/github/repos' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getGithubToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    try {
+      const repos = await github.listRepos(token.access_token)
+      return json({ repos })
+    } catch {
+      return json({ error: 'github_repos_failed' }, 500)
+    }
+  }
+
+  if (pathname === '/github/select' && method === 'POST') {
+    const { userId, owner, repo } = await request.json()
+    if (!userId || !owner || !repo) return json({ error: 'userId, owner and repo required' }, 400)
+    await db.setGithubTarget(env, userId, { owner, repo, repoFullName: `${owner}/${repo}` })
+    return json({ ok: true })
+  }
+
+  if (pathname === '/github/export' && method === 'POST') {
+    const { userId, plan, lang } = await request.json()
+    if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    const token = await db.getGithubToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    if (!token.repo) return json({ needsRepo: true })
+    try {
+      const result = await github.exportPlanToGithub(token.access_token, token, plan, lang || 'fr')
+      return json(result)
+    } catch {
+      return json({ error: 'github_export_failed' }, 500)
     }
   }
 

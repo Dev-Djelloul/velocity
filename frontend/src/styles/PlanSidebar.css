@@ -13,7 +13,7 @@
   flex-shrink: 0;
   height: calc(100vh - 4rem);
   max-height: calc(100vh - 4rem);
-  background: #0a0a0f;
+  background: var(--color-dashboard);
   border: 1px solid rgba(145, 132, 217, 0.15);
   border-radius: 12px;
   padding: 0.6rem;
@@ -231,7 +231,7 @@
 .plan-sidebar-new-btn {
   border: 1.5px solid transparent;
   background:
-    linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
     linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
   font-weight: 600;
   margin-bottom: 0.6rem;

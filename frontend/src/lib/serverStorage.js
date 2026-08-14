@@ -181,6 +181,42 @@ export function jiraExport(userId, plan, lang) {
   })
 }
 
+export function githubStatus(userId) {
+  return safeFetch(`/github/status?userId=${encodeURIComponent(userId)}`)
+}
+
+export function githubAuthorizeUrl(userId) {
+  return safeFetch(`/github/authorize-url?userId=${encodeURIComponent(userId)}`)
+}
+
+export function githubRepos(userId) {
+  return safeFetch(`/github/repos?userId=${encodeURIComponent(userId)}`)
+}
+
+export function githubSelect(userId, target) {
+  return safeFetch('/github/select', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, ...target })
+  })
+}
+
+export function githubDisconnect(userId) {
+  return safeFetch('/github/disconnect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
+export function githubExport(userId, plan, lang) {
+  return safeFetch('/github/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
 export function enqueueAgentTask(planId, userId, type, input) {
   return safeFetch('/agents/enqueue', {
     method: 'POST',

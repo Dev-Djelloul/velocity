@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconHome, IconUser, IconLogin, IconLock, IconSparkle } from './components/Icons'
+import { IconClipboard, IconHome, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -31,6 +31,7 @@ const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account']
 
 export default function App() {
   const [lang, setLang] = useState(() => localStorage.getItem('plp_lang') || 'fr')
+  const [theme, setTheme] = useState(() => localStorage.getItem('plp_theme') || 'dark')
   const [currentPage, setCurrentPage] = useState('landing') // landing, questionnaire, result, howItWorks, account
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
@@ -62,6 +63,11 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem('plp_lang', lang)
   }, [lang])
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme
+    localStorage.setItem('plp_theme', theme)
+  }, [theme])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -268,7 +274,7 @@ export default function App() {
 
   return (
     <div className="app">
-      <header className="header">
+      <header className={`header ${currentPage === 'landing' ? 'header-locked-dark' : ''}`}>
         <div className="header-top">
           <button className="header-brand-btn" onClick={() => {
             setCurrentPage('landing')
@@ -316,6 +322,15 @@ export default function App() {
                   <span className="header-credits-badge">{remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}</span>
                 )}
               </>
+            )}
+            {currentPage !== 'landing' && (
+              <button
+                className="theme-toggle"
+                onClick={() => setTheme(t => t === 'dark' ? 'light' : 'dark')}
+                title={theme === 'dark' ? (lang === 'fr' ? 'Passer au thème clair' : 'Switch to light theme') : (lang === 'fr' ? 'Passer au thème sombre' : 'Switch to dark theme')}
+              >
+                {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
+              </button>
             )}
             <div className="lang-toggle">
               <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>

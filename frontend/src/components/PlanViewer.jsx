@@ -125,6 +125,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateGithub = (nextGithub) => {
+    const nextPlan = { ...plan, github: nextGithub }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const updateNotion = (nextNotion) => {
     const nextPlan = { ...plan, notion: nextNotion }
     setPlan(nextPlan)
@@ -257,7 +263,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       {showExport && (
-        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} userId={userId} onClose={() => setShowExport(false)} captureRef={captureRef} onJiraExported={updateJira} />
+        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} userId={userId} onClose={() => setShowExport(false)} captureRef={captureRef} onJiraExported={updateJira} onGithubExported={updateGithub} />
       )}
       </div>
     </div>

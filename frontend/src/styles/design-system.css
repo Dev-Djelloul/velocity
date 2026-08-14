@@ -64,6 +64,57 @@
   --font-weight-bold: 700;
 }
 
+/* Thème clair — ne redéfinit que les tokens neutres (fonds, texte). Les couleurs de marque/
+   accent (violet, cyan, vert, orange, rouge) restent identiques dans les deux thèmes : elles
+   sont déjà assez vives pour rester lisibles sur fond clair, et ça évite de redéfinir des
+   centaines de couleurs de catégorie/data-viz éparpillées dans chaque carte. */
+[data-theme="light"] {
+  --color-bg-primary: #eef0f4;
+  --color-bg-secondary: #ffffff;
+  --color-bg-tertiary: #e3e6ed;
+  --color-dashboard: #ffffff;
+  --color-dashboard-hover: #f6f7fa;
+  --color-text-primary: #16171d;
+  --color-text-secondary: #464852;
+  --color-text-muted: #767884;
+}
+
+[data-theme="light"] input[type="date"] {
+  color-scheme: light;
+}
+
+[data-theme="light"] input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: none;
+}
+
+/* Le header utilise des surimpressions blanches semi-transparentes pensées pour un fond
+   sombre (glassmorphism) — invisibles sur fond clair, on les remplace par l'équivalent sombre. */
+[data-theme="light"] .header {
+  border-bottom-color: rgba(15, 20, 30, 0.08);
+}
+
+[data-theme="light"] .lang-toggle,
+[data-theme="light"] .theme-toggle {
+  background: rgba(15, 20, 30, 0.05);
+  border-color: rgba(15, 20, 30, 0.14);
+}
+
+/* La page d'accueil (marketing) garde son design sombre et illustré dans les deux thèmes —
+   ses visuels/dégradés sont pensés pour un fond sombre, comme la plupart des sites vitrine
+   SaaS qui restent sombres même quand le produit propose un thème clair. Le thème ne
+   s'applique qu'à l'application elle-même (plan, compte, questionnaire...). */
+.landing,
+.header-locked-dark {
+  --color-bg-primary: #0f1419;
+  --color-bg-secondary: #141922;
+  --color-bg-tertiary: #1a1f2e;
+  --color-dashboard: #1a1f2e;
+  --color-dashboard-hover: #232838;
+  --color-text-primary: #e9e9ed;
+  --color-text-secondary: #c2c3c9;
+  --color-text-muted: #a1a1a6;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -209,7 +260,7 @@ html, body, #root {
   gap: 0.45rem;
   border: 1.5px solid transparent;
   background:
-    linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
     linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
   border-radius: var(--border-radius-sm);
   padding: var(--spacing-sm) var(--spacing-lg);

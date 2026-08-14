@@ -208,3 +208,28 @@ export async function getJiraToken(env, userId) {
 export async function deleteJiraToken(env, userId) {
   await env.DB.prepare('DELETE FROM jira_tokens WHERE user_id = ?').bind(userId).run()
 }
+
+// --- Jetons OAuth GitHub ---
+
+export async function saveGithubToken(env, userId, accessToken) {
+  await env.DB.prepare(
+    `INSERT INTO github_tokens (user_id, access_token, created_at)
+     VALUES (?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET access_token = excluded.access_token, created_at = datetime('now')`
+  ).bind(userId, accessToken).run()
+}
+
+// Mémorise le dépôt GitHub sélectionné par l'utilisateur.
+export async function setGithubTarget(env, userId, { owner, repo, repoFullName }) {
+  await env.DB.prepare(
+    'UPDATE github_tokens SET owner = ?, repo = ?, repo_full_name = ? WHERE user_id = ?'
+  ).bind(owner || null, repo || null, repoFullName || null, userId).run()
+}
+
+export async function getGithubToken(env, userId) {
+  return env.DB.prepare('SELECT * FROM github_tokens WHERE user_id = ?').bind(userId).first()
+}
+
+export async function deleteGithubToken(env, userId) {
+  await env.DB.prepare('DELETE FROM github_tokens WHERE user_id = ?').bind(userId).run()
+}
