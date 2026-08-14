@@ -1,0 +1,124 @@
+.abtest-header {
+  margin-bottom: 1.25rem;
+}
+
+.abtest-header h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-primary);
+}
+
+.abtest-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  margin-top: 0.25rem;
+}
+
+.abtest-body {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.abtest-inputs {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.abtest-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.abtest-field-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.abtest-field input {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.2);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.7rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  width: 100%;
+  max-width: 220px;
+}
+
+.abtest-field input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.abtest-field-hint {
+  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  line-height: 1.45;
+  max-width: 340px;
+}
+
+.abtest-result {
+  background: linear-gradient(135deg, rgba(145, 132, 217, 0.1), rgba(6, 182, 212, 0.06));
+  border: 1px solid rgba(145, 132, 217, 0.2);
+  border-radius: var(--border-radius);
+  padding: 1.25rem;
+  height: 100%;
+}
+
+.abtest-result-caption {
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.abtest-result-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.abtest-stat {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.abtest-stat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 50%, #06b6d4 100%);
+  color: var(--color-bg-primary);
+}
+
+.abtest-stat-value {
+  color: var(--color-text-primary);
+  font-size: 1.3rem;
+  font-weight: var(--font-weight-bold);
+  line-height: 1.2;
+}
+
+.abtest-stat-label {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+@media (max-width: 768px) {
+  .abtest-body {
+    grid-template-columns: 1fr;
+  }
+}

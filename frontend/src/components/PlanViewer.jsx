@@ -10,6 +10,7 @@ import RoadmapCard from './RoadmapCard'
 import BacklogCard from './BacklogCard'
 import MarketingCard from './MarketingCard'
 import KPIDashboard from './KPIDashboard'
+import ABTestCalculatorCard from './ABTestCalculatorCard'
 import FinancialsCard from './FinancialsCard'
 import StrategyToolkitCard from './StrategyToolkitCard'
 import GanttChart from './GanttChart'
@@ -246,6 +247,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.performance')}</h2>
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
+        <div id="section-abtest" className="plan-section-anchor"><ABTestCalculatorCard lang={lang} /></div>
         <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
         <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>
 
