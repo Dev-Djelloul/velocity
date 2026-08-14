@@ -48,19 +48,25 @@
 
 .footer-section a,
 .footer-link {
-  color: var(--color-primary);
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   text-decoration: none;
   font-size: var(--font-size-sm);
   line-height: 1.25rem;
   min-height: 44px;
-  transition: all 0.2s ease;
+  transition: filter 0.2s ease, transform 0.2s ease;
   display: inline-flex;
   align-items: center;
   gap: 6px;
 }
 
 .footer-link {
-  background: none;
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   border: none;
   padding: 0;
   cursor: pointer;
@@ -69,8 +75,14 @@
 
 .footer-section a:hover,
 .footer-link:hover {
-  color: var(--color-accent-light);
+  filter: brightness(1.25);
   transform: translateX(2px);
+}
+
+.footer-section a svg,
+.footer-link svg {
+  color: var(--color-primary);
+  flex-shrink: 0;
 }
 
 /* Social Links */
@@ -86,6 +98,8 @@
   border-radius: 8px;
   background: var(--color-bg-tertiary);
   border: 1px solid rgba(145, 132, 217, 0.2);
+  color: var(--color-primary);
+  -webkit-text-fill-color: initial;
   display: flex;
   align-items: center;
   justify-content: center;
