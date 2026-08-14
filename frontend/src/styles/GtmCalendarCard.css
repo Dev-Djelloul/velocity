@@ -232,6 +232,12 @@
   border-top: 1px solid rgba(145, 132, 217, 0.1);
 }
 
+.gtm-export-hint {
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  margin-top: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .gtm-week-grid {
     grid-template-columns: 1fr;

@@ -242,7 +242,8 @@ export const translations = {
       regenerateContent: 'Régénérer le contenu',
       regeneratePaid: 'Régénérer les campagnes',
       exportContentCsv: 'Exporter le contenu (CSV)',
-      exportPaidCsv: 'Exporter les campagnes (CSV)',
+      exportPaidCsv: 'Exporter le brief de campagnes (CSV)',
+      exportPaidCsvHint: 'Un fichier prêt à copier dans Meta Ads Manager, Google Ads ou LinkedIn Campaign Manager — noms de campagne, dates et budgets déjà calculés',
       totalPaidBudget: 'Budget média total'
     },
     benchmarks: {
@@ -1145,7 +1146,8 @@ export const translations = {
       regenerateContent: 'Regenerate content',
       regeneratePaid: 'Regenerate campaigns',
       exportContentCsv: 'Export content (CSV)',
-      exportPaidCsv: 'Export campaigns (CSV)',
+      exportPaidCsv: 'Export campaign brief (CSV)',
+      exportPaidCsvHint: 'A file ready to copy into Meta Ads Manager, Google Ads or LinkedIn Campaign Manager — campaign names, dates and budgets already worked out',
       totalPaidBudget: 'Total media budget'
     },
     benchmarks: {
@@ -1307,11 +1309,6 @@ export const translations = {
       risks: 'Risks',
       budget: 'Budget',
       goal: 'Goal',
-      assets: {
-        post: 'Post',
-        email: 'Email subject',
-        landing: 'Landing tagline'
-      },
       cadence: 'Cadence',
       target: 'Target',
       formula: 'Formula',

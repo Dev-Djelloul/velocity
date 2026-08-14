@@ -16,13 +16,45 @@ function editorialToCsv(items, lang) {
   return lines.join('\n')
 }
 
-function advertisingToCsv(campaigns, lang) {
+// Brief de campagne prêt à copier dans le gestionnaire de pub de chaque plateforme
+// (Meta Ads Manager, Google Ads, LinkedIn Campaign Manager...) — pas un format d'import
+// natif garanti (chaque plateforme a son propre schéma), mais toutes les infos utiles
+// déjà organisées : nom de campagne suggéré, dates réelles, budget, statut brouillon.
+function weekStartDate(planStartDate, week) {
+  const base = new Date(planStartDate || Date.now())
+  // Ancre en UTC (pas setHours local) pour éviter qu'un fuseau horaire décale la date
+  // d'un jour lors de la reconversion en ISO — sensible ici car c'est la date affichée
+  // telle quelle dans le brief de campagne.
+  const start = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate()))
+  start.setUTCDate(start.getUTCDate() + Math.max(0, (week || 1) - 1) * 7)
+  return start
+}
+
+function isoDate(date) {
+  return date.toISOString().slice(0, 10)
+}
+
+function suggestedCampaignName(productName, c) {
+  const objective = c.objective ? c.objective.charAt(0).toUpperCase() + c.objective.slice(1) : ''
+  return [productName, c.channel, `S${c.week}`, objective].filter(Boolean).join(' - ')
+}
+
+function advertisingToCsv(campaigns, lang, planStartDate, productName) {
   const headers = lang === 'en'
-    ? ['Week', 'Channel', 'Objective', 'Format', 'Audience', 'Budget (€)', 'KPI']
-    : ['Semaine', 'Canal', 'Objectif', 'Format', 'Audience', 'Budget (€)', 'KPI']
+    ? ['Campaign Name', 'Platform', 'Objective', 'Ad Format', 'Target Audience', 'Budget (€)', 'Start Date', 'End Date', 'Primary KPI', 'Status']
+    : ['Nom de campagne', 'Plateforme', 'Objectif', 'Format', 'Audience cible', 'Budget (€)', 'Début', 'Fin', 'KPI principal', 'Statut']
+  const status = lang === 'en' ? 'Draft' : 'Brouillon'
   const escape = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
   const lines = [headers.map(escape).join(',')]
-  campaigns.forEach(c => lines.push([c.week, c.channel, c.objective, c.format, c.audience, c.budget, c.kpi].map(escape).join(',')))
+  campaigns.forEach(c => {
+    const start = weekStartDate(planStartDate, c.week)
+    const end = new Date(start)
+    end.setUTCDate(end.getUTCDate() + 6)
+    lines.push([
+      suggestedCampaignName(productName, c), c.channel, c.objective, c.format, c.audience, c.budget,
+      isoDate(start), isoDate(end), c.kpi, status
+    ].map(escape).join(','))
+  })
   return lines.join('\n')
 }
 
@@ -166,11 +198,16 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
               </button>
             )}
             {advertising && (
-              <button className="btn-secondary" onClick={() => downloadCsv(advertisingToCsv(advertising.campaigns || [], lang), 'calendrier-publicitaire.csv')}>
+              <button
+                className="btn-secondary"
+                onClick={() => downloadCsv(advertisingToCsv(advertising.campaigns || [], lang, plan.planStartDate || plan.generatedAt, plan.product?.name), 'brief-campagnes-publicitaires.csv')}
+                title={t(lang, 'gtm.exportPaidCsvHint')}
+              >
                 <IconDownload width={13} height={13} /> {t(lang, 'gtm.exportPaidCsv')}
               </button>
             )}
           </div>
+          {advertising && <p className="gtm-export-hint">{t(lang, 'gtm.exportPaidCsvHint')}</p>}
         </div>
       )}
     </div>
