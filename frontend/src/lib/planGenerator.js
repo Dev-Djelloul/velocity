@@ -1,4 +1,4 @@
-import { classifyProduct, classificationLabel, selectMarketingStrategy, strategyLabel, allocateBudget, sprintCapacity, sprintCount, kpiFocus, primaryTarget, resolveAssignee } from './engine'
+import { classifyProduct, classificationLabel, selectMarketingStrategy, strategyLabel, allocateBudget, sprintCapacity, sprintCount, kpiFocus, sectorKpi, primaryTarget, resolveAssignee } from './engine'
 import { costFor } from './costMatrix'
 import { generatePersona } from './personaGenerator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
@@ -98,9 +98,9 @@ export function generateRoadmap(resources, product, priorities, lang) {
   }
 }
 
-export function generateMarketingStrategy(market, priorities, budgetKey, lang) {
+export function generateMarketingStrategy(market, priorities, budgetKey, lang, category) {
   const budget = budgetFromKey(budgetKey)
-  const strategy = selectMarketingStrategy(market)
+  const strategy = selectMarketingStrategy(market, category)
   const channels = allocateBudget(budget, strategy).map(ch => ({
     ...ch,
     goal: goalFor(ch.name, ch.budget, lang),
@@ -149,7 +149,7 @@ function assetsFor(channel, lang) {
   return dict.channelAssets[channel] || dict.channelAssetsGeneric
 }
 
-export function calculateKPIs(priorities, resources, market, lang) {
+export function calculateKPIs(priorities, resources, market, lang, category) {
   const dict = c(lang)
   const focus = kpiFocus(priorities?.focus, lang)
   const target = primaryTarget(market)
@@ -167,12 +167,20 @@ export function calculateKPIs(priorities, resources, market, lang) {
   // L'engagement requis module l'objectif de contenus publiés.
   const contentTarget = { minimal: 8, moderate: 12, high: 20, community: 24, whiteglove: 14 }[priorities?.engagement] ?? 12
 
-  return [
+  const kpis = [
     primaryKpi,
     { name: focus.secondary.name, formula: focus.secondary.formula, unit: focus.secondary.unit, target: focus.secondary.name === 'CAC' ? Math.round(budget / target) : null, baseline: 0, timeframe: monthly },
     { name: focus.tertiary.name, formula: focus.tertiary.formula, unit: focus.tertiary.unit, target: null, baseline: 0, timeframe: weekly },
     { name: dict.contentPiecesKpi, formula: dict.contentPiecesFormula, unit: '#', target: contentTarget, baseline: 0, timeframe: weekly }
   ]
+
+  // KPI additionnel propre au secteur (ex : GMV pour une marketplace) — vient s'ajouter
+  // aux 4 KPIs génériques plutôt que d'en remplacer un, uniquement si le secteur du produit
+  // a un indicateur suffisamment distinct pour justifier un 5e KPI.
+  const sector = sectorKpi(category, lang)
+  if (sector) kpis.push({ ...sector, target: null, baseline: 0, timeframe: monthly })
+
+  return kpis
 }
 
 export function generatePlan(formData) {
@@ -181,8 +189,8 @@ export function generatePlan(formData) {
   const persona = generatePersona(market, product, priorities, lang)
   const classification = classificationLabel(classifyProduct(product, market), lang)
   const roadmap = generateRoadmap(resources, product, priorities, lang)
-  const marketing = generateMarketingStrategy(market, priorities, resources.budgetEur, lang)
-  const kpis = calculateKPIs(priorities, resources, market, lang)
+  const marketing = generateMarketingStrategy(market, priorities, resources.budgetEur, lang, product?.category)
+  const kpis = calculateKPIs(priorities, resources, market, lang, product?.category)
   const financials = generateFinancials(resources, market, lang)
   const strategyToolkit = generateStrategyToolkit(product, market, lang)
   const executiveSummary = generateExecutiveSummary(product, classification, resources, lang)

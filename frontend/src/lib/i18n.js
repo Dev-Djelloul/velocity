@@ -554,6 +554,16 @@ export const translations = {
         entries: [
           {
             date: '14 août 2026',
+            title: 'Modèles de plan par secteur',
+            items: [
+              'Le secteur du produit (déjà renseigné au questionnaire) influence désormais la génération du plan sur 10 secteurs : e-commerce, SaaS B2B, marketplace, app mobile, fintech, healthtech, dev tools, IA/ML, contenu/média, edtech',
+              'Mix de canaux marketing adapté au secteur (ex : Paid + Social pour l\'e-commerce, LinkedIn + Content pour le SaaS B2B)',
+              'KPI sectoriel additionnel quand pertinent (MRR pour le SaaS, GMV pour une marketplace, rétention J7 pour le mobile...)',
+              'Risque spécifique ajouté à l\'analyse SWOT pour les secteurs à enjeux distincts (réglementation fintech, conformité santé, démarrage à froid des marketplaces...)'
+            ]
+          },
+          {
+            date: '14 août 2026',
             title: 'Refonte visuelle complète : KPI, finances, RGPD, outils IA, suivi post-lancement',
             items: [
               'Dashboard KPI repensé : toutes les cartes au même niveau, vue Cartes/Tableau, une couleur par KPI, calculateur A/B test sorti en carte dédiée avec explications',
@@ -647,11 +657,11 @@ export const translations = {
         columns: [
           {
             label: 'Disponible',
-            items: ['Questionnaire guidé multi-phases', 'Roadmap, sprints & backlog priorisé', 'Gantt en swim-lanes & burndown à dates réelles', 'Statut tri-état des stories, synchronisé Jira & Notion', 'Calendrier de contenu & publicité unifié, export .ics', 'Stratégie marketing, KPIs & prévisions financières', 'Dashboard BI & tableaux générés par IA', 'Agents IA asynchrones', 'Suivi post-lancement & scénarios what-if', 'Sommaire actif avec suivi de lecture', 'Export PDF / CSV, partage par lien', 'FR / EN']
+            items: ['Questionnaire guidé multi-phases', 'Modèles de plan par secteur (KPIs, canaux et risques adaptés à 10 secteurs)', 'Roadmap, sprints & backlog priorisé', 'Gantt en swim-lanes & burndown à dates réelles', 'Statut tri-état des stories, synchronisé Jira & Notion', 'Calendrier de contenu & publicité unifié, export .ics', 'Stratégie marketing, KPIs & prévisions financières', 'Dashboard BI & tableaux générés par IA', 'Agents IA asynchrones (4 capacités)', 'Suivi post-lancement & simulateur budget/timeline en direct', 'Sommaire actif avec suivi de lecture', 'Export PDF / CSV, partage par lien', 'FR / EN']
           },
           {
             label: 'En cours',
-            items: ['Auto-scheduling dynamique de la roadmap', 'Priorisation par signaux externes', 'Modèles de plan par secteur']
+            items: ['Auto-scheduling dynamique de la roadmap', 'Priorisation par signaux externes']
           },
           {
             label: 'Envisagé',
@@ -1447,6 +1457,16 @@ export const translations = {
         entries: [
           {
             date: 'August 14, 2026',
+            title: 'Sector-specific plan templates',
+            items: [
+              'The product\'s sector (already captured in the questionnaire) now shapes plan generation across 10 sectors: e-commerce, B2B SaaS, marketplace, mobile app, fintech, healthtech, dev tools, AI/ML, content/media, edtech',
+              'Marketing channel mix tailored to the sector (e.g. Paid + Social for e-commerce, LinkedIn + Content for B2B SaaS)',
+              'Extra sector-specific KPI when relevant (MRR for SaaS, GMV for a marketplace, D7 retention for mobile...)',
+              'Sector-specific risk added to the SWOT analysis for sectors with distinct stakes (fintech regulation, health data compliance, marketplace cold-start...)'
+            ]
+          },
+          {
+            date: 'August 14, 2026',
             title: 'Full visual overhaul: KPIs, finances, GDPR, AI tools, post-launch tracking',
             items: [
               'KPI dashboard redesigned: all cards on equal footing, Cards/Table view, one color per KPI, A/B test calculator pulled out into its own explained card',
@@ -1540,11 +1560,11 @@ export const translations = {
         columns: [
           {
             label: 'Available',
-            items: ['Guided multi-phase questionnaire', 'Roadmap, sprints & prioritized backlog', 'Swim-lane Gantt & real-date burndown', 'Tri-state story status, synced with Jira & Notion', 'Unified content & advertising calendar, .ics export', 'Marketing strategy, KPIs & financial forecasts', 'BI dashboard & AI-generated tables', 'Asynchronous AI agents', 'Post-launch tracking & what-if scenarios', 'Active reading sidebar with scroll tracking', 'PDF / CSV export, link sharing', 'FR / EN']
+            items: ['Guided multi-phase questionnaire', 'Sector-specific plan templates (KPIs, channels and risks tailored to 10 sectors)', 'Roadmap, sprints & prioritized backlog', 'Swim-lane Gantt & real-date burndown', 'Tri-state story status, synced with Jira & Notion', 'Unified content & advertising calendar, .ics export', 'Marketing strategy, KPIs & financial forecasts', 'BI dashboard & AI-generated tables', 'Asynchronous AI agents (4 capabilities)', 'Post-launch tracking & live budget/timeline simulator', 'Active reading sidebar with scroll tracking', 'PDF / CSV export, link sharing', 'FR / EN']
           },
           {
             label: 'In progress',
-            items: ['Dynamic roadmap auto-scheduling', 'Prioritization from external signals', 'Sector-specific plan templates']
+            items: ['Dynamic roadmap auto-scheduling', 'Prioritization from external signals']
           },
           {
             label: 'Considered',

@@ -57,7 +57,15 @@ const SWOT_FR = {
   opportunityLow: 'Peu de concurrence directe identifiée : fenêtre pour occuper le terrain rapidement',
   opportunityHigh: 'Marché déjà éduqué par la concurrence : moins de pédagogie nécessaire côté acquisition',
   threatHigh: 'Concurrents établis avec des budgets d\'acquisition plus importants',
-  threatLow: 'Risque qu\'un acteur mieux financé entre sur le segment après validation du marché'
+  threatLow: 'Risque qu\'un acteur mieux financé entre sur le segment après validation du marché',
+  sectorRisk: {
+    fintech: 'Contraintes réglementaires fortes (KYC/AML, agrément) pouvant ralentir le lancement',
+    healthtech: 'Exigences de conformité sur les données de santé (hébergement agréé, consentement) à cadrer tôt',
+    marketplace: 'Problème de démarrage à froid : les deux côtés de la marketplace doivent s\'amorcer simultanément',
+    edtech: 'Cycles de décision longs côté institutions, budget souvent annuel et contraint',
+    ecommerce: 'Marges compressées par les coûts d\'acquisition payante et la logistique',
+    devtools: 'Adoption dépendante de la confiance de la communauté développeur, difficile à acheter'
+  }
 }
 
 const SWOT_EN = {
@@ -70,7 +78,15 @@ const SWOT_EN = {
   opportunityLow: 'Little direct competition identified: window to claim the space quickly',
   opportunityHigh: 'Market already educated by competitors: less acquisition groundwork needed',
   threatHigh: 'Established competitors with larger acquisition budgets',
-  threatLow: 'Risk of a better-funded player entering once the market is validated'
+  threatLow: 'Risk of a better-funded player entering once the market is validated',
+  sectorRisk: {
+    fintech: 'Heavy regulatory constraints (KYC/AML, licensing) that can slow down launch',
+    healthtech: 'Health data compliance requirements (approved hosting, consent) to scope early',
+    marketplace: 'Cold-start problem: both sides of the marketplace need to bootstrap at once',
+    edtech: 'Long institutional decision cycles, often tied to an annual, constrained budget',
+    ecommerce: 'Margins squeezed by paid acquisition costs and logistics',
+    devtools: 'Adoption depends on developer-community trust, which can\'t simply be bought'
+  }
 }
 
 const COMPETITION_LABEL = {
@@ -83,11 +99,13 @@ export function generateStrategyToolkit(product, market, lang) {
   const highCompetition = market?.competition === 'high'
   const competitionLabel = COMPETITION_LABEL[lang === 'en' ? 'en' : 'fr'][market?.competition] ?? COMPETITION_LABEL.fr.moderate
 
+  const sectorThreat = dict.sectorRisk?.[product?.category]
+
   const swot = {
     strengths: [dict.strengths[product?.stage] || dict.strengths.mvp, product?.usp || (lang === 'en' ? 'Distinctive value proposition' : 'Proposition de valeur différenciante')],
     weaknesses: [dict.weakness],
     opportunities: [highCompetition ? dict.opportunityHigh : dict.opportunityLow],
-    threats: [highCompetition ? dict.threatHigh : dict.threatLow]
+    threats: sectorThreat ? [highCompetition ? dict.threatHigh : dict.threatLow, sectorThreat] : [highCompetition ? dict.threatHigh : dict.threatLow]
   }
 
   const competitivePositioning = lang === 'en'

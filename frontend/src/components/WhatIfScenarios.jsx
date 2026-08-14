@@ -38,7 +38,7 @@ export default function WhatIfScenarios({ plan, lang }) {
   const simulated = useMemo(() => {
     const resources = { ...plan.resources, budgetEur: budgetStep.key, timelineWeeks: timelineStep.key }
     const financials = generateFinancials(resources, plan.market, lang)
-    const marketing = generateMarketingStrategy(plan.market, plan.priorities, budgetStep.key, lang)
+    const marketing = generateMarketingStrategy(plan.market, plan.priorities, budgetStep.key, lang, plan.product?.category)
     const sprints = sprintCount(timelineStep.weeks)
     return { financials, marketing, sprints }
   }, [budgetStep.key, timelineStep.key, timelineStep.weeks, plan.resources, plan.market, plan.priorities, lang])

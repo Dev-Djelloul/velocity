@@ -9,7 +9,29 @@ export const content = {
       enterprise: 'Stratégie Entreprise',
       viral: 'Croissance virale',
       balanced: 'Équilibrée',
-      content: 'Axée contenu'
+      content: 'Axée contenu',
+      sector_ecommerce: 'Stratégie e-commerce',
+      sector_saas: 'Stratégie SaaS B2B',
+      sector_marketplace: 'Stratégie marketplace',
+      sector_mobile: 'Stratégie appli mobile',
+      sector_fintech: 'Stratégie fintech',
+      sector_healthtech: 'Stratégie healthtech',
+      sector_devtools: 'Stratégie dev tools',
+      sector_ai: 'Stratégie IA / ML',
+      sector_media: 'Stratégie contenu / média',
+      sector_edtech: 'Stratégie edtech'
+    },
+    sectorKpi: {
+      ecommerce: { name: 'Panier moyen (AOV)', formula: 'chiffre_affaires / nombre_commandes', unit: '€' },
+      saas: { name: 'MRR', formula: 'Σ(abonnements_mensuels)', unit: '€' },
+      marketplace: { name: 'GMV', formula: 'Σ(valeur_des_transactions)', unit: '€' },
+      mobile: { name: 'Rétention J7', formula: 'utilisateurs_actifs_j7 / installs_cohorte', unit: '%' },
+      fintech: { name: 'Taux de complétion KYC', formula: 'kyc_complétés / kyc_démarrés', unit: '%' },
+      healthtech: { name: 'Taux d\'adoption clinique', formula: 'professionnels_actifs / professionnels_inscrits', unit: '%' },
+      devtools: { name: 'Installations SDK', formula: 'Σ(installations_package)', unit: '#' },
+      ai: { name: 'Taux d\'adoption du modèle', formula: 'requêtes_acceptées / requêtes_générées', unit: '%' },
+      media: { name: 'Temps de session moyen', formula: 'durée_totale_sessions / nombre_sessions', unit: 'min' },
+      edtech: { name: 'Taux de complétion de cours', formula: 'cours_terminés / cours_démarrés', unit: '%' }
     },
     stories: {
       onboarding: 'Finaliser le parcours d\'onboarding',
@@ -195,7 +217,29 @@ export const content = {
       enterprise: 'Enterprise play',
       viral: 'Viral growth strategy',
       balanced: 'Balanced',
-      content: 'Content-driven'
+      content: 'Content-driven',
+      sector_ecommerce: 'E-commerce strategy',
+      sector_saas: 'B2B SaaS strategy',
+      sector_marketplace: 'Marketplace strategy',
+      sector_mobile: 'Mobile app strategy',
+      sector_fintech: 'Fintech strategy',
+      sector_healthtech: 'HealthTech strategy',
+      sector_devtools: 'Dev tools strategy',
+      sector_ai: 'AI / ML strategy',
+      sector_media: 'Content / media strategy',
+      sector_edtech: 'EdTech strategy'
+    },
+    sectorKpi: {
+      ecommerce: { name: 'Average Order Value (AOV)', formula: 'revenue / number_of_orders', unit: '€' },
+      saas: { name: 'MRR', formula: 'Σ(monthly_subscriptions)', unit: '€' },
+      marketplace: { name: 'GMV', formula: 'Σ(transaction_value)', unit: '€' },
+      mobile: { name: 'D7 retention', formula: 'active_users_d7 / cohort_installs', unit: '%' },
+      fintech: { name: 'KYC completion rate', formula: 'kyc_completed / kyc_started', unit: '%' },
+      healthtech: { name: 'Clinical adoption rate', formula: 'active_professionals / registered_professionals', unit: '%' },
+      devtools: { name: 'SDK installs', formula: 'Σ(package_installs)', unit: '#' },
+      ai: { name: 'Model adoption rate', formula: 'accepted_requests / generated_requests', unit: '%' },
+      media: { name: 'Average session time', formula: 'total_session_duration / number_of_sessions', unit: 'min' },
+      edtech: { name: 'Course completion rate', formula: 'courses_completed / courses_started', unit: '%' }
     },
     stories: {
       onboarding: 'Finalize onboarding flow',

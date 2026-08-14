@@ -15,7 +15,28 @@ export function classificationLabel(key, lang) {
   return c(lang).classification[key] || key
 }
 
-export function selectMarketingStrategy(market) {
+// Mix de canaux par secteur — n'utilise que les canaux déjà pris en charge (objectifs,
+// piliers de contenu, assets) pour garder un contenu de qualité, seule la répartition change.
+// Catégories volontairement non couvertes (pm, analytics, automation, hr, finance, other) :
+// pas assez distinctes d'un mix B2B générique pour justifier un template dédié.
+const SECTOR_CHANNEL_MIX = {
+  ecommerce: { Paid: 0.4, Social: 0.25, Content: 0.15, Partnerships: 0.1, Community: 0.1 },
+  saas: { LinkedIn: 0.4, Content: 0.35, Paid: 0.15, Partnerships: 0.1 },
+  marketplace: { Partnerships: 0.3, Content: 0.25, Paid: 0.25, Community: 0.2 },
+  mobile: { TikTok: 0.45, YouTube: 0.25, Paid: 0.2, Social: 0.1 },
+  fintech: { LinkedIn: 0.35, Content: 0.35, Partnerships: 0.2, Paid: 0.1 },
+  healthtech: { Content: 0.4, Partnerships: 0.3, LinkedIn: 0.2, Community: 0.1 },
+  devtools: { Content: 0.35, Community: 0.3, Social: 0.2, Partnerships: 0.15 },
+  ai: { Content: 0.35, Social: 0.25, LinkedIn: 0.25, Paid: 0.15 },
+  media: { Social: 0.35, TikTok: 0.3, YouTube: 0.2, Community: 0.15 },
+  edtech: { Content: 0.35, Social: 0.25, Partnerships: 0.2, Paid: 0.2 }
+}
+
+export function selectMarketingStrategy(market, category) {
+  if (SECTOR_CHANNEL_MIX[category]) {
+    return { key: `sector_${category}`, allocation: SECTOR_CHANNEL_MIX[category] }
+  }
+
   if (market?.b2bVsB2c === 'b2b' || market?.b2bVsB2c === 'b2g') {
     return {
       key: 'enterprise',
@@ -71,6 +92,13 @@ export function kpiFocus(priorityFocus, lang) {
   if (priorityFocus === 'retain' || priorityFocus === 'churn') return focus.retain
   if (priorityFocus === 'monetize' || priorityFocus === 'fundraise') return focus.monetize
   return focus.acquire
+}
+
+// KPI additionnel spécifique au secteur (ex : GMV pour une marketplace, MRR pour du SaaS
+// B2B) — vient s'ajouter aux 4 KPIs génériques plutôt que d'en remplacer un, seulement
+// quand le secteur a un indicateur suffisamment distinct pour justifier l'ajout.
+export function sectorKpi(category, lang) {
+  return c(lang).sectorKpi?.[category] || null
 }
 
 const AUDIENCE_TARGET = { xs: 200, s: 500, m: 2000, l: 8000, xl: 20000 }
