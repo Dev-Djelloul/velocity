@@ -171,6 +171,7 @@
   cursor: grab;
   font-weight: var(--font-weight-medium);
   color: #fff;
+  overflow: visible;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 

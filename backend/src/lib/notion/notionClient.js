@@ -82,18 +82,53 @@ function isoDatePlusWeeks(baseIso, weeks) {
   return d.toISOString().slice(0, 10)
 }
 
+const sleep = (ms) => new Promise(resolve => setTimeout(resolve, ms))
+
+// Notion applique une limite d'environ 3 requêtes/seconde par intégration. Un 429 y est
+// attendu sous charge (sync de grands backlogs) : on retente avec le délai indiqué par
+// l'API plutôt que de faire échouer toute la synchronisation pour une story.
+async function notionRequest(accessToken, path, method, body) {
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(`${NOTION_API}${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json',
+        'Notion-Version': NOTION_VERSION
+      },
+      body: body != null ? JSON.stringify(body) : undefined
+    })
+    if (res.ok) return res.json()
+    if (res.status === 429 && attempt < 2) {
+      const retryAfter = Number(res.headers.get('Retry-After')) || 1
+      await sleep(retryAfter * 1000)
+      continue
+    }
+    throw new Error(`Notion ${path} failed: ${res.status}`)
+  }
+}
+
 async function notionFetch(accessToken, path, body) {
-  const res = await fetch(`${NOTION_API}${path}`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-      'Content-Type': 'application/json',
-      'Notion-Version': NOTION_VERSION
-    },
-    body: JSON.stringify(body)
-  })
-  if (!res.ok) throw new Error(`Notion ${path} failed: ${res.status}`)
-  return res.json()
+  return notionRequest(accessToken, path, 'POST', body)
+}
+
+// Traite les items par petits lots concurrents (respecte la limite de débit de Notion tout
+// en étant nettement plus rapide qu'un traitement un par un pour un backlog de plusieurs
+// dizaines de stories). Chaque item est isolé : un échec ne bloque pas les autres.
+async function processInBatches(items, batchSize, handler) {
+  const results = []
+  for (let i = 0; i < items.length; i += batchSize) {
+    const batch = items.slice(i, i + batchSize)
+    const batchResults = await Promise.all(batch.map(async (item) => {
+      try {
+        return { item, value: await handler(item), ok: true }
+      } catch (e) {
+        return { item, error: e, ok: false }
+      }
+    }))
+    results.push(...batchResults)
+  }
+  return results
 }
 
 // Crée une base inline sous la page et y insère les lignes (séquentiel, cap de sécurité).
@@ -245,34 +280,39 @@ export async function syncStoriesToNotion(accessToken, plan, lang, existingNotio
     databaseUrl = db.url
   }
 
-  let created = 0
-  let updated = 0
   const links = { ...(existingNotion?.links || {}) }
 
-  for (const story of allStories) {
+  const results = await processInBatches(allStories, 3, async (story) => {
     const fields = rowFields(story)
     const existingLink = links[story.id]
 
     if (existingLink?.pageId) {
-      const res = await fetch(`${NOTION_API}/pages/${existingLink.pageId}`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-          'Notion-Version': NOTION_VERSION
-        },
-        body: JSON.stringify({ properties: fields })
-      })
-      if (res.ok) { updated++; continue }
-      // La page a pu être supprimée côté Notion → on retombe sur une création ci-dessous.
+      try {
+        await notionRequest(accessToken, `/pages/${existingLink.pageId}`, 'PATCH', { properties: fields })
+        return { storyId: story.id, action: 'updated' }
+      } catch {
+        // La page a pu être supprimée côté Notion → on retombe sur une création ci-dessous.
+      }
     }
 
     const page = await notionFetch(accessToken, '/pages', { parent: { database_id: databaseId }, properties: fields })
-    links[story.id] = { pageId: page.id, url: page.url }
-    created++
+    return { storyId: story.id, action: 'created', pageId: page.id, url: page.url }
+  })
+
+  let created = 0
+  let updated = 0
+  let failed = 0
+  for (const r of results) {
+    if (!r.ok) { failed++; continue }
+    if (r.value.action === 'created') {
+      links[r.value.storyId] = { pageId: r.value.pageId, url: r.value.url }
+      created++
+    } else {
+      updated++
+    }
   }
 
-  return { created, updated, links, databaseId, databaseUrl }
+  return { created, updated, failed, links, databaseId, databaseUrl }
 }
 
 async function appendChildren(accessToken, pageId, children) {

@@ -24,7 +24,12 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
     if (res && res.error === undefined && !res.needsAuth) {
       if (onNotionStoriesSynced) onNotionStoriesSynced({ databaseId: res.databaseId, databaseUrl: res.databaseUrl, links: res.links || {} })
       if (res.databaseUrl) window.open(res.databaseUrl, '_blank', 'noopener')
-      setNotionState('idle')
+      if (res.failed > 0) {
+        setNotionMsg(t(lang, 'export.notionPartial')(res.failed))
+        setNotionState('error')
+      } else {
+        setNotionState('idle')
+      }
       return true
     }
     if (res?.error === 'no_parent') { setNotionMsg(t(lang, 'export.notionNoParent')); setNotionState('error'); return true }
