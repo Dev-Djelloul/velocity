@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import VelocityLaunchLogo from './VelocityLaunchLogo'
 import {
-  IconChevronLeft, IconChevronRight, IconChevronDown, IconBarChart, IconUser, IconClipboard,
+  IconChevronDown, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
   IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge, IconMegaphone, IconLock
 } from './Icons'
@@ -170,14 +170,8 @@ export default function PlanSidebar({ lang, onNewPlan }) {
       style={{ width: currentWidth }}
     >
       <div className="plan-sidebar-top">
+        <VelocityLaunchLogo width={22} height={22} variant="gradient" />
         {!collapsed && <span className="plan-sidebar-title">{t(lang, 'sidebar.title')}</span>}
-        <button
-          className="plan-sidebar-toggle"
-          onClick={() => setCollapsed(c => !c)}
-          title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
-        >
-          {collapsed ? <IconChevronRight width={12} height={12} /> : <IconChevronLeft width={12} height={12} />}
-        </button>
       </div>
 
       <button
@@ -220,6 +214,13 @@ export default function PlanSidebar({ lang, onNewPlan }) {
       {!collapsed && (
         <div className="plan-sidebar-resize-handle" onMouseDown={startResize} />
       )}
+
+      <button
+        className={`plan-sidebar-collapse-handle ${collapsed ? 'is-collapsed' : ''}`}
+        onClick={() => setCollapsed(c => !c)}
+        onMouseDown={e => e.stopPropagation()}
+        title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
+      />
     </div>
   )
 }
