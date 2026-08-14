@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react'
+import { useState, useEffect, Fragment } from 'react'
 import { t } from '../lib/i18n'
 import { IconTarget, IconUser, IconCoin, IconAlertTriangle, IconCheckCircle, IconClock, IconCircleDot } from './Icons'
 import '../styles/GanttChart.css'
@@ -37,6 +37,22 @@ function currentSprintId(sprints, planStartDate) {
 export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange }) {
   const [expandedId, setExpandedId] = useState(null)
   const [error, setError] = useState(null)
+
+  useEffect(() => {
+    if (!expandedId) return
+    const closeIfOutside = (e) => {
+      if (!e.target.closest('.gantt-bar-story')) setExpandedId(null)
+    }
+    const closeOnEscape = (e) => {
+      if (e.key === 'Escape') setExpandedId(null)
+    }
+    document.addEventListener('mousedown', closeIfOutside)
+    document.addEventListener('keydown', closeOnEscape)
+    return () => {
+      document.removeEventListener('mousedown', closeIfOutside)
+      document.removeEventListener('keydown', closeOnEscape)
+    }
+  }, [expandedId])
 
   if (!roadmap?.sprints?.length) return null
 

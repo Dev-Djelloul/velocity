@@ -254,7 +254,7 @@ export async function syncStoriesToNotion(accessToken, plan, lang, existingNotio
     [_('Responsable', 'Assignee')]: propText(s.assignee),
     [_('Effort', 'Effort')]: propNumber(s.effort),
     [_('Coût (€)', 'Cost (€)')]: propNumber(s.cost),
-    [_('Statut', 'Status')]: propSelect(s.status === 'done' ? _('Terminé', 'Done') : _('À faire', 'To do'))
+    [_('Statut', 'Status')]: propSelect(statusLabel(s.status, en))
   })
 
   let databaseId = existingNotion?.databaseId
