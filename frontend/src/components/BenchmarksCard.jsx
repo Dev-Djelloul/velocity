@@ -33,9 +33,9 @@ export default function BenchmarksCard({ plan, lang, onBenchmarksChange }) {
           <h3><IconGauge width={18} height={18} /> {t(lang, 'benchmarks.title')}</h3>
           <p className="benchmarks-subtitle">{t(lang, 'benchmarks.subtitle')}</p>
         </div>
-        <button className="btn-primary benchmarks-generate-btn" onClick={generate} disabled={loading}>
+        <button className="btn-ai-generate benchmarks-generate-btn" onClick={generate} disabled={loading}>
           <IconSparkle width={14} height={14} />
-          {loading ? t(lang, 'benchmarks.generating') : benchmarks ? t(lang, 'benchmarks.regenerate') : t(lang, 'benchmarks.generate')}
+          <span className="btn-ai-generate-label">{loading ? t(lang, 'benchmarks.generating') : benchmarks ? t(lang, 'benchmarks.regenerate') : t(lang, 'benchmarks.generate')}</span>
         </button>
       </div>
 

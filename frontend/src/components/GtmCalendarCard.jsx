@@ -58,6 +58,38 @@ function advertisingToCsv(campaigns, lang, planStartDate, productName) {
   return lines.join('\n')
 }
 
+// Colonnes conformes au format d'import CSV réel de Google Ads Editor (support.google.com/
+// google-ads/editor/answer/57747) : Campaign / Campaign type / Campaign status / Campaign
+// daily budget / Ad group / dates. Statut toujours "Paused" à l'import — c'est à l'utilisateur
+// de repasser les campagnes en "Enabled" une par une après relecture, jamais automatique.
+function googleAdsCampaignType(format) {
+  const f = (format || '').toLowerCase()
+  if (f.includes('video')) return 'Video'
+  if (f.includes('shopping') || f.includes('product')) return 'Shopping'
+  if (f.includes('display') || f.includes('banner')) return 'Display'
+  return 'Search'
+}
+
+function googleAdsEditorCsv(campaigns, planStartDate, productName) {
+  const headers = ['Campaign', 'Campaign type', 'Campaign status', 'Campaign daily budget', 'Start Date', 'End Date', 'Ad group', 'Ad group status', 'Notes']
+  const escape = (v) => `"${String(v ?? '').replace(/"/g, '""')}"`
+  const lines = [headers.map(escape).join(',')]
+  campaigns
+    .filter(c => /google/i.test(c.channel || ''))
+    .forEach(c => {
+      const start = weekStartDate(planStartDate, c.week)
+      const end = new Date(start)
+      end.setUTCDate(end.getUTCDate() + 6)
+      const dailyBudget = (Number(c.budget) / 7).toFixed(2)
+      lines.push([
+        suggestedCampaignName(productName, c), googleAdsCampaignType(c.format), 'Paused', dailyBudget,
+        isoDate(start), isoDate(end), c.audience || 'Ad group 1', 'Paused',
+        `Objectif : ${c.objective || '—'} · KPI : ${c.kpi || '—'}`
+      ].map(escape).join(','))
+    })
+  return lines.join('\n')
+}
+
 function downloadCsv(content, filename) {
   const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' })
   const url = URL.createObjectURL(blob)
@@ -117,9 +149,9 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
           <h3><IconCalendar width={18} height={18} /> {t(lang, 'gtm.title')}</h3>
           <p className="gtm-subtitle">{t(lang, 'gtm.subtitle')}</p>
         </div>
-        <button className="btn-primary gtm-generate-btn" onClick={generateAll} disabled={loading}>
+        <button className="btn-ai-generate gtm-generate-btn" onClick={generateAll} disabled={loading}>
           <IconSparkle width={14} height={14} />
-          {loading ? t(lang, 'gtm.generating') : t(lang, 'gtm.generateAll')}
+          <span className="btn-ai-generate-label">{loading ? t(lang, 'gtm.generating') : t(lang, 'gtm.generateAll')}</span>
         </button>
       </div>
 
@@ -204,6 +236,16 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
                 title={t(lang, 'gtm.exportPaidCsvHint')}
               >
                 <IconDownload width={13} height={13} /> {t(lang, 'gtm.exportPaidCsv')}
+              </button>
+            )}
+            {advertising && (
+              <button
+                className="btn-secondary"
+                onClick={() => downloadCsv(googleAdsEditorCsv(advertising.campaigns || [], plan.planStartDate || plan.generatedAt, plan.product?.name), 'google-ads-editor-import.csv')}
+                disabled={!(advertising.campaigns || []).some(c => /google/i.test(c.channel || ''))}
+                title={t(lang, 'gtm.exportGoogleAdsHint')}
+              >
+                <IconDownload width={13} height={13} /> {t(lang, 'gtm.exportGoogleAds')}
               </button>
             )}
           </div>

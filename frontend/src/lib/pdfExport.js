@@ -269,6 +269,87 @@ const IMG = {
 }
 const abs = (path) => (typeof window !== 'undefined' ? window.location.origin + path : path)
 
+// pptxgenjs (4.0.1) ne mesure jamais les dimensions réelles de l'image pour calculer un
+// recadrage sizing:{type:'cover'|'contain'} — son code initialise la taille "source" avec
+// celle de la boîte de destination elle-même, ce qui annule mathématiquement tout calcul de
+// recadrage (toujours 0), et produit un <a:stretch/> incomplet que PowerPoint/Keynote/Canva
+// interprètent chacun différemment. On recadre donc nous-mêmes côté canvas avant l'insertion,
+// et on place l'image obtenue sans option `sizing` (juste w/h = ceux de la boîte).
+function loadImageEl(dataUrl) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = dataUrl
+  })
+}
+
+async function toDataUrl(url) {
+  const res = await fetch(url)
+  const blob = await res.blob()
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(blob)
+  })
+}
+
+// Recadre l'image pour remplir exactement le ratio (boxW/boxH) — équivalent CSS object-fit:cover —
+// en la dessinant sur un canvas à la résolution native recadrée (bornée pour rester raisonnable).
+async function coverCrop(dataUrl, boxW, boxH) {
+  const img = await loadImageEl(dataUrl)
+  const targetRatio = boxW / boxH
+  const naturalRatio = img.naturalWidth / img.naturalHeight
+  let sx, sy, sw, sh
+  if (naturalRatio > targetRatio) {
+    sh = img.naturalHeight
+    sw = sh * targetRatio
+    sx = (img.naturalWidth - sw) / 2
+    sy = 0
+  } else {
+    sw = img.naturalWidth
+    sh = sw / targetRatio
+    sx = 0
+    sy = (img.naturalHeight - sh) / 2
+  }
+  const outW = Math.round(Math.min(sw, 1400))
+  const outH = Math.round(outW / targetRatio)
+  const canvas = document.createElement('canvas')
+  canvas.width = outW
+  canvas.height = outH
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, outW, outH)
+  return canvas.toDataURL('image/jpeg', 0.86)
+}
+
+// { key: [boxW, boxH] } — mêmes dimensions que les boîtes de placement plus bas, pour que
+// chaque image soit recadrée une seule fois avant d'être posée sur ses slides.
+const IMG_BOX = {
+  hero: [10, 5.63],
+  problem: [3, 3.4],
+  market: [3, 2.6],
+  roadmap: [2.5, 1.5],
+  gtm: [2.5, 1.5],
+  dashboard: [2.9, 1.75]
+}
+
+async function preloadImages(imgMap) {
+  const entries = await Promise.all(
+    Object.entries(imgMap).map(async ([key, url]) => {
+      try {
+        const raw = await toDataUrl(abs(url))
+        const box = IMG_BOX[key]
+        const cropped = box ? await coverCrop(raw, box[0], box[1]) : raw
+        return [key, cropped]
+      } catch {
+        return [key, null]
+      }
+    })
+  )
+  return Object.fromEntries(entries)
+}
+
 export async function exportPPTX(plan, lang) {
   const { default: PptxGenJS } = await import('pptxgenjs')
   const pptx = new PptxGenJS()
@@ -278,6 +359,9 @@ export async function exportPPTX(plan, lang) {
   const en = lang === 'en'
   const BRAND_GRAY = 'C2C3C9'
   const BRAND_CARD = '1E2530'
+
+  const imgData = await preloadImages(IMG)
+  const dataOf = (key) => imgData[key]
 
   // Pied de page : logo + wordmark, sur chaque slide (hors couverture/clôture qui l'affichent en grand)
   const stamp = (s) => {
@@ -313,7 +397,7 @@ export async function exportPPTX(plan, lang) {
   // ---------- 1. Couverture ----------
   const cover = pptx.addSlide()
   cover.background = { color: BRAND_DARK }
-  try { cover.addImage({ path: abs(IMG.hero), x: 0, y: 0, w: 10, h: 5.63, sizing: { type: 'cover', w: 10, h: 5.63 }, transparency: 65 }) } catch { /* image optionnelle */ }
+  try { cover.addImage({ data: dataOf('hero'), x: 0, y: 0, w: 10, h: 5.63, transparency: 65 }) } catch { /* image optionnelle */ }
   cover.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.2, h: 5.63, fill: { color: BRAND_VIOLET }, line: { color: BRAND_VIOLET } })
   cover.addImage({ data: LOGO_DATA, x: 0.6, y: 0.5, w: 0.6, h: 0.6 })
   cover.addText([
@@ -329,7 +413,7 @@ export async function exportPPTX(plan, lang) {
   if (plan.persona) {
     const s = pptx.addSlide()
     header(s, en ? 'The problem' : 'Le problème', plan.persona.title)
-    try { s.addImage({ path: abs(IMG.problem), x: 6.4, y: 1.4, w: 3, h: 3.4, sizing: { type: 'cover', w: 3, h: 3.4 } }) } catch { /* skip */ }
+    try { s.addImage({ data: dataOf('problem'), x: 6.4, y: 1.4, w: 3, h: 3.4 }) } catch { /* skip */ }
     if (plan.persona.name) s.addText(plan.persona.name, { x: 0.5, y: 1.35, w: 5.7, h: 0.35, fontSize: 12, bold: true, color: BRAND_VIOLET })
     if (plan.persona.quote) s.addText(`" ${plan.persona.quote} "`, { x: 0.5, y: 1.75, w: 5.7, h: 0.9, fontSize: 12, italic: true, color: BRAND_GRAY })
     s.addText(bullets(plan.persona.painPoints || [], 4), { x: 0.5, y: 2.8, w: 5.7, h: 2.2 })
@@ -338,7 +422,19 @@ export async function exportPPTX(plan, lang) {
   // ---------- 3. La solution ----------
   const sol = pptx.addSlide()
   header(sol, en ? 'The solution' : 'La solution')
-  try { sol.addImage({ path: abs(IMG.solution), x: 6.2, y: 1.4, w: 3.2, h: 3.2, sizing: { type: 'contain', w: 3.2, h: 3.2 } }) } catch { /* skip */ }
+  try {
+    if (dataOf('solution')) {
+      // "contain" (pas de recadrage) : on centre l'image à son propre ratio dans la boîte,
+      // au lieu de compter sur le sizing cassé de pptxgenjs (cf. commentaire plus haut).
+      const img = await loadImageEl(dataOf('solution'))
+      const boxX = 6.2, boxY = 1.4, boxW = 3.2, boxH = 3.2
+      const ratio = img.naturalWidth / img.naturalHeight
+      const boxRatio = boxW / boxH
+      const w = ratio > boxRatio ? boxW : boxH * ratio
+      const h = ratio > boxRatio ? boxW / ratio : boxH
+      sol.addImage({ data: dataOf('solution'), x: boxX + (boxW - w) / 2, y: boxY + (boxH - h) / 2, w, h })
+    }
+  } catch { /* skip */ }
   sol.addText(plan.product?.pitch || '', { x: 0.5, y: 1.4, w: 5.5, h: 1.6, fontSize: 14, color: 'FFFFFF' })
   if (plan.product?.usp) {
     sol.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 3.25, w: 5.5, h: 1.6, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.08 })
@@ -350,7 +446,7 @@ export async function exportPPTX(plan, lang) {
   if (plan.persona || plan.market) {
     const s = pptx.addSlide()
     header(s, en ? 'Target market' : 'Marché cible')
-    try { s.addImage({ path: abs(IMG.market), x: 6.4, y: 1.4, w: 3, h: 2.6, sizing: { type: 'cover', w: 3, h: 2.6 } }) } catch { /* skip */ }
+    try { s.addImage({ data: dataOf('market'), x: 6.4, y: 1.4, w: 3, h: 2.6 }) } catch { /* skip */ }
     const rows = [
       plan.persona?.title && [en ? 'Profile' : 'Profil', plan.persona.title],
       plan.market?.segment && [en ? 'Segment' : 'Segment', plan.market.segment],
@@ -361,11 +457,29 @@ export async function exportPPTX(plan, lang) {
     if (plan.persona?.buyingTrigger) s.addText(`${en ? 'Buying trigger' : 'Déclencheur d\'achat'} : ${plan.persona.buyingTrigger}`, { x: 0.5, y: 4.45, w: 9, h: 0.5, fontSize: 10, italic: true, color: BRAND_GRAY })
   }
 
+  // ---------- 4bis. Positionnement concurrentiel (SWOT) ----------
+  if (plan.strategyToolkit?.swot) {
+    const { swot, competitivePositioning } = plan.strategyToolkit
+    const s = pptx.addSlide()
+    header(s, t(lang, 'outputs.strategy.title'), competitivePositioning ? competitivePositioning.slice(0, 140) : undefined)
+    const quadrants = [
+      { key: 'strengths', label: t(lang, 'outputs.strategy.strengths'), color: '4ade80', x: 0.5, y: 1.35 },
+      { key: 'weaknesses', label: t(lang, 'outputs.strategy.weaknesses'), color: 'ef4444', x: 5.15, y: 1.35 },
+      { key: 'opportunities', label: t(lang, 'outputs.strategy.opportunities'), color: '4ade80', x: 0.5, y: 3.35 },
+      { key: 'threats', label: t(lang, 'outputs.strategy.threats'), color: 'ef4444', x: 5.15, y: 3.35 }
+    ]
+    quadrants.forEach(({ key, label, color, x, y }) => {
+      s.addShape(pptx.ShapeType.roundRect, { x, y, w: 4.35, h: 1.85, fill: { color: BRAND_CARD }, line: { color, width: 1 }, rectRadius: 0.06 })
+      s.addText(label, { x: x + 0.2, y: y + 0.12, w: 4, h: 0.3, fontSize: 11, bold: true, color })
+      s.addText(bullets(swot[key] || [], 3), { x: x + 0.2, y: y + 0.48, w: 3.95, h: 1.3, fontSize: 9.5 })
+    })
+  }
+
   // ---------- 5. Roadmap ----------
   if (plan.roadmap?.sprints?.length) {
     const s = pptx.addSlide()
     header(s, t(lang, 'outputs.roadmap'), `${plan.roadmap.sprints.length} ${en ? 'sprints' : 'sprints'} · ${plan.roadmap.estimatedCost} €`)
-    try { s.addImage({ path: abs(IMG.roadmap), x: 7, y: 1.35, w: 2.5, h: 1.5, sizing: { type: 'cover', w: 2.5, h: 1.5 } }) } catch { /* skip */ }
+    try { s.addImage({ data: dataOf('roadmap'), x: 7, y: 1.35, w: 2.5, h: 1.5 }) } catch { /* skip */ }
     brandTable(s,
       [t(lang, 'outputs.sprint'), t(lang, 'outputs.summary'), t(lang, 'outputs.estimatedCostEur')],
       plan.roadmap.sprints.map(sp => [sp.sprintId, sp.stories.map(x => x.title).join(', '), `${sp.estimatedCost} €`]),
@@ -377,7 +491,7 @@ export async function exportPPTX(plan, lang) {
   if (plan.marketing?.channels?.length) {
     const s = pptx.addSlide()
     header(s, `${t(lang, 'outputs.marketing')}`, `${en ? 'Total budget' : 'Budget total'} : ${plan.marketing.totalBudget} €`)
-    try { s.addImage({ path: abs(IMG.gtm), x: 7, y: 1.35, w: 2.5, h: 1.5, sizing: { type: 'cover', w: 2.5, h: 1.5 } }) } catch { /* skip */ }
+    try { s.addImage({ data: dataOf('gtm'), x: 7, y: 1.35, w: 2.5, h: 1.5 }) } catch { /* skip */ }
     brandTable(s,
       [t(lang, 'outputs.channel'), t(lang, 'outputs.estimatedCostEur'), t(lang, 'outputs.goal')],
       plan.marketing.channels.map(ch => [ch.name, `${ch.budget} €`, ch.goal]),
@@ -389,12 +503,28 @@ export async function exportPPTX(plan, lang) {
   if (plan.kpis?.length) {
     const s = pptx.addSlide()
     header(s, t(lang, 'outputs.kpis'))
-    try { s.addImage({ path: abs(IMG.dashboard), x: 6.6, y: 1.35, w: 2.9, h: 1.75, sizing: { type: 'cover', w: 2.9, h: 1.75 } }) } catch { /* skip */ }
+    try { s.addImage({ data: dataOf('dashboard'), x: 6.6, y: 1.35, w: 2.9, h: 1.75 }) } catch { /* skip */ }
     brandTable(s,
       [t(lang, 'outputs.name'), t(lang, 'outputs.target'), t(lang, 'outputs.unit')],
       plan.kpis.map(k => [k.name, k.target ?? '—', k.unit || '']),
       [3.4, 1.4, 1.4], { w: 6.2, maxRows: 8, rowH: 0.35 }
     )
+  }
+
+  // ---------- 7bis. Benchmarks sectoriels ----------
+  if (plan.benchmarks?.metrics?.length) {
+    const b = plan.benchmarks
+    const s = pptx.addSlide()
+    header(s, t(lang, 'benchmarks.title'), t(lang, 'benchmarks.subtitle'))
+    brandTable(s,
+      [t(lang, 'benchmarks.metric'), t(lang, 'benchmarks.industry'), t(lang, 'benchmarks.yours'), t(lang, 'benchmarks.verdictLabel')],
+      b.metrics.map(row => [row.metric, row.industry, row.yours, t(lang, `benchmarks.verdict.${row.verdict}`) || row.verdict]),
+      [3.1, 2, 2.7, 1.2], { w: 9, maxRows: 5, rowH: 0.4 }
+    )
+    if (b.takeaway) {
+      s.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 3.55, w: 9, h: 1.2, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.06 })
+      s.addText(b.takeaway.slice(0, 260), { x: 0.75, y: 3.7, w: 8.5, h: 0.9, fontSize: 11, color: 'FFFFFF', italic: true })
+    }
   }
 
   // ---------- 8. Finances ----------
@@ -422,7 +552,7 @@ export async function exportPPTX(plan, lang) {
   // ---------- 9. Clôture ----------
   const closing = pptx.addSlide()
   closing.background = { color: BRAND_DARK }
-  try { closing.addImage({ path: abs(IMG.hero), x: 0, y: 0, w: 10, h: 5.63, sizing: { type: 'cover', w: 10, h: 5.63 }, transparency: 75 }) } catch { /* skip */ }
+  try { closing.addImage({ data: dataOf('hero'), x: 0, y: 0, w: 10, h: 5.63, transparency: 75 }) } catch { /* skip */ }
   closing.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.2, h: 5.63, fill: { color: BRAND_VIOLET }, line: { color: BRAND_VIOLET } })
   closing.addImage({ data: LOGO_DATA, x: 4.5, y: 1.3, w: 1, h: 1 })
   closing.addText(en ? 'Ready to launch' : 'Prêt à lancer', { x: 0.6, y: 2.5, w: 8.8, h: 0.9, fontSize: 32, bold: true, color: 'FFFFFF', align: 'center' })

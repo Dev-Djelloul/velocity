@@ -29,9 +29,9 @@ export default function VeilleCard({ plan, lang, onVeilleChange }) {
           <h3><IconRadar width={18} height={18} /> {t(lang, 'veille.title')}</h3>
           <p className="veille-subtitle">{t(lang, 'veille.subtitle')}</p>
         </div>
-        <button className="btn-primary veille-generate-btn" onClick={generate} disabled={loading}>
+        <button className="btn-ai-generate veille-generate-btn" onClick={generate} disabled={loading}>
           <IconSparkle width={14} height={14} />
-          {loading ? t(lang, 'veille.generating') : veille ? t(lang, 'veille.regenerate') : t(lang, 'veille.generate')}
+          <span className="btn-ai-generate-label">{loading ? t(lang, 'veille.generating') : veille ? t(lang, 'veille.regenerate') : t(lang, 'veille.generate')}</span>
         </button>
       </div>
 

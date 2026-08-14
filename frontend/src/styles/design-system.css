@@ -200,6 +200,48 @@ html, body, #root {
   cursor: not-allowed;
 }
 
+/* Boutons de génération/régénération IA — bordure en dégradé sur fond noir, comme
+   "Créer un plan" dans le sommaire, pour signaler que l'IA fait le gros du travail. */
+.btn-ai-generate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#0a0a0f, #0a0a0f) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-sm) var(--spacing-lg);
+  font-family: inherit;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: filter 0.15s ease;
+}
+
+.btn-ai-generate:hover:not(:disabled) {
+  filter: brightness(1.25);
+}
+
+.btn-ai-generate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-ai-generate svg {
+  color: #9184d9;
+  flex-shrink: 0;
+}
+
+.btn-ai-generate-label {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .btn-secondary {
   background: var(--color-bg-tertiary);
   color: var(--color-text-primary);

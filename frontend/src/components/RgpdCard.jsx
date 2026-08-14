@@ -37,9 +37,9 @@ export default function RgpdCard({ plan, lang, onRgpdChange }) {
           <h3><IconLock width={18} height={18} /> {t(lang, 'rgpd.title')}</h3>
           <p className="rgpd-subtitle">{t(lang, 'rgpd.subtitle')}</p>
         </div>
-        <button className="btn-primary rgpd-generate-btn" onClick={generate} disabled={loading}>
+        <button className="btn-ai-generate rgpd-generate-btn" onClick={generate} disabled={loading}>
           <IconSparkle width={14} height={14} />
-          {loading ? t(lang, 'rgpd.generating') : rgpd ? t(lang, 'rgpd.regenerate') : t(lang, 'rgpd.generate')}
+          <span className="btn-ai-generate-label">{loading ? t(lang, 'rgpd.generating') : rgpd ? t(lang, 'rgpd.regenerate') : t(lang, 'rgpd.generate')}</span>
         </button>
       </div>
 

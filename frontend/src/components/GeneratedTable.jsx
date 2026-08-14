@@ -121,8 +121,8 @@ export default function GeneratedTable({ lang, plan }) {
           onChange={e => setPrompt(e.target.value)}
           disabled={loading}
         />
-        <button type="submit" className="btn-primary" disabled={loading || !prompt.trim()}>
-          <IconSparkle width={14} height={14} /> {loading ? t(lang, 'genTable.generating') : t(lang, 'genTable.generate')}
+        <button type="submit" className="btn-ai-generate" disabled={loading || !prompt.trim()}>
+          <IconSparkle width={14} height={14} /> <span className="btn-ai-generate-label">{loading ? t(lang, 'genTable.generating') : t(lang, 'genTable.generate')}</span>
         </button>
       </form>
 

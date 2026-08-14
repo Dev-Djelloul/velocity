@@ -132,8 +132,8 @@ export default function AgentActivity({ plan, userId, lang }) {
               <option value="">{t(lang, 'agents.selectStory')}</option>
               {stories.map(s => <option key={s.id} value={s.id}>{s.id} — {s.title}</option>)}
             </select>
-            <button className="btn-primary" onClick={runBrief} disabled={!selectedStoryId || busy}>
-              {t(lang, 'agents.run')}
+            <button className="btn-ai-generate" onClick={runBrief} disabled={!selectedStoryId || busy}>
+              <span className="btn-ai-generate-label">{t(lang, 'agents.run')}</span>
             </button>
           </div>
         </div>
@@ -142,8 +142,8 @@ export default function AgentActivity({ plan, userId, lang }) {
           <div className="agent-trigger-label"><IconTarget width={14} height={14} /> {t(lang, 'agents.kpiLabel')}</div>
           <p className="agent-trigger-desc">{t(lang, 'agents.kpiDesc')}</p>
           <div className="agent-trigger-row">
-            <button className="btn-primary" onClick={runKpiRecalc} disabled={busy}>
-              {t(lang, 'agents.run')}
+            <button className="btn-ai-generate" onClick={runKpiRecalc} disabled={busy}>
+              <span className="btn-ai-generate-label">{t(lang, 'agents.run')}</span>
             </button>
           </div>
         </div>
@@ -152,8 +152,8 @@ export default function AgentActivity({ plan, userId, lang }) {
           <div className="agent-trigger-label"><IconShield width={14} height={14} /> {t(lang, 'agents.riskLabel')}</div>
           <p className="agent-trigger-desc">{t(lang, 'agents.riskDesc')}</p>
           <div className="agent-trigger-row">
-            <button className="btn-primary" onClick={runRiskAnalysis} disabled={busy}>
-              {t(lang, 'agents.run')}
+            <button className="btn-ai-generate" onClick={runRiskAnalysis} disabled={busy}>
+              <span className="btn-ai-generate-label">{t(lang, 'agents.run')}</span>
             </button>
           </div>
         </div>
@@ -162,8 +162,8 @@ export default function AgentActivity({ plan, userId, lang }) {
           <div className="agent-trigger-label"><IconCoin width={14} height={14} /> {t(lang, 'agents.budgetLabel')}</div>
           <p className="agent-trigger-desc">{t(lang, 'agents.budgetDesc')}</p>
           <div className="agent-trigger-row">
-            <button className="btn-primary" onClick={runBudgetOptimization} disabled={busy || !plan.marketing?.channels?.length}>
-              {t(lang, 'agents.run')}
+            <button className="btn-ai-generate" onClick={runBudgetOptimization} disabled={busy || !plan.marketing?.channels?.length}>
+              <span className="btn-ai-generate-label">{t(lang, 'agents.run')}</span>
             </button>
           </div>
         </div>
