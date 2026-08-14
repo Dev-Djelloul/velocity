@@ -223,25 +223,40 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       )}
 
       <div className="plan-grid">
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.synthese')}</h2>
         <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.market')}</h2>
         <div id="section-persona" className="plan-section-anchor"><PersonaCard persona={plan.persona} lang={lang} /></div>
         <div id="section-veille" className="plan-section-anchor"><VeilleCard plan={plan} lang={lang} onVeilleChange={updateVeille} /></div>
         <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.execution')}</h2>
         <div id="section-calendar" className="plan-section-anchor"><CalendarView plan={plan} roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} launchDate={plan.launchDate} marketing={plan.marketing} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} planStartDate={plan.planStartDate || plan.generatedAt} onPlanStartDateChange={updatePlanStartDate} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} jira={plan.jira} plan={plan} userId={userId} onNotionStoriesSynced={updateNotion} /></div>
         <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
         <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>
         <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={setBudget} /></div>
         <div id="section-editorial" className="plan-section-anchor"><EditorialCalendarCard plan={plan} lang={lang} onEditorialChange={updateEditorial} /></div>
         <div id="section-advertising" className="plan-section-anchor"><AdvertisingCalendarCard plan={plan} lang={lang} onAdvertisingChange={updateAdvertising} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.performance')}</h2>
         <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
         <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.compliance')}</h2>
         <div id="section-rgpd" className="plan-section-anchor"><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.aitools')}</h2>
         <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
         <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
         <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
+
+        <h2 className="plan-section-title">{t(lang, 'sidebar.groups.postlaunch')}</h2>
         <div id="section-tracking" className="plan-section-anchor"><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
         <div id="section-whatif" className="plan-section-anchor"><WhatIfScenarios plan={plan} lang={lang} onScenariosChange={updateScenarios} /></div>
       </div>
