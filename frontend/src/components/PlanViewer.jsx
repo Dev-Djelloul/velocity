@@ -16,7 +16,6 @@ import StrategyToolkitCard from './StrategyToolkitCard'
 import GanttChart from './GanttChart'
 import BurndownChart from './BurndownChart'
 import CalendarView from './CalendarView'
-import AskChart from './AskChart'
 import GeneratedTable from './GeneratedTable'
 import AgentActivity from './AgentActivity'
 import PostLaunchTracking from './PostLaunchTracking'
@@ -255,8 +254,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-rgpd" className="plan-section-anchor"><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.aitools')}</h2>
-        <div id="section-askchart" className="plan-section-anchor"><AskChart plan={{ ...plan, marketing: liveMarketing }} lang={lang} /></div>
-        <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={plan} /></div>
+        <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={{ ...plan, marketing: liveMarketing }} /></div>
         <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.postlaunch')}</h2>

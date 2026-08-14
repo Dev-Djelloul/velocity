@@ -93,29 +93,27 @@ export const translations = {
         afterDependent: '{dep} dépend de cette story — elle ne peut pas être planifiée après.'
       }
     },
-    askChart: {
-      title: 'Graphiques en langage naturel',
-      subtitle: 'Pose une question sur ton plan, le graphique correspondant s\'affiche',
-      placeholder: 'ex : montre-moi le budget par mois',
-      ask: 'Générer',
-      noData: 'Pas assez de données pour répondre à cette question — essaie une des suggestions.',
-      suggestions: [
-        'Budget par canal',
-        'Effort par sprint',
-        'Coût par sprint',
-        'Cibles des KPI'
-      ]
-    },
     genTable: {
-      title: 'Tableau généré par prompt',
-      subtitle: 'Décris le tableau dont tu as besoin, il se construit automatiquement',
-      placeholder: 'ex : tableau de suivi des influenceurs à contacter',
-      generate: 'Générer le tableau',
+      title: 'Analyse IA du plan',
+      subtitle: 'Décrivez ce que vous voulez voir en une phrase : un tableau se construit à partir des données réelles de votre plan, avec un graphique en plus si la comparaison s\'y prête',
+      placeholder: 'ex : liste des stories par sprint avec leur effort',
+      generate: 'Générer',
       generating: 'Génération…',
       addRow: '+ Ajouter une ligne',
       removeRow: 'Supprimer la ligne',
       removeColumn: 'Supprimer la colonne',
-      exportCsv: 'Exporter en CSV'
+      exportCsv: 'Exporter en CSV',
+      suggestionsTitle: 'Vous ne savez pas quoi taper ? Essayez :',
+      suggestions: [
+        'Budget marketing par canal',
+        'Effort par sprint',
+        'Cibles des KPI avec leur formule',
+        'Répartition du budget (produit / marketing / ops)',
+        'Tableau de suivi des influenceurs à contacter',
+        'Checklist de lancement par semaine'
+      ],
+      empty: 'Aucun résultat pour le moment. Décrivez ce que vous voulez comparer, suivre ou lister ci-dessus — ou partez d\'une suggestion.',
+      autoChartNote: 'Graphique généré automatiquement à partir des deux colonnes du tableau'
     },
     backlog: {
       title: 'Backlog',
@@ -282,23 +280,33 @@ export const translations = {
     },
     agents: {
       title: 'Agents IA',
-      subtitle: 'Des actions IA asynchrones qui tournent en tâche de fond, indépendamment de cette page',
+      subtitle: 'Des actions IA asynchrones qui tournent en tâche de fond, indépendamment de cette page : vous lancez, vous pouvez fermer l\'onglet, le résultat vous attend dans le journal ci-dessous',
       briefLabel: 'Rédiger un brief d\'exécution',
+      briefDesc: 'Choisissez une story et l\'agent rédige un brief prêt à exécuter : étapes concrètes, ressources nécessaires, risques à anticiper.',
       kpiLabel: 'Recalculer les KPIs',
+      kpiDesc: 'L\'agent réévalue vos cibles KPI à partir de l\'avancement réel de la roadmap (stories terminées, temps écoulé) — utile après quelques sprints, pour ne pas piloter sur des cibles figées au jour 1.',
+      riskLabel: 'Analyser les risques du plan',
+      riskDesc: 'L\'agent identifie 3 à 5 risques prioritaires spécifiques à votre produit et votre marché, avec une mitigation concrète pour chacun.',
+      budgetLabel: 'Optimiser le budget marketing',
+      budgetDesc: 'L\'agent revoit la répartition actuelle de votre budget par canal et propose des mouvements argumentés (augmenter, réduire, maintenir).',
       selectStory: 'Choisir une story...',
       run: 'Lancer',
       logTitle: 'Journal d\'activité',
       logEmpty: 'Aucune action lancée pour le moment.',
       type: {
         story_brief: 'Brief d\'exécution',
-        recalc_kpis: 'Recalcul des KPIs'
+        recalc_kpis: 'Recalcul des KPIs',
+        risk_analysis: 'Analyse des risques',
+        budget_optimization: 'Optimisation budgétaire'
       },
       status: {
         queued: 'En attente',
         running: 'En cours',
         done: 'Terminé',
         error: 'Erreur'
-      }
+      },
+      severity: { high: 'Critique', medium: 'Modéré', low: 'Mineur' },
+      direction: { increase: 'Augmenter', decrease: 'Réduire', maintain: 'Maintenir' }
     },
     tracking: {
       title: 'Suivi post-lancement',
@@ -954,29 +962,27 @@ export const translations = {
         afterDependent: '{dep} depends on this story — it cannot be scheduled after it.'
       }
     },
-    askChart: {
-      title: 'Natural language charts',
-      subtitle: 'Ask a question about your plan, the matching chart appears',
-      placeholder: 'e.g. show me the budget by month',
-      ask: 'Generate',
-      noData: 'Not enough data to answer this — try one of the suggestions.',
-      suggestions: [
-        'Budget by channel',
-        'Effort by sprint',
-        'Cost by sprint',
-        'KPI targets'
-      ]
-    },
     genTable: {
-      title: 'Prompt-generated table',
-      subtitle: 'Describe the table you need, it builds itself automatically',
-      placeholder: 'e.g. tracking table for influencers to contact',
-      generate: 'Generate table',
+      title: 'AI plan analysis',
+      subtitle: 'Describe what you want to see in one sentence: a table builds itself from your plan\'s real data, plus a chart on top when the comparison lends itself to one',
+      placeholder: 'e.g. list of stories per sprint with their effort',
+      generate: 'Generate',
       generating: 'Generating…',
       addRow: '+ Add row',
       removeRow: 'Remove row',
       removeColumn: 'Remove column',
-      exportCsv: 'Export as CSV'
+      exportCsv: 'Export as CSV',
+      suggestionsTitle: 'Not sure what to type? Try:',
+      suggestions: [
+        'Marketing budget by channel',
+        'Effort per sprint',
+        'KPI targets with their formula',
+        'Budget split (product / marketing / ops)',
+        'Tracking table for influencers to contact',
+        'Launch checklist by week'
+      ],
+      empty: 'No result yet. Describe what you want to compare, track or list above — or start from a suggestion.',
+      autoChartNote: 'Chart generated automatically from the table\'s two columns'
     },
     backlog: {
       title: 'Backlog',
@@ -1143,23 +1149,33 @@ export const translations = {
     },
     agents: {
       title: 'AI Agents',
-      subtitle: 'Asynchronous AI actions running in the background, independent of this page',
+      subtitle: 'Asynchronous AI actions running in the background, independent of this page: trigger one, close the tab if you want, the result waits in the log below',
       briefLabel: 'Write an execution brief',
+      briefDesc: 'Pick a story and the agent writes a ready-to-execute brief: concrete steps, resources needed, risks to anticipate.',
       kpiLabel: 'Recalculate KPIs',
+      kpiDesc: 'The agent re-evaluates your KPI targets from actual roadmap progress (stories done, time elapsed) — useful after a few sprints, so you\'re not steering by day-1 targets.',
+      riskLabel: 'Analyze plan risks',
+      riskDesc: 'The agent identifies 3 to 5 priority risks specific to your product and market, each with a concrete mitigation.',
+      budgetLabel: 'Optimize marketing budget',
+      budgetDesc: 'The agent reviews your current per-channel budget split and proposes justified moves (increase, decrease, maintain).',
       selectStory: 'Choose a story...',
       run: 'Run',
       logTitle: 'Activity log',
       logEmpty: 'No action triggered yet.',
       type: {
         story_brief: 'Execution brief',
-        recalc_kpis: 'KPI recalculation'
+        recalc_kpis: 'KPI recalculation',
+        risk_analysis: 'Risk analysis',
+        budget_optimization: 'Budget optimization'
       },
       status: {
         queued: 'Queued',
         running: 'Running',
         done: 'Done',
         error: 'Error'
-      }
+      },
+      severity: { high: 'Critical', medium: 'Moderate', low: 'Minor' },
+      direction: { increase: 'Increase', decrease: 'Decrease', maintain: 'Maintain' }
     },
     tracking: {
       title: 'Post-launch tracking',

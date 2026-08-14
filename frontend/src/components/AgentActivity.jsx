@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { enqueueAgentTask, fetchAgentTasks } from '../lib/serverStorage'
-import { IconSparkle, IconCheckCircle, IconAlertTriangle, IconClock, IconClipboard, IconTarget } from './Icons'
+import { IconSparkle, IconCheckCircle, IconAlertTriangle, IconClock, IconClipboard, IconTarget, IconShield, IconCoin } from './Icons'
 import '../styles/AgentActivity.css'
 
 const POLL_MS = 2500
@@ -77,6 +77,39 @@ export default function AgentActivity({ plan, userId, lang }) {
     setBusy(false)
   }
 
+  const runRiskAnalysis = async () => {
+    if (busy) return
+    setBusy(true)
+    const stories2 = allStories(plan.roadmap)
+    const doneStories = stories2.filter(s => s.status === 'done').length
+    await enqueueAgentTask(planId, userId, 'risk_analysis', {
+      lang,
+      productName: plan.product?.name,
+      productPitch: plan.product?.pitch,
+      market: plan.market?.segment || plan.market?.b2bVsB2c,
+      totalWeeks: plan.roadmap?.totalDuration || 0,
+      teamSize: plan.resources?.teamSize,
+      budget: plan.resources?.budgetEur,
+      doneStories,
+      totalStories: stories2.length
+    })
+    await refresh()
+    setBusy(false)
+  }
+
+  const runBudgetOptimization = async () => {
+    if (busy || !plan.marketing?.channels?.length) return
+    setBusy(true)
+    await enqueueAgentTask(planId, userId, 'budget_optimization', {
+      lang,
+      productName: plan.product?.name,
+      totalBudget: plan.marketing.totalBudget,
+      channels: plan.marketing.channels.map(c => ({ name: c.name, budget: c.budget, pct: c.pct, goal: c.goal }))
+    })
+    await refresh()
+    setBusy(false)
+  }
+
   const statusIcon = (status) => {
     if (status === 'done') return <IconCheckCircle width={14} height={14} className="agent-status-done" />
     if (status === 'error') return <IconAlertTriangle width={14} height={14} className="agent-status-error" />
@@ -93,6 +126,7 @@ export default function AgentActivity({ plan, userId, lang }) {
       <div className="agent-triggers">
         <div className="agent-trigger">
           <div className="agent-trigger-label"><IconClipboard width={14} height={14} /> {t(lang, 'agents.briefLabel')}</div>
+          <p className="agent-trigger-desc">{t(lang, 'agents.briefDesc')}</p>
           <div className="agent-trigger-row">
             <select value={selectedStoryId} onChange={e => setSelectedStoryId(e.target.value)} disabled={busy}>
               <option value="">{t(lang, 'agents.selectStory')}</option>
@@ -106,8 +140,29 @@ export default function AgentActivity({ plan, userId, lang }) {
 
         <div className="agent-trigger">
           <div className="agent-trigger-label"><IconTarget width={14} height={14} /> {t(lang, 'agents.kpiLabel')}</div>
+          <p className="agent-trigger-desc">{t(lang, 'agents.kpiDesc')}</p>
           <div className="agent-trigger-row">
             <button className="btn-primary" onClick={runKpiRecalc} disabled={busy}>
+              {t(lang, 'agents.run')}
+            </button>
+          </div>
+        </div>
+
+        <div className="agent-trigger">
+          <div className="agent-trigger-label"><IconShield width={14} height={14} /> {t(lang, 'agents.riskLabel')}</div>
+          <p className="agent-trigger-desc">{t(lang, 'agents.riskDesc')}</p>
+          <div className="agent-trigger-row">
+            <button className="btn-primary" onClick={runRiskAnalysis} disabled={busy}>
+              {t(lang, 'agents.run')}
+            </button>
+          </div>
+        </div>
+
+        <div className="agent-trigger">
+          <div className="agent-trigger-label"><IconCoin width={14} height={14} /> {t(lang, 'agents.budgetLabel')}</div>
+          <p className="agent-trigger-desc">{t(lang, 'agents.budgetDesc')}</p>
+          <div className="agent-trigger-row">
+            <button className="btn-primary" onClick={runBudgetOptimization} disabled={busy || !plan.marketing?.channels?.length}>
               {t(lang, 'agents.run')}
             </button>
           </div>
@@ -139,6 +194,31 @@ export default function AgentActivity({ plan, userId, lang }) {
               <div className="agent-log-result">
                 {task.output.kpis?.map((k, i) => (
                   <p key={i}><strong>{k.name}:</strong> {k.newTarget ?? '='} — {k.rationale}</p>
+                ))}
+              </div>
+            )}
+
+            {task.status === 'done' && task.type === 'risk_analysis' && task.output && (
+              <div className="agent-log-result">
+                {task.output.risks?.map((r, i) => (
+                  <div key={i} className={`agent-risk-item severity-${r.severity}`}>
+                    <div className="agent-risk-head">
+                      <span className={`agent-risk-severity severity-${r.severity}`}>{t(lang, `agents.severity.${r.severity}`)}</span>
+                      <span className="agent-risk-title">{r.risk}</span>
+                    </div>
+                    <p className="agent-risk-mitigation">{r.mitigation}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {task.status === 'done' && task.type === 'budget_optimization' && task.output && (
+              <div className="agent-log-result">
+                <p className="agent-log-summary">{task.output.assessment}</p>
+                {task.output.moves?.map((m, i) => (
+                  <p key={i} className={`agent-budget-move direction-${m.direction}`}>
+                    <strong>{m.channel}</strong> — {t(lang, `agents.direction.${m.direction}`)} : {m.rationale}
+                  </p>
                 ))}
               </div>
             )}

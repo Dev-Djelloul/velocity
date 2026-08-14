@@ -58,7 +58,6 @@ const GROUPS = [
   {
     key: 'aitools',
     sections: [
-      { id: 'section-askchart', labelKey: 'askChart.title', Icon: IconSparkle },
       { id: 'section-table', labelKey: 'genTable.title', Icon: IconSave },
       { id: 'section-agents', labelKey: 'agents.title', Icon: IconSparkle }
     ]
