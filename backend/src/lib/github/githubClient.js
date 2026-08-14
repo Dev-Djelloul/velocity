@@ -34,6 +34,8 @@ export async function exchangeCode(env, code) {
   return data.access_token
 }
 
+// GitHub rejette avec 403 toute requête sans User-Agent — le fetch natif de Cloudflare
+// Workers n'en envoie pas par défaut, contrairement à un navigateur.
 function ghFetch(accessToken, path, opts = {}) {
   return fetch(`${API_BASE}${path}`, {
     ...opts,
@@ -41,6 +43,7 @@ function ghFetch(accessToken, path, opts = {}) {
       Authorization: `Bearer ${accessToken}`,
       Accept: 'application/vnd.github+json',
       'X-GitHub-Api-Version': '2022-11-28',
+      'User-Agent': 'VelocityLaunch',
       ...(opts.body ? { 'Content-Type': 'application/json' } : {}),
       ...opts.headers
     }
