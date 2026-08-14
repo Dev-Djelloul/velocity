@@ -177,53 +177,41 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
     }
   }
 
-  // Calendrier éditorial → base datée (Date = semaine réelle, pour vue calendrier)
-  if (plan.editorial?.items?.length) {
+  // Calendrier de contenu & publicité → une seule base fusionnant contenu organique et
+  // campagnes payantes (comme la vue GTM unifiée de l'app), avec une colonne Type pour
+  // distinguer les deux et une colonne Détail qui absorbe les champs propres à chacun
+  // (Angle/CTA pour le contenu, Objectif/Budget/KPI pour le payant).
+  const contentRows = (plan.editorial?.items || []).map(it => ({
+    [_('Élément', 'Item')]: propTitle(it.title),
+    [_('Type', 'Type')]: propSelect(_('Contenu organique', 'Organic content')),
+    Date: propDate(isoDatePlusWeeks(base, (it.week || 1) - 1)),
+    [_('Semaine', 'Week')]: propNumber(it.week),
+    [_('Canal', 'Channel')]: propSelect(it.channel),
+    [_('Format', 'Format')]: propText(it.format),
+    [_('Détail', 'Detail')]: propText(`${_('Angle', 'Angle')} : ${it.angle || '—'} · CTA : ${it.cta || '—'}`)
+  }))
+  const paidRows = (plan.advertising?.campaigns || []).map(c => ({
+    [_('Élément', 'Item')]: propTitle(`${c.channel} — ${c.format}`),
+    [_('Type', 'Type')]: propSelect(_('Campagne payante', 'Paid campaign')),
+    Date: propDate(isoDatePlusWeeks(base, (c.week || 1) - 1)),
+    [_('Semaine', 'Week')]: propNumber(c.week),
+    [_('Canal', 'Channel')]: propSelect(c.channel),
+    [_('Format', 'Format')]: propText(c.format),
+    [_('Détail', 'Detail')]: propText(`${_('Objectif', 'Objective')} : ${c.objective || '—'} · Budget : ${c.budget ?? '—'} € · KPI : ${c.kpi || '—'}`)
+  }))
+  if (contentRows.length || paidRows.length) {
     await createDatabaseWithRows(
-      accessToken, parentPageId, _('Calendrier éditorial', 'Editorial calendar'),
+      accessToken, parentPageId, _('Calendrier de contenu & publicité', 'Content & advertising calendar'),
       {
-        [_('Contenu', 'Content')]: { title: {} },
+        [_('Élément', 'Item')]: { title: {} },
+        [_('Type', 'Type')]: { select: {} },
         Date: { date: {} },
         [_('Semaine', 'Week')]: { number: {} },
         [_('Canal', 'Channel')]: { select: {} },
         [_('Format', 'Format')]: { rich_text: {} },
-        [_('Angle', 'Angle')]: { rich_text: {} },
-        CTA: { rich_text: {} }
+        [_('Détail', 'Detail')]: { rich_text: {} }
       },
-      plan.editorial.items.map(it => ({
-        [_('Contenu', 'Content')]: propTitle(it.title),
-        Date: propDate(isoDatePlusWeeks(base, (it.week || 1) - 1)),
-        [_('Semaine', 'Week')]: propNumber(it.week),
-        [_('Canal', 'Channel')]: propSelect(it.channel),
-        [_('Format', 'Format')]: propText(it.format),
-        [_('Angle', 'Angle')]: propText(it.angle),
-        CTA: propText(it.cta)
-      }))
-    )
-  }
-
-  // Calendrier publicitaire → base des campagnes datée
-  if (plan.advertising?.campaigns?.length) {
-    await createDatabaseWithRows(
-      accessToken, parentPageId, _('Calendrier publicitaire', 'Advertising calendar'),
-      {
-        [_('Campagne', 'Campaign')]: { title: {} },
-        Date: { date: {} },
-        [_('Semaine', 'Week')]: { number: {} },
-        [_('Canal', 'Channel')]: { select: {} },
-        [_('Objectif', 'Objective')]: { select: {} },
-        [_('Budget (€)', 'Budget (€)')]: { number: {} },
-        KPI: { rich_text: {} }
-      },
-      plan.advertising.campaigns.map(c => ({
-        [_('Campagne', 'Campaign')]: propTitle(`${c.channel} — ${c.format}`),
-        Date: propDate(isoDatePlusWeeks(base, (c.week || 1) - 1)),
-        [_('Semaine', 'Week')]: propNumber(c.week),
-        [_('Canal', 'Channel')]: propSelect(c.channel),
-        [_('Objectif', 'Objective')]: propSelect(c.objective),
-        [_('Budget (€)', 'Budget (€)')]: propNumber(c.budget),
-        KPI: propText(c.kpi)
-      }))
+      [...contentRows, ...paidRows]
     )
   }
 }
