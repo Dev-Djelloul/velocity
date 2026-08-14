@@ -67,6 +67,13 @@ const propNumber = (v) => { const n = Number(v); return { number: Number.isFinit
 const propSelect = (v) => (v ? { select: { name: String(v).slice(0, 100).replace(/,/g, ' ') } } : { select: null })
 const propDate = (iso) => (iso ? { date: { start: iso } } : { date: null })
 
+// Libellé de statut Notion pour un statut de story VelocityLaunch (tri-état).
+function statusLabel(status, en) {
+  if (status === 'done') return en ? 'Done' : 'Terminé'
+  if (status === 'in_progress') return en ? 'In progress' : 'En cours'
+  return en ? 'To do' : 'À faire'
+}
+
 // Date = base (generatedAt) décalée de N semaines, au format YYYY-MM-DD (pour vues calendrier/timeline).
 function isoDatePlusWeeks(baseIso, weeks) {
   const d = baseIso ? new Date(baseIso) : new Date()
@@ -129,7 +136,7 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
           [_('Responsable', 'Assignee')]: propText(s.assignee),
           [_('Effort', 'Effort')]: propNumber(s.effort),
           [_('Coût (€)', 'Cost (€)')]: propNumber(s.cost),
-          [_('Statut', 'Status')]: propSelect(s.status === 'done' ? _('Terminé', 'Done') : _('À faire', 'To do'))
+          [_('Statut', 'Status')]: propSelect(statusLabel(s.status, en))
         }))
       )
     }

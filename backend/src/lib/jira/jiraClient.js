@@ -192,6 +192,13 @@ async function transitionTo(accessToken, cloudId, key, targetCategory) {
   } catch { /* transition best-effort */ }
 }
 
+// Catégorie de statut Jira cible pour un statut de story VelocityLaunch (tri-état).
+function jiraCategoryFor(status) {
+  if (status === 'done') return 'done'
+  if (status === 'in_progress') return 'indeterminate'
+  return 'new'
+}
+
 const CATEGORY_LABELS = { product: 'produit', marketing: 'marketing', ops: 'ops' }
 
 // Priorité dérivée de l'ordre des sprints (les plus tôt = les plus urgents).
@@ -285,7 +292,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       if (existing) {
         await updateIssue(accessToken, cloudId, existing, baseFields)
         links[story.id] = { key: existing, url: browse(existing) }
-        if (story.status === 'done') await transitionTo(accessToken, cloudId, existing, 'done')
+        await transitionTo(accessToken, cloudId, existing, jiraCategoryFor(story.status))
         updated++
         continue
       }
@@ -297,7 +304,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
       try {
         const issue = await createIssue(accessToken, cloudId, createFields)
         links[story.id] = { key: issue.key, url: browse(issue.key) }
-        if (story.status === 'done') await transitionTo(accessToken, cloudId, issue.key, 'done')
+        await transitionTo(accessToken, cloudId, issue.key, jiraCategoryFor(story.status))
         created++
       } catch (e) {
         // Le rattachement à l'Epic (parent) ou le champ story points peuvent être refusés selon le projet.
@@ -307,7 +314,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
         try {
           const issue = await createIssue(accessToken, cloudId, fallback)
           links[story.id] = { key: issue.key, url: browse(issue.key) }
-          if (story.status === 'done') await transitionTo(accessToken, cloudId, issue.key, 'done')
+          await transitionTo(accessToken, cloudId, issue.key, jiraCategoryFor(story.status))
           created++
         } catch { /* on saute cette story sans casser l'export */ }
       }

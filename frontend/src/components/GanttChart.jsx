@@ -1,12 +1,17 @@
-import { useState } from 'react'
+import { useState, Fragment } from 'react'
 import { t } from '../lib/i18n'
-import { IconTarget, IconUser, IconAlertTriangle, IconCheckCircle, IconPencil } from './Icons'
+import { IconTarget, IconUser, IconCoin, IconAlertTriangle, IconCheckCircle, IconClock, IconCircleDot } from './Icons'
 import '../styles/GanttChart.css'
 
 const SPRINT_DAYS = 14
+// Palette réutilisée telle quelle depuis DashboardBI (donuts) — une couleur par responsable,
+// cohérente avec le reste de l'app plutôt que d'inventer une nouvelle palette.
+const GROUP_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6366f1', '#f472b6', '#a89fe8']
+const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
+const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
 
-function sprintDates(generatedAt, sprintId) {
-  const start = new Date(generatedAt || Date.now())
+function sprintDates(planStartDate, sprintId) {
+  const start = new Date(planStartDate || Date.now())
   start.setDate(start.getDate() + (sprintId - 1) * SPRINT_DAYS)
   const end = new Date(start)
   end.setDate(end.getDate() + SPRINT_DAYS)
@@ -18,50 +23,78 @@ function formatShort(date, lang) {
   return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' })
 }
 
-function currentSprintId(sprints, generatedAt) {
+function monthLabel(date, lang) {
+  const locale = lang === 'en' ? 'en-US' : 'fr-FR'
+  return date.toLocaleDateString(locale, { month: 'long', year: 'numeric' })
+}
+
+function currentSprintId(sprints, planStartDate) {
   const now = new Date()
-  const current = sprints.find(sp => sprintDates(generatedAt, sp.sprintId).end >= now) || sprints[sprints.length - 1]
+  const current = sprints.find(sp => sprintDates(planStartDate, sp.sprintId).end >= now) || sprints[sprints.length - 1]
   return current.sprintId
 }
 
 export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange }) {
-  const [editingStoryId, setEditingStoryId] = useState(null)
-  const [expandedIds, setExpandedIds] = useState(() => new Set())
+  const [expandedId, setExpandedId] = useState(null)
   const [error, setError] = useState(null)
 
   if (!roadmap?.sprints?.length) return null
 
   const { sprints } = roadmap
-  const minSprintId = currentSprintId(sprints, generatedAt)
+  const planStartDate = generatedAt
+  const minSprintId = currentSprintId(sprints, planStartDate)
 
   const flashError = (message) => {
     setError(message)
     setTimeout(() => setError(null), 3000)
   }
 
-  const toggleExpanded = (storyId) => {
-    setExpandedIds(prev => {
-      const next = new Set(prev)
-      if (next.has(storyId)) next.delete(storyId)
-      else next.add(storyId)
-      return next
-    })
-  }
+  // --- Colonnes du calendrier : un sprint = une colonne, regroupées par mois pour l'entête ---
+  const cols = sprints.map(sp => ({ sprintId: sp.sprintId, ...sprintDates(planStartDate, sp.sprintId) }))
+  const monthBands = []
+  cols.forEach(col => {
+    const key = `${col.start.getFullYear()}-${col.start.getMonth()}`
+    const last = monthBands[monthBands.length - 1]
+    if (last && last.key === key) last.span++
+    else monthBands.push({ key, label: monthLabel(col.start, lang), span: 1 })
+  })
+
+  // --- Regroupement en swim-lanes par responsable, comme un Gantt d'équipe classique ---
+  const groups = []
+  const groupIndexByAssignee = new Map()
+  sprints.forEach(sp => sp.stories.forEach(story => {
+    const key = story.assignee || '—'
+    if (!groupIndexByAssignee.has(key)) {
+      groupIndexByAssignee.set(key, groups.length)
+      groups.push({ assignee: key, stories: [], minSprint: sp.sprintId, maxSprint: sp.sprintId })
+    }
+    const g = groups[groupIndexByAssignee.get(key)]
+    g.stories.push({ ...story, sprintId: sp.sprintId })
+    g.minSprint = Math.min(g.minSprint, sp.sprintId)
+    g.maxSprint = Math.max(g.maxSprint, sp.sprintId)
+  }))
+  groups.forEach(g => g.stories.sort((a, b) => a.sprintId - b.sprintId))
+
+  // Aplatit groupe+stories en lignes numérotées (2 lignes d'entête d'abord).
+  const rows = []
+  groups.forEach((g, gi) => {
+    rows.push({ type: 'group', group: g, colorIdx: gi })
+    g.stories.forEach(story => rows.push({ type: 'story', story, group: g, colorIdx: gi }))
+  })
+
+  const sprintOf = new Map()
+  const storyById = new Map()
+  sprints.forEach(sp => sp.stories.forEach(s => {
+    sprintOf.set(s.id, sp.sprintId)
+    storyById.set(s.id, s)
+  }))
 
   const moveStory = (storyId, fromSprintId, toSprintId) => {
     if (fromSprintId === toSprintId) return
-
     if (toSprintId < minSprintId) {
       flashError(t(lang, 'gantt.errors.pastSprint'))
       return
     }
-
-    const sprintOf = new Map()
-    const storyById = new Map()
-    sprints.forEach(sp => sp.stories.forEach(s => {
-      sprintOf.set(s.id, sp.sprintId)
-      storyById.set(s.id, s)
-    }))
 
     const story = storyById.get(storyId)
     if (!story) return
@@ -96,16 +129,6 @@ export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange
     })
     onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
     setError(null)
-    setEditingStoryId(storyId)
-    setExpandedIds(prev => new Set(prev).add(storyId))
-  }
-
-  const updateStoryField = (storyId, field, value) => {
-    const nextSprints = sprints.map(sp => ({
-      ...sp,
-      stories: sp.stories.map(s => s.id === storyId ? { ...s, [field]: value } : s)
-    }))
-    onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
   }
 
   const handleDrop = (e, toSprintId) => {
@@ -129,104 +152,106 @@ export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange
         </div>
       )}
 
-      <div className="gantt-grid" style={{ '--gantt-cols': sprints.length }}>
-        {sprints.map(sp => {
-          const { start, end } = sprintDates(generatedAt, sp.sprintId)
-          const locked = sp.sprintId < minSprintId
-          return (
-            <div key={sp.sprintId} className={`gantt-col-header ${locked ? 'locked' : ''}`}>
-              <div className="gantt-sprint-label">Sprint {sp.sprintId}</div>
-              <div className="gantt-sprint-dates">{formatShort(start, lang)} → {formatShort(end, lang)}</div>
-            </div>
-          )
-        })}
+      <div className="gantt-scroll">
+        <div
+          className="gantt-timeline"
+          style={{ '--gantt-sprint-count': sprints.length }}
+        >
+          {monthBands.map((mb, i) => {
+            const startCol = 2 + monthBands.slice(0, i).reduce((s, m) => s + m.span, 0)
+            return (
+              <div key={mb.key} className="gantt-month-header" style={{ gridRow: 1, gridColumn: `${startCol} / span ${mb.span}` }}>
+                {mb.label}
+              </div>
+            )
+          })}
 
-        {sprints.map(sp => {
-          const locked = sp.sprintId < minSprintId
-          return (
-            <div
-              key={`col-${sp.sprintId}`}
-              className={`gantt-col ${locked ? 'locked' : ''}`}
-              onDragOver={e => !locked && e.preventDefault()}
-              onDrop={e => !locked && handleDrop(e, sp.sprintId)}
-            >
-              {sp.stories.map(story => {
-                const isEditing = editingStoryId === story.id
-                const isExpanded = expandedIds.has(story.id) || isEditing
+          {cols.map((col, i) => {
+            const locked = col.sprintId < minSprintId
+            return (
+              <div key={col.sprintId} className={`gantt-sprint-header ${locked ? 'locked' : ''}`} style={{ gridRow: 2, gridColumn: 2 + i }}>
+                <span>Sprint {col.sprintId}</span>
+                <span className="gantt-sprint-header-dates">{formatShort(col.start, lang)} → {formatShort(col.end, lang)}</span>
+              </div>
+            )
+          })}
 
-                return (
-                  <div
-                    key={story.id}
-                    className={`gantt-bar ${story.dependsOn?.length ? 'has-deps' : ''} ${isExpanded ? 'expanded' : ''} ${isEditing ? 'editing' : ''}`}
-                    draggable={!isEditing}
-                    onDragStart={e => e.dataTransfer.setData('text/plain', `${story.id}::${sp.sprintId}`)}
-                    title={!isExpanded ? story.title : undefined}
-                  >
-                    <div className="gantt-bar-top">
-                      <span className="gantt-bar-id">{story.id}</span>
-                      <button
-                        type="button"
-                        className="gantt-bar-expand"
-                        onClick={() => toggleExpanded(story.id)}
-                        title={isExpanded ? t(lang, 'gantt.collapse') : t(lang, 'gantt.expand')}
-                      >
-                        {isExpanded ? '▾' : '▸'}
-                      </button>
-                    </div>
+          {cols.map((col, i) => {
+            const locked = col.sprintId < minSprintId
+            return (
+              <div
+                key={`dz-${col.sprintId}`}
+                className={`gantt-dropzone ${locked ? 'locked' : ''} ${i % 2 === 1 ? 'alt' : ''}`}
+                style={{ gridRow: `3 / span ${rows.length}`, gridColumn: 2 + i }}
+                onDragOver={e => !locked && e.preventDefault()}
+                onDrop={e => !locked && handleDrop(e, col.sprintId)}
+              />
+            )
+          })}
 
-                    {isEditing ? (
-                      <div className="gantt-bar-edit">
-                        <input
-                          type="text"
-                          value={story.title}
-                          onChange={e => updateStoryField(story.id, 'title', e.target.value)}
-                        />
-                        <div className="gantt-bar-edit-row">
-                          <label>
-                            <IconTarget width={11} height={11} />
-                            <input
-                              type="number"
-                              min="1"
-                              value={story.effort}
-                              onChange={e => updateStoryField(story.id, 'effort', Number(e.target.value) || 0)}
-                            />
-                          </label>
-                          <label>
-                            <IconUser width={11} height={11} />
-                            <input
-                              type="text"
-                              value={story.assignee}
-                              onChange={e => updateStoryField(story.id, 'assignee', e.target.value)}
-                            />
-                          </label>
-                        </div>
-                        <button type="button" className="gantt-bar-done" onClick={() => setEditingStoryId(null)}>
-                          <IconCheckCircle width={12} height={12} /> {t(lang, 'gantt.done')}
-                        </button>
-                      </div>
-                    ) : (
-                      <>
-                        <span className="gantt-bar-title">{story.title}</span>
-                        <span className="gantt-bar-effort"><IconTarget width={11} height={11} /> {story.effort}pts</span>
-                        {isExpanded && (
-                          <>
-                            <span className="gantt-bar-assignee"><IconUser width={11} height={11} /> {story.assignee}</span>
-                            {story.dependsOn?.length > 0 && (
-                              <span className="gantt-bar-deps">{t(lang, 'outputs.dependsOn')}: {story.dependsOn.join(', ')}</span>
-                            )}
-                            <button type="button" className="gantt-bar-edit-btn" onClick={() => setEditingStoryId(story.id)}>
-                              <IconPencil width={11} height={11} /> {t(lang, 'gantt.edit')}
-                            </button>
-                          </>
-                        )}
-                      </>
-                    )}
+          {rows.map((r, i) => {
+            const gridRow = 3 + i
+            const color = GROUP_COLORS[r.colorIdx % GROUP_COLORS.length]
+
+            if (r.type === 'group') {
+              const g = r.group
+              return (
+                <Fragment key={`group-${g.assignee}`}>
+                  <div className="gantt-sidebar-cell gantt-sidebar-group" style={{ gridRow, gridColumn: 1 }}>
+                    <span className="gantt-group-dot" style={{ background: color }} />
+                    {g.assignee}
                   </div>
-                )
-              })}
-            </div>
-          )
-        })}
+                  <div
+                    className="gantt-bar gantt-bar-group"
+                    style={{ gridRow, gridColumn: `${2 + (g.minSprint - 1)} / ${2 + g.maxSprint}`, background: color }}
+                  >
+                    {g.assignee}
+                  </div>
+                </Fragment>
+              )
+            }
+
+            const story = r.story
+            const status = story.status || 'todo'
+            const StatusIcon = STATUS_ICONS[status] || STATUS_ICONS.todo
+            const isExpanded = expandedId === story.id
+
+            return (
+              <Fragment key={story.id}>
+                <div className="gantt-sidebar-cell gantt-sidebar-story" style={{ gridRow, gridColumn: 1 }} title={story.title}>
+                  <span className="gantt-connector" style={{ borderColor: color }} />
+                  {story.title}
+                </div>
+                <div
+                  className={`gantt-bar gantt-bar-story status-${status}`}
+                  style={{ gridRow, gridColumn: 2 + (story.sprintId - 1), '--group-color': color }}
+                  draggable
+                  onDragStart={e => e.dataTransfer.setData('text/plain', `${story.id}::${story.sprintId}`)}
+                  onClick={() => setExpandedId(isExpanded ? null : story.id)}
+                >
+                  <StatusIcon width={12} height={12} className="gantt-bar-status-icon" />
+                  <span className="gantt-bar-story-id">{story.id}</span>
+
+                  {isExpanded && (
+                    <div className="gantt-detail" onClick={e => e.stopPropagation()}>
+                      <div className="gantt-detail-title">{story.title}</div>
+                      {story.description && <p className="gantt-detail-desc">{story.description}</p>}
+                      <div className="gantt-detail-meta">
+                        <span><StatusIcon width={12} height={12} /> {t(lang, `outputs.rollover.status.${STATUS_I18N_KEY[status]}`)}</span>
+                        <span><IconTarget width={12} height={12} /> {story.effort}pts</span>
+                        <span><IconUser width={12} height={12} /> {story.assignee}</span>
+                        <span><IconCoin width={12} height={12} /> {story.cost}€</span>
+                      </div>
+                      {story.dependsOn?.length > 0 && (
+                        <p className="gantt-detail-deps">{t(lang, 'outputs.dependsOn')}: {story.dependsOn.join(', ')}</p>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Fragment>
+            )
+          })}
+        </div>
       </div>
       <p className="gantt-hint">{t(lang, 'gantt.dragHint')}</p>
     </div>

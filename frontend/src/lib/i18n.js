@@ -83,12 +83,10 @@ export const translations = {
     },
     gantt: {
       title: 'Gantt interactif',
-      subtitle: 'Glisse une story vers un autre sprint pour la replanifier',
-      dragHint: 'Astuce : fais glisser une carte vers une autre colonne pour changer son sprint. Clique sur ▸ pour voir le détail complet.',
+      subtitle: 'Vue d\'ensemble par responsable — glisse une barre vers une autre colonne pour la replanifier',
+      dragHint: 'Astuce : fais glisser une barre vers une autre colonne de sprint pour la replanifier. Clique dessus pour voir le détail.',
       expand: 'Voir le détail',
       collapse: 'Réduire',
-      edit: 'Modifier',
-      done: 'Terminé',
       errors: {
         pastSprint: 'Impossible de replanifier avant le sprint en cours.',
         beforeDependency: 'Cette story dépend de {dep} — elle ne peut pas être planifiée avant.',
@@ -869,12 +867,10 @@ export const translations = {
     },
     gantt: {
       title: 'Interactive Gantt',
-      subtitle: 'Drag a story to another sprint to reschedule it',
-      dragHint: 'Tip: drag a card to another column to change its sprint. Click ▸ to see the full detail.',
+      subtitle: 'Overview by assignee — drag a bar to another column to reschedule it',
+      dragHint: 'Tip: drag a bar to another sprint column to reschedule it. Click it to see the detail.',
       expand: 'View detail',
       collapse: 'Collapse',
-      edit: 'Edit',
-      done: 'Done',
       errors: {
         pastSprint: 'Cannot reschedule before the current sprint.',
         beforeDependency: 'This story depends on {dep} — it cannot be scheduled before it.',
