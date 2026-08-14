@@ -254,10 +254,14 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
               {jiraResult.boardUrl && <a className="export-notion-link" href={jiraResult.boardUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.jiraOpen')}</a>}
             </div>
           )}
-          {jiraState === 'error' && jiraMsg && <span className="export-notion-error">{jiraMsg}</span>}
-          <button className="export-reconnect-link" onClick={reconnectJira} disabled={jiraState === 'working' || jiraState === 'connecting'}>
-            {t(lang, 'export.jiraReconnect')}
-          </button>
+          {jiraState === 'error' && jiraMsg && (
+            <>
+              <span className="export-notion-error">{jiraMsg}</span>
+              <button className="export-reconnect-link" onClick={reconnectJira}>
+                {t(lang, 'export.jiraReconnect')}
+              </button>
+            </>
+          )}
 
           <button className="btn-integration btn-github" onClick={handleGithub} disabled={githubState === 'working' || githubState === 'connecting'}>
             <img className="btn-notion-icon" src="/assets/icons/icons8-github-logo-32.png" alt="" aria-hidden="true" />
@@ -284,10 +288,14 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
               {githubResult.repoUrl && <a className="export-notion-link" href={githubResult.repoUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.githubOpen')}</a>}
             </div>
           )}
-          {githubState === 'error' && githubMsg && <span className="export-notion-error">{githubMsg}</span>}
-          <button className="export-reconnect-link" onClick={reconnectGithub} disabled={githubState === 'working' || githubState === 'connecting'}>
-            {t(lang, 'export.githubReconnect')}
-          </button>
+          {githubState === 'error' && githubMsg && (
+            <>
+              <span className="export-notion-error">{githubMsg}</span>
+              <button className="export-reconnect-link" onClick={reconnectGithub}>
+                {t(lang, 'export.githubReconnect')}
+              </button>
+            </>
+          )}
         </div>
 
         <button className="btn-secondary close-btn" onClick={onClose}>{t(lang, 'export.close')}</button>
