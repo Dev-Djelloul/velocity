@@ -11,7 +11,7 @@ NOTION_COVER_URL = "https://velocity.digitalblueskye.com/assets/ai-images/lucid-
 JIRA_REDIRECT_URI = "https://velocity-launch.djelloulabid75.workers.dev/jira/callback"
 JIRA_CLIENT_ID = "dNq58ioA9irxzv6Xj8oxKOZ5VHlk0zvE"
 GITHUB_REDIRECT_URI = "https://velocity-launch.djelloulabid75.workers.dev/github/callback"
-# GITHUB_CLIENT_ID : à renseigner une fois l'OAuth App créée sur GitHub
+GITHUB_CLIENT_ID = "Ov23li93Iig7GBy9fpt2"
 # JIRA_CLIENT_SECRET : secret via `wrangler secret put JIRA_CLIENT_SECRET --name velocity-launch`
 # NOTION_CLIENT_SECRET : secret via `wrangler secret put NOTION_CLIENT_SECRET --name velocity-launch`
 # GITHUB_CLIENT_SECRET : secret via `wrangler secret put GITHUB_CLIENT_SECRET --name velocity-launch`
