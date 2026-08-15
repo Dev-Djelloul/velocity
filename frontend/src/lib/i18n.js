@@ -900,7 +900,9 @@ export const translations = {
       roleMember: 'Membre',
       membersTitle: 'Membres',
       noTeamActive: 'Tu es dans ton espace personnel — sélectionne ou crée une équipe pour voir ses membres.',
-      mockNotice: 'Équipe simulée en mode démo (aucune clé Clerk configurée) — les invitations réelles ne sont pas disponibles ici.'
+      mockNotice: 'Équipe simulée en mode démo (aucune clé Clerk configurée) — les invitations réelles ne sont pas disponibles ici.',
+      limitReachedFree: (limit) => `Le plan gratuit est limité à ${limit} espace d'équipe. Passe en Pro pour en créer jusqu'à 5, ou contacte-nous pour un nombre illimité en Entreprise.`,
+      limitReachedPro: (limit) => `Ton plan Pro est limité à ${limit} espaces d'équipe. Contacte-nous pour passer en Entreprise et débloquer un nombre illimité d'espaces.`
     },
     account: {
       title: 'Mon compte',
@@ -1846,7 +1848,9 @@ export const translations = {
       roleMember: 'Member',
       membersTitle: 'Members',
       noTeamActive: 'You\'re in your personal space — select or create a team to see its members.',
-      mockNotice: 'Simulated team in demo mode (no Clerk key configured) — real invitations aren\'t available here.'
+      mockNotice: 'Simulated team in demo mode (no Clerk key configured) — real invitations aren\'t available here.',
+      limitReachedFree: (limit) => `The Free plan is limited to ${limit} team space. Upgrade to Pro to create up to 5, or contact us for unlimited spaces on Enterprise.`,
+      limitReachedPro: (limit) => `Your Pro plan is limited to ${limit} team spaces. Get in touch to move to Enterprise and unlock unlimited spaces.`
     },
     account: {
       title: 'My account',

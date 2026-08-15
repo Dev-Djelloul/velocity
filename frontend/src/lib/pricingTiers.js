@@ -7,6 +7,11 @@
 const PRO_MONTHLY = 9
 const PRO_YEARLY_MONTHLY_EQUIVALENT = Math.round((PRO_MONTHLY * 10 / 12) * 100) / 100
 
+// Nombre d'espaces d'équipe (Clerk Organizations) qu'un compte peut rejoindre/créer.
+// Entreprise = illimité, cohérent avec son positionnement "sur devis" plutôt qu'un
+// plafond fixe qu'il faudrait justifier en négociation commerciale.
+export const TEAM_SPACE_LIMITS = { free: 1, pro: 5, enterprise: Infinity }
+
 export function getPricingTiers(lang) {
   const fr = lang !== 'en'
 
@@ -20,13 +25,13 @@ export function getPricingTiers(lang) {
       cta: { type: 'current' },
       features: fr ? [
         '3 plans générés',
-        'Espace personnel & espaces d\'équipe',
+        'Espace personnel + 1 espace d\'équipe',
         'Export PDF & CSV',
         'Partage par lien',
         'Sections IA à la demande (veille, benchmarks, RGPD…)'
       ] : [
         '3 generated plans',
-        'Personal space & team spaces',
+        'Personal space + 1 team space',
         'PDF & CSV export',
         'Shareable link',
         'On-demand AI sections (market watch, benchmarks, GDPR…)'
@@ -45,12 +50,14 @@ export function getPricingTiers(lang) {
       cta: { type: 'checkout' },
       features: fr ? [
         'Générations de plans illimitées',
+        'Jusqu\'à 5 espaces d\'équipe',
         'Intégrations Notion, Jira & GitHub',
         'Export avancé (présentation PPTX)',
         'Historique complet & notifications d\'équipe',
         'Support prioritaire par email'
       ] : [
         'Unlimited plan generations',
+        'Up to 5 team spaces',
         'Notion, Jira & GitHub integrations',
         'Advanced export (PPTX presentation)',
         'Full history & team notifications',
@@ -66,6 +73,7 @@ export function getPricingTiers(lang) {
       cta: { type: 'contact' },
       features: fr ? [
         'Tout Pro, plus :',
+        'Espaces d\'équipe illimités',
         'Accompagnement à l\'onboarding',
         'SSO / SAML sur demande',
         'Facturation centralisée multi-équipes',
@@ -73,6 +81,7 @@ export function getPricingTiers(lang) {
         'Déploiement et intégrations sur mesure'
       ] : [
         'Everything in Pro, plus:',
+        'Unlimited team spaces',
         'Guided onboarding',
         'SSO / SAML on request',
         'Centralized multi-team billing',

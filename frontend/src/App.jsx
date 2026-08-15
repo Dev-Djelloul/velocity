@@ -32,6 +32,7 @@ import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib
 import { getTimezone, setTimezone as persistTimezone } from './lib/dateFormat'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
+import { TEAM_SPACE_LIMITS } from './lib/pricingTiers'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
@@ -447,8 +448,10 @@ export default function App() {
   const handleCreateTeam = async () => {
     const name = newTeamName.trim()
     // Garde-fou contre les double-soumissions (Entrée + clic, double-clic) : sans lui,
-    // chaque appui en trop créait une organisation Clerk distincte côté serveur.
-    if (!name || creatingTeam) return
+    // chaque appui en trop créait une organisation Clerk distincte côté serveur. Le
+    // contrôle de la limite d'espaces se fait normalement en amont (bouton désactivé /
+    // modal d'upsell), ce check n'est qu'une seconde barrière défensive.
+    if (!name || creatingTeam || teamLimitReached) return
     setCreatingTeam(true)
     try {
       await team.createTeam(name)
@@ -476,6 +479,12 @@ export default function App() {
 
   const remaining = isSignedIn ? remainingCredits(userId) : 0
   const pro = isSignedIn && isPro(userId)
+
+  // Compte les espaces dont l'utilisateur est déjà membre (team.myTeams), pas seulement
+  // ceux qu'il a créés — un compte qui a rejoint des équipes via invitation ne devrait pas
+  // pouvoir en créer indéfiniment d'autres en plus sous prétexte qu'il ne les a pas "créées".
+  const teamLimit = pro ? TEAM_SPACE_LIMITS.pro : TEAM_SPACE_LIMITS.free
+  const teamLimitReached = (team.myTeams?.length || 0) >= teamLimit
 
   // Juste un indicateur pour le menu (scan local, pas de polling ici) — la page Mon
   // compte interroge elle le serveur au chargement pour la liste à jour.
@@ -714,26 +723,48 @@ export default function App() {
             title={t(lang, 'team.createTeamTitle')}
             onClose={() => setShowCreateTeam(false)}
           >
-            <p className="unsaved-changes-body">{t(lang, 'team.createTeamBody')}</p>
-            {team.isMock && <p className="team-mock-notice">{t(lang, 'team.mockNotice')}</p>}
-            <input
-              className="team-create-input"
-              type="text"
-              value={newTeamName}
-              onChange={e => setNewTeamName(e.target.value)}
-              placeholder={t(lang, 'team.createTeamNamePlaceholder')}
-              autoFocus
-              disabled={creatingTeam}
-              onKeyDown={e => e.key === 'Enter' && handleCreateTeam()}
-            />
-            <div className="unsaved-changes-actions">
-              <button className="btn-secondary" onClick={() => setShowCreateTeam(false)} disabled={creatingTeam}>
-                {t(lang, 'team.createTeamCancel')}
-              </button>
-              <button className="btn-primary" onClick={handleCreateTeam} disabled={!newTeamName.trim() || creatingTeam}>
-                {creatingTeam ? (lang === 'fr' ? 'Création…' : 'Creating…') : t(lang, 'team.createTeamConfirm')}
-              </button>
-            </div>
+            {teamLimitReached ? (
+              <>
+                <p className="unsaved-changes-body">
+                  {pro
+                    ? t(lang, 'team.limitReachedPro')(teamLimit)
+                    : t(lang, 'team.limitReachedFree')(teamLimit)}
+                </p>
+                <div className="unsaved-changes-actions">
+                  <button className="btn-secondary" onClick={() => setShowCreateTeam(false)}>
+                    {t(lang, 'team.createTeamCancel')}
+                  </button>
+                  {!pro && (
+                    <button className="btn-primary" onClick={() => { setShowCreateTeam(false); goToUpgrade() }}>
+                      {t(lang, 'account.upgradeCta')}
+                    </button>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="unsaved-changes-body">{t(lang, 'team.createTeamBody')}</p>
+                {team.isMock && <p className="team-mock-notice">{t(lang, 'team.mockNotice')}</p>}
+                <input
+                  className="team-create-input"
+                  type="text"
+                  value={newTeamName}
+                  onChange={e => setNewTeamName(e.target.value)}
+                  placeholder={t(lang, 'team.createTeamNamePlaceholder')}
+                  autoFocus
+                  disabled={creatingTeam}
+                  onKeyDown={e => e.key === 'Enter' && handleCreateTeam()}
+                />
+                <div className="unsaved-changes-actions">
+                  <button className="btn-secondary" onClick={() => setShowCreateTeam(false)} disabled={creatingTeam}>
+                    {t(lang, 'team.createTeamCancel')}
+                  </button>
+                  <button className="btn-primary" onClick={handleCreateTeam} disabled={!newTeamName.trim() || creatingTeam}>
+                    {creatingTeam ? (lang === 'fr' ? 'Création…' : 'Creating…') : t(lang, 'team.createTeamConfirm')}
+                  </button>
+                </div>
+              </>
+            )}
           </InfoModal>
         )}
       </header>
