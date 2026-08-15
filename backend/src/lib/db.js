@@ -9,26 +9,44 @@ function genId() {
   return crypto.randomUUID().replace(/-/g, '').slice(0, 20)
 }
 
-export async function listPlans(env, userId) {
-  const { results } = await env.DB.prepare(
-    'SELECT id, data, created_at, updated_at FROM plans WHERE user_id = ? ORDER BY updated_at DESC'
-  ).bind(userId).all()
+// teamId présent : plans partagés de cette équipe (visibles par tout membre — pas de
+// filtre sur user_id, l'appartenance à l'équipe suffit). teamId absent : uniquement les
+// plans personnels de userId (team_id IS NULL), pour ne jamais mélanger les deux listes.
+export async function listPlans(env, userId, teamId) {
+  const query = teamId
+    ? env.DB.prepare('SELECT id, data, created_at, updated_at FROM plans WHERE team_id = ? ORDER BY updated_at DESC').bind(teamId)
+    : env.DB.prepare('SELECT id, data, created_at, updated_at FROM plans WHERE user_id = ? AND team_id IS NULL ORDER BY updated_at DESC').bind(userId)
+  const { results } = await query.all()
   return results.map(row => ({ ...JSON.parse(row.data), id: row.id, savedAt: row.created_at, updatedAt: row.updated_at }))
 }
 
-export async function upsertPlan(env, userId, plan) {
+// teamId n'est appliqué qu'à la création (id absent) : une fois un plan créé dans un
+// espace, il y reste — changer d'équipe active avant un simple enregistrement ne doit
+// jamais faire "migrer" un plan existant vers une autre équipe.
+export async function upsertPlan(env, userId, plan, teamId) {
   const id = plan.id || genId()
+  const isNew = !plan.id
   const now = new Date().toISOString()
+  const effectiveTeamId = isNew ? (teamId || null) : (plan.team_id ?? null)
   await env.DB.prepare(
-    `INSERT INTO plans (id, user_id, data, product_name, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?)
+    `INSERT INTO plans (id, user_id, team_id, data, product_name, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET data = excluded.data, product_name = excluded.product_name, updated_at = excluded.updated_at`
-  ).bind(id, userId, JSON.stringify({ ...plan, id }), plan.product?.name || null, now, now).run()
-  return { ...plan, id, savedAt: now, updatedAt: now }
+  ).bind(id, userId, effectiveTeamId, JSON.stringify({ ...plan, id, team_id: effectiveTeamId }), plan.product?.name || null, now, now).run()
+  return { ...plan, id, team_id: effectiveTeamId, savedAt: now, updatedAt: now }
 }
 
-export async function deletePlan(env, userId, id) {
-  await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ?').bind(id, userId).run()
+// Un plan personnel ne peut être supprimé que par son propriétaire (user_id). Un plan
+// d'équipe peut l'être par n'importe quel membre actuel de l'équipe (team_id) — la
+// vérification de rôle plus fine (ex: réserver aux admins) se fait côté route API, qui
+// reçoit le rôle envoyé par le client (même modèle de confiance que le reste de l'app,
+// voir la note en tête de fichier sur l'absence de vérification JWT serveur).
+export async function deletePlan(env, userId, id, teamId) {
+  if (teamId) {
+    await env.DB.prepare('DELETE FROM plans WHERE id = ? AND team_id = ?').bind(id, teamId).run()
+  } else {
+    await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ? AND team_id IS NULL').bind(id, userId).run()
+  }
 }
 
 export async function getPlan(env, id) {

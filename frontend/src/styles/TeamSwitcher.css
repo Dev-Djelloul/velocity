@@ -1,0 +1,70 @@
+.header-team-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 34px;
+  box-sizing: border-box;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-lg);
+  padding: 0 0.7rem;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  max-width: 160px;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.header-team-btn:hover,
+.header-team-btn.active {
+  background: rgba(145, 132, 217, 0.15);
+  border-color: var(--color-primary);
+  color: var(--color-accent);
+}
+
+.header-team-label {
+  font-size: 0.8rem;
+  font-weight: var(--font-weight-medium);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.header-team-dropdown {
+  min-width: 220px;
+}
+
+.header-dropdown-item.is-current {
+  color: var(--color-primary);
+  background: rgba(145, 132, 217, 0.1);
+}
+
+.team-mock-notice {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  padding: 0.5rem 0.65rem;
+  margin-bottom: 1rem !important;
+}
+
+.team-create-input {
+  width: 100%;
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.75rem;
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  margin-bottom: 1.25rem;
+}
+
+.team-create-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+@media (max-width: 900px) {
+  .header-team-label { display: none; }
+  .header-team-btn { padding: 0; width: 34px; justify-content: center; }
+}

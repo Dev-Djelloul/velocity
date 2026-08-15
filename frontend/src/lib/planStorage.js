@@ -6,23 +6,43 @@ const SHARES_KEY = 'plp_plan_shares'
 // répliquée vers le stockage serveur (best-effort, fire-and-forget).
 let activeUserId = null
 
+// Espace actif : null = personnel, sinon l'id de l'équipe (voir lib/auth.jsx useTeam()).
+// Défini par App.jsx à chaque changement d'équipe active — détermine quels plans
+// savePlan()/getAllPlans() lisent et écrivent.
+let activeTeamId = null
+
+// Rôle de l'utilisateur dans l'équipe active ('org:admin' | 'org:member' | null) — mis à
+// jour en même temps que activeTeamId. Évite de faire redescendre le rôle en prop dans
+// chaque composant qui peut supprimer un plan ; seul deletePlan() en a besoin.
+let activeRole = null
+
 export function setActiveUser(userId) {
   activeUserId = userId
 }
 
-// Clé scopée par utilisateur (même principe que creditTracker.js) — sans ça, tous
-// les comptes qui se connectent sur ce même navigateur partagent la même liste de
-// plans dans localStorage, et voient les plans des uns et des autres.
-function plansKey(userId) {
-  return `plp_saved_plans_${userId}`
+export function setActiveTeam(teamId, role) {
+  activeTeamId = teamId || null
+  activeRole = teamId ? (role || null) : null
+}
+
+// Clé scopée par utilisateur ET par espace actif (personnel vs équipe) — sans ça, tous
+// les comptes qui se connectent sur ce même navigateur partagent la même liste de plans
+// dans localStorage, et changer d'équipe active mélangerait les plans des différents
+// espaces au lieu de les garder cloisonnés.
+function plansKey(userId, teamId) {
+  return `plp_saved_plans_${userId}__${teamId || 'personal'}`
 }
 
 export function savePlan(plan) {
   if (!activeUserId) return plan
   const plans = getAllPlans()
+  const isNew = !plan.id
   const planWithMeta = {
     ...plan,
     id: plan.id || generateId(),
+    // team_id ne se fixe qu'à la création : un plan reste dans l'espace où il est né,
+    // même si on change d'équipe active avant un enregistrement ultérieur.
+    team_id: isNew ? activeTeamId : (plan.team_id ?? null),
     savedAt: plan.savedAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
@@ -34,23 +54,24 @@ export function savePlan(plan) {
     plans.push(planWithMeta)
   }
 
-  localStorage.setItem(plansKey(activeUserId), JSON.stringify(plans))
-  pushPlan(activeUserId, planWithMeta)
+  localStorage.setItem(plansKey(activeUserId, planWithMeta.team_id), JSON.stringify(plans))
+  pushPlan(activeUserId, planWithMeta, planWithMeta.team_id)
   return planWithMeta
 }
 
-// Hydrate le cache local depuis le serveur (multi-appareil) — appelé au login.
-// Écrase toujours le cache local (même si le serveur renvoie une liste vide) pour
-// qu'un nouveau compte ne se retrouve jamais avec les plans d'un compte précédent.
-export async function syncPlansFromServer(userId) {
-  const serverPlans = await fetchPlans(userId)
-  localStorage.setItem(plansKey(userId), JSON.stringify(serverPlans || []))
+// Hydrate le cache local depuis le serveur (multi-appareil, et vue à jour des plans
+// d'équipe créés par d'autres membres) — appelé au login et à chaque changement d'équipe
+// active. Écrase toujours le cache local (même si le serveur renvoie une liste vide) pour
+// qu'un nouveau compte/espace ne se retrouve jamais avec les plans d'un contexte précédent.
+export async function syncPlansFromServer(userId, teamId) {
+  const serverPlans = await fetchPlans(userId, teamId)
+  localStorage.setItem(plansKey(userId, teamId), JSON.stringify(serverPlans || []))
 }
 
 export function getAllPlans() {
   if (!activeUserId) return []
   try {
-    const stored = localStorage.getItem(plansKey(activeUserId))
+    const stored = localStorage.getItem(plansKey(activeUserId, activeTeamId))
     return stored ? JSON.parse(stored) : []
   } catch {
     return []
@@ -66,8 +87,8 @@ export function deletePlan(id) {
   if (!activeUserId) return
   const plans = getAllPlans()
   const filtered = plans.filter(p => p.id !== id)
-  localStorage.setItem(plansKey(activeUserId), JSON.stringify(filtered))
-  removePlan(activeUserId, id)
+  localStorage.setItem(plansKey(activeUserId, activeTeamId), JSON.stringify(filtered))
+  removePlan(activeUserId, id, activeTeamId, activeRole)
 }
 
 export async function createShareLink(planId) {

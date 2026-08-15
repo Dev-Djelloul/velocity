@@ -901,6 +901,22 @@ export const translations = {
       switchToSignUp: "Pas encore de compte ? S'inscrire",
       continueWith: 'Continuer avec'
     },
+    team: {
+      personalSpace: 'Personnel',
+      switcherTitle: 'Espace',
+      myTeams: 'Mes équipes',
+      createTeam: 'Créer une équipe',
+      createTeamTitle: 'Créer une équipe',
+      createTeamBody: 'Les plans créés dans cet espace seront visibles par tous les membres de l\'équipe.',
+      createTeamNamePlaceholder: 'Nom de l\'équipe',
+      createTeamConfirm: 'Créer',
+      createTeamCancel: 'Annuler',
+      roleAdmin: 'Admin',
+      roleMember: 'Membre',
+      membersTitle: 'Membres',
+      noTeamActive: 'Tu es dans ton espace personnel — sélectionne ou crée une équipe pour voir ses membres.',
+      mockNotice: 'Équipe simulée en mode démo (aucune clé Clerk configurée) — les invitations réelles ne sont pas disponibles ici.'
+    },
     account: {
       title: 'Mon compte',
       subtitle: 'Gère ton profil, tes plans et ton abonnement',
@@ -1829,6 +1845,22 @@ export const translations = {
       switchToSignIn: 'Already have an account? Sign in',
       switchToSignUp: 'No account yet? Sign up',
       continueWith: 'Continue with'
+    },
+    team: {
+      personalSpace: 'Personal',
+      switcherTitle: 'Workspace',
+      myTeams: 'My teams',
+      createTeam: 'Create a team',
+      createTeamTitle: 'Create a team',
+      createTeamBody: 'Plans created in this space will be visible to every team member.',
+      createTeamNamePlaceholder: 'Team name',
+      createTeamConfirm: 'Create',
+      createTeamCancel: 'Cancel',
+      roleAdmin: 'Admin',
+      roleMember: 'Member',
+      membersTitle: 'Members',
+      noTeamActive: 'You\'re in your personal space — select or create a team to see its members.',
+      mockNotice: 'Simulated team in demo mode (no Clerk key configured) — real invitations aren\'t available here.'
     },
     account: {
       title: 'My account',

@@ -5,6 +5,7 @@ import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
 import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown } from './components/Icons'
 import InfoModal from './components/InfoModal'
+import TeamSwitcher from './components/TeamSwitcher'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -14,21 +15,22 @@ import DraftsModal from './components/DraftsModal'
 import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
 import AccountPage from './components/AccountPage'
+import TeamPage from './components/TeamPage'
 import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
 import { PricingModal, ChangelogModal, RoadmapModal } from './components/ProductModals'
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, syncPlansFromServer, generateId } from './lib/planStorage'
+import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, syncPlansFromServer, generateId } from './lib/planStorage'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
-import { useUser, useAuth } from './lib/auth'
+import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account']
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -41,7 +43,8 @@ const PAGE_TO_PATH = {
   howItWorks: '/comment-ca-marche',
   questionnaire: '/questionnaire',
   result: '/mon-plan',
-  account: '/mon-compte'
+  account: '/mon-compte',
+  team: '/mon-equipe'
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
@@ -50,7 +53,8 @@ const PATH_TO_PAGE = {
   '/inscription': 'auth',
   '/questionnaire': 'questionnaire',
   '/mon-plan': 'result',
-  '/mon-compte': 'account'
+  '/mon-compte': 'account',
+  '/mon-equipe': 'team'
 }
 
 function pathForPage(page, authMode) {
@@ -95,6 +99,7 @@ export default function App() {
 
   const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
+  const team = useTeam()
   const wasSignedIn = useRef(isSignedIn)
 
   const goToAuth = (mode, intent = null) => {
@@ -159,8 +164,9 @@ export default function App() {
     if (!wasSignedIn.current && isSignedIn && userId) {
       setPlanActiveUser(userId)
       setDraftActiveUser(userId)
+      // La sync des plans est gérée par l'effet dédié ci-dessous (aussi déclenché par un
+      // changement d'équipe active) — inutile de la dupliquer ici.
       Promise.all([
-        syncPlansFromServer(userId),
         syncDraftsFromServer(userId),
         syncCreditsFromServer(userId)
       ]).then(() => setDataVersion(v => v + 1))
@@ -175,10 +181,20 @@ export default function App() {
     }
     if (wasSignedIn.current && !isSignedIn) {
       setPlanActiveUser(null)
+      setPlanActiveTeam(null)
       setDraftActiveUser(null)
     }
     wasSignedIn.current = isSignedIn
   }, [isSignedIn, isLoaded, userId, authIntent])
+
+  // Resynchronise la liste des plans à chaque changement d'espace actif (personnel <->
+  // équipe, ou passage d'une équipe à une autre) — couvre aussi la sync initiale au login,
+  // team.teamId valant alors null (espace personnel) le temps que Clerk charge l'org active.
+  useEffect(() => {
+    if (!isLoaded || !isSignedIn || !userId || !team.isLoaded) return
+    setPlanActiveTeam(team.teamId, team.role)
+    syncPlansFromServer(userId, team.teamId).then(() => setDataVersion(v => v + 1))
+  }, [isLoaded, isSignedIn, userId, team.teamId, team.role, team.isLoaded])
 
   // Retour depuis Stripe Checkout : le webhook a normalement déjà activé le Pro
   // côté serveur, on resynchronise le cache local et on nettoie l'URL.
@@ -393,6 +409,10 @@ export default function App() {
               )}
             </div>
 
+            {isSignedIn && currentPage !== 'landing' && (
+              <TeamSwitcher lang={lang} team={team} onManageTeam={() => { setCurrentPage('team'); window.scrollTo(0, 0) }} />
+            )}
+
             {isSignedIn ? (
               <div className="header-menu">
                 <button
@@ -469,6 +489,9 @@ export default function App() {
             onLoadPlan={handleLoadFromHistory}
             onLoadDraft={handleLoadDraft}
           />
+        )}
+        {currentPage === 'team' && isSignedIn && (
+          <TeamPage lang={lang} onBack={() => setCurrentPage('landing')} />
         )}
       </main>
 

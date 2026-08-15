@@ -44,21 +44,28 @@ export async function handleApi(request, env, url) {
 
   if (pathname === '/plans' && method === 'GET') {
     const userId = searchParams.get('userId')
+    const teamId = searchParams.get('teamId') || null
     if (!userId) return json({ error: 'userId required' }, 400)
-    return json(await db.listPlans(env, userId))
+    return json(await db.listPlans(env, userId, teamId))
   }
 
   if (pathname === '/plans' && method === 'POST') {
-    const { userId, plan } = await request.json()
+    const { userId, plan, teamId } = await request.json()
     if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
-    return json(await db.upsertPlan(env, userId, plan))
+    return json(await db.upsertPlan(env, userId, plan, teamId || null))
   }
 
   const planMatch = pathname.match(/^\/plans\/([^/]+)$/)
   if (planMatch && method === 'DELETE') {
     const userId = searchParams.get('userId')
+    const teamId = searchParams.get('teamId') || null
+    const role = searchParams.get('role') || null
     if (!userId) return json({ error: 'userId required' }, 400)
-    await db.deletePlan(env, userId, planMatch[1])
+    // Un plan d'équipe ne peut être supprimé que par un admin — un membre simple peut
+    // créer/éditer mais pas supprimer. Le rôle vient du client (voir la note de confiance
+    // en tête de db.js) : suffisant pour ce produit, à durcir avec la vérification JWT.
+    if (teamId && role !== 'org:admin') return json({ error: 'forbidden' }, 403)
+    await db.deletePlan(env, userId, planMatch[1], teamId)
     return json({ ok: true })
   }
 

@@ -210,7 +210,10 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
               <div className="plan-sidebar-history-list">
                 {changeLog.map((entry, i) => (
                   <div className="plan-sidebar-history-group" key={i}>
-                    <span className="plan-sidebar-history-date">{formatFullDateTime(entry.date, lang)}</span>
+                    <span className="plan-sidebar-history-date">
+                      {formatFullDateTime(entry.date, lang)}
+                      {entry.author && <span className="plan-sidebar-history-author"> · {entry.author}</span>}
+                    </span>
                     <ul className="change-list">
                       {(entry.changes || entry.sections || []).map((change, j) => (
                         <li className="change-row" key={j}>

@@ -324,6 +324,11 @@
   margin-bottom: 0.35rem;
 }
 
+.plan-sidebar-history-author {
+  color: var(--color-text-muted);
+  font-weight: var(--font-weight-medium);
+}
+
 .plan-sidebar-history-panel .change-row {
   font-size: 0.76rem;
 }

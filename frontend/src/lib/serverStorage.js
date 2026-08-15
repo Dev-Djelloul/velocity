@@ -17,20 +17,27 @@ async function safeFetch(path, options) {
   }
 }
 
-export function fetchPlans(userId) {
-  return safeFetch(`/plans?userId=${encodeURIComponent(userId)}`).then(r => r || [])
+// teamId absent : plans personnels de userId. teamId fourni : plans partagés de cette
+// équipe (visibles par tout membre) — voir backend/src/lib/db.js pour la logique de scope.
+export function fetchPlans(userId, teamId) {
+  const query = teamId ? `?userId=${encodeURIComponent(userId)}&teamId=${encodeURIComponent(teamId)}` : `?userId=${encodeURIComponent(userId)}`
+  return safeFetch(`/plans${query}`).then(r => r || [])
 }
 
-export function pushPlan(userId, plan) {
+export function pushPlan(userId, plan, teamId) {
   return safeFetch('/plans', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, plan })
+    body: JSON.stringify({ userId, plan, teamId: teamId || null })
   })
 }
 
-export function removePlan(userId, id) {
-  return safeFetch(`/plans/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+// role : requis pour supprimer un plan d'équipe (seuls les admins peuvent), ignoré pour
+// un plan personnel — voir la vérification côté backend/src/workers/api.js.
+export function removePlan(userId, id, teamId, role) {
+  const params = new URLSearchParams({ userId })
+  if (teamId) { params.set('teamId', teamId); if (role) params.set('role', role) }
+  return safeFetch(`/plans/${encodeURIComponent(id)}?${params.toString()}`, { method: 'DELETE' })
 }
 
 export function fetchDrafts(userId) {

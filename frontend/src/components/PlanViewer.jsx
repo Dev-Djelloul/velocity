@@ -24,7 +24,7 @@ import ExportModal from './ExportModal'
 import InfoModal from './InfoModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
-import { useAuth } from '../lib/auth'
+import { useAuth, useUser } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
@@ -34,6 +34,7 @@ import '../styles/PlanSidebar.css'
 
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang }) {
   const { userId } = useAuth()
+  const { user } = useUser()
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
@@ -203,8 +204,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   const handleSave = () => {
     if (!plan.id || !isDirty) return
+    // L'auteur n'a d'intérêt qu'en équipe (plusieurs personnes sur le même plan) mais on
+    // le garde aussi pour un plan personnel — coût nul, et ça rend le futur passage d'un
+    // plan personnel vers une équipe cohérent rétroactivement.
+    const author = user?.fullName || user?.firstName || null
     const nextChangeLog = [
-      { date: new Date().toISOString(), changes: pendingChanges.map(({ section, detail }) => ({ section, detail })) },
+      { date: new Date().toISOString(), author, changes: pendingChanges.map(({ section, detail }) => ({ section, detail })) },
       ...(plan.changeLog || [])
     ].slice(0, 50)
     const savedPlan = savePlan({ ...plan, changeLog: nextChangeLog })

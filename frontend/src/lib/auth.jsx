@@ -9,6 +9,8 @@ import {
   useUser as useClerkUser,
   useAuth as useClerkAuth,
   useClerk,
+  useOrganization,
+  useOrganizationList,
   SignedIn as ClerkSignedIn,
   SignedOut as ClerkSignedOut,
   SignInButton as ClerkSignInButton,
@@ -38,10 +40,46 @@ function loadMockUser() {
   }
 }
 
+// Une seule équipe simulée (pas de vrai flux d'invitation possible sans backend Clerk) —
+// suffisant pour développer/tester le switcher, la page membres et le scope des plans en
+// local. Le créateur est toujours admin ; un second membre fictif "Membre" (rôle simple)
+// est ajouté pour pouvoir visualiser les deux niveaux de permission dans l'UI.
+function loadMockTeam() {
+  try {
+    const raw = localStorage.getItem('plp_mock_team')
+    return raw ? JSON.parse(raw) : null
+  } catch {
+    return null
+  }
+}
+
 function MockAuthProvider({ children }) {
   const [user, setUser] = useState(loadMockUser)
   const [modalOpen, setModalOpen] = useState(false)
   const [afterSignIn, setAfterSignIn] = useState(null)
+  const [team, setTeam] = useState(loadMockTeam)
+  const [activeTeamId, setActiveTeamIdState] = useState(() => localStorage.getItem('plp_mock_active_team') || null)
+
+  const createTeam = useCallback((name) => {
+    const fake = {
+      id: `mock_team_${Date.now()}`,
+      name,
+      members: [
+        { id: user?.id, name: user?.fullName || 'Toi', role: 'org:admin' },
+        { id: 'mock_member_demo', name: 'Membre démo', role: 'org:member' }
+      ]
+    }
+    localStorage.setItem('plp_mock_team', JSON.stringify(fake))
+    localStorage.setItem('plp_mock_active_team', fake.id)
+    setTeam(fake)
+    setActiveTeamIdState(fake.id)
+  }, [user])
+
+  const setActiveTeamId = useCallback((id) => {
+    setActiveTeamIdState(id)
+    if (id) localStorage.setItem('plp_mock_active_team', id)
+    else localStorage.removeItem('plp_mock_active_team')
+  }, [])
 
   const signIn = useCallback((provider) => {
     const fake = {
@@ -79,7 +117,7 @@ function MockAuthProvider({ children }) {
   }, [])
 
   return (
-    <MockAuthContext.Provider value={{ user, signIn, signOut, openModal, updateAvatar }}>
+    <MockAuthContext.Provider value={{ user, signIn, signOut, openModal, updateAvatar, team, activeTeamId, setActiveTeamId, createTeam }}>
       {children}
       {modalOpen && (
         <div className="modal-backdrop" onClick={() => setModalOpen(false)}>
@@ -153,6 +191,46 @@ export function useAuth() {
     return { isLoaded: true, isSignedIn: !!user, userId: user?.id ?? null, signOut }
   }
   return useClerkAuth()
+}
+
+// Contexte d'équipe actif : null = espace personnel, sinon l'id de l'organisation Clerk
+// (ou de l'équipe simulée en mode démo). Consommé par App.jsx pour scoper la liste des
+// plans, et par le header pour le switcher. `role`/`isAdmin` servent aux permissions
+// (ex: seuls les admins peuvent supprimer un plan d'équipe ou changer un rôle).
+export function useTeam() {
+  if (isMockAuth) {
+    const { team, activeTeamId, setActiveTeamId, createTeam } = useMockAuthContext()
+    const active = team && team.id === activeTeamId ? team : null
+    return {
+      isLoaded: true,
+      teamId: active?.id ?? null,
+      teamName: active?.name ?? null,
+      role: active ? 'org:admin' : null,
+      isAdmin: !!active,
+      members: active?.members ?? [],
+      myTeams: team ? [team] : [],
+      setActiveTeamId,
+      createTeam,
+      isMock: true
+    }
+  }
+  const { organization, membership, isLoaded } = useOrganization()
+  const { userMemberships, setActive, createOrganization, isLoaded: listLoaded } = useOrganizationList({ userMemberships: { infinite: true } })
+  const myTeams = (userMemberships?.data || []).map(m => m.organization)
+  return {
+    isLoaded: isLoaded && listLoaded,
+    teamId: organization?.id ?? null,
+    teamName: organization?.name ?? null,
+    role: membership?.role ?? null,
+    isAdmin: membership?.role === 'org:admin',
+    myTeams,
+    setActiveTeamId: (id) => setActive?.({ organization: id || null }),
+    createTeam: async (name) => {
+      const org = await createOrganization?.({ name })
+      if (org) await setActive?.({ organization: org.id })
+    },
+    isMock: false
+  }
 }
 
 export function SignedIn({ children }) {
