@@ -3,9 +3,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconShield } from './components/Icons'
 import InfoModal from './components/InfoModal'
-import TeamSwitcher from './components/TeamSwitcher'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -84,6 +83,8 @@ export default function App() {
   const [pendingDemoData, setPendingDemoData] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
+  const [showCreateTeam, setShowCreateTeam] = useState(false)
+  const [newTeamName, setNewTeamName] = useState('')
   const headerMenuRef = useRef(null)
 
   useEffect(() => {
@@ -350,6 +351,14 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  const handleCreateTeam = () => {
+    const name = newTeamName.trim()
+    if (!name) return
+    team.createTeam(name)
+    setNewTeamName('')
+    setShowCreateTeam(false)
+  }
+
   const remaining = isSignedIn ? remainingCredits(userId) : 0
   const pro = isSignedIn && isPro(userId)
 
@@ -374,43 +383,43 @@ export default function App() {
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
-            <button className="header-nav-link" onClick={() => setShowDemo(true)}>
-              {lang === 'fr' ? 'Démo' : 'Demo'}
-            </button>
+            {!isSignedIn && (
+              <button className="header-nav-link" onClick={() => setShowDemo(true)}>
+                {lang === 'fr' ? 'Démo' : 'Demo'}
+              </button>
+            )}
           </nav>
 
           <div className="header-actions" ref={headerMenuRef}>
-            <div className="header-menu">
-              <button
-                className={`header-icon-btn ${openHeaderMenu === 'settings' ? 'active' : ''}`}
-                onClick={() => setOpenHeaderMenu(m => m === 'settings' ? null : 'settings')}
-                title={lang === 'fr' ? 'Préférences' : 'Preferences'}
-                aria-label={lang === 'fr' ? 'Préférences' : 'Preferences'}
-              >
-                <IconSettings width={16} height={16} />
-              </button>
-              {openHeaderMenu === 'settings' && (
-                <div className="header-dropdown header-dropdown-settings">
-                  {currentPage !== 'landing' && (
-                    <button
-                      className="header-dropdown-item"
-                      onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
-                    >
-                      {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
-                      {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
-                    </button>
-                  )}
-                  <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
-                  <div className="header-dropdown-lang">
-                    <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
-                    <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+            {!isSignedIn && (
+              <div className="header-menu">
+                <button
+                  className={`header-icon-btn ${openHeaderMenu === 'settings' ? 'active' : ''}`}
+                  onClick={() => setOpenHeaderMenu(m => m === 'settings' ? null : 'settings')}
+                  title={lang === 'fr' ? 'Préférences' : 'Preferences'}
+                  aria-label={lang === 'fr' ? 'Préférences' : 'Preferences'}
+                >
+                  <IconSettings width={16} height={16} />
+                </button>
+                {openHeaderMenu === 'settings' && (
+                  <div className="header-dropdown header-dropdown-settings">
+                    {currentPage !== 'landing' && (
+                      <button
+                        className="header-dropdown-item"
+                        onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
+                      >
+                        {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
+                        {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
+                      </button>
+                    )}
+                    <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
+                    <div className="header-dropdown-lang">
+                      <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
+                      <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+                    </div>
                   </div>
-                </div>
-              )}
-            </div>
-
-            {isSignedIn && currentPage !== 'landing' && (
-              <TeamSwitcher lang={lang} team={team} onManageTeam={() => { setCurrentPage('team'); window.scrollTo(0, 0) }} />
+                )}
+              </div>
             )}
 
             {isSignedIn ? (
@@ -421,6 +430,7 @@ export default function App() {
                   title={t(lang, 'auth.myAccount')}
                 >
                   {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
+                  <span className="header-avatar-team-label">{team.teamId ? team.teamName : t(lang, 'team.personalSpace')}</span>
                   <IconChevronDown width={13} height={13} className="header-avatar-caret" />
                 </button>
                 {openHeaderMenu === 'account' && (
@@ -430,6 +440,51 @@ export default function App() {
                         {remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}
                       </div>
                     )}
+
+                    <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
+                    <button
+                      className={`header-dropdown-item ${!team.teamId ? 'is-current' : ''}`}
+                      onClick={() => { team.setActiveTeamId(null) }}
+                    >
+                      {!team.teamId && <IconCheckCircle width={14} height={14} />}
+                      <span>{t(lang, 'team.personalSpace')}</span>
+                    </button>
+                    {!!team.myTeams?.length && team.myTeams.map(tm => (
+                      <button
+                        key={tm.id}
+                        className={`header-dropdown-item ${team.teamId === tm.id ? 'is-current' : ''}`}
+                        onClick={() => { team.setActiveTeamId(tm.id) }}
+                      >
+                        {team.teamId === tm.id && <IconCheckCircle width={14} height={14} />}
+                        <span>{tm.name}</span>
+                      </button>
+                    ))}
+                    {team.teamId && (
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setCurrentPage('team'); window.scrollTo(0, 0) }}>
+                        <IconShield width={14} height={14} /> {t(lang, 'team.membersTitle')}
+                      </button>
+                    )}
+                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
+                      <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
+                    </button>
+                    <div className="header-dropdown-divider" />
+
+                    {currentPage !== 'landing' && (
+                      <button
+                        className="header-dropdown-item"
+                        onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
+                      >
+                        {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
+                        {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
+                      </button>
+                    )}
+                    <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
+                    <div className="header-dropdown-lang">
+                      <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
+                      <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+                    </div>
+                    <div className="header-dropdown-divider" />
+
                     <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
                       <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
                     </button>
@@ -449,12 +504,42 @@ export default function App() {
               </button>
             )}
 
-            <button className="btn-header-cta" onClick={handleStartClick}>
-              <IconSparkle width={14} height={14} />
-              <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
-            </button>
+            {!isSignedIn && (
+              <button className="btn-header-cta" onClick={handleStartClick}>
+                <IconSparkle width={14} height={14} />
+                <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
+              </button>
+            )}
           </div>
         </div>
+
+        {showCreateTeam && (
+          <InfoModal
+            icon={<IconUsers width={22} height={22} />}
+            title={t(lang, 'team.createTeamTitle')}
+            onClose={() => setShowCreateTeam(false)}
+          >
+            <p className="unsaved-changes-body">{t(lang, 'team.createTeamBody')}</p>
+            {team.isMock && <p className="team-mock-notice">{t(lang, 'team.mockNotice')}</p>}
+            <input
+              className="team-create-input"
+              type="text"
+              value={newTeamName}
+              onChange={e => setNewTeamName(e.target.value)}
+              placeholder={t(lang, 'team.createTeamNamePlaceholder')}
+              autoFocus
+              onKeyDown={e => e.key === 'Enter' && handleCreateTeam()}
+            />
+            <div className="unsaved-changes-actions">
+              <button className="btn-secondary" onClick={() => setShowCreateTeam(false)}>
+                {t(lang, 'team.createTeamCancel')}
+              </button>
+              <button className="btn-primary" onClick={handleCreateTeam} disabled={!newTeamName.trim()}>
+                {t(lang, 'team.createTeamConfirm')}
+              </button>
+            </div>
+          </InfoModal>
+        )}
       </header>
 
       {error && <div className="error-banner">{error}</div>}
