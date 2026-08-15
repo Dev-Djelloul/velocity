@@ -50,6 +50,14 @@ export function movePlan(userId, id, fromTeamId, toTeamId, role) {
   })
 }
 
+// Polling léger de notifications (voir lib/notifications.js) : userId personnel + toutes
+// les équipes dont l'utilisateur est membre, pour retrouver un commentaire posté depuis un
+// autre appareil sans avoir à ouvrir cet espace localement au préalable.
+export function fetchNotifications(userId, teamIds) {
+  const query = `?userId=${encodeURIComponent(userId)}${teamIds?.length ? `&teamIds=${encodeURIComponent(teamIds.join(','))}` : ''}`
+  return safeFetch(`/notifications${query}`).then(r => r || [])
+}
+
 export function fetchDrafts(userId) {
   return safeFetch(`/drafts?userId=${encodeURIComponent(userId)}`).then(r => r || [])
 }

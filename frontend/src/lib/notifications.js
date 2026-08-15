@@ -1,8 +1,8 @@
-// Agrège les commentaires de tous les plans mis en cache localement pour cet utilisateur
-// (espace personnel + chaque équipe déjà visitée dans ce navigateur) en une seule liste
-// triée par date — sert de flux de notifications dans Mon compte. Ne couvre que les
-// espaces déjà chargés localement (pas d'appel serveur dédié), ce qui reste suffisant
-// puisque syncPlansFromServer alimente ce cache à chaque connexion/changement d'espace.
+import { fetchNotifications } from './serverStorage'
+
+// Repli local : agrège les commentaires des plans déjà mis en cache dans ce navigateur
+// (espace personnel + équipes déjà visitées ici). Utilisé en attendant la première réponse
+// du serveur, ou si celui-ci n'est pas configuré/joignable.
 export function collectRecentComments(userId, lang) {
   if (!userId) return []
   const prefix = `plp_saved_plans_${userId}__`
@@ -30,4 +30,17 @@ export function collectRecentComments(userId, lang) {
     }
   }
   return items.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+}
+
+// Interroge le serveur (polling léger — voir AccountPage) pour retrouver aussi les
+// commentaires postés depuis un autre appareil, sur des espaces jamais ouverts localement
+// ici. `teamIds` = toutes les équipes dont l'utilisateur est membre (team.myTeams), pas
+// seulement l'équipe active. Repli silencieux sur le cache local si le serveur ne répond
+// pas (safeFetch renvoie []).
+export async function fetchRecentComments(userId, teamIds, lang) {
+  const remote = await fetchNotifications(userId, teamIds)
+  if (remote?.length) {
+    return remote.map(c => ({ ...c, planName: c.planName || (lang === 'fr' ? 'Plan sans titre' : 'Untitled plan') }))
+  }
+  return collectRecentComments(userId, lang)
 }

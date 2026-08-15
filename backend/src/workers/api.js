@@ -81,6 +81,13 @@ export async function handleApi(request, env, url) {
     return json(moved)
   }
 
+  if (pathname === '/notifications' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    const teamIds = (searchParams.get('teamIds') || '').split(',').map(s => s.trim()).filter(Boolean)
+    if (!userId) return json({ error: 'userId required' }, 400)
+    return json(await db.getRecentComments(env, userId, teamIds))
+  }
+
   if (pathname === '/drafts' && method === 'GET') {
     const userId = searchParams.get('userId')
     if (!userId) return json({ error: 'userId required' }, 400)

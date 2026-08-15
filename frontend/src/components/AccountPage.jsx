@@ -1,11 +1,11 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
 import { getAllPlans, deletePlan, movePlanToTeam } from '../lib/planStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { collectRecentComments } from '../lib/notifications'
+import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
 import { getReadIds, markCommentsRead } from '../lib/commentReads'
 import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconCheckCircle, IconMessageCircle } from './Icons'
 
@@ -42,6 +42,25 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     setReadVersion(v => v + 1)
     onOpenNotification?.(item)
   }
+
+  // Polling léger (toutes les 45s tant que cette page est ouverte) : va chercher côté
+  // serveur les commentaires postés depuis un autre appareil, sur des espaces jamais
+  // ouverts localement dans ce navigateur — sans ça, un commentaire posté ailleurs
+  // resterait invisible ici tant qu'on n'a pas soi-même rouvert cet espace.
+  const teamIdsKey = (team.myTeams || []).map(tm => tm.id).join(',')
+  useEffect(() => {
+    if (!userId) return
+    const teamIds = teamIdsKey ? teamIdsKey.split(',') : []
+    let cancelled = false
+    const poll = () => {
+      fetchRecentComments(userId, teamIds, lang).then(list => {
+        if (!cancelled) setNotifications(list)
+      })
+    }
+    poll()
+    const interval = setInterval(poll, 45000)
+    return () => { cancelled = true; clearInterval(interval) }
+  }, [userId, teamIdsKey, lang])
 
   // Sortir un plan de son équipe active est réservé aux admins (même règle que la
   // suppression) ; le déplacer depuis le personnel n'a pas cette contrainte.

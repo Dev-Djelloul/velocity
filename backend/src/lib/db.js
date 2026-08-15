@@ -36,6 +36,43 @@ export async function upsertPlan(env, userId, plan, teamId) {
   return { ...plan, id, team_id: effectiveTeamId, savedAt: now, updatedAt: now }
 }
 
+// Agrège les commentaires de tous les plans accessibles à userId (son espace personnel +
+// chaque équipe listée dans teamIds) — support du polling léger de notifications
+// (fetchNotifications côté client). LIMIT 100 plans scannés : largement suffisant à cette
+// échelle, à revoir si le nombre de plans par utilisateur grossit significativement.
+export async function getRecentComments(env, userId, teamIds = []) {
+  const clauses = ['(user_id = ? AND team_id IS NULL)']
+  const binds = [userId]
+  if (teamIds.length) {
+    clauses.push(`team_id IN (${teamIds.map(() => '?').join(',')})`)
+    binds.push(...teamIds)
+  }
+  const { results } = await env.DB.prepare(
+    `SELECT id, team_id, data FROM plans WHERE ${clauses.join(' OR ')} ORDER BY updated_at DESC LIMIT 100`
+  ).bind(...binds).all()
+
+  const comments = []
+  for (const row of results) {
+    let plan
+    try {
+      plan = JSON.parse(row.data)
+    } catch {
+      continue
+    }
+    for (const comment of (plan.comments || [])) {
+      comments.push({
+        ...comment,
+        planId: row.id,
+        planName: plan.product?.name || null,
+        spaceId: row.team_id,
+        spaceName: plan.createdSpaceId === row.team_id ? plan.createdSpaceName : null
+      })
+    }
+  }
+  comments.sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
+  return comments.slice(0, 30)
+}
+
 // Un plan personnel ne peut être supprimé que par son propriétaire (user_id). Un plan
 // d'équipe peut l'être par n'importe quel membre actuel de l'équipe (team_id) — la
 // vérification de rôle plus fine (ex: réserver aux admins) se fait côté route API, qui
