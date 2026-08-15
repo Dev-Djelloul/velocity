@@ -36,15 +36,19 @@ function renderAvatarBlob(emoji, bg) {
   return new Promise(resolve => canvas.toBlob(resolve, 'image/png'))
 }
 
-export default function AvatarPicker({ lang, onClose }) {
-  const updateAvatar = useUpdateAvatar()
+// onSave optionnel : par défaut, met à jour l'avatar du compte (Clerk). Passer un onSave
+// personnalisé permet de réutiliser exactement le même sélecteur pour autre chose que le
+// compte — l'espace personnel par exemple (voir SpacePage), qui n'a pas d'avatar Clerk.
+export default function AvatarPicker({ lang, onClose, onSave, title }) {
+  const updateAccountAvatar = useUpdateAvatar()
+  const save = onSave || updateAccountAvatar
   const [saving, setSaving] = useState(null)
 
   const pick = async (preset) => {
     setSaving(preset.emoji)
     try {
       const blob = await renderAvatarBlob(preset.emoji, preset.bg)
-      await updateAvatar(blob)
+      await save(blob)
       onClose()
     } finally {
       setSaving(null)
@@ -56,7 +60,7 @@ export default function AvatarPicker({ lang, onClose }) {
     if (!file) return
     setSaving('upload')
     try {
-      await updateAvatar(file)
+      await save(file)
       onClose()
     } finally {
       setSaving(null)
@@ -66,7 +70,7 @@ export default function AvatarPicker({ lang, onClose }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal card avatar-picker" onClick={e => e.stopPropagation()}>
-        <h3>{t(lang, 'account.avatarTitle')}</h3>
+        <h3>{title || t(lang, 'account.avatarTitle')}</h3>
         <div className="avatar-picker-grid">
           {PRESETS.map(p => (
             <button

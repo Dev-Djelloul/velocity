@@ -7,6 +7,7 @@ import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
 import { getReadIds, markCommentsRead } from '../lib/commentReads'
+import { getPersonalSpace } from '../lib/personalSpace'
 import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconCheckCircle, IconMessageCircle } from './Icons'
 
 const PROVIDER_ICONS = {
@@ -80,7 +81,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   // équipe dont on est membre (team.myTeams) — un plan de l'historique peut appartenir à
   // n'importe laquelle, pas seulement celle actuellement affichée dans le switcher.
   const spaceNameFor = (teamId) => {
-    if (!teamId) return t(lang, 'team.personalSpace')
+    if (!teamId) return getPersonalSpace(userId, lang).name
     if (teamId === team.teamId) return team.teamName
     return team.myTeams?.find(tm => tm.id === teamId)?.name || t(lang, 'team.myTeams')
   }
@@ -194,7 +195,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
                   <strong>{item.authorName}</strong>
                   {lang === 'fr' ? ' a commenté ' : ' commented on '}
                   <em>{item.planName}</em>
-                  <span className="account-notif-space">{item.spaceId ? (item.spaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}</span>
+                  <span className="account-notif-space">{item.spaceId ? (item.spaceName || t(lang, 'team.myTeams')) : getPersonalSpace(userId, lang).name}</span>
                 </span>
                 <span className="account-notif-text">{item.text}</span>
                 <span className="account-notif-date">{formatFullDateTime(item.createdAt, lang)}</span>

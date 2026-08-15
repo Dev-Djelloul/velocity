@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
-import { useTeam, useUser } from '../lib/auth'
+import { useTeam, useUser, useAuth } from '../lib/auth'
 import { getAllPlans, deletePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave } from './Icons'
+import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
+import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil } from './Icons'
 import { teamColor } from './TeamAvatar'
+import AvatarPicker from './AvatarPicker'
+import InfoModal from './InfoModal'
 import '../styles/SpacePage.css'
 
 // Combien de plans "récents" afficher dans l'espace personnel — un aperçu rapide, pas un
@@ -22,14 +25,40 @@ function byRecency(a, b) {
 // crédits et sert désormais d'historique complet de tous les plans de l'espace, pendant
 // que cette page ne montre que les derniers plans actifs (personnel) ou le tableau de bord
 // partagé (équipe).
-export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory }) {
+export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onPersonalSpaceChange }) {
   const team = useTeam()
   const { user } = useUser()
+  const { userId } = useAuth()
   const isTeam = !!team.teamId
   const [plans, setPlans] = useState(getAllPlans)
   const [drafts, setDrafts] = useState(isTeam ? [] : getAllDrafts)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
+  const [personalSpace, setPersonalSpace] = useState(() => getPersonalSpace(userId, lang))
+  const [showEditPersonal, setShowEditPersonal] = useState(false)
+  const [showPersonalAvatarPicker, setShowPersonalAvatarPicker] = useState(false)
+  const [editName, setEditName] = useState('')
+
+  const openEditPersonal = () => {
+    setEditName(personalSpace.name)
+    setShowEditPersonal(true)
+  }
+
+  const saveEditPersonal = () => {
+    const next = { ...personalSpace, name: editName.trim() || personalSpace.name }
+    savePersonalSpace(userId, next)
+    setPersonalSpace(next)
+    setShowEditPersonal(false)
+    onPersonalSpaceChange?.()
+  }
+
+  const savePersonalAvatar = async (blob) => {
+    const dataUrl = await blobToDataUrl(blob)
+    const next = { ...personalSpace, avatar: dataUrl }
+    savePersonalSpace(userId, next)
+    setPersonalSpace(next)
+    onPersonalSpaceChange?.()
+  }
 
   const sortedPlans = useMemo(() => [...plans].sort(byRecency), [plans])
   const visiblePlans = isTeam ? sortedPlans : sortedPlans.slice(0, RECENT_PLANS_LIMIT)
@@ -77,17 +106,24 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                 {(team.teamName || '?').trim().charAt(0).toUpperCase()}
               </span>
             )
+          ) : personalSpace.avatar ? (
+            <img className="space-page-avatar" src={personalSpace.avatar} alt="" />
           ) : user?.imageUrl ? (
             <img className="space-page-avatar" src={user.imageUrl} alt="" />
           ) : (
             <span className="space-page-avatar space-page-avatar-personal"><IconUser width={20} height={20} /></span>
           )}
           <div>
-            <h1>{isTeam ? team.teamName : t(lang, 'team.personalSpace')}</h1>
+            <h1>{isTeam ? team.teamName : personalSpace.name}</h1>
             <p>{isTeam
               ? (lang === 'fr' ? 'Espace équipe · partagé avec tous les membres' : 'Team space · shared with every member')
               : (lang === 'fr' ? 'Espace personnel · visible par vous seul' : 'Personal space · only visible to you')}</p>
           </div>
+          {!isTeam && (
+            <button className="space-page-edit-btn" onClick={openEditPersonal} title={lang === 'fr' ? "Personnaliser l'espace" : 'Customize space'}>
+              <IconPencil width={14} height={14} />
+            </button>
+          )}
         </div>
         {isTeam && (
           <button className="btn-secondary space-page-settings-btn" onClick={onOpenTeamSettings}>
@@ -194,6 +230,47 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
               : 'Create a team to share your plans, comment and assign tasks with others.'}</p>
           </div>
         </div>
+      )}
+
+      {showEditPersonal && (
+        <InfoModal
+          icon={<IconPencil width={22} height={22} />}
+          title={lang === 'fr' ? "Personnaliser l'espace" : 'Customize space'}
+          onClose={() => setShowEditPersonal(false)}
+        >
+          <div className="space-edit-avatar-row">
+            {personalSpace.avatar ? (
+              <img className="space-edit-avatar-preview" src={personalSpace.avatar} alt="" />
+            ) : (
+              <span className="space-edit-avatar-preview space-page-avatar-personal"><IconUser width={20} height={20} /></span>
+            )}
+            <button className="btn-secondary" onClick={() => setShowPersonalAvatarPicker(true)}>
+              {lang === 'fr' ? "Changer l'avatar" : 'Change avatar'}
+            </button>
+          </div>
+          <label className="space-edit-label">{lang === 'fr' ? "Nom de l'espace" : 'Space name'}</label>
+          <input
+            className="team-create-input"
+            type="text"
+            value={editName}
+            onChange={e => setEditName(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && saveEditPersonal()}
+            autoFocus
+          />
+          <div className="unsaved-changes-actions">
+            <button className="btn-secondary" onClick={() => setShowEditPersonal(false)}>{t(lang, 'plans.cancel')}</button>
+            <button className="btn-primary" onClick={saveEditPersonal} disabled={!editName.trim()}>{t(lang, 'app.save')}</button>
+          </div>
+        </InfoModal>
+      )}
+
+      {showPersonalAvatarPicker && (
+        <AvatarPicker
+          lang={lang}
+          title={lang === 'fr' ? "Avatar de l'espace personnel" : 'Personal space avatar'}
+          onSave={savePersonalAvatar}
+          onClose={() => setShowPersonalAvatarPicker(false)}
+        />
       )}
 
       {deleteTarget && (

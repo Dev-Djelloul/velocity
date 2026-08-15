@@ -26,6 +26,7 @@ import { t } from './lib/i18n'
 import { savePlan, getAllPlans, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
 import { collectRecentComments } from './lib/notifications'
 import { getReadIds } from './lib/commentReads'
+import { getPersonalSpace } from './lib/personalSpace'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
@@ -451,6 +452,8 @@ export default function App() {
     ? collectRecentComments(userId, lang).filter(n => !getReadIds(userId).has(n.id)).length
     : 0
 
+  const personalSpaceName = isSignedIn ? getPersonalSpace(userId, lang).name : t(lang, 'team.personalSpace')
+
   const goToNotifications = () => {
     setCurrentPage('account')
     window.scrollTo(0, 0)
@@ -555,6 +558,8 @@ export default function App() {
                   >
                     {team.teamId ? (
                       <TeamAvatar id={team.teamId} name={team.teamName} imageUrl={team.teamImageUrl} className="header-space-btn-avatar" />
+                    ) : getPersonalSpace(userId, lang).avatar ? (
+                      <img className="header-space-avatar header-space-btn-avatar" src={getPersonalSpace(userId, lang).avatar} alt="" />
                     ) : user?.imageUrl ? (
                       <img className="header-space-avatar header-space-btn-avatar" src={user.imageUrl} alt="" />
                     ) : (
@@ -562,7 +567,7 @@ export default function App() {
                         <IconUser width={12} height={12} />
                       </span>
                     )}
-                    <span className="header-space-btn-label">{team.teamId ? team.teamName : t(lang, 'team.personalSpace')}</span>
+                    <span className="header-space-btn-label">{team.teamId ? team.teamName : personalSpaceName}</span>
                     <IconChevronDown width={13} height={13} className="header-avatar-caret" />
                   </button>
                   {openHeaderMenu === 'space' && (
@@ -583,14 +588,16 @@ export default function App() {
                         disabled={switchingSpace}
                         onClick={() => switchSpace(null)}
                       >
-                        {user?.imageUrl ? (
+                        {getPersonalSpace(userId, lang).avatar ? (
+                          <img className="header-space-avatar" src={getPersonalSpace(userId, lang).avatar} alt="" />
+                        ) : user?.imageUrl ? (
                           <img className="header-space-avatar" src={user.imageUrl} alt="" />
                         ) : (
                           <span className="header-space-avatar header-space-avatar-personal">
                             <IconUser width={13} height={13} />
                           </span>
                         )}
-                        <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
+                        <span className="header-space-name">{personalSpaceName}</span>
                         {!team.teamId && <IconCheckCircle width={14} height={14} className="header-space-check" />}
                       </button>
                       {team.myTeams.map(tm => (
@@ -772,6 +779,7 @@ export default function App() {
             onCreatePlan={handleStartClick}
             onOpenTeamSettings={() => { setCurrentPage('team'); window.scrollTo(0, 0) }}
             onSeeFullHistory={() => { setCurrentPage('account'); window.scrollTo(0, 0) }}
+            onPersonalSpaceChange={() => setDataVersion(v => v + 1)}
           />
         )}
       </main>
