@@ -20,13 +20,13 @@ export function getPricingTiers(lang) {
       cta: { type: 'current' },
       features: fr ? [
         '3 plans générés',
-        'Espace personnel',
+        'Espace personnel & espaces d\'équipe',
         'Export PDF & CSV',
         'Partage par lien',
         'Sections IA à la demande (veille, benchmarks, RGPD…)'
       ] : [
         '3 generated plans',
-        'Personal space',
+        'Personal space & team spaces',
         'PDF & CSV export',
         'Shareable link',
         'On-demand AI sections (market watch, benchmarks, GDPR…)'
@@ -45,14 +45,12 @@ export function getPricingTiers(lang) {
       cta: { type: 'checkout' },
       features: fr ? [
         'Générations de plans illimitées',
-        'Espaces d\'équipe illimités',
         'Intégrations Notion, Jira & GitHub',
         'Export avancé (présentation PPTX)',
         'Historique complet & notifications d\'équipe',
         'Support prioritaire par email'
       ] : [
         'Unlimited plan generations',
-        'Unlimited team spaces',
         'Notion, Jira & GitHub integrations',
         'Advanced export (PPTX presentation)',
         'Full history & team notifications',
