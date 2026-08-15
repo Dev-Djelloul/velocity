@@ -12,6 +12,7 @@ const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' 
 export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, onNotionStoriesSynced, teamMembers }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
+  const [myTasksOnly, setMyTasksOnly] = useState(false)
   const [search, setSearch] = useState('')
 
   // Sync Notion : une base dédiée avec une ligne par story, ouverte en un clic (pas de
@@ -73,6 +74,7 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
   const filtered = allStories.filter(s => {
     if (statusFilter !== 'all' && (s.status || 'todo') !== statusFilter) return false
     if (assigneeFilter !== 'all' && s.assignee !== assigneeFilter) return false
+    if (myTasksOnly && s.assignedToId !== userId) return false
     if (search.trim() && !s.title.toLowerCase().includes(search.trim().toLowerCase())) return false
     return true
   })
@@ -157,6 +159,14 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
           <option value="all">{t(lang, 'backlog.filterAllAssignees')}</option>
           {assignees.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
+        {!!teamMembers?.length && (
+          <button
+            className={`backlog-mytasks-toggle ${myTasksOnly ? 'active' : ''}`}
+            onClick={() => setMyTasksOnly(v => !v)}
+          >
+            <IconUser width={13} height={13} /> {lang === 'fr' ? 'Mes tâches assignées' : 'My assigned tasks'}
+          </button>
+        )}
       </div>
 
       <div className="backlog-list">
