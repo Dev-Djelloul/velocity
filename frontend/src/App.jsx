@@ -143,6 +143,20 @@ export default function App() {
     persistTimezone(timezone)
   }, [timezone])
 
+  // Un changement de fuseau horaire fait dans un autre onglet (même origine) ne met à jour
+  // que le localStorage de cet onglet-là — sans ce listener, un onglet resté ouvert depuis
+  // avant le changement continue d'afficher les dates dans l'ancien fuseau (typiquement
+  // "auto", donc l'heure de Paris pour un utilisateur en France) jusqu'à un rechargement
+  // complet. L'event "storage" ne se déclenche jamais dans l'onglet à l'origine du
+  // changement, donc pas de conflit avec l'effet de persistance ci-dessus.
+  useEffect(() => {
+    const onStorage = (e) => {
+      if (e.key === 'plp_timezone') setTimezone(e.newValue || 'auto')
+    }
+    window.addEventListener('storage', onStorage)
+    return () => window.removeEventListener('storage', onStorage)
+  }, [])
+
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false'
     localStorage.setItem('plp_reduce_motion', reduceMotion ? '1' : '0')
