@@ -1,0 +1,542 @@
+<title>Checklist Search Console</title>
+<style>
+  :root {
+    --bg: #f7f7fb;
+    --surface: #ffffff;
+    --surface-raised: #ffffff;
+    --ink: #1c1b29;
+    --ink-muted: #5b5872;
+    --ink-faint: #8a87a0;
+    --accent: #5457d6;
+    --accent-ink: #3d3fb0;
+    --accent-soft: #ecedfb;
+    --success: #1f8a5f;
+    --success-soft: #e7f5ee;
+    --border: #e4e2ed;
+    --border-strong: #d3d0e2;
+    --code-bg: #f0eff8;
+    --shadow: 0 1px 2px rgba(28, 27, 41, 0.04), 0 8px 24px rgba(28, 27, 41, 0.05);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #131220;
+      --surface: #1a1929;
+      --surface-raised: #201f32;
+      --ink: #f1f0f7;
+      --ink-muted: #a9a6c0;
+      --ink-faint: #716e8c;
+      --accent: #9184d9;
+      --accent-ink: #b0a5e8;
+      --accent-soft: rgba(145, 132, 217, 0.14);
+      --success: #3fcf8e;
+      --success-soft: rgba(63, 207, 142, 0.12);
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(255, 255, 255, 0.16);
+      --code-bg: rgba(145, 132, 217, 0.1);
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #131220;
+    --surface: #1a1929;
+    --surface-raised: #201f32;
+    --ink: #f1f0f7;
+    --ink-muted: #a9a6c0;
+    --ink-faint: #716e8c;
+    --accent: #9184d9;
+    --accent-ink: #b0a5e8;
+    --accent-soft: rgba(145, 132, 217, 0.14);
+    --success: #3fcf8e;
+    --success-soft: rgba(63, 207, 142, 0.12);
+    --border: rgba(255, 255, 255, 0.09);
+    --border-strong: rgba(255, 255, 255, 0.16);
+    --code-bg: rgba(145, 132, 217, 0.1);
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.2), 0 12px 32px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page {
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 4rem 1.75rem 6rem;
+  }
+
+  code, .mono {
+    font-family: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, monospace;
+    font-size: 0.85em;
+  }
+
+  /* ---------- Header ---------- */
+
+  .doc-header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding-bottom: 2.5rem;
+    margin-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .doc-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    align-self: flex-start;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--accent-ink);
+    background: var(--accent-soft);
+    border-radius: 999px;
+    padding: 0.35rem 0.75rem 0.35rem 0.6rem;
+  }
+
+  .doc-kicker .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  h1 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: clamp(1.9rem, 1.6rem + 1.3vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.14;
+    letter-spacing: -0.01em;
+    margin: 0;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+
+  .doc-sub {
+    font-size: 1.02rem;
+    color: var(--ink-muted);
+    max-width: 58ch;
+    margin: 0;
+  }
+
+  .doc-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.5rem;
+    margin-top: 0.4rem;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+  }
+
+  .doc-meta strong {
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  /* ---------- Verdict banner ---------- */
+
+  .verdict {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    background: var(--success-soft);
+    border: 1px solid color-mix(in srgb, var(--success) 30%, transparent);
+    border-radius: 14px;
+    padding: 1.25rem 1.4rem;
+    margin-bottom: 3rem;
+  }
+
+  .verdict-icon {
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--success);
+    color: var(--surface);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    margin-top: 0.1rem;
+  }
+
+  .verdict-body p {
+    margin: 0;
+  }
+
+  .verdict-title {
+    font-weight: 700;
+    color: var(--ink);
+    margin-bottom: 0.3rem !important;
+  }
+
+  .verdict-detail {
+    color: var(--ink-muted);
+    font-size: 0.95rem;
+  }
+
+  /* ---------- Section scaffolding ---------- */
+
+  section {
+    margin-bottom: 3.25rem;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    gap: 0.65rem;
+    margin-bottom: 1.4rem;
+  }
+
+  .section-num {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+  }
+
+  h2 {
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-weight: 400;
+    font-size: 1.4rem;
+    letter-spacing: -0.005em;
+    margin: 0;
+    color: var(--ink);
+    text-wrap: balance;
+  }
+
+  .section-note {
+    color: var(--ink-muted);
+    font-size: 0.94rem;
+    margin: 0 0 1.4rem;
+    max-width: 62ch;
+  }
+
+  /* ---------- Status table (déjà en place) ---------- */
+
+  .status-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+  }
+
+  .status-row {
+    display: grid;
+    grid-template-columns: 1.6rem 1fr;
+    gap: 0.85rem;
+    padding: 0.95rem 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .status-row:last-child {
+    border-bottom: none;
+  }
+
+  .status-check {
+    width: 1.15rem;
+    height: 1.15rem;
+    border-radius: 50%;
+    background: var(--success-soft);
+    color: var(--success);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-top: 0.15rem;
+  }
+
+  .status-text strong {
+    display: block;
+    font-size: 0.96rem;
+    color: var(--ink);
+    font-weight: 600;
+  }
+
+  .status-text span {
+    display: block;
+    font-size: 0.86rem;
+    color: var(--ink-muted);
+    margin-top: 0.15rem;
+  }
+
+  /* ---------- Steps (à faire) ---------- */
+
+  .steps {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .step {
+    display: grid;
+    grid-template-columns: 2.25rem 1fr;
+    gap: 1.1rem;
+    position: relative;
+    padding-bottom: 1.9rem;
+  }
+
+  .step:last-child {
+    padding-bottom: 0;
+  }
+
+  .step-line {
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .step-line::before {
+    content: "";
+    position: absolute;
+    top: 2.1rem;
+    bottom: -0.6rem;
+    width: 1px;
+    background: var(--border-strong);
+  }
+
+  .step:last-child .step-line::before {
+    display: none;
+  }
+
+  .step-num {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    color: var(--accent-ink);
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.9rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+
+  .step-body {
+    padding-top: 0.2rem;
+  }
+
+  .step-title {
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink);
+    margin: 0 0 0.35rem;
+  }
+
+  .step-detail {
+    color: var(--ink-muted);
+    font-size: 0.93rem;
+    margin: 0;
+  }
+
+  .step-detail + .step-detail {
+    margin-top: 0.5rem;
+  }
+
+  .step-callout {
+    margin-top: 0.7rem;
+    background: var(--accent-soft);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 0.65rem 0.85rem;
+    font-size: 0.88rem;
+    color: var(--ink-muted);
+  }
+
+  .step-callout strong {
+    color: var(--ink);
+  }
+
+  .field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--code-bg);
+    border-radius: 6px;
+    padding: 0.3rem 0.6rem;
+    color: var(--ink);
+    word-break: break-all;
+  }
+
+  .field-label {
+    color: var(--ink-faint);
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: block;
+    margin-bottom: 0.35rem;
+  }
+
+  /* ---------- Footer ---------- */
+
+  .doc-footer {
+    margin-top: 3.5rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 560px) {
+    .page { padding: 2.75rem 1.25rem 4rem; }
+    .status-row { grid-template-columns: 1.4rem 1fr; }
+    .step { grid-template-columns: 1.9rem 1fr; gap: 0.85rem; }
+    .step-num { width: 1.9rem; height: 1.9rem; font-size: 0.8rem; }
+  }
+</style>
+
+<div class="page">
+
+  <header class="doc-header">
+    <span class="doc-kicker"><span class="dot"></span>SEO — mise en route</span>
+    <h1>Indexer VelocityLaunch sur Google</h1>
+    <p class="doc-sub">Ce qui a déjà été fait côté code, et les quelques actions manuelles qu'il reste à faire dans Google Search Console pour que le site soit officiellement soumis à l'indexation.</p>
+    <div class="doc-meta">
+      <span><strong>Domaine</strong> velocity.digitalblueskye.com</span>
+      <span><strong>Dernière mise à jour</strong> 15 août 2026</span>
+    </div>
+  </header>
+
+  <div class="verdict">
+    <div class="verdict-icon">✓</div>
+    <div class="verdict-body">
+      <p class="verdict-title">Côté code, il n'y a plus rien à faire.</p>
+      <p class="verdict-detail">Toutes les fondations techniques sont en place et déployées en production. Ce qui reste est administratif : créer et vérifier la propriété dans Search Console, puis lui indiquer où regarder. Ça prend environ 10 minutes, une seule fois.</p>
+    </div>
+  </div>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">01</span>
+      <h2>Déjà en place</h2>
+    </div>
+    <p class="section-note">Posé et vérifié en conditions réelles au fil des derniers commits.</p>
+
+    <div class="status-list">
+      <div class="status-row">
+        <div class="status-check">✓</div>
+        <div class="status-text">
+          <strong>Title &amp; meta description optimisés</strong>
+          <span>Un titre et une description distincts par page, écrits pour le clic, plutôt que le titre générique par défaut de Vite.</span>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-check">✓</div>
+        <div class="status-text">
+          <strong>Open Graph &amp; Twitter Card</strong>
+          <span>Les aperçus de partage sur LinkedIn, X et Facebook affichent maintenant un titre, une description et une image — avant, une page vide.</span>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-check">✓</div>
+        <div class="status-text">
+          <strong>robots.txt</strong>
+          <span>Autorise l'indexation des pages publiques, exclut explicitement les pages privées (compte, questionnaire, résultat, connexion).</span>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-check">✓</div>
+        <div class="status-text">
+          <strong>sitemap.xml</strong>
+          <span>Liste l'accueil et « Comment ça marche », référencé depuis robots.txt.</span>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-check">✓</div>
+        <div class="status-text">
+          <strong>URLs réelles par page</strong>
+          <span>Chaque page a sa propre adresse (/comment-ca-marche, /connexion...) au lieu de rester masquée derrière un état interne à « / ».</span>
+        </div>
+      </div>
+      <div class="status-row">
+        <div class="status-check">✓</div>
+        <div class="status-text">
+          <strong>Contenu prérendu en HTML statique</strong>
+          <span>L'accueil et « Comment ça marche » sont lisibles par les robots sans exécuter de JavaScript.</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="section-head">
+      <span class="section-num">02</span>
+      <h2>À faire dans Search Console</h2>
+    </div>
+    <p class="section-note">Une seule fois. Chaque étape dépend de la précédente — suis l'ordre.</p>
+
+    <div class="steps">
+
+      <div class="step">
+        <div class="step-line"><div class="step-num">1</div></div>
+        <div class="step-body">
+          <p class="step-title">Créer la propriété</p>
+          <p class="step-detail">Sur <span class="mono">search.google.com/search-console</span>, choisis <strong>« Préfixe d'URL »</strong> (pas « Domaine » — ça demande une vérification DNS sur digitalblueskye.com, inutile pour un sous-domaine seul).</p>
+          <div class="step-callout"><span class="field-label">À saisir</span><span class="field mono">https://velocity.digitalblueskye.com</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"><div class="step-num">2</div></div>
+        <div class="step-body">
+          <p class="step-title">Vérifier la propriété</p>
+          <p class="step-detail">Méthode recommandée : <strong>balise HTML</strong>. Google te donne une ligne <span class="mono">&lt;meta name="google-site-verification"...&gt;</span> à coller dans <span class="mono">index.html</span>.</p>
+          <div class="step-callout">Reviens me donner ce code et je l'ajoute — c'est une ligne, un commit, un déploiement.</div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"><div class="step-num">3</div></div>
+        <div class="step-body">
+          <p class="step-title">Soumettre le sitemap</p>
+          <p class="step-detail">Dans le menu « Sitemaps » à gauche, colle le chemin ci-dessous et valide.</p>
+          <div class="step-callout"><span class="field-label">Chemin du sitemap</span><span class="field mono">sitemap.xml</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"><div class="step-num">4</div></div>
+        <div class="step-body">
+          <p class="step-title">Demander l'indexation des 2 pages publiques</p>
+          <p class="step-detail">Outil « Inspection de l'URL » en haut, colle chaque URL, clique <strong>« Demander une indexation »</strong>. Accélère la première indexation au lieu d'attendre le crawl naturel de Google (qui peut prendre plusieurs jours).</p>
+          <div class="step-callout"><span class="field-label">Deux URLs à soumettre</span><span class="field mono">/</span> &nbsp; <span class="field mono">/comment-ca-marche</span></div>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="step-line"><div class="step-num">5</div></div>
+        <div class="step-body">
+          <p class="step-title">Revenir dans 1 à 2 semaines</p>
+          <p class="step-detail">Rapport <strong>« Pages »</strong> : confirme que les 2 URLs publiques sont indexées et qu'aucune page privée n'apparaît par erreur (déjà bloquées par robots.txt, donc normalement rien à corriger). Rapport <strong>« Performances »</strong> : premières requêtes de recherche qui ramènent du trafic.</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer class="doc-footer">
+    <span>VelocityLaunch — checklist SEO</span>
+    <span>Étape suivante possible : données structurées (JSON-LD), une fois l'indexation confirmée.</span>
+  </footer>
+
+</div>
