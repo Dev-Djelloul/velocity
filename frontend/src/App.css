@@ -32,8 +32,9 @@
   display: flex;
   align-items: center;
   gap: 1.75rem;
-  flex: 1;
-  justify-content: center;
+  flex: 0 1 auto;
+  justify-content: flex-start;
+  margin-left: 2.5rem;
 }
 
 .header-nav-link {

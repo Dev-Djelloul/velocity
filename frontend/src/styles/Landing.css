@@ -236,7 +236,8 @@
   cursor: pointer;
   font-weight: var(--font-weight-semibold);
   font-size: var(--font-size-base);
-  padding: 0.85rem 2rem;
+  padding: 0.9rem 2rem;
+  box-sizing: border-box;
   transition: all 0.2s ease;
 }
 
@@ -248,7 +249,8 @@
 }
 
 .btn-cta-demo-enhanced {
-  padding: 0.85rem 1.75rem;
+  padding: 1rem 1.75rem;
+  font-size: var(--font-size-lg);
 }
 
 /* ===== ANIMATIONS ===== */

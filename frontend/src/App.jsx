@@ -388,6 +388,12 @@ export default function App() {
                 {lang === 'fr' ? 'Démo' : 'Demo'}
               </button>
             )}
+            {!isSignedIn && (
+              <button className="btn-header-cta" onClick={handleStartClick}>
+                <IconSparkle width={14} height={14} />
+                <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
+              </button>
+            )}
           </nav>
 
           <div className="header-actions" ref={headerMenuRef}>
@@ -510,13 +516,6 @@ export default function App() {
             ) : (
               <button className="btn-header-signin" onClick={() => goToAuth('signin')} title={t(lang, 'auth.signIn')}>
                 <IconLogin width={18} height={18} />
-              </button>
-            )}
-
-            {!isSignedIn && (
-              <button className="btn-header-cta" onClick={handleStartClick}>
-                <IconSparkle width={14} height={14} />
-                <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
               </button>
             )}
           </div>
