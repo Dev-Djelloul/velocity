@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart, IconMessageCircle } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -24,6 +24,8 @@ import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
 import { savePlan, getAllPlans, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
+import { collectRecentComments } from './lib/notifications'
+import { getReadIds } from './lib/commentReads'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
@@ -431,6 +433,20 @@ export default function App() {
   const remaining = isSignedIn ? remainingCredits(userId) : 0
   const pro = isSignedIn && isPro(userId)
 
+  // Juste un indicateur pour le menu (scan local, pas de polling ici) — la page Mon
+  // compte interroge elle le serveur au chargement pour la liste à jour.
+  const unreadNotifCount = isSignedIn
+    ? collectRecentComments(userId, lang).filter(n => !getReadIds(userId).has(n.id)).length
+    : 0
+
+  const goToNotifications = () => {
+    setCurrentPage('account')
+    window.scrollTo(0, 0)
+    setTimeout(() => {
+      document.getElementById('account-notifications')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    }, 80)
+  }
+
   // Invitation d'équipe ouverte alors qu'une session est déjà active dans ce navigateur
   // (typiquement : on teste le lien d'invitation soi-même, dans le même navigateur que
   // celui qui vient de l'envoyer) — Clerk accepte silencieusement l'invitation pour la
@@ -616,6 +632,10 @@ export default function App() {
                       </button>
                       <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
                         <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
+                      </button>
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToNotifications() }}>
+                        <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
+                        {unreadNotifCount > 0 && <span className="header-dropdown-item-badge">{unreadNotifCount}</span>}
                       </button>
                       <div className="header-dropdown-divider" />
 

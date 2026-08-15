@@ -152,7 +152,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
         )}
       </div>
 
-      <div className="account-section card">
+      <div className="account-section card" id="account-notifications">
         <h3>
           <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
           {unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}

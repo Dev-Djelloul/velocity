@@ -268,6 +268,21 @@
   transition: background 0.15s ease;
 }
 
+.header-dropdown-item-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.35rem;
+  margin-left: auto;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
 .header-dropdown-item-primary {
   background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
   color: #0b0c10;
