@@ -375,6 +375,18 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingNotificationPlanId, team.teamId, team.isLoaded, dataVersion])
 
+  // "Historique de tous les plans" (Mon compte) regroupe tous les espaces — cliquer sur un
+  // plan qui n'appartient pas à l'espace actif doit d'abord y basculer (même mécanisme de
+  // changement différé que handleOpenNotification ci-dessus).
+  const handleOpenPlanFromHistory = (plan) => {
+    if ((plan.team_id || null) === (team.teamId || null)) {
+      handleLoadFromHistory(plan)
+      return
+    }
+    setPendingNotificationPlanId(plan.id)
+    team.setActiveTeamId(plan.team_id || null)
+  }
+
   const handleLoadDraft = (formData) => {
     setInitialFormData(formData)
     setCurrentPage('questionnaire')
@@ -743,7 +755,7 @@ export default function App() {
             key={dataVersion}
             lang={lang}
             onBack={() => setCurrentPage('landing')}
-            onLoadPlan={handleLoadFromHistory}
+            onLoadPlan={handleOpenPlanFromHistory}
             onOpenNotification={handleOpenNotification}
           />
         )}

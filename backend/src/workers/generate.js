@@ -72,7 +72,10 @@ export default {
     }
 
     if (request.method !== 'POST') {
-      return new Response('Method not allowed', { status: 405 })
+      // Sans les en-têtes CORS ici, toute route GET non reconnue (ex: appelée avant son
+      // déploiement, ou tout simplement inexistante) échoue côté navigateur avec une
+      // erreur CORS opaque au lieu du vrai code 405 — piégeant à déboguer.
+      return new Response('Method not allowed', { status: 405, headers: CORS_HEADERS })
     }
 
     try {

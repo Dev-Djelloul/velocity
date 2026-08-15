@@ -81,6 +81,13 @@ export async function handleApi(request, env, url) {
     return json(moved)
   }
 
+  if (pathname === '/plans/all' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    const teamIds = (searchParams.get('teamIds') || '').split(',').map(s => s.trim()).filter(Boolean)
+    if (!userId) return json({ error: 'userId required' }, 400)
+    return json(await db.getAllPlansForUser(env, userId, teamIds))
+  }
+
   if (pathname === '/notifications' && method === 'GET') {
     const userId = searchParams.get('userId')
     const teamIds = (searchParams.get('teamIds') || '').split(',').map(s => s.trim()).filter(Boolean)

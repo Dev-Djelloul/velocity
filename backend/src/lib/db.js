@@ -36,6 +36,23 @@ export async function upsertPlan(env, userId, plan, teamId) {
   return { ...plan, id, team_id: effectiveTeamId, savedAt: now, updatedAt: now }
 }
 
+// Tous les plans accessibles à userId, tous espaces confondus (personnel + chaque équipe
+// listée dans teamIds) — utilisé par "Historique de tous les plans" dans Mon compte, qui
+// regroupe volontairement tout au même endroit (contrairement aux tableaux de bord
+// d'espace, eux scopés à un seul espace à la fois).
+export async function getAllPlansForUser(env, userId, teamIds = []) {
+  const clauses = ['(user_id = ? AND team_id IS NULL)']
+  const binds = [userId]
+  if (teamIds.length) {
+    clauses.push(`team_id IN (${teamIds.map(() => '?').join(',')})`)
+    binds.push(...teamIds)
+  }
+  const { results } = await env.DB.prepare(
+    `SELECT id, data, created_at, updated_at FROM plans WHERE ${clauses.join(' OR ')} ORDER BY updated_at DESC`
+  ).bind(...binds).all()
+  return results.map(row => ({ ...JSON.parse(row.data), id: row.id, savedAt: row.created_at, updatedAt: row.updated_at }))
+}
+
 // Agrège les commentaires de tous les plans accessibles à userId (son espace personnel +
 // chaque équipe listée dans teamIds) — support du polling léger de notifications
 // (fetchNotifications côté client). LIMIT 100 plans scannés : largement suffisant à cette

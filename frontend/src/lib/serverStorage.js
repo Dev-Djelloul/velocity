@@ -50,6 +50,13 @@ export function movePlan(userId, id, fromTeamId, toTeamId, role) {
   })
 }
 
+// Tous les plans de l'utilisateur, tous espaces confondus — pour "Historique de tous les
+// plans" dans Mon compte (contrairement à fetchPlans, scopé à un seul espace à la fois).
+export function fetchAllPlans(userId, teamIds) {
+  const query = `?userId=${encodeURIComponent(userId)}${teamIds?.length ? `&teamIds=${encodeURIComponent(teamIds.join(','))}` : ''}`
+  return safeFetch(`/plans/all${query}`).then(r => r || [])
+}
+
 // Polling léger de notifications (voir lib/notifications.js) : userId personnel + toutes
 // les équipes dont l'utilisateur est membre, pour retrouver un commentaire posté depuis un
 // autre appareil sans avoir à ouvrir cet espace localement au préalable.

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
-import { getAllPlans, deletePlan, movePlanToTeam } from '../lib/planStorage'
+import { deletePlan, movePlanToTeam, fetchAllPlansAggregated } from '../lib/planStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
@@ -24,7 +24,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   const authProvider = useAuthProvider()
   const team = useTeam()
   const ProviderIcon = authProvider ? PROVIDER_ICONS[authProvider] : null
-  const [plans, setPlans] = useState(getAllPlans)
+  const [plans, setPlans] = useState([])
   const [notifications, setNotifications] = useState(() => collectRecentComments(userId, lang))
   const [readVersion, setReadVersion] = useState(0)
   const [showUpgrade, setShowUpgrade] = useState(false)
@@ -62,6 +62,29 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     return () => { cancelled = true; clearInterval(interval) }
   }, [userId, teamIdsKey, lang])
 
+  // "Historique de tous les plans" regroupe volontairement tous les espaces (contrairement
+  // aux tableaux de bord d'espace, eux scopés à un seul à la fois) — chargé une fois au
+  // montage, pas de polling ici (contrairement aux notifications, la fraîcheur seconde
+  // près n'a pas d'intérêt pour une liste qu'on consulte, pas qu'on surveille).
+  const refreshPlans = () => {
+    const teamIds = teamIdsKey ? teamIdsKey.split(',') : []
+    fetchAllPlansAggregated(userId, teamIds).then(setPlans)
+  }
+  useEffect(() => {
+    if (!userId) return
+    refreshPlans()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, teamIdsKey])
+
+  // Le nom d'affichage d'un espace peut être celui actif (team.teamName) ou une autre
+  // équipe dont on est membre (team.myTeams) — un plan de l'historique peut appartenir à
+  // n'importe laquelle, pas seulement celle actuellement affichée dans le switcher.
+  const spaceNameFor = (teamId) => {
+    if (!teamId) return t(lang, 'team.personalSpace')
+    if (teamId === team.teamId) return team.teamName
+    return team.myTeams?.find(tm => tm.id === teamId)?.name || t(lang, 'team.myTeams')
+  }
+
   // Sortir un plan de son équipe active est réservé aux admins (même règle que la
   // suppression) ; le déplacer depuis le personnel n'a pas cette contrainte.
   const canMoveOut = !team.teamId || team.isAdmin
@@ -74,7 +97,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     const plan = movePlanTarget
     setMovePlanTarget(null)
     await movePlanToTeam(plan.id, targetTeamId)
-    setPlans(getAllPlans())
+    refreshPlans()
   }
 
   const startCheckout = async () => {
@@ -95,7 +118,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
 
   const confirmRemovePlan = () => {
     deletePlan(deletePlanTarget.id)
-    setPlans(getAllPlans())
+    refreshPlans()
     setDeletePlanTarget(null)
   }
 
@@ -193,20 +216,28 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
                   <span className="account-list-item-name">{p.product?.name}</span>
                   <span className="account-list-item-meta">{p.classification}</span>
                   <span className="plan-origin-tag">
-                    <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
-                    {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
-                    {p.createdByName && ` · ${p.createdByName}`}
+                    <span className={`plan-origin-dot ${p.team_id ? 'is-team' : 'is-personal'}`} />
+                    {spaceNameFor(p.team_id)}
+                    {p.createdByName && ` · ${lang === 'fr' ? 'créé par' : 'created by'} ${p.createdByName}`}
                     {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
                   </span>
                 </button>
-                {canMoveOut && moveTargets.length > 0 && (
-                  <button className="account-list-item-move" onClick={() => setMovePlanTarget(p)} title={t(lang, 'plans.move')}>
-                    {t(lang, 'plans.move')}
-                  </button>
+                {(p.team_id || null) === (team.teamId || null) ? (
+                  <>
+                    {canMoveOut && moveTargets.length > 0 && (
+                      <button className="account-list-item-move" onClick={() => setMovePlanTarget(p)} title={t(lang, 'plans.move')}>
+                        {t(lang, 'plans.move')}
+                      </button>
+                    )}
+                    <button className="account-list-item-delete" onClick={() => setDeletePlanTarget(p)} title="Delete">
+                      <IconTrash width={14} height={14} />
+                    </button>
+                  </>
+                ) : (
+                  <span className="account-list-item-hint">
+                    {lang === 'fr' ? 'Changez d\'espace pour gérer' : 'Switch space to manage'}
+                  </span>
                 )}
-                <button className="account-list-item-delete" onClick={() => setDeletePlanTarget(p)} title="Delete">
-                  <IconTrash width={14} height={14} />
-                </button>
               </div>
             ))}
           </div>

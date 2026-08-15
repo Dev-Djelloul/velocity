@@ -1,4 +1,4 @@
-import { fetchPlans, pushPlan, removePlan, movePlan as moveServerPlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
+import { fetchPlans, fetchAllPlans, pushPlan, removePlan, movePlan as moveServerPlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
 
 const SHARES_KEY = 'plp_plan_shares'
 
@@ -93,6 +93,29 @@ export function getAllPlans() {
   } catch {
     return []
   }
+}
+
+// Tous les plans de l'utilisateur, tous espaces confondus (personnel + chaque équipe listée
+// dans teamIds) — pour "Historique de tous les plans" dans Mon compte, qui doit tout
+// regrouper au même endroit (contrairement aux tableaux de bord d'espace, eux scopés à un
+// seul espace). Repli local si le serveur ne répond pas : scanne tous les espaces déjà mis
+// en cache dans ce navigateur (mêmes limites que lib/notifications.js).
+export async function fetchAllPlansAggregated(userId, teamIds) {
+  const remote = await fetchAllPlans(userId, teamIds || [])
+  if (remote?.length) return remote
+
+  if (!userId) return []
+  const prefix = `plp_saved_plans_${userId}__`
+  const seen = new Map()
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (!key || !key.startsWith(prefix)) continue
+    try {
+      const plans = JSON.parse(localStorage.getItem(key) || '[]')
+      for (const plan of plans) seen.set(plan.id, plan)
+    } catch { /* clé corrompue, on l'ignore */ }
+  }
+  return [...seen.values()].sort((a, b) => (b.updatedAt || b.savedAt || '').localeCompare(a.updatedAt || a.savedAt || ''))
 }
 
 export function getPlanById(id) {
