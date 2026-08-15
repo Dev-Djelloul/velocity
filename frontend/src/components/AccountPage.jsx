@@ -8,7 +8,7 @@ import { formatFullDateTime } from '../lib/dateFormat'
 import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
 import { getReadIds, markCommentsRead } from '../lib/commentReads'
 import { getPersonalSpace } from '../lib/personalSpace'
-import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconCheckCircle, IconMessageCircle } from './Icons'
+import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconMessageCircle } from './Icons'
 
 const PROVIDER_ICONS = {
   google: IconProviderGoogle,
@@ -16,6 +16,8 @@ const PROVIDER_ICONS = {
   slack: IconProviderSlack
 }
 import AvatarPicker from './AvatarPicker'
+import PricingCards from './PricingCards'
+import { ContactModal } from './CompanyModals'
 import '../styles/AccountPage.css'
 
 export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotification, pendingAction, onConsumeAction }) {
@@ -29,6 +31,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   const [notifications, setNotifications] = useState(() => collectRecentComments(userId, lang))
   const [readVersion, setReadVersion] = useState(0)
   const [showUpgrade, setShowUpgrade] = useState(false)
+  const [showContact, setShowContact] = useState(false)
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState(false)
@@ -118,10 +121,10 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     refreshPlans()
   }
 
-  const startCheckout = async () => {
+  const startCheckout = async (interval) => {
     setCheckoutLoading(true)
     setCheckoutError(false)
-    const result = await createCheckoutSession(userId, user?.primaryEmailAddress?.emailAddress)
+    const result = await createCheckoutSession(userId, user?.primaryEmailAddress?.emailAddress, interval)
     if (result?.url) {
       window.location.href = result.url
       return
@@ -272,36 +275,28 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
 
       {showUpgrade && (
         <div className="modal-backdrop" onClick={() => setShowUpgrade(false)}>
-          <div className="upgrade-modal" onClick={e => e.stopPropagation()}>
+          <div className="pricing-modal-v2" onClick={e => e.stopPropagation()}>
             <button className="upgrade-modal-close" onClick={() => setShowUpgrade(false)} title={t(lang, 'export.close')}>
               <IconX width={16} height={16} />
             </button>
-            <div className="upgrade-modal-icon"><IconRocket width={26} height={26} /></div>
-            <h3>{t(lang, 'account.upgradeTitle')}</h3>
-            <p className="upgrade-modal-body">{t(lang, 'account.upgradeBody')}</p>
+            <h3 className="pricing-modal-v2-title">{t(lang, 'account.upgradeTitle')}</h3>
+            <p className="pricing-modal-v2-subtitle">{t(lang, 'account.upgradeBody')}</p>
 
-            <ul className="upgrade-modal-features">
-              <li><IconCheckCircle width={15} height={15} /> {lang === 'fr' ? 'Générations de plans illimitées' : 'Unlimited plan generations'}</li>
-              <li><IconCheckCircle width={15} height={15} /> {lang === 'fr' ? 'Accès prioritaire aux futures fonctionnalités' : 'Priority access to upcoming features'}</li>
-              <li><IconCheckCircle width={15} height={15} /> {lang === 'fr' ? 'Support prioritaire' : 'Priority support'}</li>
-            </ul>
+            {!isServerConfigured && <p className="upgrade-note pricing-modal-v2-note">{t(lang, 'account.upgradeNote')}</p>}
+            {checkoutError && <p className="upgrade-note pricing-modal-v2-note">{t(lang, 'account.upgradeError')}</p>}
 
-            {!isServerConfigured && <p className="upgrade-note">{t(lang, 'account.upgradeNote')}</p>}
-            {checkoutError && <p className="upgrade-note">{t(lang, 'account.upgradeError')}</p>}
-
-            <button
-              className="upgrade-modal-cta"
-              disabled={!isServerConfigured || checkoutLoading}
-              onClick={startCheckout}
-            >
-              {checkoutLoading ? t(lang, 'account.upgradeLoading') : t(lang, 'account.upgradeConfirm')}
-            </button>
-            <button className="upgrade-modal-secondary" onClick={() => setShowUpgrade(false)}>
-              {t(lang, 'export.close')}
-            </button>
+            <PricingCards
+              lang={lang}
+              currentTierId={pro ? 'pro' : 'free'}
+              proLoading={checkoutLoading || !isServerConfigured}
+              onSelectPro={startCheckout}
+              onSelectEnterprise={() => { setShowUpgrade(false); setShowContact(true) }}
+            />
           </div>
         </div>
       )}
+
+      {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
 
       {deletePlanTarget && (
         <div className="confirm-modal-backdrop" onClick={() => setDeletePlanTarget(null)}>

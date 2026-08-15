@@ -843,7 +843,23 @@ export default function App() {
       {activeModal === 'about' && <AboutModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'careers' && <CareersModal lang={lang} onClose={() => setActiveModal(null)} onContactClick={() => setActiveModal('contact')} />}
       {activeModal === 'contact' && <ContactModal lang={lang} onClose={() => setActiveModal(null)} />}
-      {activeModal === 'pricing' && <PricingModal lang={lang} onClose={() => setActiveModal(null)} onContactClick={() => setActiveModal('contact')} />}
+      {activeModal === 'pricing' && (
+        <PricingModal
+          lang={lang}
+          onClose={() => setActiveModal(null)}
+          onContactClick={() => setActiveModal('contact')}
+          currentTierId={pro ? 'pro' : 'free'}
+          onSelectPro={() => {
+            if (isSignedIn) {
+              setPendingAccountAction('upgrade')
+              setCurrentPage('account')
+              window.scrollTo(0, 0)
+            } else {
+              goToAuth('signup')
+            }
+          }}
+        />
+      )}
       {activeModal === 'changelog' && <ChangelogModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'roadmap' && <RoadmapModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'privacy' && <PrivacyModal lang={lang} onClose={() => setActiveModal(null)} />}

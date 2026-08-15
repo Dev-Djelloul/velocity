@@ -462,12 +462,12 @@ export async function handleApi(request, env, url) {
   }
 
   if (pathname === '/checkout' && method === 'POST') {
-    const { userId, email, successUrl, cancelUrl } = await request.json()
+    const { userId, email, successUrl, cancelUrl, interval } = await request.json()
     if (!userId || !successUrl || !cancelUrl) {
       return json({ error: 'userId, successUrl and cancelUrl required' }, 400)
     }
     try {
-      const session = await createCheckoutSession(env, { userId, email, successUrl, cancelUrl })
+      const session = await createCheckoutSession(env, { userId, email, successUrl, cancelUrl, interval })
       return json({ url: session.url })
     } catch (err) {
       return json({ error: err.message }, 500)

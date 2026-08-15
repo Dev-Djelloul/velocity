@@ -40,10 +40,16 @@ async function stripeRequest(env, path, params) {
   return data
 }
 
-export async function createCheckoutSession(env, { userId, email, successUrl, cancelUrl }) {
+// interval: 'year' utilise le prix annuel (remise affichée côté UI) si configuré côté
+// Worker, sinon retombe sur le prix mensuel — évite de casser le paiement si le second
+// Price Stripe n'a pas encore été créé/configuré.
+export async function createCheckoutSession(env, { userId, email, successUrl, cancelUrl, interval }) {
+  const priceId = interval === 'year' && env.STRIPE_PRICE_ID_YEARLY
+    ? env.STRIPE_PRICE_ID_YEARLY
+    : env.STRIPE_PRICE_ID
   return stripeRequest(env, '/checkout/sessions', {
     mode: 'subscription',
-    line_items: [{ price: env.STRIPE_PRICE_ID, quantity: 1 }],
+    line_items: [{ price: priceId, quantity: 1 }],
     success_url: successUrl,
     cancel_url: cancelUrl,
     client_reference_id: userId,

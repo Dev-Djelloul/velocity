@@ -557,28 +557,7 @@ export const translations = {
     modals: {
       pricing: {
         title: 'Tarification',
-        intro: 'VelocityLaunch est gratuit pendant la beta. Pas de carte bancaire, pas de limite cachée sur les fonctionnalités principales.',
-        currentBadge: 'Actuel',
-        currentTitle: 'Beta gratuite',
-        currentPrice: '0€',
-        currentFeatures: [
-          'Plans de lancement illimités',
-          'Questionnaire complet FR / EN',
-          'Roadmap, stratégie marketing et KPIs générés',
-          'Export PDF et CSV',
-          'Partage par lien privé',
-          'Brouillons sauvegardés localement'
-        ],
-        soonBadge: 'Bientôt',
-        soonTitle: 'Pro',
-        soonPrice: 'À venir',
-        soonFeatures: [
-          'Historique et sauvegarde cloud',
-          "Espaces d'équipe collaboratifs",
-          'Templates sectoriels avancés',
-          'Intégrations (Notion, Slack…)'
-        ],
-        notifyMe: 'Me prévenir'
+        intro: 'Commence gratuitement, passe en Pro quand tu en as besoin — sans engagement, annulable à tout moment.'
       },
       changelog: {
         title: 'Changelog',
@@ -935,8 +914,8 @@ export const translations = {
       limitModalBody: 'Tu as utilisé tes 3 plans gratuits. Passe en Pro pour générer des plans illimités, ou supprime un plan existant depuis ton compte si tu veux simplement faire de la place — attention, supprimer un plan ne te redonne pas de crédit.',
       limitModalManage: 'Voir mes plans',
       upgradeCta: 'Passer en Pro',
-      upgradeTitle: 'Passer en Pro',
-      upgradeBody: 'Débloque des générations de plans illimitées et les futures fonctionnalités Pro.',
+      upgradeTitle: 'Choisis ton offre',
+      upgradeBody: 'Passe en Pro pour des générations illimitées et des équipes sans limite, ou contacte-nous pour une offre Entreprise sur mesure.',
       upgradeNote: 'Le paiement Stripe sera activé dès que la clé sera configurée côté serveur.',
       upgradeError: "Impossible de contacter Stripe pour l'instant. Réessaie dans un instant.",
       upgradeLoading: 'Redirection vers Stripe…',
@@ -1524,28 +1503,7 @@ export const translations = {
     modals: {
       pricing: {
         title: 'Pricing',
-        intro: 'VelocityLaunch is free during beta. No credit card, no hidden limits on core features.',
-        currentBadge: 'Current',
-        currentTitle: 'Free beta',
-        currentPrice: '€0',
-        currentFeatures: [
-          'Unlimited launch plans',
-          'Full questionnaire FR / EN',
-          'Generated roadmap, marketing strategy and KPIs',
-          'PDF and CSV export',
-          'Private link sharing',
-          'Drafts saved locally'
-        ],
-        soonBadge: 'Coming soon',
-        soonTitle: 'Pro',
-        soonPrice: 'Coming soon',
-        soonFeatures: [
-          'History and cloud backup',
-          'Collaborative team spaces',
-          'Advanced sector templates',
-          'Integrations (Notion, Slack…)'
-        ],
-        notifyMe: 'Notify me'
+        intro: 'Start for free, upgrade to Pro whenever you need — no commitment, cancel anytime.'
       },
       changelog: {
         title: 'Changelog',
@@ -1902,8 +1860,8 @@ export const translations = {
       limitModalBody: "You've used your 3 free plans. Upgrade to Pro to generate unlimited plans, or delete an existing plan from your account if you just want to make room — note that deleting a plan does not refund a credit.",
       limitModalManage: 'View my plans',
       upgradeCta: 'Upgrade to Pro',
-      upgradeTitle: 'Upgrade to Pro',
-      upgradeBody: 'Unlock unlimited plan generations and future Pro features.',
+      upgradeTitle: 'Choose your plan',
+      upgradeBody: 'Upgrade to Pro for unlimited generations and unlimited teams, or get in touch for a custom Enterprise plan.',
       upgradeNote: 'Stripe payment will go live as soon as the key is configured server-side.',
       upgradeError: 'Could not reach Stripe right now. Please try again shortly.',
       upgradeLoading: 'Redirecting to Stripe…',

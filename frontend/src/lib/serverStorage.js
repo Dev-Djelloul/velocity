@@ -265,13 +265,14 @@ export function removeAgentTask(userId, id) {
   return safeFetch(`/agents/tasks/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
 }
 
-export function createCheckoutSession(userId, email) {
+export function createCheckoutSession(userId, email, interval) {
   return safeFetch('/checkout', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       userId,
       email,
+      interval,
       successUrl: `${window.location.origin}${window.location.pathname}?upgraded=1`,
       cancelUrl: window.location.href
     })
