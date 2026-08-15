@@ -253,7 +253,8 @@ export const translations = {
       exportPaidCsvHint: 'Un pense-bête à garder sous la main pendant la création manuelle de vos campagnes (ou à transmettre à qui les crée pour vous) — noms suggérés, dates et budgets déjà calculés. Pas un fichier d\'import automatique.',
       exportGoogleAds: 'Exporter pour Google Ads Editor',
       exportGoogleAdsHint: 'Fichier au format d\'import CSV de Google Ads Editor (campagnes créées en pause — à vérifier et activer vous-même). Ne contient que les campagnes dont le canal mentionne "Google".',
-      totalPaidBudget: 'Budget média total'
+      totalPaidBudget: 'Budget média total',
+      budgetDrift: (liveBudget) => `Le budget simulé dans « Stratégie Marketing » a changé (${liveBudget.toLocaleString()} €) — régénère pour l'appliquer ici.`
     },
     benchmarks: {
       title: 'Benchmarks',
@@ -1182,7 +1183,8 @@ export const translations = {
       exportPaidCsvHint: 'A cheat sheet to keep handy while manually creating your campaigns (or to hand off to whoever creates them for you) — suggested names, dates and budgets already worked out. Not an automatic import file.',
       exportGoogleAds: 'Export for Google Ads Editor',
       exportGoogleAdsHint: 'File in Google Ads Editor\'s CSV import format (campaigns created paused — review and enable them yourself). Only includes campaigns whose channel mentions "Google".',
-      totalPaidBudget: 'Total media budget'
+      totalPaidBudget: 'Total media budget',
+      budgetDrift: (liveBudget) => `The simulated budget in "Marketing Strategy" has changed (${liveBudget.toLocaleString()} €) — regenerate to apply it here.`
     },
     benchmarks: {
       title: 'Benchmarks',

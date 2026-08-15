@@ -108,6 +108,14 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
   const hasAny = !!editorial || !!advertising
   const loading = loadingContent || loadingPaid
 
+  // plan.marketing reflète ici le budget live du simulateur (voir PlanViewer, qui passe
+  // { ...plan, marketing: liveMarketing }) — s'il diffère du budget figé dans la dernière
+  // génération du calendrier, on prévient plutôt que de laisser un chiffre silencieusement
+  // obsolète. Régénérer relit plan.marketing donc applique automatiquement la valeur actuelle.
+  const liveBudget = plan.marketing?.totalBudget
+  const budgetDrifted = advertising?.totalBudget != null && liveBudget != null
+    && Math.round(advertising.totalBudget) !== Math.round(liveBudget)
+
   const generateContent = async () => {
     setLoadingContent(true)
     try {
@@ -164,6 +172,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
           {advertising?.totalBudget != null && (
             <div className="gtm-total-budget">
               {t(lang, 'gtm.totalPaidBudget')} : <strong>{Number(advertising.totalBudget).toLocaleString()} €</strong>
+              {budgetDrifted && <span className="gtm-budget-drift">{t(lang, 'gtm.budgetDrift')(liveBudget)}</span>}
             </div>
           )}
 
