@@ -216,9 +216,47 @@
   color: var(--color-success);
 }
 
+/* Éléments partagés entre la bannière flottante et le journal de la carte "Ravi de te
+   revoir" : chaque modification est une ligne avec un tag de section coloré + le détail. */
+.change-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+
+.change-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+}
+
+.change-section-tag {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  background: rgba(145, 132, 217, 0.16);
+  color: #b3a9ea;
+  border-radius: 6px;
+  padding: 0.1rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.change-detail {
+  color: var(--color-text-secondary);
+  word-break: break-word;
+}
+
 /* Bannière flottante, toujours visible pendant le scroll : rend le fait qu'il y a des
    changements non enregistrés impossible à manquer, même quand on a édité une section
-   loin en bas de page. */
+   loin en bas de page. Boîte (pas une bulle tronquée) pour que le texte complet de chaque
+   modification reste lisible. */
 .unsaved-banner {
   position: fixed;
   top: 88px;
@@ -226,11 +264,12 @@
   transform: translateX(-50%);
   z-index: 150;
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  max-width: min(560px, calc(100vw - 2rem));
-  padding: 0.65rem 0.75rem 0.65rem 1rem;
-  border-radius: 999px;
+  flex-direction: column;
+  gap: 0.6rem;
+  width: min(480px, calc(100vw - 2rem));
+  max-height: min(60vh, 420px);
+  padding: 0.85rem 1rem;
+  border-radius: 14px;
   border: 1.5px solid transparent;
   background:
     linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
@@ -244,29 +283,23 @@
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 
+.unsaved-banner-head {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-shrink: 0;
+}
+
 .unsaved-banner-icon {
   color: #9184d9;
   flex-shrink: 0;
 }
 
-.unsaved-banner-text {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
+.unsaved-banner-title {
   flex: 1;
-}
-
-.unsaved-banner-text span:first-child {
   font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.unsaved-banner-extra {
-  font-size: 0.72rem;
-  color: var(--color-text-muted);
 }
 
 .unsaved-banner-save {
@@ -285,6 +318,11 @@
 
 .unsaved-banner-save:hover {
   filter: brightness(1.15);
+}
+
+.unsaved-banner .change-list {
+  overflow-y: auto;
+  padding-right: 0.25rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -308,45 +346,32 @@
   text-transform: uppercase;
   letter-spacing: 0.04em;
   color: var(--color-text-muted) !important;
-  margin-bottom: 0.35rem !important;
+  margin-bottom: 0.5rem !important;
 }
 
-.plan-changelog ul {
-  list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  margin: 0;
-  padding: 0;
+/* Un "carré" par enregistrement (regroupe toutes les modifications faites en une fois),
+   plutôt qu'une simple ligne de texte tronquée. */
+.plan-changelog-group {
+  background: rgba(145, 132, 217, 0.06);
+  border: 1px solid rgba(145, 132, 217, 0.18);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
 }
 
-.plan-changelog > ul > li {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.2rem;
-  font-size: var(--font-size-sm);
+.plan-changelog-group + .plan-changelog-group {
+  margin-top: 0.5rem;
 }
 
 .plan-changelog-date {
-  color: var(--color-text-muted);
-  flex-shrink: 0;
+  display: inline-block;
+  color: #06b6d4;
   font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.4rem;
 }
 
-.plan-changelog ul.plan-changelog-details {
-  list-style: disc;
-  padding-left: 1.1rem;
-  gap: 0.15rem;
-}
-
-.plan-changelog-details li {
-  color: var(--color-text-secondary);
-  display: list-item;
-}
-
-.plan-changelog ul.plan-changelog-full {
-  max-height: 220px;
+.plan-changelog-full {
+  max-height: 320px;
   overflow-y: auto;
   padding-right: 0.5rem;
 }

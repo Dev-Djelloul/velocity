@@ -105,13 +105,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 22px;
-  height: 22px;
   flex-shrink: 0;
-  border-radius: 6px;
+  background: none;
+  border: none;
+  padding: 0;
   color: var(--color-text-muted);
   opacity: 0;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: opacity 0.15s ease, color 0.15s ease;
 }
 
 .agent-log-item:hover .agent-log-delete,
@@ -120,7 +120,6 @@
 }
 
 .agent-log-delete:hover {
-  background: rgba(239, 68, 68, 0.12);
   color: #ef4444;
 }
 

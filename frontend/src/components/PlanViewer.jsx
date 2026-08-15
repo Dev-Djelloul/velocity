@@ -27,7 +27,7 @@ import { savePlan } from '../lib/planStorage'
 import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { describeRoadmapChange, describeKpisChange, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
+import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
 import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
@@ -59,10 +59,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   // Une description précise (pas juste le nom de la section) pour chaque modification,
   // calculée au moment du changement pendant qu'on a encore l'ancienne ET la nouvelle
-  // valeur sous la main — impossible à reconstituer après coup. On garde aussi la section
-  // pour l'afficher en préfixe ("Roadmap — ...").
-  const markChanged = (section, detail) => {
-    setPendingChanges(prev => [...prev, { section, detail }])
+  // valeur sous la main — impossible à reconstituer après coup. `key` identifie l'élément
+  // précis modifié (une story, un KPI...) : rééditer le même élément avant d'enregistrer
+  // remplace l'entrée en attente au lieu d'en empiler une nouvelle à chaque clic — sinon
+  // incrémenter un KPI dix fois de suite crée dix lignes dans le journal.
+  const markChanged = (key, section, detail) => {
+    setPendingChanges(prev => {
+      const idx = prev.findIndex(c => c.key === key)
+      if (idx === -1) return [...prev, { key, section, detail }]
+      const next = [...prev]
+      next[idx] = { key, section, detail }
+      return next
+    })
   }
 
   const budgetKeyFor = (value) => {
@@ -89,30 +97,48 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // explicitement via le bouton "Enregistrer" (voir handleSave) pour laisser la main à
   // l'utilisateur — avant, chaque régénération (veille, benchmarks...) ou glisser-déposer
   // écrasait silencieusement la version sauvegardée.
-  const updateRoadmap = (nextRoadmap) => {
-    markChanged('roadmap', describeRoadmapChange(plan.roadmap, nextRoadmap, lang))
+  //
+  // RoadmapCard, GanttChart et BacklogCard modifient tous la même donnée (roadmap.sprints)
+  // mais depuis des vues différentes : on garde une fonction par origine pour que le
+  // journal dise "Roadmap · Gantt" plutôt que juste "Roadmap" quand l'édition vient du
+  // Gantt, et une entrée par story déplacée/modifiée (voir diffRoadmapItems).
+  const updateRoadmapFrom = (section) => (nextRoadmap) => {
+    const items = diffRoadmapItems(plan.roadmap, nextRoadmap, lang)
+    if (items.length) {
+      items.forEach(({ key, detail }) => markChanged(key, section, detail))
+    } else {
+      markChanged(section, section, lang === 'fr' ? 'Mise à jour' : 'Updated')
+    }
     setPlan(p => ({ ...p, roadmap: nextRoadmap }))
   }
+  const updateRoadmap = updateRoadmapFrom('roadmap')
+  const updateRoadmapFromGantt = updateRoadmapFrom('roadmapGantt')
+  const updateRoadmapFromBacklog = updateRoadmapFrom('roadmapBacklog')
 
   const updatePlanStartDate = (dateStr) => {
     const nextIso = dateStr + 'T00:00:00Z'
-    markChanged('planStartDate', describeDateChange(plan.planStartDate, nextIso, lang))
+    markChanged('planStartDate', 'planStartDate', describeDateChange(plan.planStartDate, nextIso, lang))
     setPlan(p => ({ ...p, planStartDate: nextIso }))
   }
 
   const updateKpis = (nextKpis) => {
-    markChanged('kpis', describeKpisChange(plan.kpis, nextKpis, lang))
+    const items = diffKpiItems(plan.kpis, nextKpis, lang)
+    if (items.length) {
+      items.forEach(({ key, detail }) => markChanged(key, 'kpis', detail))
+    } else {
+      markChanged('kpis', 'kpis', lang === 'fr' ? 'Mis à jour' : 'Updated')
+    }
     setPlan(p => ({ ...p, kpis: nextKpis }))
   }
 
   const updateMetricsHistory = (nextHistory) => {
-    markChanged('metrics', describeMetricsChange(plan.metricsHistory, nextHistory, lang))
+    markChanged('metrics', 'metrics', describeMetricsChange(plan.metricsHistory, nextHistory, lang))
     setPlan(p => ({ ...p, metricsHistory: nextHistory }))
   }
 
   const updateLaunchDate = (dateStr) => {
     const nextIso = dateStr + 'T00:00:00Z'
-    markChanged('launchDate', describeDateChange(plan.launchDate, nextIso, lang))
+    markChanged('launchDate', 'launchDate', describeDateChange(plan.launchDate, nextIso, lang))
     setPlan(p => ({ ...p, launchDate: nextIso }))
   }
 
@@ -122,27 +148,27 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const regeneratedLabel = lang === 'fr' ? 'Régénéré' : 'Regenerated'
 
   const updateVeille = (nextVeille) => {
-    markChanged('veille', regeneratedLabel)
+    markChanged('veille', 'veille', regeneratedLabel)
     setPlan(p => ({ ...p, veille: nextVeille }))
   }
 
   const updateBenchmarks = (nextBenchmarks) => {
-    markChanged('benchmarks', regeneratedLabel)
+    markChanged('benchmarks', 'benchmarks', regeneratedLabel)
     setPlan(p => ({ ...p, benchmarks: nextBenchmarks }))
   }
 
   const updateEditorial = (nextEditorial) => {
-    markChanged('editorial', regeneratedLabel)
+    markChanged('editorial', 'editorial', regeneratedLabel)
     setPlan(p => ({ ...p, editorial: nextEditorial }))
   }
 
   const updateAdvertising = (nextAdvertising) => {
-    markChanged('advertising', regeneratedLabel)
+    markChanged('advertising', 'advertising', regeneratedLabel)
     setPlan(p => ({ ...p, advertising: nextAdvertising }))
   }
 
   const updateRgpd = (nextRgpd) => {
-    markChanged('rgpd', regeneratedLabel)
+    markChanged('rgpd', 'rgpd', regeneratedLabel)
     setPlan(p => ({ ...p, rgpd: nextRgpd }))
   }
 
@@ -179,7 +205,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const handleSave = () => {
     if (!plan.id || !isDirty) return
     const nextChangeLog = [
-      { date: new Date().toISOString(), changes: pendingChanges },
+      { date: new Date().toISOString(), changes: pendingChanges.map(({ section, detail }) => ({ section, detail })) },
       ...(plan.changeLog || [])
     ].slice(0, 50)
     const savedPlan = savePlan({ ...plan, changeLog: nextChangeLog })
@@ -187,6 +213,9 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     setPendingChanges([])
     setJustSaved(true)
     setTimeout(() => setJustSaved(false), 2500)
+    // Remonte vers le journal en haut de page pour que la modification qu'on vient
+    // d'enregistrer soit immédiatement visible, plutôt que de rester scrollé loin en bas.
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleNewPlanClick = () => {
@@ -199,25 +228,30 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   const generatedDateTime = formatFullDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
 
-  // Affiche "Section — détail" ; reste compatible avec les entrées enregistrées avant
-  // l'ajout du préfixe de section (simples chaînes) ou avec l'ancien format par sections.
-  const formatChangeItem = (change) => {
-    if (typeof change === 'string') return change
-    return `${sectionLabel(change.section, lang)} — ${change.detail}`
+  // Une ligne de changement : compatible avec les entrées enregistrées avant l'ajout du
+  // préfixe de section (simples chaînes).
+  const ChangeRow = ({ change }) => {
+    if (typeof change === 'string') return <li className="change-row"><span className="change-detail">{change}</span></li>
+    return (
+      <li className="change-row">
+        <span className="change-section-tag">{sectionLabel(change.section, lang)}</span>
+        <span className="change-detail">{change.detail}</span>
+      </li>
+    )
   }
 
   return (
     <div className="plan-viewer-layout">
       {isDirty && (
         <div className="unsaved-banner" role="status">
-          <IconSave width={15} height={15} className="unsaved-banner-icon" />
-          <div className="unsaved-banner-text">
-            <span>{t(lang, 'app.justModified')(formatChangeItem(pendingChanges[pendingChanges.length - 1]))}</span>
-            {pendingChanges.length > 1 && (
-              <span className="unsaved-banner-extra">{t(lang, 'app.pendingChangesExtra')(pendingChanges.length - 1)}</span>
-            )}
+          <div className="unsaved-banner-head">
+            <IconSave width={15} height={15} className="unsaved-banner-icon" />
+            <span className="unsaved-banner-title">{t(lang, 'app.pendingChangesTitle')(pendingChanges.length)}</span>
+            <button className="unsaved-banner-save" onClick={handleSave}>{t(lang, 'app.save')}</button>
           </div>
-          <button className="unsaved-banner-save" onClick={handleSave}>{t(lang, 'app.save')}</button>
+          <ul className="change-list">
+            {pendingChanges.map(change => <ChangeRow key={change.key} change={change} />)}
+          </ul>
         </div>
       )}
       <PlanSidebar lang={lang} onNewPlan={handleNewPlanClick} />
@@ -234,16 +268,16 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             ) : plan.changeLog?.length ? (
               <div className="plan-changelog">
                 <p className="plan-changelog-heading">{t(lang, 'outputs.lastChangesTitle')}</p>
-                <ul className={showFullChangeLog ? 'plan-changelog-full' : ''}>
+                <div className={showFullChangeLog ? 'plan-changelog-full' : ''}>
                   {(showFullChangeLog ? plan.changeLog : plan.changeLog.slice(0, 3)).map((entry, i) => (
-                    <li key={i}>
+                    <div className="plan-changelog-group" key={i}>
                       <span className="plan-changelog-date">{formatFullDateTime(entry.date, lang)}</span>
-                      <ul className="plan-changelog-details">
-                        {(entry.changes || entry.sections || []).map((change, j) => <li key={j}>{formatChangeItem(change)}</li>)}
+                      <ul className="change-list">
+                        {(entry.changes || entry.sections || []).map((change, j) => <ChangeRow key={j} change={change} />)}
                       </ul>
-                    </li>
+                    </div>
                   ))}
-                </ul>
+                </div>
                 {plan.changeLog.length > 3 && (
                   <button className="plan-changelog-toggle" onClick={() => setShowFullChangeLog(v => !v)}>
                     {showFullChangeLog ? t(lang, 'outputs.hideFullChangeLog') : t(lang, 'outputs.showFullChangeLog')(plan.changeLog.length)}
@@ -339,8 +373,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.execution')}</h2>
         <div id="section-calendar" className="plan-section-anchor"><CalendarView plan={plan} roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} launchDate={plan.launchDate} marketing={plan.marketing} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} planStartDate={plan.planStartDate || plan.generatedAt} onPlanStartDateChange={updatePlanStartDate} onRoadmapChange={updateRoadmap} /></div>
-        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmap} jira={plan.jira} plan={plan} userId={userId} onNotionStoriesSynced={updateNotion} /></div>
-        <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmap} /></div>
+        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} onNotionStoriesSynced={updateNotion} /></div>
+        <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmapFromGantt} /></div>
         <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>

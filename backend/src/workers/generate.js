@@ -7,14 +7,7 @@ import { generatePlanWithAI } from '../lib/ai/client'
 import { recordUsage } from '../lib/ai/usageTracker'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import * as db from '../lib/db'
-import { handleApi } from './api'
-
-const CORS_HEADERS = {
-  'Content-Type': 'application/json',
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type'
-}
+import { handleApi, CORS_HEADERS } from './api'
 
 function generateWithRules(data, lang) {
   const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
