@@ -130,6 +130,11 @@ export default function AccountPage({ lang, onBack, onLoadPlan }) {
                 <button className="account-list-item-main" onClick={() => onLoadPlan(p)}>
                   <span className="account-list-item-name">{p.product?.name}</span>
                   <span className="account-list-item-meta">{p.classification}</span>
+                  <span className="plan-origin-tag">
+                    <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
+                    {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
+                    {p.createdByName && ` · ${p.createdByName}`}
+                  </span>
                 </button>
                 {canMoveOut && moveTargets.length > 0 && (
                   <button className="account-list-item-move" onClick={() => setMovePlanTarget(p)} title={t(lang, 'plans.move')}>

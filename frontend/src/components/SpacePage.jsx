@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
-import { useTeam } from '../lib/auth'
+import { useTeam, useUser } from '../lib/auth'
 import { getAllPlans, deletePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
@@ -24,6 +24,7 @@ function byRecency(a, b) {
 // partagé (équipe).
 export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory }) {
   const team = useTeam()
+  const { user } = useUser()
   const isTeam = !!team.teamId
   const [plans, setPlans] = useState(getAllPlans)
   const [drafts, setDrafts] = useState(isTeam ? [] : getAllDrafts)
@@ -76,6 +77,8 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                 {(team.teamName || '?').trim().charAt(0).toUpperCase()}
               </span>
             )
+          ) : user?.imageUrl ? (
+            <img className="space-page-avatar" src={user.imageUrl} alt="" />
           ) : (
             <span className="space-page-avatar space-page-avatar-personal"><IconUser width={20} height={20} /></span>
           )}
@@ -138,6 +141,11 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                 <button className="account-list-item-main" onClick={() => onLoadPlan(p)}>
                   <span className="account-list-item-name">{p.product?.name}</span>
                   <span className="account-list-item-meta">{p.classification}</span>
+                  <span className="plan-origin-tag">
+                    <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
+                    {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
+                    {p.createdByName && ` · ${p.createdByName}`}
+                  </span>
                 </button>
                 <button className="account-list-item-delete" onClick={() => setDeleteTarget(p)} title="Delete">
                   <IconTrash width={14} height={14} />

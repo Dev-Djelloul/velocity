@@ -16,13 +16,24 @@ let activeTeamId = null
 // chaque composant qui peut supprimer un plan ; seul deletePlan() en a besoin.
 let activeRole = null
 
+// Nom de l'équipe active et de l'auteur courant — utilisés uniquement pour figer une
+// origine lisible sur chaque plan à sa création (voir savePlan). Contrairement à team_id,
+// jamais réécrits après coup : un plan déplacé garde la trace de where/qui l'a créé.
+let activeTeamName = null
+let activeCreatorName = null
+
 export function setActiveUser(userId) {
   activeUserId = userId
 }
 
-export function setActiveTeam(teamId, role) {
+export function setActiveTeam(teamId, role, teamName) {
   activeTeamId = teamId || null
   activeRole = teamId ? (role || null) : null
+  activeTeamName = teamId ? (teamName || null) : null
+}
+
+export function setActiveCreator(name) {
+  activeCreatorName = name || null
 }
 
 // Clé scopée par utilisateur ET par espace actif (personnel vs équipe) — sans ça, tous
@@ -43,6 +54,12 @@ export function savePlan(plan) {
     // team_id ne se fixe qu'à la création : un plan reste dans l'espace où il est né,
     // même si on change d'équipe active avant un enregistrement ultérieur.
     team_id: isNew ? activeTeamId : (plan.team_id ?? null),
+    // Origine figée pour toujours, y compris à travers un déplacement d'espace (qui lui
+    // modifie team_id) — sans ça, impossible de savoir après coup qui a créé un plan et
+    // dans quel espace, une fois qu'il a changé de main.
+    createdSpaceId: isNew ? activeTeamId : (plan.createdSpaceId !== undefined ? plan.createdSpaceId : (plan.team_id ?? null)),
+    createdSpaceName: isNew ? activeTeamName : (plan.createdSpaceName ?? null),
+    createdByName: isNew ? activeCreatorName : (plan.createdByName ?? null),
     savedAt: plan.savedAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }

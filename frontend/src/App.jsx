@@ -23,7 +23,7 @@ import { PricingModal, ChangelogModal, RoadmapModal } from './components/Product
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, syncPlansFromServer, generateId } from './lib/planStorage'
+import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
@@ -214,9 +214,10 @@ export default function App() {
   // team.teamId valant alors null (espace personnel) le temps que Clerk charge l'org active.
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !userId || !team.isLoaded) return
-    setPlanActiveTeam(team.teamId, team.role)
+    setPlanActiveTeam(team.teamId, team.role, team.teamName)
+    setPlanActiveCreator(user?.fullName || user?.firstName || null)
     syncPlansFromServer(userId, team.teamId).then(() => setDataVersion(v => v + 1))
-  }, [isLoaded, isSignedIn, userId, team.teamId, team.role, team.isLoaded])
+  }, [isLoaded, isSignedIn, userId, team.teamId, team.role, team.teamName, team.isLoaded, user])
 
   // Retour depuis Stripe Checkout : le webhook a normalement déjà activé le Pro
   // côté serveur, on resynchronise le cache local et on nettoie l'URL.
@@ -501,6 +502,8 @@ export default function App() {
                   >
                     {team.teamId ? (
                       <TeamAvatar id={team.teamId} name={team.teamName} imageUrl={team.teamImageUrl} className="header-space-btn-avatar" />
+                    ) : user?.imageUrl ? (
+                      <img className="header-space-avatar header-space-btn-avatar" src={user.imageUrl} alt="" />
                     ) : (
                       <span className="header-space-avatar header-space-btn-avatar header-space-avatar-personal">
                         <IconUser width={12} height={12} />
@@ -527,9 +530,13 @@ export default function App() {
                         disabled={switchingSpace}
                         onClick={() => switchSpace(null)}
                       >
-                        <span className="header-space-avatar header-space-avatar-personal">
-                          <IconUser width={13} height={13} />
-                        </span>
+                        {user?.imageUrl ? (
+                          <img className="header-space-avatar" src={user.imageUrl} alt="" />
+                        ) : (
+                          <span className="header-space-avatar header-space-avatar-personal">
+                            <IconUser width={13} height={13} />
+                          </span>
+                        )}
                         <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
                         {!team.teamId && <IconCheckCircle width={14} height={14} className="header-space-check" />}
                       </button>

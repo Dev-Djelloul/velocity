@@ -226,6 +226,31 @@
   color: var(--color-text-muted);
 }
 
+.plan-origin-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-top: 0.1rem;
+}
+
+.plan-origin-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.plan-origin-dot.is-team {
+  background: var(--color-primary);
+}
+
+.plan-origin-dot.is-personal {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 .account-list-item-delete {
   flex-shrink: 0;
   background: none;
