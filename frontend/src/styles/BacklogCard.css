@@ -37,6 +37,18 @@
 .backlog-notion-sync-link:hover:not(:disabled) { color: var(--color-accent-light, #a89fe8); }
 .backlog-notion-sync-link:disabled { opacity: 0.6; cursor: default; }
 
+.export-pro-badge {
+  display: inline-block;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.08rem 0.35rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  vertical-align: middle;
+}
+
 .backlog-notion-sync-error { color: #f59e0b; }
 
 .backlog-filters {

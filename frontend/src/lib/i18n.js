@@ -969,11 +969,7 @@ export const translations = {
       timezoneAuto: 'Automatique (fuseau de cet appareil)',
       accessibilityTitle: 'Accessibilité',
       reduceMotionLabel: 'Réduire les animations',
-      reduceMotionBody: 'Désactive les transitions et animations décoratives dans toute l\'application.',
-      devicesTitle: 'Sécurité & appareils',
-      devicesBody: 'Mot de passe, double authentification et appareils actuellement connectés à ton compte.',
-      devicesCta: 'Gérer les appareils actifs',
-      devicesUnavailable: 'Indisponible en mode démo (aucune clé Clerk configurée).'
+      reduceMotionBody: 'Désactive les transitions et animations décoratives dans toute l\'application.'
     }
   },
   en: {
@@ -1941,11 +1937,7 @@ export const translations = {
       timezoneAuto: "Automatic (this device's timezone)",
       accessibilityTitle: 'Accessibility',
       reduceMotionLabel: 'Reduce motion',
-      reduceMotionBody: 'Turns off decorative transitions and animations across the app.',
-      devicesTitle: 'Security & devices',
-      devicesBody: 'Password, two-factor auth, and devices currently signed in to your account.',
-      devicesCta: 'Manage active devices',
-      devicesUnavailable: 'Unavailable in demo mode (no Clerk key configured).'
+      reduceMotionBody: 'Turns off decorative transitions and animations across the app.'
     }
   }
 }

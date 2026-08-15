@@ -9,7 +9,7 @@ import '../styles/BacklogCard.css'
 const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
 const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
 
-export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, onNotionStoriesSynced, teamMembers }) {
+export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, isPro, onRequestUpgrade, onNotionStoriesSynced, teamMembers }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [myTasksOnly, setMyTasksOnly] = useState(false)
@@ -38,6 +38,7 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
   }
 
   const handleNotionSync = async () => {
+    if (!isPro) { onRequestUpgrade?.(); return }
     if (!userId) { setNotionMsg(t(lang, 'export.notionSignIn')); setNotionState('error'); return }
     setNotionState('working'); setNotionMsg('')
     try {
@@ -135,7 +136,7 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
           {t(lang, 'backlog.subtitle')(doneCount, allStories.length)}
           {' · '}
           <button className="backlog-notion-sync-link" onClick={handleNotionSync} disabled={notionState === 'working' || notionState === 'connecting'}>
-            <img src="/assets/icons/icons8-notion-32.png" alt="" width={12} height={12} /> {notionSyncLabel}
+            <img src="/assets/icons/icons8-notion-32.png" alt="" width={12} height={12} /> {notionSyncLabel} {!isPro && <span className="export-pro-badge">PRO</span>}
           </button>
           {notionState === 'error' && notionMsg && <span className="backlog-notion-sync-error"> — {notionMsg}</span>}
         </p>

@@ -361,6 +361,28 @@
   gap: 0.75rem;
 }
 
+.account-pro-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-md, 10px);
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-secondary), var(--color-bg-secondary)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  color: var(--color-text-primary);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: filter 0.15s ease, transform 0.15s ease;
+}
+
+.account-pro-cta:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
 .account-notif-item {
   display: flex;
   flex-direction: column;

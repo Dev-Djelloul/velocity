@@ -218,9 +218,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     setPendingChanges([])
     setJustSaved(true)
     setTimeout(() => setJustSaved(false), 2500)
-    // Remonte en haut de page après l'enregistrement, pour repartir d'une vue propre
-    // plutôt que de rester scrollé loin en bas de l'édition qu'on vient de faire.
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   // Efface le journal des modifications (pas le plan lui-même) — action immédiate une fois
@@ -400,7 +397,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.execution')}</h2>
         <div id="section-calendar" className="plan-section-anchor"><CalendarView plan={plan} roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} launchDate={plan.launchDate} marketing={plan.marketing} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} planStartDate={plan.planStartDate || plan.generatedAt} onPlanStartDateChange={updatePlanStartDate} onRoadmapChange={updateRoadmap} /></div>
-        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} onNotionStoriesSynced={updateNotion} teamMembers={team.teamId ? team.members : []} /></div>
+        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} isPro={isPro} onRequestUpgrade={onRequestUpgrade} onNotionStoriesSynced={updateNotion} teamMembers={team.teamId ? team.members : []} /></div>
         <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmapFromGantt} /></div>
         <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 

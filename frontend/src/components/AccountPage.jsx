@@ -201,10 +201,14 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
               </div>
               <span>{t(lang, 'account.creditsFree')(used, FREE_PLAN_LIMIT)}</span>
             </div>
-            {remaining === 0 && <p className="credits-exhausted">{t(lang, 'account.creditsExhausted')}</p>}
-            <button className="btn-primary upgrade-btn" onClick={() => setShowUpgrade(true)}>
-              <IconRocket width={14} height={14} /> {t(lang, 'account.upgradeCta')}
-            </button>
+            {remaining === 0 && (
+              <>
+                <p className="credits-exhausted">{t(lang, 'account.creditsExhausted')}</p>
+                <button className="account-pro-cta" onClick={() => setShowUpgrade(true)}>
+                  <IconRocket width={14} height={14} /> {t(lang, 'account.upgradeCta')}
+                </button>
+              </>
+            )}
           </>
         )}
       </div>
@@ -225,7 +229,9 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
         {!pro ? (
           <div className="account-locked-teaser">
             <p className="account-empty">{t(lang, 'account.notificationsProNote')}</p>
-            <button className="btn-secondary" onClick={() => setShowUpgrade(true)}>{t(lang, 'account.upgradeCta')}</button>
+            <button className="account-pro-cta" onClick={() => setShowUpgrade(true)}>
+              <IconRocket width={14} height={14} /> {t(lang, 'account.upgradeCta')}
+            </button>
           </div>
         ) : visibleNotifications.length === 0 ? (
           <p className="account-empty">{lang === 'fr' ? 'Aucune notification pour le moment.' : 'No notifications yet.'}</p>
