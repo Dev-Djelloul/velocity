@@ -1,0 +1,67 @@
+// Intégration Clerk côté serveur : vérification des webhooks (format Svix) + appels
+// à la Backend API pour appliquer les limites d'espaces d'équipe par plan (voir
+// TEAM_SPACE_LIMITS côté frontend, frontend/src/lib/pricingTiers.js — dupliqué ici
+// volontairement plutôt que partagé, un Worker et un bundle Vite n'important pas
+// le même graphe de modules).
+export const TEAM_SPACE_LIMITS = { free: 1, pro: 5 }
+
+const CLERK_API = 'https://api.clerk.com/v1'
+
+// Vérifie la signature Svix d'un webhook Clerk (HMAC SHA-256, secret base64 préfixé
+// "whsec_"). Contenu signé : "{svix-id}.{svix-timestamp}.{payload brut}". L'en-tête
+// svix-signature peut porter plusieurs versions séparées par des espaces ("v1,xxx v1,yyy") ;
+// une seule doit matcher.
+export async function verifyClerkWebhook(payload, headers, secret) {
+  const svixId = headers.get('svix-id')
+  const svixTimestamp = headers.get('svix-timestamp')
+  const svixSignature = headers.get('svix-signature')
+  if (!svixId || !svixTimestamp || !svixSignature || !secret) return false
+
+  const secretBytes = base64Decode(secret.replace(/^whsec_/, ''))
+  const key = await crypto.subtle.importKey('raw', secretBytes, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign'])
+  const signedContent = `${svixId}.${svixTimestamp}.${payload}`
+  const sigBuffer = await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(signedContent))
+  const expected = base64Encode(new Uint8Array(sigBuffer))
+
+  return svixSignature.split(' ').some(part => {
+    const [, sig] = part.split(',')
+    return sig === expected
+  })
+}
+
+function base64Decode(b64) {
+  const bin = atob(b64)
+  const bytes = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
+  return bytes
+}
+
+function base64Encode(bytes) {
+  let bin = ''
+  for (const b of bytes) bin += String.fromCharCode(b)
+  return btoa(bin)
+}
+
+async function clerkRequest(env, path, options = {}) {
+  const res = await fetch(`${CLERK_API}${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${env.CLERK_SECRET_KEY}`,
+      'Content-Type': 'application/json',
+      ...options.headers
+    }
+  })
+  if (!res.ok) throw new Error(`Clerk API ${path} failed: ${res.status}`)
+  return res.status === 204 ? null : res.json()
+}
+
+// Toutes les organisations (espaces d'équipe) dont l'utilisateur est membre, tous rôles
+// confondus — reflète ce que le switcher d'espace affiche côté client (team.myTeams).
+export async function listUserOrganizationMemberships(env, userId) {
+  const data = await clerkRequest(env, `/users/${userId}/organization_memberships?limit=100`)
+  return data?.data || []
+}
+
+export async function deleteOrganization(env, organizationId) {
+  await clerkRequest(env, `/organizations/${organizationId}`, { method: 'DELETE' })
+}

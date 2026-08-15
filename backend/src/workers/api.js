@@ -1,5 +1,6 @@
 import * as db from '../lib/db'
 import { createCheckoutSession, verifyWebhookSignature } from '../lib/stripe'
+import { verifyClerkWebhook, listUserOrganizationMemberships, deleteOrganization, TEAM_SPACE_LIMITS } from '../lib/clerk'
 import { generateTableWithAI } from '../lib/ai/tableClient'
 import { generateTableFromPrompt } from '../lib/generator/tableFallback'
 import { generateVeilleWithAI } from '../lib/ai/veilleClient'
@@ -499,6 +500,41 @@ export async function handleApi(request, env, url) {
       const subscription = event.data.object
       const userId = await db.findUserIdByStripeCustomer(env, subscription.customer)
       if (userId) await db.setPro(env, userId, false, subscription.customer)
+    }
+
+    return json({ received: true })
+  }
+
+  // Webhook Clerk : applique côté serveur la limite d'espaces d'équipe par plan (le
+  // bouton "Créer une équipe" bloque déjà côté client, mais rien n'empêchait jusqu'ici
+  // d'appeler l'API Clerk directement pour la contourner). Réagit à organization.created
+  // uniquement — rejoindre une équipe via invitation n'est pas limité, on ne pénalise pas
+  // quelqu'un pour un espace qu'il n'a pas créé lui-même.
+  if (pathname === '/webhooks/clerk' && method === 'POST') {
+    const payload = await request.text()
+    if (!(await verifyClerkWebhook(payload, request.headers, env.CLERK_WEBHOOK_SECRET))) {
+      return json({ error: 'invalid signature' }, 400)
+    }
+
+    const event = JSON.parse(payload)
+
+    if (event.type === 'organization.created') {
+      const org = event.data
+      const creatorId = org.created_by
+      if (creatorId && env.CLERK_SECRET_KEY) {
+        try {
+          const isPro = (await db.getCredits(env, creatorId)).isPro
+          const limit = isPro ? TEAM_SPACE_LIMITS.pro : TEAM_SPACE_LIMITS.free
+          const memberships = await listUserOrganizationMemberships(env, creatorId)
+          if (memberships.length > limit) {
+            await deleteOrganization(env, org.id)
+          }
+        } catch (err) {
+          // Best-effort : une erreur d'appel Clerk (clé mal configurée, API indisponible)
+          // ne doit pas faire échouer le webhook — Clerk réessaierait indéfiniment sinon.
+          console.error('clerk webhook: team limit check failed', err)
+        }
+      }
     }
 
     return json({ received: true })
