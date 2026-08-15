@@ -6,7 +6,7 @@ import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
-import { getReadIds, markCommentsRead } from '../lib/commentReads'
+import { getReadIds, markCommentsRead, getDismissedIds, dismissComments } from '../lib/commentReads'
 import { getPersonalSpace } from '../lib/personalSpace'
 import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconMessageCircle } from './Icons'
 
@@ -37,15 +37,27 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   const [checkoutError, setCheckoutError] = useState(false)
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
+  const [showClearNotifs, setShowClearNotifs] = useState(false)
 
   const pro = isPro(userId)
   const readIds = getReadIds(userId)
-  const unreadNotifications = notifications.filter(n => !readIds.has(n.id)).length
+  const dismissedIds = getDismissedIds(userId)
+  const visibleNotifications = notifications.filter(n => !dismissedIds.has(n.id))
+  const unreadNotifications = visibleNotifications.filter(n => !readIds.has(n.id)).length
 
   const openNotification = (item) => {
     markCommentsRead(userId, [item.id])
     setReadVersion(v => v + 1)
     onOpenNotification?.(item)
+  }
+
+  // "Tout effacer" ne supprime jamais le commentaire réel (visible côté plan) — seulement
+  // sa présence dans CE flux de notifications, pour repartir d'une liste vide quand elle
+  // devient trop longue à parcourir.
+  const clearAllNotifications = () => {
+    dismissComments(userId, visibleNotifications.map(n => n.id))
+    setReadVersion(v => v + 1)
+    setShowClearNotifs(false)
   }
 
   // Polling léger (toutes les 45s tant que cette page est ouverte) : va chercher côté
@@ -198,21 +210,28 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       </div>
 
       <div className="account-section card" id="account-notifications">
-        <h3>
-          <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
-          {!pro && <span className="export-pro-badge">PRO</span>}
-          {pro && unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}
+        <h3 className="account-section-title-row">
+          <span>
+            <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
+            {!pro && <span className="export-pro-badge">PRO</span>}
+            {pro && unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}
+          </span>
+          {pro && visibleNotifications.length > 0 && (
+            <button className="account-clear-btn" onClick={() => setShowClearNotifs(true)}>
+              {t(lang, 'account.clearNotifications')}
+            </button>
+          )}
         </h3>
         {!pro ? (
           <div className="account-locked-teaser">
             <p className="account-empty">{t(lang, 'account.notificationsProNote')}</p>
             <button className="btn-secondary" onClick={() => setShowUpgrade(true)}>{t(lang, 'account.upgradeCta')}</button>
           </div>
-        ) : notifications.length === 0 ? (
+        ) : visibleNotifications.length === 0 ? (
           <p className="account-empty">{lang === 'fr' ? 'Aucune notification pour le moment.' : 'No notifications yet.'}</p>
         ) : (
           <div className="account-list">
-            {notifications.slice(0, 8).map(item => (
+            {visibleNotifications.slice(0, 8).map(item => (
               <button
                 key={item.id}
                 className={`account-notif-item ${readIds.has(item.id) ? '' : 'is-unread'}`}
@@ -308,6 +327,20 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       )}
 
       {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
+
+      {showClearNotifs && (
+        <div className="confirm-modal-backdrop" onClick={() => setShowClearNotifs(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>{t(lang, 'account.clearNotificationsConfirmTitle')}</h3>
+            <p>{t(lang, 'account.clearNotificationsConfirmBody')}</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setShowClearNotifs(false)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-danger" onClick={clearAllNotifications}>{t(lang, 'account.clearNotifications')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {deletePlanTarget && (
         <div className="confirm-modal-backdrop" onClick={() => setDeletePlanTarget(null)}>

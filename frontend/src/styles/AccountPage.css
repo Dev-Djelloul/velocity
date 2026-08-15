@@ -143,6 +143,28 @@
   margin-bottom: 0.85rem;
 }
 
+.account-section-title-row {
+  justify-content: space-between;
+}
+
+.account-section-title-row > span {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.account-clear-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  text-decoration: underline;
+}
+
+.account-clear-btn:hover { color: var(--color-text-primary); }
+
 .credits-pro {
   color: var(--color-success);
   font-weight: var(--font-weight-semibold);

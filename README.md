@@ -35,6 +35,9 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 - **Historique & brouillons** — tous les plans générés sont sauvegardés localement (`localStorage`) et consultables depuis "Mes plans" ; les réponses en cours peuvent être sauvegardées comme brouillon nommé.
 - **Bilingue FR / EN** — interface, contenu généré et documents exportés s'adaptent à la langue choisie.
 - **Compte & crédits** — connexion via Clerk (Google, Apple, Slack ou email), quota de plans gratuits par utilisateur, passage en illimité via un abonnement Stripe.
+- **Espaces d'équipe** — organisations Clerk : espace personnel + équipes (invitations, rôles), plans déplaçables entre espaces, historique et notifications de commentaires partagés. Limite d'espaces par plan (1 Gratuit / 5 Pro / illimité Entreprise), appliquée côté interface et côté serveur via un webhook Clerk.
+- **Tarification à 3 offres** — Gratuit, Pro (mensuel ou annuel, checkout Stripe) et Entreprise (sur devis, formulaire de contact). PPTX, intégrations Notion/Jira/GitHub, historique multi-espaces et notifications d'équipe réservés à Pro.
+- **Page Paramètres** — thème clair/sombre, langue, fuseau horaire (appliqué aux dates affichées), réduction des animations, accès aux appareils actifs et à la sécurité du compte (panneau natif Clerk).
 - **Intégrations Notion, Jira et GitHub** — connexion OAuth par utilisateur, export d'une page Notion structurée (roadmap + calendrier éditorial/pub unifiés), création d'Epics/Stories Jira et d'issues/milestones GitHub à partir du plan, avec synchronisation bidirectionnelle idempotente.
 
 ## Stack technique
@@ -43,8 +46,8 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 |---|---|
 | Frontend | React 18 + Vite, React Router (URLs propres par page), CSS custom (pas de framework UI) |
 | Backend | Cloudflare Workers (JavaScript, sans framework) |
-| Authentification | Clerk (Google, Apple, Slack, email) — mode démo local (session simulée) si aucune clé n'est configurée |
-| Paiement | Stripe (abonnement Pro récurrent) |
+| Authentification | Clerk (Google, Apple, Slack, email) + Organizations (espaces d'équipe) — mode démo local (session + équipe simulées) si aucune clé n'est configurée |
+| Paiement | Stripe (abonnement Pro récurrent, mensuel ou annuel) |
 | Base de données | Cloudflare D1 (comptes, crédits, tokens OAuth Notion/Jira/GitHub) |
 | Tâches asynchrones | Cloudflare Queues (agents IA) |
 | Intégrations tierces | Notion, Jira, GitHub — OAuth + API REST propres à chaque provider |
@@ -81,7 +84,7 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 
 Le frontend fonctionne **de manière autonome** sans backend configuré : `VITE_BACKEND_URL` est optionnelle. Sans elle (ou si l'appel échoue), le même moteur à règles tourne directement dans le navigateur (`frontend/src/lib/planGenerator.js`), garantissant un résultat instantané en toutes circonstances.
 
-Le schéma ci-dessus couvre le flux de génération. Le Worker gère aussi, indépendamment : l'authentification et les crédits (Clerk + D1), les abonnements Pro (webhooks Stripe), et les connexions OAuth par utilisateur vers Notion, Jira et GitHub (export et synchronisation du plan).
+Le schéma ci-dessus couvre le flux de génération. Le Worker gère aussi, indépendamment : l'authentification et les crédits (Clerk + D1), les abonnements Pro (webhooks Stripe), les connexions OAuth par utilisateur vers Notion, Jira et GitHub (export et synchronisation du plan), et l'application côté serveur de la limite d'espaces d'équipe par plan (webhook Clerk sur `organization.created`, voir `backend/src/lib/clerk.js`).
 
 ## Démarrage rapide
 
@@ -139,6 +142,8 @@ VITE_CLERK_PUBLISHABLE_KEY=
 VITE_STRIPE_PRICE_ID=
 ```
 
+Le prix Stripe **annuel** (bascule "Annuel" de la grille tarifaire) est configuré uniquement côté serveur — voir `STRIPE_PRICE_ID_YEARLY` ci-dessous. Sans lui, le checkout retombe silencieusement sur le prix mensuel.
+
 ### Backend (secrets Wrangler)
 
 ```bash
@@ -152,7 +157,10 @@ npx wrangler secret put OPENROUTER_API_KEY
 | `AI_MODEL` | Non | Modèle OpenRouter à utiliser (voir `wrangler.toml` > `[vars]` pour la valeur par défaut). |
 | `STRIPE_SECRET_KEY` | Pour le paiement | Clé secrète Stripe. |
 | `STRIPE_WEBHOOK_SECRET` | Pour le paiement | Secret du endpoint webhook Stripe (activation du Pro après paiement). |
-| `STRIPE_PRICE_ID` | Pour le paiement | ID du prix Stripe côté serveur. |
+| `STRIPE_PRICE_ID` | Pour le paiement | ID du prix Stripe mensuel côté serveur. |
+| `STRIPE_PRICE_ID_YEARLY` | Optionnelle | ID du prix Stripe annuel. Sans elle, le checkout "Annuel" facture au tarif mensuel. |
+| `CLERK_SECRET_KEY` | Pour les espaces d'équipe | Clé secrète Clerk (Backend API) — sert à compter les organisations d'un utilisateur et à en supprimer une en trop lors du webhook `organization.created`. |
+| `CLERK_WEBHOOK_SECRET` | Pour les espaces d'équipe | Secret de signature (Svix) du endpoint webhook Clerk. Endpoint à créer dans Clerk Dashboard → Webhooks, événement `organization.created`, URL `<votre-worker>/webhooks/clerk`. |
 | `NOTION_CLIENT_SECRET` | Pour l'intégration Notion | Secret de l'app OAuth Notion (`NOTION_CLIENT_ID` est en clair dans `wrangler.toml`). |
 | `JIRA_CLIENT_SECRET` | Pour l'intégration Jira | Secret de l'app OAuth Jira. |
 | `GITHUB_CLIENT_SECRET` | Pour l'intégration GitHub | Secret de l'app OAuth GitHub. |
@@ -205,7 +213,8 @@ velocity/
 │       └── lib/
 │           ├── ai/              # Client OpenRouter, schéma de sortie, brand voice
 │           ├── generator/       # Moteur à règles (roadmap, marketing, KPIs, financier)
-│           ├── stripe.js        # Abonnement Pro (webhooks)
+│           ├── stripe.js        # Abonnement Pro (checkout mensuel/annuel, webhooks)
+│           ├── clerk.js         # Webhook Clerk (Svix) + Backend API — limite d'espaces d'équipe par plan
 │           ├── notion/          # Export Notion (OAuth + API)
 │           ├── jira/            # Sync Jira (OAuth + API)
 │           └── github/          # Sync GitHub (OAuth + API)

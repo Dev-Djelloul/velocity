@@ -1,5 +1,6 @@
 import { t } from '../lib/i18n'
-import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings } from './Icons'
+import { useOpenSecurity } from '../lib/auth'
+import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings, IconSmartphone } from './Icons'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 
@@ -15,6 +16,8 @@ const COMMON_TIMEZONES = [
 ]
 
 export default function SettingsPage({ lang, theme, onToggleTheme, onChangeLang, timezone, onChangeTimezone, reduceMotion, onToggleReduceMotion, onBack }) {
+  const openSecurity = useOpenSecurity()
+
   return (
     <div className="account-page">
       <button className="account-back-btn" onClick={onBack}>
@@ -80,6 +83,16 @@ export default function SettingsPage({ lang, theme, onToggleTheme, onChangeLang,
             <span className="settings-switch-thumb" />
           </button>
         </div>
+      </div>
+
+      <div className="account-section card">
+        <h3><IconSmartphone width={16} height={16} /> {t(lang, 'settings.devicesTitle')}</h3>
+        <p className="account-security-note">{t(lang, 'settings.devicesBody')}</p>
+        {openSecurity ? (
+          <button className="btn-secondary" onClick={openSecurity}>{t(lang, 'settings.devicesCta')}</button>
+        ) : (
+          <p className="account-security-note">{t(lang, 'settings.devicesUnavailable')}</p>
+        )}
       </div>
     </div>
   )

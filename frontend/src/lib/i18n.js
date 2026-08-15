@@ -563,6 +563,21 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '15 août 2026',
+            title: 'Espaces d\'équipe, tarification Pro et page Paramètres',
+            items: [
+              'Transfert d\'un plan entre l\'espace personnel et une équipe (ou entre deux équipes), directement depuis Mon compte',
+              'Nouvelle grille tarifaire à 3 offres (Gratuit / Pro / Entreprise) avec bascule mensuel-annuel, remplaçant l\'ancienne modal Pro unique — Entreprise redirige vers le formulaire de contact plutôt qu\'un faux prix',
+              'Limites d\'espaces d\'équipe par plan (1 en Gratuit, 5 en Pro, illimité en Entreprise), appliquées côté interface et côté serveur via un webhook Clerk qui supprime toute organisation créée en trop',
+              'Export PPTX et intégrations Notion / Jira / GitHub réservés au plan Pro (badge PRO + vérification serveur)',
+              'Historique multi-espaces et notifications de commentaires d\'équipe réservés au plan Pro ; le gratuit garde un historique scopé à l\'espace actif',
+              'Nouvelle page Paramètres regroupant thème, langue, fuseau horaire (appliqué aux dates affichées), réduction des animations, et accès aux appareils actifs / sécurité du compte',
+              'Bouton "Tout effacer" sur les notifications de Mon compte',
+              'Correction des boutons de la modal "limite de plans gratuits atteinte" : chacun mène désormais au bon endroit (paiement Pro ou liste des plans) au lieu de renvoyer tous les deux au même endroit',
+              'Nouvelle police de titres (IBM Plex Sans), en complément d\'Inter pour le texte courant'
+            ]
+          },
+          {
             date: '14 août 2026',
             title: 'Modèles de plan par secteur',
             items: [
@@ -935,7 +950,10 @@ export const translations = {
       memberSince: 'Membre depuis',
       demoBadge: 'Compte démo',
       notificationsProNote: 'Les notifications de commentaires d\'équipe sont réservées au plan Pro.',
-      plansFreeNote: 'Historique limité à l\'espace actif. Passe en Pro pour voir tous tes espaces regroupés.'
+      plansFreeNote: 'Historique limité à l\'espace actif. Passe en Pro pour voir tous tes espaces regroupés.',
+      clearNotifications: 'Tout effacer',
+      clearNotificationsConfirmTitle: 'Effacer toutes les notifications ?',
+      clearNotificationsConfirmBody: 'Elles disparaîtront de cette liste (les commentaires restent visibles sur leurs plans). Action irréversible.'
     },
     settings: {
       title: 'Paramètres',
@@ -951,7 +969,11 @@ export const translations = {
       timezoneAuto: 'Automatique (fuseau de cet appareil)',
       accessibilityTitle: 'Accessibilité',
       reduceMotionLabel: 'Réduire les animations',
-      reduceMotionBody: 'Désactive les transitions et animations décoratives dans toute l\'application.'
+      reduceMotionBody: 'Désactive les transitions et animations décoratives dans toute l\'application.',
+      devicesTitle: 'Sécurité & appareils',
+      devicesBody: 'Mot de passe, double authentification et appareils actuellement connectés à ton compte.',
+      devicesCta: 'Gérer les appareils actifs',
+      devicesUnavailable: 'Indisponible en mode démo (aucune clé Clerk configurée).'
     }
   },
   en: {
@@ -1513,6 +1535,21 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: 'August 15, 2026',
+            title: 'Team spaces, Pro pricing and Settings page',
+            items: [
+              'Move a plan between your personal space and a team (or between two teams), right from My account',
+              'New 3-tier pricing grid (Free / Pro / Enterprise) with a monthly/yearly toggle, replacing the old single Pro modal — Enterprise now routes to the contact form instead of a made-up price',
+              'Per-plan team space limits (1 on Free, 5 on Pro, unlimited on Enterprise), enforced both in the UI and server-side via a Clerk webhook that deletes any organization created past the limit',
+              'PPTX export and Notion / Jira / GitHub integrations restricted to Pro (PRO badge + server-side check)',
+              'Cross-space history and team comment notifications restricted to Pro; Free keeps a history scoped to the active space',
+              'New Settings page bringing together theme, language, timezone (now applied to displayed dates), reduced motion, and access to active devices / account security',
+              '"Clear all" button on My account notifications',
+              'Fixed the "free plan limit reached" modal buttons: each now goes to the right place (Pro checkout or plan list) instead of both landing on the same spot',
+              'New heading font (IBM Plex Sans), paired with Inter for body text'
+            ]
+          },
+          {
             date: 'August 14, 2026',
             title: 'Sector-specific plan templates',
             items: [
@@ -1885,7 +1922,10 @@ export const translations = {
       memberSince: 'Member since',
       demoBadge: 'Demo account',
       notificationsProNote: 'Team comment notifications are a Pro feature.',
-      plansFreeNote: 'History limited to the active space. Upgrade to Pro to see all your spaces combined.'
+      plansFreeNote: 'History limited to the active space. Upgrade to Pro to see all your spaces combined.',
+      clearNotifications: 'Clear all',
+      clearNotificationsConfirmTitle: 'Clear all notifications?',
+      clearNotificationsConfirmBody: 'They\'ll disappear from this list (comments remain visible on their plans). This cannot be undone.'
     },
     settings: {
       title: 'Settings',
@@ -1901,7 +1941,11 @@ export const translations = {
       timezoneAuto: "Automatic (this device's timezone)",
       accessibilityTitle: 'Accessibility',
       reduceMotionLabel: 'Reduce motion',
-      reduceMotionBody: 'Turns off decorative transitions and animations across the app.'
+      reduceMotionBody: 'Turns off decorative transitions and animations across the app.',
+      devicesTitle: 'Security & devices',
+      devicesBody: 'Password, two-factor auth, and devices currently signed in to your account.',
+      devicesCta: 'Manage active devices',
+      devicesUnavailable: 'Unavailable in demo mode (no Clerk key configured).'
     }
   }
 }
