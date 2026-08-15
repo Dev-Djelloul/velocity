@@ -96,6 +96,7 @@ export default function App() {
   const [authIntent, setAuthIntent] = useState(null)
   const [pendingDemoData, setPendingDemoData] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
+  const [pendingAccountAction, setPendingAccountAction] = useState(null) // 'plans' | 'upgrade' | null
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [switchingSpace, setSwitchingSpace] = useState(false)
@@ -772,6 +773,8 @@ export default function App() {
             onBack={() => setCurrentPage('landing')}
             onLoadPlan={handleOpenPlanFromHistory}
             onOpenNotification={handleOpenNotification}
+            pendingAction={pendingAccountAction}
+            onConsumeAction={() => setPendingAccountAction(null)}
           />
         )}
         {currentPage === 'team' && isSignedIn && (
@@ -853,13 +856,13 @@ export default function App() {
           <div className="limit-modal-actions">
             <button
               className="btn-secondary"
-              onClick={() => { setShowLimitModal(false); setCurrentPage('account'); window.scrollTo(0, 0) }}
+              onClick={() => { setShowLimitModal(false); setPendingAccountAction('plans'); setCurrentPage('account'); window.scrollTo(0, 0) }}
             >
               {t(lang, 'account.limitModalManage')}
             </button>
             <button
               className="btn-primary"
-              onClick={() => { setShowLimitModal(false); setCurrentPage('account'); window.scrollTo(0, 0) }}
+              onClick={() => { setShowLimitModal(false); setPendingAccountAction('upgrade'); setCurrentPage('account'); window.scrollTo(0, 0) }}
             >
               {t(lang, 'account.upgradeCta')}
             </button>

@@ -18,7 +18,7 @@ const PROVIDER_ICONS = {
 import AvatarPicker from './AvatarPicker'
 import '../styles/AccountPage.css'
 
-export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotification }) {
+export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotification, pendingAction, onConsumeAction }) {
   const { user } = useUser()
   const { userId, signOut } = useAuth()
   const openSecurity = useOpenSecurity()
@@ -76,6 +76,23 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     refreshPlans()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId, teamIdsKey])
+
+  // Action différée demandée depuis ailleurs dans l'app (ex: la modal "limite de plans
+  // gratuits atteinte") — ouvrir directement la modal Pro, ou défiler jusqu'à la liste des
+  // plans, plutôt que de systématiquement atterrir en haut de la page (illisible : il
+  // fallait scroller soi-même pour comprendre où était passé le crédit consommé).
+  useEffect(() => {
+    if (!pendingAction) return
+    if (pendingAction === 'upgrade') {
+      setShowUpgrade(true)
+    } else if (pendingAction === 'plans') {
+      setTimeout(() => {
+        document.getElementById('account-plans')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      }, 80)
+    }
+    onConsumeAction?.()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingAction])
 
   // Le nom d'affichage d'un espace peut être celui actif (team.teamName) ou une autre
   // équipe dont on est membre (team.myTeams) — un plan de l'historique peut appartenir à
@@ -205,7 +222,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
         )}
       </div>
 
-      <div className="account-section card">
+      <div className="account-section card" id="account-plans">
         <h3><IconClipboard width={16} height={16} /> {t(lang, 'account.plansSectionTitle')}</h3>
         {plans.length === 0 ? (
           <p className="account-empty">{t(lang, 'account.noPlans')}</p>
