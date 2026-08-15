@@ -113,3 +113,14 @@ p {
 h1, h2, h3, h4, h5, h6 {
   line-height: 1.2;
 }
+
+/* Préférence utilisateur "Réduire les animations" (Paramètres) — désactive transitions et
+   animations décoratives dans toute l'app, en plus du respect natif de prefers-reduced-motion. */
+[data-reduce-motion="true"] *,
+[data-reduce-motion="true"] *::before,
+[data-reduce-motion="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

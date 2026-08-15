@@ -17,6 +17,7 @@ import AccountPage from './components/AccountPage'
 import TeamPage from './components/TeamPage'
 import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
+import SettingsPage from './components/SettingsPage'
 import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
 import { PricingModal, ChangelogModal, RoadmapModal } from './components/ProductModals'
@@ -28,13 +29,14 @@ import { collectRecentComments } from './lib/notifications'
 import { getReadIds } from './lib/commentReads'
 import { getPersonalSpace } from './lib/personalSpace'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
+import { getTimezone, setTimezone as persistTimezone } from './lib/dateFormat'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space']
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'settings']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -49,7 +51,8 @@ const PAGE_TO_PATH = {
   result: '/mon-plan',
   account: '/mon-compte',
   team: '/mon-equipe',
-  space: '/mon-espace'
+  space: '/mon-espace',
+  settings: '/parametres'
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
@@ -60,7 +63,8 @@ const PATH_TO_PAGE = {
   '/mon-plan': 'result',
   '/mon-compte': 'account',
   '/mon-equipe': 'team',
-  '/mon-espace': 'space'
+  '/mon-espace': 'space',
+  '/parametres': 'settings'
 }
 
 function pathForPage(page, authMode) {
@@ -73,6 +77,8 @@ export default function App() {
   const location = useLocation()
   const [lang, setLang] = useState(() => localStorage.getItem('plp_lang') || 'fr')
   const [theme, setTheme] = useState(() => localStorage.getItem('plp_theme') || 'dark')
+  const [timezone, setTimezone] = useState(() => getTimezone())
+  const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem('plp_reduce_motion') === '1')
   const [currentPage, setCurrentPage] = useState(() => PATH_TO_PAGE[window.location.pathname] || 'landing')
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
@@ -130,6 +136,15 @@ export default function App() {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('plp_theme', theme)
   }, [theme])
+
+  useEffect(() => {
+    persistTimezone(timezone)
+  }, [timezone])
+
+  useEffect(() => {
+    document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false'
+    localStorage.setItem('plp_reduce_motion', reduceMotion ? '1' : '0')
+  }, [reduceMotion])
 
   // Reflète currentPage/authMode dans l'URL (navigation interne -> barre d'adresse).
   useEffect(() => {
@@ -413,6 +428,11 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  const goToSettings = () => {
+    setCurrentPage('settings')
+    window.scrollTo(0, 0)
+  }
+
   const handleCreateTeam = async () => {
     const name = newTeamName.trim()
     // Garde-fou contre les double-soumissions (Entrée + clic, double-clic) : sans lui,
@@ -656,22 +676,10 @@ export default function App() {
                         <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
                         {unreadNotifCount > 0 && <span className="header-dropdown-item-badge">{unreadNotifCount}</span>}
                       </button>
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToSettings() }}>
+                        <IconSettings width={16} height={16} /> {t(lang, 'settings.title')}
+                      </button>
                       <div className="header-dropdown-divider" />
-
-                      {currentPage !== 'landing' && (
-                        <button
-                          className="header-dropdown-item"
-                          onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
-                        >
-                          {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
-                          {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
-                        </button>
-                      )}
-                      <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
-                      <div className="header-dropdown-lang">
-                        <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
-                        <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
-                      </div>
                       <div className="header-dropdown-divider" />
 
                       <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => { setOpenHeaderMenu(null); signOut() }}>
@@ -780,6 +788,19 @@ export default function App() {
             onOpenTeamSettings={() => { setCurrentPage('team'); window.scrollTo(0, 0) }}
             onSeeFullHistory={() => { setCurrentPage('account'); window.scrollTo(0, 0) }}
             onPersonalSpaceChange={() => setDataVersion(v => v + 1)}
+          />
+        )}
+        {currentPage === 'settings' && isSignedIn && (
+          <SettingsPage
+            lang={lang}
+            theme={theme}
+            onToggleTheme={() => setTheme(th => th === 'dark' ? 'light' : 'dark')}
+            onChangeLang={setLang}
+            timezone={timezone}
+            onChangeTimezone={setTimezone}
+            reduceMotion={reduceMotion}
+            onToggleReduceMotion={() => setReduceMotion(r => !r)}
+            onBack={() => setCurrentPage('landing')}
           />
         )}
       </main>

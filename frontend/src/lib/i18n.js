@@ -953,6 +953,22 @@ export const translations = {
       noDrafts: 'Aucun brouillon sauvegardé.',
       memberSince: 'Membre depuis',
       demoBadge: 'Compte démo'
+    },
+    settings: {
+      title: 'Paramètres',
+      backToApp: "Retour à l'app",
+      appearanceTitle: 'Apparence',
+      themeLabel: 'Thème',
+      themeDark: 'Sombre',
+      themeLight: 'Clair',
+      languageTitle: 'Langue',
+      languageBody: "Langue de l'interface et des plans générés.",
+      timezoneTitle: 'Fuseau horaire',
+      timezoneBody: 'Utilisé pour afficher les dates (historique, notifications, exports).',
+      timezoneAuto: 'Automatique (fuseau de cet appareil)',
+      accessibilityTitle: 'Accessibilité',
+      reduceMotionLabel: 'Réduire les animations',
+      reduceMotionBody: 'Désactive les transitions et animations décoratives dans toute l\'application.'
     }
   },
   en: {
@@ -1904,6 +1920,22 @@ export const translations = {
       noDrafts: 'No saved drafts.',
       memberSince: 'Member since',
       demoBadge: 'Demo account'
+    },
+    settings: {
+      title: 'Settings',
+      backToApp: 'Back to app',
+      appearanceTitle: 'Appearance',
+      themeLabel: 'Theme',
+      themeDark: 'Dark',
+      themeLight: 'Light',
+      languageTitle: 'Language',
+      languageBody: 'Language for the interface and generated plans.',
+      timezoneTitle: 'Timezone',
+      timezoneBody: 'Used to display dates (history, notifications, exports).',
+      timezoneAuto: "Automatic (this device's timezone)",
+      accessibilityTitle: 'Accessibility',
+      reduceMotionLabel: 'Reduce motion',
+      reduceMotionBody: 'Turns off decorative transitions and animations across the app.'
     }
   }
 }
