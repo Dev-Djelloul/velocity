@@ -153,37 +153,117 @@
 
 .plan-actions { display: flex; gap: 0.5rem; }
 
-.plan-new-btn {
+.plan-save-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
   border: 1.5px solid transparent;
-  background:
-    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
-    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
   border-radius: var(--border-radius-sm);
   padding: 0.55rem 1.1rem;
   font-family: inherit;
   font-size: var(--font-size-sm);
   font-weight: 600;
-  cursor: pointer;
-  transition: filter 0.15s ease;
+  transition: filter 0.15s ease, background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
 }
 
-.plan-new-btn:hover {
+/* Rien à enregistrer : indicateur discret, non cliquable — évite de tenter l'utilisateur
+   avec un bouton qui n'a rien à faire. */
+.plan-save-btn:not(.is-dirty):not(.just-saved) {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.12);
+  color: var(--color-text-muted);
+  cursor: default;
+  opacity: 0.75;
+}
+
+.plan-save-btn:not(.is-dirty):not(.just-saved) .plan-save-btn-icon {
+  color: var(--color-text-muted);
+}
+
+/* Changements en attente : même traitement visuel accrocheur que l'ancien bouton "Nouveau
+   plan" (bordure + texte en dégradé), pour signaler clairement qu'une action est possible. */
+.plan-save-btn.is-dirty {
+  background:
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  cursor: pointer;
+}
+
+.plan-save-btn.is-dirty:hover {
   filter: brightness(1.25);
 }
 
-.plan-new-btn-icon {
+.plan-save-btn.is-dirty .plan-save-btn-icon {
   color: #9184d9;
-  flex-shrink: 0;
 }
 
-.plan-new-btn-label {
+.plan-save-btn.is-dirty .plan-save-btn-label {
   background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Confirmation brève juste après le clic. */
+.plan-save-btn.just-saved {
+  background: rgba(74, 222, 128, 0.14);
+  border-color: rgba(74, 222, 128, 0.4);
+  color: var(--color-success);
+  cursor: default;
+}
+
+.plan-save-btn.just-saved .plan-save-btn-icon {
+  color: var(--color-success);
+}
+
+.plan-changelog {
+  margin-top: 0.15rem;
+}
+
+.plan-changelog-heading {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-text-muted) !important;
+  margin-bottom: 0.35rem !important;
+}
+
+.plan-changelog ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin: 0;
+  padding: 0;
+}
+
+.plan-changelog li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  font-size: var(--font-size-sm);
+}
+
+.plan-changelog-date {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+}
+
+.plan-changelog-sections {
+  color: var(--color-text-secondary);
+}
+
+.unsaved-changes-body {
+  color: var(--color-text-secondary);
+  margin-bottom: 1.25rem !important;
+}
+
+.unsaved-changes-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
 }
 
 .executive-summary.card {

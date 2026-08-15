@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import PlanSidebar from './PlanSidebar'
 import DashboardBI from './DashboardBI'
 import PersonaCard from './PersonaCard'
@@ -21,12 +21,13 @@ import AgentActivity from './AgentActivity'
 import PostLaunchTracking from './PostLaunchTracking'
 import WhatIfScenarios from './WhatIfScenarios'
 import ExportModal from './ExportModal'
+import InfoModal from './InfoModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
 import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconPlus } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -37,7 +38,26 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
+  const [changedSections, setChangedSections] = useState(new Set())
+  const [justSaved, setJustSaved] = useState(false)
+  const [confirmLeave, setConfirmLeave] = useState(false)
   const captureRef = useRef(null)
+
+  const isDirty = changedSections.size > 0
+
+  // Avertit avant de fermer/rafraîchir l'onglet s'il reste des modifications non
+  // enregistrées — les navigateurs ignorent le texte personnalisé et affichent leur
+  // propre message, mais le blocage lui-même fonctionne partout.
+  useEffect(() => {
+    if (!isDirty) return
+    const handler = (e) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [isDirty])
+
+  const markChanged = (section) => {
+    setChangedSections(prev => new Set(prev).add(section))
+  }
 
   const budgetKeyFor = (value) => {
     if (value <= 3500) return 'b2k'
@@ -59,66 +79,64 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     setDisabledChannels(prev => prev.includes(name) ? prev.filter(n => n !== name) : [...prev, name])
   }
 
+  // Éditions de contenu : mises à jour en mémoire seulement, l'enregistrement se fait
+  // explicitement via le bouton "Enregistrer" (voir handleSave) pour laisser la main à
+  // l'utilisateur — avant, chaque régénération (veille, benchmarks...) ou glisser-déposer
+  // écrasait silencieusement la version sauvegardée.
   const updateRoadmap = (nextRoadmap) => {
-    const nextPlan = { ...plan, roadmap: nextRoadmap }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, roadmap: nextRoadmap }))
+    markChanged('roadmap')
   }
 
   const updatePlanStartDate = (dateStr) => {
-    const nextPlan = { ...plan, planStartDate: dateStr + 'T00:00:00Z' }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, planStartDate: dateStr + 'T00:00:00Z' }))
+    markChanged('planStartDate')
   }
 
   const updateKpis = (nextKpis) => {
-    const nextPlan = { ...plan, kpis: nextKpis }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, kpis: nextKpis }))
+    markChanged('kpis')
   }
 
   const updateMetricsHistory = (nextHistory) => {
-    const nextPlan = { ...plan, metricsHistory: nextHistory }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, metricsHistory: nextHistory }))
+    markChanged('metrics')
   }
 
   const updateLaunchDate = (dateStr) => {
-    const nextPlan = { ...plan, launchDate: dateStr + 'T00:00:00Z' }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, launchDate: dateStr + 'T00:00:00Z' }))
+    markChanged('launchDate')
   }
 
   const updateVeille = (nextVeille) => {
-    const nextPlan = { ...plan, veille: nextVeille }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, veille: nextVeille }))
+    markChanged('veille')
   }
 
   const updateBenchmarks = (nextBenchmarks) => {
-    const nextPlan = { ...plan, benchmarks: nextBenchmarks }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, benchmarks: nextBenchmarks }))
+    markChanged('benchmarks')
   }
 
   const updateEditorial = (nextEditorial) => {
-    const nextPlan = { ...plan, editorial: nextEditorial }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, editorial: nextEditorial }))
+    markChanged('editorial')
   }
 
   const updateAdvertising = (nextAdvertising) => {
-    const nextPlan = { ...plan, advertising: nextAdvertising }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, advertising: nextAdvertising }))
+    markChanged('advertising')
   }
 
   const updateRgpd = (nextRgpd) => {
-    const nextPlan = { ...plan, rgpd: nextRgpd }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    setPlan(p => ({ ...p, rgpd: nextRgpd }))
+    markChanged('rgpd')
   }
 
+  // Jira/GitHub/Notion restent enregistrés immédiatement : ce ne sont pas des éditions de
+  // contenu mais des accusés de réception techniques (quelles issues/pages existent déjà
+  // côté provider) qui garantissent la synchronisation idempotente. Les laisser en attente
+  // d'un clic sur "Enregistrer" risquerait de recréer les mêmes issues en double.
   const updateJira = (nextJira) => {
     const nextPlan = { ...plan, jira: nextJira }
     setPlan(nextPlan)
@@ -145,11 +163,34 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     } catch { /* clipboard indisponible, on ignore silencieusement */ }
   }
 
+  const handleSave = () => {
+    if (!plan.id || !isDirty) return
+    const labels = t(lang, 'outputs.changeLogSectionLabels')
+    const sections = Array.from(changedSections).map(key => labels[key] || key)
+    const nextChangeLog = [
+      { date: new Date().toISOString(), sections },
+      ...(plan.changeLog || [])
+    ].slice(0, 10)
+    const savedPlan = savePlan({ ...plan, changeLog: nextChangeLog })
+    setPlan(savedPlan)
+    setChangedSections(new Set())
+    setJustSaved(true)
+    setTimeout(() => setJustSaved(false), 2500)
+  }
+
+  const handleNewPlanClick = () => {
+    if (isDirty) {
+      setConfirmLeave(true)
+      return
+    }
+    onReset()
+  }
+
   const generatedDateTime = formatFullDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
 
   return (
     <div className="plan-viewer-layout">
-      <PlanSidebar lang={lang} onNewPlan={onReset} />
+      <PlanSidebar lang={lang} onNewPlan={handleNewPlanClick} />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
@@ -158,7 +199,23 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </span>
           <div className="plan-confirmation-text">
             <h3>{justGenerated ? t(lang, 'outputs.planReadyTitle') : t(lang, 'outputs.planLoadedTitle')}</h3>
-            <p>{justGenerated ? t(lang, 'outputs.planReadySubtitle')(generatedDateTime) : t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
+            {justGenerated ? (
+              <p>{t(lang, 'outputs.planReadySubtitle')(generatedDateTime)}</p>
+            ) : plan.changeLog?.length ? (
+              <div className="plan-changelog">
+                <p className="plan-changelog-heading">{t(lang, 'outputs.lastChangesTitle')}</p>
+                <ul>
+                  {plan.changeLog.slice(0, 3).map((entry, i) => (
+                    <li key={i}>
+                      <span className="plan-changelog-date">{formatFullDateTime(entry.date, lang)}</span>
+                      <span className="plan-changelog-sections">{entry.sections.join(', ')}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <p>{t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
+            )}
           </div>
         </div>
       )}
@@ -204,9 +261,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         </div>
         <div className="plan-actions">
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
-          <button className="plan-new-btn" onClick={onReset}>
-            <IconPlus width={14} height={14} className="plan-new-btn-icon" />
-            <span className="plan-new-btn-label">{t(lang, 'app.newPlan')}</span>
+          <button
+            className={`plan-save-btn ${isDirty ? 'is-dirty' : ''} ${justSaved ? 'just-saved' : ''}`}
+            onClick={handleSave}
+            disabled={!isDirty}
+            title={isDirty ? t(lang, 'app.save') : t(lang, 'app.saved')}
+          >
+            {justSaved
+              ? <IconCheckCircle width={14} height={14} className="plan-save-btn-icon" />
+              : <IconSave width={14} height={14} className="plan-save-btn-icon" />}
+            <span className="plan-save-btn-label">
+              {justSaved ? t(lang, 'app.saved') : (isDirty ? t(lang, 'app.save') : t(lang, 'app.saved'))}
+            </span>
           </button>
         </div>
       </div>
@@ -264,6 +330,24 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
       {showExport && (
         <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} userId={userId} onClose={() => setShowExport(false)} captureRef={captureRef} onJiraExported={updateJira} onGithubExported={updateGithub} />
+      )}
+
+      {confirmLeave && (
+        <InfoModal
+          icon={<IconAlertTriangle width={22} height={22} />}
+          title={t(lang, 'app.unsavedChangesTitle')}
+          onClose={() => setConfirmLeave(false)}
+        >
+          <p className="unsaved-changes-body">{t(lang, 'app.unsavedChangesBody')}</p>
+          <div className="unsaved-changes-actions">
+            <button className="btn-secondary" onClick={() => { setConfirmLeave(false); onReset() }}>
+              {t(lang, 'app.discardChanges')}
+            </button>
+            <button className="btn-primary" onClick={() => { handleSave(); setConfirmLeave(false); onReset() }}>
+              {t(lang, 'app.saveAndContinue')}
+            </button>
+          </div>
+        </InfoModal>
       )}
       </div>
     </div>

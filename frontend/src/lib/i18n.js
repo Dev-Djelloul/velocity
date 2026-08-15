@@ -4,7 +4,13 @@ export const translations = {
       title: 'Product Launch Planner',
       subtitle: 'Générateur intelligent de plan de lancement SaaS',
       newPlan: 'Nouveau plan',
-      export: 'Exporter'
+      export: 'Exporter',
+      save: 'Enregistrer',
+      saved: 'Enregistré',
+      unsavedChangesTitle: 'Changements non enregistrés',
+      unsavedChangesBody: 'Tu as des modifications non enregistrées sur ce plan. Si tu continues sans les enregistrer, elles seront perdues.',
+      discardChanges: 'Continuer sans enregistrer',
+      saveAndContinue: 'Enregistrer et continuer'
     },
     steps: ['Produit', 'Marché', 'Ressources', 'Priorités'],
     nav: {
@@ -163,7 +169,7 @@ export const translations = {
       persona: 'Persona',
       collapse: 'Réduire le panneau',
       expand: 'Déplier le panneau',
-      createPlan: 'Créer un plan',
+      createPlan: 'Créer un nouveau plan',
       groups: {
         synthese: 'Synthèse',
         market: 'Marché & stratégie',
@@ -447,6 +453,20 @@ export const translations = {
       planReadySubtitle: (dateTime) => `Généré à l'instant, ${dateTime}.`,
       planLoadedTitle: 'Ravi de te revoir !',
       planLoadedSubtitle: (dateTime) => `Ce plan a été généré ${dateTime} — reprenons là où tu t'étais arrêté 😃`,
+      lastChangesTitle: 'Depuis ta dernière visite',
+      noChangesYet: 'Aucune modification enregistrée pour l\'instant.',
+      changeLogSectionLabels: {
+        roadmap: 'Roadmap',
+        planStartDate: 'Date de démarrage',
+        kpis: 'KPIs',
+        metrics: 'Suivi post-lancement',
+        launchDate: 'Date de lancement',
+        veille: 'Veille IA',
+        benchmarks: 'Benchmarks',
+        editorial: 'Calendrier éditorial',
+        advertising: 'Calendrier publicitaire',
+        rgpd: 'RGPD'
+      },
       assets: {
         post: 'Brief de post',
         email: 'Objet email',
@@ -921,7 +941,13 @@ export const translations = {
       title: 'Product Launch Planner',
       subtitle: 'Intelligent SaaS launch plan generator',
       newPlan: 'New plan',
-      export: 'Export'
+      export: 'Export',
+      save: 'Save',
+      saved: 'Saved',
+      unsavedChangesTitle: 'Unsaved changes',
+      unsavedChangesBody: 'This plan has unsaved changes. If you continue without saving, they will be lost.',
+      discardChanges: 'Continue without saving',
+      saveAndContinue: 'Save and continue'
     },
     steps: ['Product', 'Market', 'Resources', 'Priorities'],
     nav: {
@@ -1080,7 +1106,7 @@ export const translations = {
       persona: 'Persona',
       collapse: 'Collapse panel',
       expand: 'Expand panel',
-      createPlan: 'Create a plan',
+      createPlan: 'Create a new plan',
       groups: {
         synthese: 'Overview',
         market: 'Market & strategy',
@@ -1359,6 +1385,20 @@ export const translations = {
       planReadySubtitle: (dateTime) => `Generated just now, ${dateTime}.`,
       planLoadedTitle: 'Good to see you again!',
       planLoadedSubtitle: (dateTime) => `This plan was generated ${dateTime} — let's pick up where you left off 😃`,
+      lastChangesTitle: 'Since your last visit',
+      noChangesYet: 'No changes saved yet.',
+      changeLogSectionLabels: {
+        roadmap: 'Roadmap',
+        planStartDate: 'Start date',
+        kpis: 'KPIs',
+        metrics: 'Post-launch tracking',
+        launchDate: 'Launch date',
+        veille: 'AI market watch',
+        benchmarks: 'Benchmarks',
+        editorial: 'Editorial calendar',
+        advertising: 'Ad calendar',
+        rgpd: 'GDPR'
+      },
       assets: {
         post: 'Post brief',
         email: 'Email subject',
