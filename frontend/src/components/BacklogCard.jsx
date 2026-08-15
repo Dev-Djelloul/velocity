@@ -9,7 +9,7 @@ import '../styles/BacklogCard.css'
 const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
 const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
 
-export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, onNotionStoriesSynced }) {
+export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, onNotionStoriesSynced, teamMembers }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [search, setSearch] = useState('')
@@ -92,6 +92,26 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
     onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
   }
 
+  // Assignation à un vrai membre de l'équipe — distinct du champ `assignee` (un rôle
+  // générique "Dev"/"Marketing"... proposé par la génération IA, pas une vraie personne).
+  // N'a de sens qu'en espace équipe : teamMembers est vide en personnel, la colonne
+  // n'apparaît donc pas.
+  const assignToMember = (story, memberId) => {
+    const member = teamMembers?.find(m => m.id === memberId)
+    const nextSprints = sprints.map(sp => {
+      if (sp.sprintId !== story.sprintId) return sp
+      return {
+        ...sp,
+        stories: sp.stories.map(s => s.id !== story.id ? s : {
+          ...s,
+          assignedToId: member?.id || null,
+          assignedToName: member?.name || null
+        })
+      }
+    })
+    onRoadmapChange?.({ ...roadmap, sprints: nextSprints })
+  }
+
   const moveToSprint = (story, targetSprintId) => {
     if (targetSprintId === story.sprintId) return
     const { sprintId, ...storyWithoutSprint } = story
@@ -161,6 +181,19 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
             <span className="backlog-meta"><IconTarget width={12} height={12} /> {story.effort}pts</span>
             <span className="backlog-meta"><IconUser width={12} height={12} /> {story.assignee}</span>
             <span className="backlog-meta"><IconCoin width={12} height={12} /> {story.cost}€</span>
+            {!!teamMembers?.length && (
+              <select
+                className="backlog-assignee-select"
+                value={story.assignedToId || ''}
+                onChange={e => assignToMember(story, e.target.value || null)}
+                title={lang === 'fr' ? 'Assigner à un membre' : 'Assign to a member'}
+              >
+                <option value="">{lang === 'fr' ? 'Non assigné' : 'Unassigned'}</option>
+                {teamMembers.map(m => (
+                  <option key={m.id} value={m.id}>{m.name}</option>
+                ))}
+              </select>
+            )}
             {jira?.links?.[story.id]?.url && (
               <a className="backlog-jira-link" href={jira.links[story.id].url} target="_blank" rel="noopener noreferrer" title={jira.links[story.id].key}>
                 <img src="/assets/icons/icons8-jira-32.png" alt="Jira" width={13} height={13} /> {jira.links[story.id].key}

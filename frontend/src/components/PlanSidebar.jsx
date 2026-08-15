@@ -8,7 +8,7 @@ import {
   IconChevronDown, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
   IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge, IconMegaphone, IconLock,
-  IconClock as IconHistory, IconTrash, IconAlertTriangle
+  IconClock as IconHistory, IconTrash, IconAlertTriangle, IconMessageCircle, IconX
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
@@ -77,12 +77,24 @@ const GROUPS = [
 
 const FIRST_ID = GROUPS[0].sections[0].id
 
+const COMMENT_TOPICS = [
+  { key: 'general', fr: 'Général', en: 'General' },
+  { key: 'roadmap', fr: 'Roadmap', en: 'Roadmap' },
+  { key: 'marketing', fr: 'Marketing', en: 'Marketing' },
+  { key: 'kpis', fr: 'KPIs', en: 'KPIs' },
+  { key: 'financials', fr: 'Budget', en: 'Budget' }
+]
+
+function topicLabel(key, lang) {
+  return COMMENT_TOPICS.find(t => t.key === key)?.[lang] || COMMENT_TOPICS[0][lang]
+}
+
 const RAIL_WIDTH = 60
 const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId }) {
   const [collapsed, setCollapsed] = useState(false)
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(FIRST_ID)
@@ -90,6 +102,9 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const [collapsedGroups, setCollapsedGroups] = useState({})
   const [historyOpen, setHistoryOpen] = useState(false)
   const [confirmClearHistory, setConfirmClearHistory] = useState(false)
+  const [commentsOpen, setCommentsOpen] = useState(false)
+  const [commentTopic, setCommentTopic] = useState('general')
+  const [commentText, setCommentText] = useState('')
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
   const itemRefs = useRef({})
 
@@ -155,6 +170,12 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   }, [resizing, width])
 
   const currentWidth = collapsed ? RAIL_WIDTH : width
+
+  const submitComment = () => {
+    if (!commentText.trim()) return
+    onAddComment?.(commentTopic, commentText)
+    setCommentText('')
+  }
 
   const renderItem = ({ id, labelKey, Icon }) => (
     <a
@@ -234,6 +255,76 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
               <button className="plan-sidebar-history-clear" onClick={() => setConfirmClearHistory(true)}>
                 <IconTrash width={13} height={13} /> {t(lang, 'outputs.historyClear')}
               </button>
+            </div>
+          )}
+        </div>
+      )}
+
+      {onAddComment && (
+        <div className="plan-sidebar-history">
+          <button
+            className={`plan-sidebar-item plan-sidebar-history-toggle ${commentsOpen ? 'open' : ''}`}
+            onClick={() => setCommentsOpen(v => !v)}
+            title={collapsed ? (lang === 'fr' ? 'Commentaires' : 'Comments') : undefined}
+          >
+            <span className="plan-sidebar-icon"><IconMessageCircle width={16} height={16} /></span>
+            {!collapsed && (
+              <>
+                <span className="plan-sidebar-label">
+                  {lang === 'fr' ? 'Commentaires' : 'Comments'}
+                  {!!comments?.length && <span className="plan-sidebar-comments-count">{comments.length}</span>}
+                </span>
+                <IconChevronDown width={12} height={12} className="plan-sidebar-history-chevron" />
+              </>
+            )}
+          </button>
+
+          {!collapsed && commentsOpen && (
+            <div className="plan-sidebar-history-panel">
+              <div className="plan-sidebar-comments-composer">
+                <select value={commentTopic} onChange={e => setCommentTopic(e.target.value)}>
+                  {COMMENT_TOPICS.map(topic => (
+                    <option key={topic.key} value={topic.key}>{topic[lang]}</option>
+                  ))}
+                </select>
+                <textarea
+                  value={commentText}
+                  onChange={e => setCommentText(e.target.value)}
+                  placeholder={lang === 'fr' ? 'Écrire un commentaire…' : 'Write a comment…'}
+                  rows={2}
+                />
+                <button
+                  className="plan-sidebar-comments-submit"
+                  onClick={submitComment}
+                  disabled={!commentText.trim()}
+                >
+                  {lang === 'fr' ? 'Publier' : 'Post'}
+                </button>
+              </div>
+
+              {!!comments?.length && (
+                <div className="plan-sidebar-history-list">
+                  {comments.map(comment => (
+                    <div className="plan-sidebar-comment" key={comment.id}>
+                      <div className="plan-sidebar-comment-head">
+                        <span className="change-section-tag">{topicLabel(comment.section, lang)}</span>
+                        <span className="plan-sidebar-history-author">{comment.authorName}</span>
+                        <span className="plan-sidebar-history-date">{formatFullDateTime(comment.createdAt, lang)}</span>
+                        {comment.authorId === currentUserId && (
+                          <button
+                            className="plan-sidebar-comment-delete"
+                            title={lang === 'fr' ? 'Supprimer' : 'Delete'}
+                            onClick={() => onDeleteComment?.(comment.id)}
+                          >
+                            <IconX width={12} height={12} />
+                          </button>
+                        )}
+                      </div>
+                      <p className="plan-sidebar-comment-text">{comment.text}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -214,7 +214,7 @@ export function useTeam() {
       isMock: true
     }
   }
-  const { organization, membership, isLoaded } = useOrganization()
+  const { organization, membership, isLoaded, memberships } = useOrganization({ memberships: { infinite: true } })
   const { userMemberships, setActive, createOrganization, isLoaded: listLoaded } = useOrganizationList({ userMemberships: { infinite: true } })
   const seenTeamIds = new Set()
   const myTeams = (userMemberships?.data || [])
@@ -224,6 +224,13 @@ export function useTeam() {
       seenTeamIds.add(org.id)
       return true
     })
+  // Liste des membres de l'équipe active — nécessaire pour l'assignation de tâches
+  // (BacklogCard). publicUserData est ce que Clerk expose sans permission particulière.
+  const members = (memberships?.data || []).map(m => ({
+    id: m.publicUserData?.userId,
+    name: [m.publicUserData?.firstName, m.publicUserData?.lastName].filter(Boolean).join(' ') || m.publicUserData?.identifier || 'Membre',
+    role: m.role
+  }))
   return {
     isLoaded: isLoaded && listLoaded,
     teamId: organization?.id ?? null,
@@ -231,6 +238,7 @@ export function useTeam() {
     role: membership?.role ?? null,
     isAdmin: membership?.role === 'org:admin',
     myTeams,
+    members,
     setActiveTeamId: (id) => setActive?.({ organization: id || null }),
     createTeam: async (name) => {
       const org = await createOrganization?.({ name })

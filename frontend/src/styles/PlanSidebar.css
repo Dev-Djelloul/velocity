@@ -363,6 +363,113 @@
   display: none;
 }
 
+.plan-sidebar-comments-count {
+  flex-shrink: 0;
+  background: rgba(145, 132, 217, 0.18);
+  color: #9184d9;
+  font-size: 0.62rem;
+  font-weight: 700;
+  border-radius: 999px;
+  padding: 0.05rem 0.4rem;
+  margin-left: 0.35rem;
+}
+
+.plan-sidebar-comments-composer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-bottom: 0.55rem;
+  margin-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.plan-sidebar-comments-composer select {
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  padding: 0.3rem 0.4rem;
+}
+
+.plan-sidebar-comments-composer textarea {
+  resize: vertical;
+  min-height: 44px;
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: 0.76rem;
+  padding: 0.4rem 0.5rem;
+}
+
+.plan-sidebar-comments-composer textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.plan-sidebar-comments-submit {
+  align-self: flex-end;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  border: none;
+  border-radius: 6px;
+  color: #0b0c10;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.35rem 0.8rem;
+  cursor: pointer;
+}
+
+.plan-sidebar-comments-submit:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.plan-sidebar-comment {
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.plan-sidebar-comment:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.plan-sidebar-comment-head {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.plan-sidebar-comment-delete {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.1rem;
+  display: flex;
+  border-radius: 4px;
+}
+
+.plan-sidebar-comment-delete:hover {
+  color: #f87171;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.plan-sidebar-comment-text {
+  font-size: 0.78rem;
+  color: var(--color-text-secondary);
+  line-height: 1.4;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
 .plan-sidebar-brand {
   display: flex;
   align-items: center;

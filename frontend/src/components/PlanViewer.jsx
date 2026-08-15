@@ -24,7 +24,7 @@ import ExportModal from './ExportModal'
 import InfoModal from './InfoModal'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
-import { useAuth, useUser } from '../lib/auth'
+import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
@@ -35,6 +35,7 @@ import '../styles/PlanSidebar.css'
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang }) {
   const { userId } = useAuth()
   const { user } = useUser()
+  const team = useTeam()
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
@@ -232,6 +233,32 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     savePlan(cleared)
   }
 
+  // Commentaires : postés/supprimés immédiatement (comme Jira/GitHub/Notion plus haut),
+  // pas soumis au bouton "Enregistrer" — c'est une conversation, pas une édition de
+  // contenu, ça n'a pas de sens de la faire attendre derrière les modifications en cours.
+  const addComment = (section, text) => {
+    const trimmed = text.trim()
+    if (!trimmed || !plan.id) return
+    const comment = {
+      id: `c_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+      section,
+      text: trimmed,
+      authorId: userId,
+      authorName: user?.fullName || user?.firstName || (lang === 'fr' ? 'Anonyme' : 'Anonymous'),
+      createdAt: new Date().toISOString()
+    }
+    const nextPlan = { ...plan, comments: [comment, ...(plan.comments || [])] }
+    setPlan(nextPlan)
+    savePlan(nextPlan)
+  }
+
+  const deleteComment = (id) => {
+    if (!plan.id) return
+    const nextPlan = { ...plan, comments: (plan.comments || []).filter(c => c.id !== id) }
+    setPlan(nextPlan)
+    savePlan(nextPlan)
+  }
+
   const handleNewPlanClick = () => {
     if (isDirty) {
       setConfirmLeave(true)
@@ -268,7 +295,16 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </ul>
         </div>
       )}
-      <PlanSidebar lang={lang} onNewPlan={handleNewPlanClick} changeLog={plan.changeLog} onClearHistory={handleClearHistory} />
+      <PlanSidebar
+        lang={lang}
+        onNewPlan={handleNewPlanClick}
+        changeLog={plan.changeLog}
+        onClearHistory={handleClearHistory}
+        comments={plan.comments}
+        onAddComment={addComment}
+        onDeleteComment={deleteComment}
+        currentUserId={userId}
+      />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
@@ -364,7 +400,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.execution')}</h2>
         <div id="section-calendar" className="plan-section-anchor"><CalendarView plan={plan} roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} launchDate={plan.launchDate} marketing={plan.marketing} /></div>
         <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} planStartDate={plan.planStartDate || plan.generatedAt} onPlanStartDateChange={updatePlanStartDate} onRoadmapChange={updateRoadmap} /></div>
-        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} onNotionStoriesSynced={updateNotion} /></div>
+        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} onNotionStoriesSynced={updateNotion} teamMembers={team.teamId ? team.members : []} /></div>
         <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmapFromGantt} /></div>
         <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 
