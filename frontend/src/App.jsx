@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconShield } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -59,6 +59,15 @@ const PATH_TO_PAGE = {
 function pathForPage(page, authMode) {
   if (page === 'auth') return authMode === 'signup' ? '/inscription' : '/connexion'
   return PAGE_TO_PATH[page] || '/'
+}
+
+// Couleur stable par équipe (même id -> même couleur à chaque rendu), pour distinguer
+// visuellement plusieurs organisations dans le switcher d'espace.
+const TEAM_COLORS = ['#9184d9', '#6366f1', '#06b6d4', '#f59e0b', '#22c55e', '#ec4899', '#ef4444', '#14b8a6']
+function teamColor(id) {
+  let hash = 0
+  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0
+  return TEAM_COLORS[hash % TEAM_COLORS.length]
 }
 
 export default function App() {
@@ -458,33 +467,42 @@ export default function App() {
                     <div className="header-dropdown-divider" />
 
                     <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
+                    <p className="header-space-hint">
+                      {lang === 'fr'
+                        ? "Espace personnel : plans visibles par vous seul. Équipe : visibles par tous ses membres."
+                        : 'Personal: plans only you can see. Team: visible to every member.'}
+                    </p>
                     <button
-                      className={`header-dropdown-item ${!team.teamId ? 'is-current' : ''}`}
+                      className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
                       onClick={() => { team.setActiveTeamId(null) }}
                     >
-                      {!team.teamId && <IconCheckCircle width={14} height={14} />}
-                      <span>{t(lang, 'team.personalSpace')}</span>
+                      <span className="header-space-avatar header-space-avatar-personal">
+                        <IconUser width={13} height={13} />
+                      </span>
+                      <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
+                      {!team.teamId && <IconCheckCircle width={14} height={14} className="header-space-check" />}
                     </button>
-                    {!!team.myTeams?.length && (
-                      <>
-                        <div className="header-dropdown-label">{t(lang, 'team.myTeams')}</div>
-                        {team.myTeams.map(tm => (
-                          <button
-                            key={tm.id}
-                            className={`header-dropdown-item ${team.teamId === tm.id ? 'is-current' : ''}`}
-                            onClick={() => { team.setActiveTeamId(tm.id) }}
-                          >
-                            {team.teamId === tm.id && <IconCheckCircle width={14} height={14} />}
-                            <span>{tm.name}</span>
-                          </button>
-                        ))}
-                      </>
-                    )}
-                    {team.teamId && (
-                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setCurrentPage('team'); window.scrollTo(0, 0) }}>
-                        <IconShield width={14} height={14} /> {t(lang, 'team.membersTitle')}
-                      </button>
-                    )}
+                    {team.myTeams.map(tm => (
+                      <div className={`header-space-row-wrap ${team.teamId === tm.id ? 'is-current' : ''}`} key={tm.id}>
+                        <button
+                          className="header-space-row"
+                          onClick={() => { team.setActiveTeamId(tm.id) }}
+                        >
+                          <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
+                            {tm.name.trim().charAt(0).toUpperCase()}
+                          </span>
+                          <span className="header-space-name">{tm.name}</span>
+                          {team.teamId === tm.id && <IconCheckCircle width={14} height={14} className="header-space-check" />}
+                        </button>
+                        <button
+                          className="header-space-settings-btn"
+                          title={lang === 'fr' ? "Paramètres de l'équipe" : 'Team settings'}
+                          onClick={() => { team.setActiveTeamId(tm.id); setOpenHeaderMenu(null); setCurrentPage('team'); window.scrollTo(0, 0) }}
+                        >
+                          <IconSettings width={14} height={14} />
+                        </button>
+                      </div>
+                    ))}
                     <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
                       <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
                     </button>

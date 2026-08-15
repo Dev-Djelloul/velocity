@@ -216,7 +216,14 @@ export function useTeam() {
   }
   const { organization, membership, isLoaded } = useOrganization()
   const { userMemberships, setActive, createOrganization, isLoaded: listLoaded } = useOrganizationList({ userMemberships: { infinite: true } })
-  const myTeams = (userMemberships?.data || []).map(m => m.organization)
+  const seenTeamIds = new Set()
+  const myTeams = (userMemberships?.data || [])
+    .map(m => m.organization)
+    .filter(org => {
+      if (!org || seenTeamIds.has(org.id)) return false
+      seenTeamIds.add(org.id)
+      return true
+    })
   return {
     isLoaded: isLoaded && listLoaded,
     teamId: organization?.id ?? null,
@@ -227,7 +234,13 @@ export function useTeam() {
     setActiveTeamId: (id) => setActive?.({ organization: id || null }),
     createTeam: async (name) => {
       const org = await createOrganization?.({ name })
-      if (org) await setActive?.({ organization: org.id })
+      if (org) {
+        await setActive?.({ organization: org.id })
+        // Le cache de useOrganizationList ne se met pas à jour tout seul après une
+        // création : sans ce revalidate, la nouvelle équipe n'apparaît dans le switcher
+        // qu'après un rechargement complet (ou une déconnexion/reconnexion).
+        await userMemberships?.revalidate?.()
+      }
     },
     isMock: false
   }
