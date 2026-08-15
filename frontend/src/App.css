@@ -385,6 +385,7 @@
   color: #0b0c10;
   font-size: 0.68rem;
   font-weight: 700;
+  object-fit: cover;
 }
 
 .header-space-avatar-personal {

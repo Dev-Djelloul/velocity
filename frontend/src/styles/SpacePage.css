@@ -34,6 +34,7 @@
   color: #0b0c10;
   font-size: 1.1rem;
   font-weight: 700;
+  object-fit: cover;
 }
 
 .space-page-avatar-personal {

@@ -15,6 +15,7 @@ import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
 import AccountPage from './components/AccountPage'
 import TeamPage from './components/TeamPage'
+import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
 import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
@@ -62,15 +63,6 @@ const PATH_TO_PAGE = {
 function pathForPage(page, authMode) {
   if (page === 'auth') return authMode === 'signup' ? '/inscription' : '/connexion'
   return PAGE_TO_PATH[page] || '/'
-}
-
-// Couleur stable par équipe (même id -> même couleur à chaque rendu), pour distinguer
-// visuellement plusieurs organisations dans le switcher d'espace.
-const TEAM_COLORS = ['#9184d9', '#6366f1', '#06b6d4', '#f59e0b', '#22c55e', '#ec4899', '#ef4444', '#14b8a6']
-function teamColor(id) {
-  let hash = 0
-  for (let i = 0; i < id.length; i++) hash = (hash * 31 + id.charCodeAt(i)) >>> 0
-  return TEAM_COLORS[hash % TEAM_COLORS.length]
 }
 
 export default function App() {
@@ -508,9 +500,7 @@ export default function App() {
                     title={t(lang, 'team.switcherTitle')}
                   >
                     {team.teamId ? (
-                      <span className="header-space-avatar header-space-btn-avatar" style={{ background: teamColor(team.teamId) }}>
-                        {(team.teamName || '?').trim().charAt(0).toUpperCase()}
-                      </span>
+                      <TeamAvatar id={team.teamId} name={team.teamName} imageUrl={team.teamImageUrl} className="header-space-btn-avatar" />
                     ) : (
                       <span className="header-space-avatar header-space-btn-avatar header-space-avatar-personal">
                         <IconUser width={12} height={12} />
@@ -550,9 +540,7 @@ export default function App() {
                             disabled={switchingSpace}
                             onClick={() => switchSpace(tm.id)}
                           >
-                            <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
-                              {tm.name.trim().charAt(0).toUpperCase()}
-                            </span>
+                            <TeamAvatar id={tm.id} name={tm.name} imageUrl={tm.hasImage ? tm.imageUrl : null} />
                             <span className="header-space-name">{tm.name}</span>
                             {team.teamId === tm.id && <IconCheckCircle width={14} height={14} className="header-space-check" />}
                           </button>

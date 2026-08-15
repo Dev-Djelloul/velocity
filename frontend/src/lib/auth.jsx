@@ -205,6 +205,7 @@ export function useTeam() {
       isLoaded: true,
       teamId: active?.id ?? null,
       teamName: active?.name ?? null,
+      teamImageUrl: null,
       role: active ? 'org:admin' : null,
       isAdmin: !!active,
       members: active?.members ?? [],
@@ -235,6 +236,10 @@ export function useTeam() {
     isLoaded: isLoaded && listLoaded,
     teamId: organization?.id ?? null,
     teamName: organization?.name ?? null,
+    // hasImage distingue un vrai logo uploadé de l'avatar générique que Clerk renvoie par
+    // défaut (imageUrl n'est jamais vide) — sans ce champ on afficherait cet avatar
+    // générique au lieu de notre propre pastille colorée/initiale.
+    teamImageUrl: organization?.hasImage ? organization.imageUrl : null,
     role: membership?.role ?? null,
     isAdmin: membership?.role === 'org:admin',
     myTeams,

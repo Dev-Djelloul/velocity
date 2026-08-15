@@ -5,6 +5,7 @@ import { getAllPlans, deletePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave } from './Icons'
+import { teamColor } from './TeamAvatar'
 import '../styles/SpacePage.css'
 
 // Combien de plans "récents" afficher dans l'espace personnel — un aperçu rapide, pas un
@@ -68,7 +69,13 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
         </button>
         <div className="space-page-title">
           {isTeam ? (
-            <span className="space-page-avatar">{(team.teamName || '?').trim().charAt(0).toUpperCase()}</span>
+            team.teamImageUrl ? (
+              <img className="space-page-avatar" src={team.teamImageUrl} alt="" />
+            ) : (
+              <span className="space-page-avatar" style={{ background: teamColor(team.teamId) }}>
+                {(team.teamName || '?').trim().charAt(0).toUpperCase()}
+              </span>
+            )
           ) : (
             <span className="space-page-avatar space-page-avatar-personal"><IconUser width={20} height={20} /></span>
           )}
