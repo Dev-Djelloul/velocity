@@ -333,6 +333,11 @@
   background: rgba(145, 132, 217, 0.12);
 }
 
+.header-space-row:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 .header-space-row-wrap {
   display: flex;
   align-items: center;

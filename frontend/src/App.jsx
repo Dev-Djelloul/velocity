@@ -93,6 +93,7 @@ export default function App() {
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
   const [showCreateTeam, setShowCreateTeam] = useState(false)
+  const [switchingSpace, setSwitchingSpace] = useState(false)
   const [newTeamName, setNewTeamName] = useState('')
   const headerMenuRef = useRef(null)
 
@@ -473,7 +474,16 @@ export default function App() {
                     <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
                     <button
                       className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
-                      onClick={() => { team.setActiveTeamId(null) }}
+                      disabled={switchingSpace}
+                      onClick={async () => {
+                        setSwitchingSpace(true)
+                        try {
+                          await team.setActiveTeamId(null)
+                        } finally {
+                          setSwitchingSpace(false)
+                          setOpenHeaderMenu(null)
+                        }
+                      }}
                     >
                       <span className="header-space-avatar header-space-avatar-personal">
                         <IconUser width={13} height={13} />
@@ -488,7 +498,16 @@ export default function App() {
                       <div className={`header-space-row-wrap ${team.teamId === tm.id ? 'is-current' : ''}`} key={tm.id}>
                         <button
                           className="header-space-row"
-                          onClick={() => { team.setActiveTeamId(tm.id) }}
+                          disabled={switchingSpace}
+                          onClick={async () => {
+                            setSwitchingSpace(true)
+                            try {
+                              await team.setActiveTeamId(tm.id)
+                            } finally {
+                              setSwitchingSpace(false)
+                              setOpenHeaderMenu(null)
+                            }
+                          }}
                         >
                           <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
                             {tm.name.trim().charAt(0).toUpperCase()}
