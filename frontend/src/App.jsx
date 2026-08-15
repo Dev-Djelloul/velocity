@@ -94,6 +94,7 @@ export default function App() {
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [switchingSpace, setSwitchingSpace] = useState(false)
+  const [creatingTeam, setCreatingTeam] = useState(false)
   const [newTeamName, setNewTeamName] = useState('')
   const headerMenuRef = useRef(null)
 
@@ -361,12 +362,19 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
-  const handleCreateTeam = () => {
+  const handleCreateTeam = async () => {
     const name = newTeamName.trim()
-    if (!name) return
-    team.createTeam(name)
-    setNewTeamName('')
-    setShowCreateTeam(false)
+    // Garde-fou contre les double-soumissions (Entrée + clic, double-clic) : sans lui,
+    // chaque appui en trop créait une organisation Clerk distincte côté serveur.
+    if (!name || creatingTeam) return
+    setCreatingTeam(true)
+    try {
+      await team.createTeam(name)
+      setNewTeamName('')
+      setShowCreateTeam(false)
+    } finally {
+      setCreatingTeam(false)
+    }
   }
 
   const remaining = isSignedIn ? remainingCredits(userId) : 0
@@ -582,14 +590,15 @@ export default function App() {
               onChange={e => setNewTeamName(e.target.value)}
               placeholder={t(lang, 'team.createTeamNamePlaceholder')}
               autoFocus
+              disabled={creatingTeam}
               onKeyDown={e => e.key === 'Enter' && handleCreateTeam()}
             />
             <div className="unsaved-changes-actions">
-              <button className="btn-secondary" onClick={() => setShowCreateTeam(false)}>
+              <button className="btn-secondary" onClick={() => setShowCreateTeam(false)} disabled={creatingTeam}>
                 {t(lang, 'team.createTeamCancel')}
               </button>
-              <button className="btn-primary" onClick={handleCreateTeam} disabled={!newTeamName.trim()}>
-                {t(lang, 'team.createTeamConfirm')}
+              <button className="btn-primary" onClick={handleCreateTeam} disabled={!newTeamName.trim() || creatingTeam}>
+                {creatingTeam ? (lang === 'fr' ? 'Création…' : 'Creating…') : t(lang, 'team.createTeamConfirm')}
               </button>
             </div>
           </InfoModal>
