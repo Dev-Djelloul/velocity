@@ -447,116 +447,141 @@ export default function App() {
             )}
 
             {isSignedIn ? (
-              <div className="header-menu">
-                <button
-                  className={`header-avatar-btn ${openHeaderMenu === 'account' ? 'active' : ''}`}
-                  onClick={() => setOpenHeaderMenu(m => m === 'account' ? null : 'account')}
-                  title={t(lang, 'auth.myAccount')}
-                >
-                  {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
-                  <span className="header-avatar-team-label">{team.teamId ? team.teamName : t(lang, 'team.personalSpace')}</span>
-                  <IconChevronDown width={13} height={13} className="header-avatar-caret" />
-                </button>
-                {openHeaderMenu === 'account' && (
-                  <div className="header-dropdown header-dropdown-account">
-                    {!pro && (
-                      <div className="header-dropdown-credits-hero">
-                        <span className="header-dropdown-credits-value">{remaining}</span>
-                        <span className="header-dropdown-credits-caption">{lang === 'fr' ? 'plans restants' : 'plans left'}</span>
-                      </div>
-                    )}
-
-                    <button className="header-dropdown-item header-dropdown-item-primary" onClick={() => { setOpenHeaderMenu(null); handleStartClick() }}>
-                      <IconSparkle width={16} height={16} /> {lang === 'fr' ? 'Créer un plan' : 'Create a plan'}
-                    </button>
-
-                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
-                      <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
-                    </button>
-                    <div className="header-dropdown-divider" />
-
-                    <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
-                    <button
-                      className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
-                      disabled={switchingSpace}
-                      onClick={async () => {
-                        setSwitchingSpace(true)
-                        try {
-                          await team.setActiveTeamId(null)
-                        } finally {
-                          setSwitchingSpace(false)
-                          setOpenHeaderMenu(null)
-                        }
-                      }}
-                    >
-                      <span className="header-space-avatar header-space-avatar-personal">
-                        <IconUser width={13} height={13} />
+              <>
+                {/* Switcher d'espace, séparé du compte (même logique que le duo UserButton /
+                    OrganizationSwitcher de Clerk) : le compte ne change jamais selon l'espace
+                    actif, ça n'a donc pas de sens de les mélanger dans un seul menu. */}
+                <div className="header-menu">
+                  <button
+                    className={`header-space-btn ${openHeaderMenu === 'space' ? 'active' : ''}`}
+                    onClick={() => setOpenHeaderMenu(m => m === 'space' ? null : 'space')}
+                    title={t(lang, 'team.switcherTitle')}
+                  >
+                    {team.teamId ? (
+                      <span className="header-space-avatar header-space-btn-avatar" style={{ background: teamColor(team.teamId) }}>
+                        {(team.teamName || '?').trim().charAt(0).toUpperCase()}
                       </span>
-                      <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
-                      {!team.teamId && <IconCheckCircle width={14} height={14} className="header-space-check" />}
-                    </button>
-                    {team.myTeams.map(tm => (
-                      <div className={`header-space-row-wrap ${team.teamId === tm.id ? 'is-current' : ''}`} key={tm.id}>
-                        <button
-                          className="header-space-row"
-                          disabled={switchingSpace}
-                          onClick={async () => {
-                            setSwitchingSpace(true)
-                            try {
-                              await team.setActiveTeamId(tm.id)
-                            } finally {
-                              setSwitchingSpace(false)
-                              setOpenHeaderMenu(null)
-                            }
-                          }}
-                        >
-                          <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
-                            {tm.name.trim().charAt(0).toUpperCase()}
-                          </span>
-                          <span className="header-space-name">{tm.name}</span>
-                          {team.teamId === tm.id && <IconCheckCircle width={14} height={14} className="header-space-check" />}
-                        </button>
-                        <button
-                          className="header-space-settings-btn"
-                          title={lang === 'fr' ? "Paramètres de l'équipe" : 'Team settings'}
-                          onClick={() => { team.setActiveTeamId(tm.id); setOpenHeaderMenu(null); setCurrentPage('team'); window.scrollTo(0, 0) }}
-                        >
-                          <IconSettings width={14} height={14} />
-                        </button>
-                      </div>
-                    ))}
-                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
-                      <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
-                    </button>
-                    <div className="header-dropdown-divider" />
-
-                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
-                      <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
-                    </button>
-                    <div className="header-dropdown-divider" />
-
-                    {currentPage !== 'landing' && (
-                      <button
-                        className="header-dropdown-item"
-                        onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
-                      >
-                        {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
-                        {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
-                      </button>
+                    ) : (
+                      <span className="header-space-avatar header-space-btn-avatar header-space-avatar-personal">
+                        <IconUser width={12} height={12} />
+                      </span>
                     )}
-                    <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
-                    <div className="header-dropdown-lang">
-                      <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
-                      <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
-                    </div>
-                    <div className="header-dropdown-divider" />
+                    <span className="header-space-btn-label">{team.teamId ? team.teamName : t(lang, 'team.personalSpace')}</span>
+                    <IconChevronDown width={13} height={13} className="header-avatar-caret" />
+                  </button>
+                  {openHeaderMenu === 'space' && (
+                    <div className="header-dropdown header-space-dropdown">
+                      <button className="header-dropdown-item header-dropdown-item-primary" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
+                        <IconPlus width={16} height={16} /> {t(lang, 'team.createTeam')}
+                      </button>
 
-                    <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => { setOpenHeaderMenu(null); signOut() }}>
-                      <IconLogOut width={16} height={16} /> {t(lang, 'auth.signOut')}
-                    </button>
-                  </div>
-                )}
-              </div>
+                      <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
+                      <button
+                        className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
+                        disabled={switchingSpace}
+                        onClick={async () => {
+                          setSwitchingSpace(true)
+                          try {
+                            await team.setActiveTeamId(null)
+                          } finally {
+                            setSwitchingSpace(false)
+                            setOpenHeaderMenu(null)
+                          }
+                        }}
+                      >
+                        <span className="header-space-avatar header-space-avatar-personal">
+                          <IconUser width={13} height={13} />
+                        </span>
+                        <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
+                        {!team.teamId && <IconCheckCircle width={14} height={14} className="header-space-check" />}
+                      </button>
+                      {team.myTeams.map(tm => (
+                        <div className={`header-space-row-wrap ${team.teamId === tm.id ? 'is-current' : ''}`} key={tm.id}>
+                          <button
+                            className="header-space-row"
+                            disabled={switchingSpace}
+                            onClick={async () => {
+                              setSwitchingSpace(true)
+                              try {
+                                await team.setActiveTeamId(tm.id)
+                              } finally {
+                                setSwitchingSpace(false)
+                                setOpenHeaderMenu(null)
+                              }
+                            }}
+                          >
+                            <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
+                              {tm.name.trim().charAt(0).toUpperCase()}
+                            </span>
+                            <span className="header-space-name">{tm.name}</span>
+                            {team.teamId === tm.id && <IconCheckCircle width={14} height={14} className="header-space-check" />}
+                          </button>
+                          <button
+                            className="header-space-settings-btn"
+                            title={lang === 'fr' ? "Paramètres de l'équipe" : 'Team settings'}
+                            onClick={() => { team.setActiveTeamId(tm.id); setOpenHeaderMenu(null); setCurrentPage('team'); window.scrollTo(0, 0) }}
+                          >
+                            <IconSettings width={14} height={14} />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="header-menu">
+                  <button
+                    className={`header-avatar-btn ${openHeaderMenu === 'account' ? 'active' : ''}`}
+                    onClick={() => setOpenHeaderMenu(m => m === 'account' ? null : 'account')}
+                    title={t(lang, 'auth.myAccount')}
+                  >
+                    {user?.imageUrl ? <img src={user.imageUrl} alt="" /> : <IconUser width={16} height={16} />}
+                    <IconChevronDown width={13} height={13} className="header-avatar-caret" />
+                  </button>
+                  {openHeaderMenu === 'account' && (
+                    <div className="header-dropdown header-dropdown-account">
+                      {!pro && (
+                        <div className="header-dropdown-credits-hero">
+                          <span className="header-dropdown-credits-value">{remaining}</span>
+                          <span className="header-dropdown-credits-caption">{lang === 'fr' ? 'plans restants' : 'plans left'}</span>
+                        </div>
+                      )}
+
+                      <button className="header-dropdown-item header-dropdown-item-primary" onClick={() => { setOpenHeaderMenu(null); handleStartClick() }}>
+                        <IconSparkle width={16} height={16} /> {lang === 'fr' ? 'Créer un plan' : 'Create a plan'}
+                      </button>
+
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
+                        <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
+                      </button>
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
+                        <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
+                      </button>
+                      <div className="header-dropdown-divider" />
+
+                      {currentPage !== 'landing' && (
+                        <button
+                          className="header-dropdown-item"
+                          onClick={() => { setTheme(t => t === 'dark' ? 'light' : 'dark') }}
+                        >
+                          {theme === 'dark' ? <IconMoon width={16} height={16} /> : <IconSun width={16} height={16} />}
+                          {theme === 'dark' ? (lang === 'fr' ? 'Thème clair' : 'Light theme') : (lang === 'fr' ? 'Thème sombre' : 'Dark theme')}
+                        </button>
+                      )}
+                      <div className="header-dropdown-label">{lang === 'fr' ? 'Langue' : 'Language'}</div>
+                      <div className="header-dropdown-lang">
+                        <button className={lang === 'fr' ? 'active' : ''} onClick={() => setLang('fr')}>FR</button>
+                        <button className={lang === 'en' ? 'active' : ''} onClick={() => setLang('en')}>EN</button>
+                      </div>
+                      <div className="header-dropdown-divider" />
+
+                      <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => { setOpenHeaderMenu(null); signOut() }}>
+                        <IconLogOut width={16} height={16} /> {t(lang, 'auth.signOut')}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
             ) : (
               <button className="btn-header-signin" onClick={() => goToAuth('signin')} title={t(lang, 'auth.signIn')}>
                 <IconLogin width={18} height={18} />
