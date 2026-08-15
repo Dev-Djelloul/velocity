@@ -229,6 +229,10 @@ export function fetchAgentTasks(planId) {
   return safeFetch(`/agents/tasks?planId=${encodeURIComponent(planId)}`).then(r => r || [])
 }
 
+export function removeAgentTask(userId, id) {
+  return safeFetch(`/agents/tasks/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+}
+
 export function createCheckoutSession(userId, email) {
   return safeFetch('/checkout', {
     method: 'POST',

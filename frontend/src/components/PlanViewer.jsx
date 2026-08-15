@@ -41,6 +41,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [changedSections, setChangedSections] = useState(new Set())
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [showFullChangeLog, setShowFullChangeLog] = useState(false)
   const captureRef = useRef(null)
 
   const isDirty = changedSections.size > 0
@@ -170,7 +171,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const nextChangeLog = [
       { date: new Date().toISOString(), sections },
       ...(plan.changeLog || [])
-    ].slice(0, 10)
+    ].slice(0, 50)
     const savedPlan = savePlan({ ...plan, changeLog: nextChangeLog })
     setPlan(savedPlan)
     setChangedSections(new Set())
@@ -204,14 +205,19 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             ) : plan.changeLog?.length ? (
               <div className="plan-changelog">
                 <p className="plan-changelog-heading">{t(lang, 'outputs.lastChangesTitle')}</p>
-                <ul>
-                  {plan.changeLog.slice(0, 3).map((entry, i) => (
+                <ul className={showFullChangeLog ? 'plan-changelog-full' : ''}>
+                  {(showFullChangeLog ? plan.changeLog : plan.changeLog.slice(0, 3)).map((entry, i) => (
                     <li key={i}>
                       <span className="plan-changelog-date">{formatFullDateTime(entry.date, lang)}</span>
                       <span className="plan-changelog-sections">{entry.sections.join(', ')}</span>
                     </li>
                   ))}
                 </ul>
+                {plan.changeLog.length > 3 && (
+                  <button className="plan-changelog-toggle" onClick={() => setShowFullChangeLog(v => !v)}>
+                    {showFullChangeLog ? t(lang, 'outputs.hideFullChangeLog') : t(lang, 'outputs.showFullChangeLog')(plan.changeLog.length)}
+                  </button>
+                )}
               </div>
             ) : (
               <p>{t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>

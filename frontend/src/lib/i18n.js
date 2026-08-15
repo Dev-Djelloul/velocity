@@ -302,6 +302,7 @@ export const translations = {
       run: 'Lancer',
       logTitle: 'Journal d\'activité',
       logEmpty: 'Aucune action lancée pour le moment.',
+      deleteTask: 'Supprimer cette génération',
       type: {
         story_brief: 'Brief d\'exécution',
         recalc_kpis: 'Recalcul des KPIs',
@@ -455,6 +456,8 @@ export const translations = {
       planLoadedSubtitle: (dateTime) => `Ce plan a été généré ${dateTime} — reprenons là où tu t'étais arrêté 😃`,
       lastChangesTitle: 'Depuis ta dernière visite',
       noChangesYet: 'Aucune modification enregistrée pour l\'instant.',
+      showFullChangeLog: (count) => `Voir tout l'historique (${count})`,
+      hideFullChangeLog: 'Réduire',
       changeLogSectionLabels: {
         roadmap: 'Roadmap',
         planStartDate: 'Date de démarrage',
@@ -1239,6 +1242,7 @@ export const translations = {
       run: 'Run',
       logTitle: 'Activity log',
       logEmpty: 'No action triggered yet.',
+      deleteTask: 'Delete this generation',
       type: {
         story_brief: 'Execution brief',
         recalc_kpis: 'KPI recalculation',
@@ -1387,6 +1391,8 @@ export const translations = {
       planLoadedSubtitle: (dateTime) => `This plan was generated ${dateTime} — let's pick up where you left off 😃`,
       lastChangesTitle: 'Since your last visit',
       noChangesYet: 'No changes saved yet.',
+      showFullChangeLog: (count) => `See full history (${count})`,
+      hideFullChangeLog: 'Collapse',
       changeLogSectionLabels: {
         roadmap: 'Roadmap',
         planStartDate: 'Start date',

@@ -255,6 +255,27 @@
   color: var(--color-text-secondary);
 }
 
+.plan-changelog ul.plan-changelog-full {
+  max-height: 220px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.plan-changelog-toggle {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-top: 0.5rem;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-accent);
+  cursor: pointer;
+}
+
+.plan-changelog-toggle:hover {
+  text-decoration: underline;
+}
+
 .unsaved-changes-body {
   color: var(--color-text-secondary);
   margin-bottom: 1.25rem !important;

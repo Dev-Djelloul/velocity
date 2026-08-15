@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
-import { enqueueAgentTask, fetchAgentTasks } from '../lib/serverStorage'
-import { IconSparkle, IconCheckCircle, IconAlertTriangle, IconClock, IconClipboard, IconTarget, IconShield, IconCoin } from './Icons'
+import { enqueueAgentTask, fetchAgentTasks, removeAgentTask } from '../lib/serverStorage'
+import { IconSparkle, IconCheckCircle, IconAlertTriangle, IconClock, IconClipboard, IconTarget, IconShield, IconCoin, IconTrash } from './Icons'
 import '../styles/AgentActivity.css'
 
 const POLL_MS = 2500
@@ -110,6 +110,12 @@ export default function AgentActivity({ plan, userId, lang }) {
     setBusy(false)
   }
 
+  const deleteTask = async (taskId) => {
+    setTasks(prev => prev.filter(task => task.id !== taskId))
+    const ok = await removeAgentTask(userId, taskId)
+    if (!ok) await refresh() // échec silencieux côté serveur : on resynchronise pour ne pas rester désynchro
+  }
+
   const statusIcon = (status) => {
     if (status === 'done') return <IconCheckCircle width={14} height={14} className="agent-status-done" />
     if (status === 'error') return <IconAlertTriangle width={14} height={14} className="agent-status-error" />
@@ -178,6 +184,14 @@ export default function AgentActivity({ plan, userId, lang }) {
               {statusIcon(task.status)}
               <span className="agent-log-type">{t(lang, `agents.type.${task.type}`)}</span>
               <span className="agent-log-status">{t(lang, `agents.status.${task.status}`)}</span>
+              <button
+                className="agent-log-delete"
+                onClick={() => deleteTask(task.id)}
+                title={t(lang, 'agents.deleteTask')}
+                aria-label={t(lang, 'agents.deleteTask')}
+              >
+                <IconTrash width={13} height={13} />
+              </button>
             </div>
 
             {task.status === 'done' && task.type === 'story_brief' && task.output && (

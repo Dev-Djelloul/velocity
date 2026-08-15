@@ -101,6 +101,29 @@
   letter-spacing: 0.03em;
 }
 
+.agent-log-delete {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 6px;
+  color: var(--color-text-muted);
+  opacity: 0;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.agent-log-item:hover .agent-log-delete,
+.agent-log-delete:focus-visible {
+  opacity: 1;
+}
+
+.agent-log-delete:hover {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
 .agent-status-done { color: var(--color-success); }
 .agent-status-error { color: #ef4444; }
 .agent-status-pending { color: var(--color-warning); }

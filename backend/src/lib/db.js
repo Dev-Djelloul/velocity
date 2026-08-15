@@ -149,6 +149,15 @@ export async function listAgentTasksForPlan(env, planId) {
   }))
 }
 
+// userId requis et vérifié par l'appelant (route API) pour qu'un utilisateur ne puisse
+// supprimer que ses propres tâches, jamais celles d'un autre plan/compte.
+export async function deleteAgentTask(env, userId, id) {
+  const result = await env.DB.prepare(
+    'DELETE FROM agent_tasks WHERE id = ? AND user_id = ?'
+  ).bind(id, userId).run()
+  return result.meta.changes > 0
+}
+
 export async function setPro(env, userId, isPro, stripeCustomerId) {
   await env.DB.prepare(
     `INSERT INTO credits (user_id, is_pro, stripe_customer_id, updated_at) VALUES (?, ?, ?, datetime('now'))

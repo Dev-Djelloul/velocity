@@ -419,6 +419,15 @@ export async function handleApi(request, env, url) {
     return json(await db.listAgentTasksForPlan(env, planId))
   }
 
+  const agentTaskMatch = pathname.match(/^\/agents\/tasks\/([^/]+)$/)
+  if (agentTaskMatch && method === 'DELETE') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const deleted = await db.deleteAgentTask(env, userId, agentTaskMatch[1])
+    if (!deleted) return json({ error: 'not found' }, 404)
+    return json({ ok: true })
+  }
+
   if (pathname === '/checkout' && method === 'POST') {
     const { userId, email, successUrl, cancelUrl } = await request.json()
     if (!userId || !successUrl || !cancelUrl) {
