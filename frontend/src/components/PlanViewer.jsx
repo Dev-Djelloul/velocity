@@ -32,7 +32,7 @@ import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
-export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang }) {
+export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade }) {
   const { userId } = useAuth()
   const { user } = useUser()
   const team = useTeam()
@@ -427,7 +427,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       {showExport && (
-        <ExportModal plan={{ ...plan, marketing: liveMarketing }} lang={lang} userId={userId} onClose={() => setShowExport(false)} captureRef={captureRef} onJiraExported={updateJira} onGithubExported={updateGithub} />
+        <ExportModal
+          plan={{ ...plan, marketing: liveMarketing }}
+          lang={lang}
+          userId={userId}
+          isPro={isPro}
+          onRequestUpgrade={() => { setShowExport(false); onRequestUpgrade?.() }}
+          onClose={() => setShowExport(false)}
+          captureRef={captureRef}
+          onJiraExported={updateJira}
+          onGithubExported={updateGithub}
+        />
       )}
 
       {confirmLeave && (

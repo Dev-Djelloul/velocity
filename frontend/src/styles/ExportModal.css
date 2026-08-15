@@ -115,6 +115,18 @@
   text-align: left;
 }
 
+.export-pro-badge {
+  display: inline-block;
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  vertical-align: middle;
+}
+
 /* Boutons d'intégration : bordure dégradée + halo de couleur au hover */
 .btn-integration {
   display: inline-flex;

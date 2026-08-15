@@ -47,14 +47,14 @@ export function getPricingTiers(lang) {
         'Générations de plans illimitées',
         'Espaces d\'équipe illimités',
         'Intégrations Notion, Jira & GitHub',
-        'Export avancé (PDF, CSV, PPTX, XLSX)',
+        'Export avancé (présentation PPTX)',
         'Historique complet & notifications d\'équipe',
         'Support prioritaire par email'
       ] : [
         'Unlimited plan generations',
         'Unlimited team spaces',
         'Notion, Jira & GitHub integrations',
-        'Advanced export (PDF, CSV, PPTX, XLSX)',
+        'Advanced export (PPTX presentation)',
         'Full history & team notifications',
         'Priority email support'
       ]

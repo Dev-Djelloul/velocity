@@ -9,7 +9,7 @@ import {
 import { waitForConnection } from '../lib/oauthConnect'
 import '../styles/ExportModal.css'
 
-export default function ExportModal({ plan, lang, userId, onClose, captureRef, onJiraExported, onGithubExported }) {
+export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrade, onClose, captureRef, onJiraExported, onGithubExported }) {
   // Notion (export page complète)
   const [notionState, setNotionState] = useState('idle')
   const [notionUrl, setNotionUrl] = useState(null)
@@ -40,6 +40,7 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
   }
 
   const handleNotion = async () => {
+    if (!isPro) { onRequestUpgrade?.(); return }
     if (!userId) { setNotionMsg(t(lang, 'export.notionSignIn')); setNotionState('error'); return }
     setNotionState('working'); setNotionMsg(''); setNotionUrl(null)
     try {
@@ -86,6 +87,7 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
   }
 
   const handleJira = async () => {
+    if (!isPro) { onRequestUpgrade?.(); return }
     if (!userId) { setJiraMsg(t(lang, 'export.jiraSignIn')); setJiraState('error'); return }
     setJiraState('working'); setJiraMsg(''); setJiraResult(null)
     try {
@@ -153,6 +155,7 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
   }
 
   const handleGithub = async () => {
+    if (!isPro) { onRequestUpgrade?.(); return }
     if (!userId) { setGithubMsg(t(lang, 'export.githubSignIn')); setGithubState('error'); return }
     setGithubState('working'); setGithubMsg(''); setGithubResult(null)
     try {
@@ -202,14 +205,21 @@ export default function ExportModal({ plan, lang, userId, onClose, captureRef, o
         <h3>{t(lang, 'export.title')}</h3>
         <div className="modal-actions">
           <button className="btn-primary" onClick={() => exportPDF(plan, lang)}>{t(lang, 'export.pdf')}</button>
-          <button className="btn-primary" onClick={() => exportPPTX(plan, lang)}>{t(lang, 'export.pptx')}</button>
+          <button
+            className="btn-primary"
+            onClick={() => isPro ? exportPPTX(plan, lang) : onRequestUpgrade?.()}
+          >
+            {t(lang, 'export.pptx')} {!isPro && <span className="export-pro-badge">PRO</span>}
+          </button>
           <button className="btn-primary" onClick={() => exportCSV(plan, lang)}>{t(lang, 'export.csv')}</button>
           <button className="btn-primary" onClick={() => exportJSON(plan)}>{t(lang, 'export.json')}</button>
           <button className="btn-primary" onClick={() => exportImage(captureRef?.current, plan)}>{t(lang, 'export.image')}</button>
         </div>
 
         <div className="export-integrations">
-          <span className="export-integrations-label">{t(lang, 'export.integrations')}</span>
+          <span className="export-integrations-label">
+            {t(lang, 'export.integrations')} {!isPro && <span className="export-pro-badge">PRO</span>}
+          </span>
 
           <button className="btn-integration btn-notion" onClick={handleNotion} disabled={notionState === 'working' || notionState === 'connecting'}>
             <img className="btn-notion-icon" src="/assets/icons/icons8-notion-32.png" alt="" aria-hidden="true" />

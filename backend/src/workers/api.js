@@ -245,6 +245,7 @@ export async function handleApi(request, env, url) {
   if (pathname === '/notion/export' && method === 'POST') {
     const { userId, plan, lang } = await request.json()
     if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
     const token = await db.getNotionToken(env, userId)
     if (!token) return json({ needsAuth: true })
     try {
@@ -260,6 +261,7 @@ export async function handleApi(request, env, url) {
   if (pathname === '/notion/sync-stories' && method === 'POST') {
     const { userId, plan, lang } = await request.json()
     if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
     const token = await db.getNotionToken(env, userId)
     if (!token) return json({ needsAuth: true })
     try {
@@ -343,6 +345,7 @@ export async function handleApi(request, env, url) {
   if (pathname === '/jira/export' && method === 'POST') {
     const { userId, plan, lang } = await request.json()
     if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
     const token = await db.getJiraToken(env, userId)
     if (!token) return json({ needsAuth: true })
     if (!token.project_key) return json({ needsProject: true })
@@ -418,6 +421,7 @@ export async function handleApi(request, env, url) {
   if (pathname === '/github/export' && method === 'POST') {
     const { userId, plan, lang } = await request.json()
     if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
     const token = await db.getGithubToken(env, userId)
     if (!token) return json({ needsAuth: true })
     if (!token.repo) return json({ needsRepo: true })

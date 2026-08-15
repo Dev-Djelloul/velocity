@@ -434,6 +434,16 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  // Point d'entrée unique vers la modal Pro depuis n'importe où dans l'app (limite de
+  // plans atteinte, export/intégration réservée à Pro…) — toujours "Mon compte" avec la
+  // modal auto-ouverte, voir pendingAction dans AccountPage.jsx.
+  const goToUpgrade = () => {
+    setShowLimitModal(false)
+    setPendingAccountAction('upgrade')
+    setCurrentPage('account')
+    window.scrollTo(0, 0)
+  }
+
   const handleCreateTeam = async () => {
     const name = newTeamName.trim()
     // Garde-fou contre les double-soumissions (Entrée + clic, double-clic) : sans lui,
@@ -764,7 +774,7 @@ export default function App() {
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
         {currentPage === 'result' && plan && (isSignedIn || isSharedView) && (
-          <PlanViewer key={plan.id || plan.generatedAt} plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} />
+          <PlanViewer key={plan.id || plan.generatedAt} plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} isPro={pro} onRequestUpgrade={goToUpgrade} />
         )}
         {currentPage === 'account' && isSignedIn && (
           <AccountPage
@@ -850,13 +860,8 @@ export default function App() {
           onContactClick={() => setActiveModal('contact')}
           currentTierId={pro ? 'pro' : 'free'}
           onSelectPro={() => {
-            if (isSignedIn) {
-              setPendingAccountAction('upgrade')
-              setCurrentPage('account')
-              window.scrollTo(0, 0)
-            } else {
-              goToAuth('signup')
-            }
+            if (isSignedIn) goToUpgrade()
+            else goToAuth('signup')
           }}
         />
       )}
@@ -878,7 +883,7 @@ export default function App() {
             </button>
             <button
               className="btn-primary"
-              onClick={() => { setShowLimitModal(false); setPendingAccountAction('upgrade'); setCurrentPage('account'); window.scrollTo(0, 0) }}
+              onClick={goToUpgrade}
             >
               {t(lang, 'account.upgradeCta')}
             </button>
