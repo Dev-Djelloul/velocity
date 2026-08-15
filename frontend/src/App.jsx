@@ -377,6 +377,21 @@ export default function App() {
     }
   }
 
+  const switchSpace = async (id) => {
+    setSwitchingSpace(true)
+    try {
+      await team.setActiveTeamId(id)
+    } catch (err) {
+      console.error('Échec du changement d\'espace', err)
+      setError(lang === 'fr'
+        ? "Impossible de changer d'espace pour le moment. Réessaie dans un instant."
+        : "Couldn't switch space right now. Please try again.")
+    } finally {
+      setSwitchingSpace(false)
+      setOpenHeaderMenu(null)
+    }
+  }
+
   const remaining = isSignedIn ? remainingCredits(userId) : 0
   const pro = isSignedIn && isPro(userId)
 
@@ -479,15 +494,7 @@ export default function App() {
                       <button
                         className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
                         disabled={switchingSpace}
-                        onClick={async () => {
-                          setSwitchingSpace(true)
-                          try {
-                            await team.setActiveTeamId(null)
-                          } finally {
-                            setSwitchingSpace(false)
-                            setOpenHeaderMenu(null)
-                          }
-                        }}
+                        onClick={() => switchSpace(null)}
                       >
                         <span className="header-space-avatar header-space-avatar-personal">
                           <IconUser width={13} height={13} />
@@ -500,15 +507,7 @@ export default function App() {
                           <button
                             className="header-space-row"
                             disabled={switchingSpace}
-                            onClick={async () => {
-                              setSwitchingSpace(true)
-                              try {
-                                await team.setActiveTeamId(tm.id)
-                              } finally {
-                                setSwitchingSpace(false)
-                                setOpenHeaderMenu(null)
-                              }
-                            }}
+                            onClick={() => switchSpace(tm.id)}
                           >
                             <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
                               {tm.name.trim().charAt(0).toUpperCase()}
