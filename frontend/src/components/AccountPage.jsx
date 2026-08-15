@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
-import { deletePlan, movePlanToTeam, fetchAllPlansAggregated } from '../lib/planStorage'
+import { deletePlan, movePlanToTeam, fetchAllPlansAggregated, getAllPlans } from '../lib/planStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
@@ -38,6 +38,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
 
+  const pro = isPro(userId)
   const readIds = getReadIds(userId)
   const unreadNotifications = notifications.filter(n => !readIds.has(n.id)).length
 
@@ -50,10 +51,11 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   // Polling léger (toutes les 45s tant que cette page est ouverte) : va chercher côté
   // serveur les commentaires postés depuis un autre appareil, sur des espaces jamais
   // ouverts localement dans ce navigateur — sans ça, un commentaire posté ailleurs
-  // resterait invisible ici tant qu'on n'a pas soi-même rouvert cet espace.
+  // resterait invisible ici tant qu'on n'a pas soi-même rouvert cet espace. Réservé à Pro
+  // (voir tarification) : inutile d'interroger le serveur pour un flux qu'on n'affiche pas.
   const teamIdsKey = (team.myTeams || []).map(tm => tm.id).join(',')
   useEffect(() => {
-    if (!userId) return
+    if (!userId || !pro) return
     const teamIds = teamIdsKey ? teamIdsKey.split(',') : []
     let cancelled = false
     const poll = () => {
@@ -64,13 +66,13 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     poll()
     const interval = setInterval(poll, 45000)
     return () => { cancelled = true; clearInterval(interval) }
-  }, [userId, teamIdsKey, lang])
+  }, [userId, teamIdsKey, lang, pro])
 
-  // "Historique de tous les plans" regroupe volontairement tous les espaces (contrairement
-  // aux tableaux de bord d'espace, eux scopés à un seul à la fois) — chargé une fois au
-  // montage, pas de polling ici (contrairement aux notifications, la fraîcheur seconde
-  // près n'a pas d'intérêt pour une liste qu'on consulte, pas qu'on surveille).
+  // "Historique de tous les plans" regroupe tous les espaces — réservé à Pro (voir
+  // tarification). En gratuit, on reste utile (gérer ses propres plans reste possible)
+  // mais scopé au seul espace actif, sans agrégation cross-espaces ni appel serveur dédié.
   const refreshPlans = () => {
+    if (!pro) { setPlans(getAllPlans()); return }
     const teamIds = teamIdsKey ? teamIdsKey.split(',') : []
     fetchAllPlansAggregated(userId, teamIds).then(setPlans)
   }
@@ -78,7 +80,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     if (!userId) return
     refreshPlans()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userId, teamIdsKey])
+  }, [userId, teamIdsKey, pro])
 
   // Action différée demandée depuis ailleurs dans l'app (ex: la modal "limite de plans
   // gratuits atteinte") — ouvrir directement la modal Pro, ou défiler jusqu'à la liste des
@@ -133,7 +135,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     setCheckoutError(true)
   }
 
-  const pro = isPro(userId)
   const used = getUsedCredits(userId)
   const remaining = remainingCredits(userId)
 
@@ -199,9 +200,15 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       <div className="account-section card" id="account-notifications">
         <h3>
           <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
-          {unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}
+          {!pro && <span className="export-pro-badge">PRO</span>}
+          {pro && unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}
         </h3>
-        {notifications.length === 0 ? (
+        {!pro ? (
+          <div className="account-locked-teaser">
+            <p className="account-empty">{t(lang, 'account.notificationsProNote')}</p>
+            <button className="btn-secondary" onClick={() => setShowUpgrade(true)}>{t(lang, 'account.upgradeCta')}</button>
+          </div>
+        ) : notifications.length === 0 ? (
           <p className="account-empty">{lang === 'fr' ? 'Aucune notification pour le moment.' : 'No notifications yet.'}</p>
         ) : (
           <div className="account-list">
@@ -226,7 +233,11 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       </div>
 
       <div className="account-section card" id="account-plans">
-        <h3><IconClipboard width={16} height={16} /> {t(lang, 'account.plansSectionTitle')}</h3>
+        <h3>
+          <IconClipboard width={16} height={16} /> {t(lang, 'account.plansSectionTitle')}
+          {!pro && <span className="export-pro-badge">PRO</span>}
+        </h3>
+        {!pro && <p className="account-security-note">{t(lang, 'account.plansFreeNote')}</p>}
         {plans.length === 0 ? (
           <p className="account-empty">{t(lang, 'account.noPlans')}</p>
         ) : (

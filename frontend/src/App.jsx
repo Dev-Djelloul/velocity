@@ -487,8 +487,9 @@ export default function App() {
   const teamLimitReached = (team.myTeams?.length || 0) >= teamLimit
 
   // Juste un indicateur pour le menu (scan local, pas de polling ici) — la page Mon
-  // compte interroge elle le serveur au chargement pour la liste à jour.
-  const unreadNotifCount = isSignedIn
+  // compte interroge elle le serveur au chargement pour la liste à jour. Réservé à Pro
+  // (voir tarification), comme le flux de notifications lui-même.
+  const unreadNotifCount = isSignedIn && pro
     ? collectRecentComments(userId, lang).filter(n => !getReadIds(userId).has(n.id)).length
     : 0
 

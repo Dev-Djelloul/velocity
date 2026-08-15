@@ -933,7 +933,9 @@ export const translations = {
       noPlans: 'Aucun plan généré pour le moment.',
       noDrafts: 'Aucun brouillon sauvegardé.',
       memberSince: 'Membre depuis',
-      demoBadge: 'Compte démo'
+      demoBadge: 'Compte démo',
+      notificationsProNote: 'Les notifications de commentaires d\'équipe sont réservées au plan Pro.',
+      plansFreeNote: 'Historique limité à l\'espace actif. Passe en Pro pour voir tous tes espaces regroupés.'
     },
     settings: {
       title: 'Paramètres',
@@ -1881,7 +1883,9 @@ export const translations = {
       noPlans: 'No plan generated yet.',
       noDrafts: 'No saved drafts.',
       memberSince: 'Member since',
-      demoBadge: 'Demo account'
+      demoBadge: 'Demo account',
+      notificationsProNote: 'Team comment notifications are a Pro feature.',
+      plansFreeNote: 'History limited to the active space. Upgrade to Pro to see all your spaces combined.'
     },
     settings: {
       title: 'Settings',
