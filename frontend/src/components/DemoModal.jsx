@@ -10,25 +10,25 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
     {
       id: 'saas',
       title: 'SaaS B2B',
-      desc: 'Gestion de projet pour PME',
+      desc: lang === 'fr' ? 'Gestion de projet pour PME' : 'Project management for SMBs',
       Icon: IconBriefcase
     },
     {
       id: 'ecommerce',
       title: 'E-commerce',
-      desc: 'Mode éco-responsable, pré-lancement',
+      desc: lang === 'fr' ? 'Mode éco-responsable, pré-lancement' : 'Eco-friendly fashion, pre-launch',
       Icon: IconShoppingBag
     },
     {
       id: 'mobile',
-      title: 'Application Mobile',
-      desc: 'Automatisation pour équipes distribuées',
+      title: lang === 'fr' ? 'Application Mobile' : 'Mobile App',
+      desc: lang === 'fr' ? 'Automatisation pour équipes distribuées' : 'Automation for distributed teams',
       Icon: IconSmartphone
     },
     {
       id: 'ai',
-      title: 'Plateforme IA',
-      desc: 'Copilote data pour entreprises',
+      title: lang === 'fr' ? 'Plateforme IA' : 'AI Platform',
+      desc: lang === 'fr' ? 'Copilote data pour entreprises' : 'Data copilot for enterprises',
       Icon: IconSparkle
     }
   ]
@@ -161,8 +161,8 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
     <div className="modal-backdrop" onClick={onClose}>
       <div className="demo-modal card" onClick={e => e.stopPropagation()}>
         <div className="demo-modal-header">
-          <h2>Voir les exemples</h2>
-          <p>Choisissez un exemple pour voir un plan généré automatiquement</p>
+          <h2>{lang === 'fr' ? 'Voir les exemples' : 'See examples'}</h2>
+          <p>{lang === 'fr' ? 'Choisissez un exemple pour voir un plan généré automatiquement' : 'Choose an example to see an automatically generated plan'}</p>
         </div>
 
         <div className="demo-grid">
@@ -186,7 +186,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
             disabled={!selectedDemo}
             onClick={() => handleLoadDemo(selectedDemo)}
           >
-            <span className="btn-demo-load-text">Charger cet exemple</span>
+            <span className="btn-demo-load-text">{lang === 'fr' ? 'Charger cet exemple' : 'Load this example'}</span>
           </button>
         </div>
       </div>
