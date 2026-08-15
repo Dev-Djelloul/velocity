@@ -237,6 +237,39 @@
 
 .account-list-item-delete:hover { color: #fca5a5; }
 
+.account-list-item-move {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.65rem;
+  font-size: var(--font-size-xs);
+  white-space: nowrap;
+}
+
+.account-list-item-move:hover { color: var(--color-accent); }
+
+.move-target-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin: 0.75rem 0;
+}
+
+.move-target-btn {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(145, 132, 217, 0.2);
+  border-radius: var(--border-radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 0.6rem 0.85rem;
+  text-align: left;
+  font-size: var(--font-size-sm);
+}
+
+.move-target-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
+
 .upgrade-note {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);

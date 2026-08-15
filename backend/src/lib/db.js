@@ -49,6 +49,24 @@ export async function deletePlan(env, userId, id, teamId) {
   }
 }
 
+// Déplace un plan existant vers un autre espace (personnel <-> équipe, ou équipe <-> équipe).
+// fromTeamId doit correspondre à l'espace actuel du plan (vérifié par le WHERE) : un plan
+// personnel ne peut être déplacé que par son propriétaire, un plan d'équipe que par un membre
+// de cette équipe (la restriction "admin uniquement" pour en sortir est appliquée côté route,
+// comme pour deletePlan). Retourne null si le plan n'existe pas dans l'espace source attendu.
+export async function movePlan(env, userId, id, fromTeamId, toTeamId) {
+  const row = fromTeamId
+    ? await env.DB.prepare('SELECT data FROM plans WHERE id = ? AND team_id = ?').bind(id, fromTeamId).first()
+    : await env.DB.prepare('SELECT data FROM plans WHERE id = ? AND user_id = ? AND team_id IS NULL').bind(id, userId).first()
+  if (!row) return null
+  const now = new Date().toISOString()
+  const effectiveTeamId = toTeamId || null
+  const data = { ...JSON.parse(row.data), team_id: effectiveTeamId }
+  await env.DB.prepare('UPDATE plans SET team_id = ?, data = ?, updated_at = ? WHERE id = ?')
+    .bind(effectiveTeamId, JSON.stringify(data), now, id).run()
+  return { ...data, updatedAt: now }
+}
+
 export async function getPlan(env, id) {
   const row = await env.DB.prepare('SELECT data FROM plans WHERE id = ?').bind(id).first()
   return row ? JSON.parse(row.data) : null

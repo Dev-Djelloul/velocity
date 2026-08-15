@@ -40,6 +40,16 @@ export function removePlan(userId, id, teamId, role) {
   return safeFetch(`/plans/${encodeURIComponent(id)}?${params.toString()}`, { method: 'DELETE' })
 }
 
+// role : requis pour déplacer un plan hors d'une équipe (seuls les admins peuvent), ignoré
+// quand fromTeamId est absent (déplacement depuis le personnel) — voir backend/src/workers/api.js.
+export function movePlan(userId, id, fromTeamId, toTeamId, role) {
+  return safeFetch(`/plans/${encodeURIComponent(id)}/move`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, fromTeamId: fromTeamId || null, toTeamId: toTeamId || null, role })
+  })
+}
+
 export function fetchDrafts(userId) {
   return safeFetch(`/drafts?userId=${encodeURIComponent(userId)}`).then(r => r || [])
 }

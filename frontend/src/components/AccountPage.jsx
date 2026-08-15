@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
-import { useUser, useAuth, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
-import { getAllPlans, deletePlan } from '../lib/planStorage'
+import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
+import { getAllPlans, deletePlan, movePlanToTeam } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
@@ -20,6 +20,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
   const { userId, signOut } = useAuth()
   const openSecurity = useOpenSecurity()
   const authProvider = useAuthProvider()
+  const team = useTeam()
   const ProviderIcon = authProvider ? PROVIDER_ICONS[authProvider] : null
   const [plans, setPlans] = useState(getAllPlans)
   const [drafts, setDrafts] = useState(getAllDrafts)
@@ -29,6 +30,22 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
   const [checkoutError, setCheckoutError] = useState(false)
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
   const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
+  const [movePlanTarget, setMovePlanTarget] = useState(null)
+
+  // Sortir un plan de son équipe active est réservé aux admins (même règle que la
+  // suppression) ; le déplacer depuis le personnel n'a pas cette contrainte.
+  const canMoveOut = !team.teamId || team.isAdmin
+  const moveTargets = [
+    ...(team.teamId ? [{ id: null, name: t(lang, 'plans.movePersonal') }] : []),
+    ...(team.myTeams || []).filter(tm => tm.id !== team.teamId).map(tm => ({ id: tm.id, name: tm.name }))
+  ]
+
+  const confirmMovePlan = async (targetTeamId) => {
+    const plan = movePlanTarget
+    setMovePlanTarget(null)
+    await movePlanToTeam(plan.id, targetTeamId)
+    setPlans(getAllPlans())
+  }
 
   const startCheckout = async () => {
     setCheckoutLoading(true)
@@ -123,6 +140,11 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
                   <span className="account-list-item-name">{p.product?.name}</span>
                   <span className="account-list-item-meta">{p.classification}</span>
                 </button>
+                {canMoveOut && moveTargets.length > 0 && (
+                  <button className="account-list-item-move" onClick={() => setMovePlanTarget(p)} title={t(lang, 'plans.move')}>
+                    {t(lang, 'plans.move')}
+                  </button>
+                )}
                 <button className="account-list-item-delete" onClick={() => setDeletePlanTarget(p)} title="Delete">
                   <IconTrash width={14} height={14} />
                 </button>
@@ -192,6 +214,26 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
             <div className="confirm-modal-actions">
               <button className="btn-secondary" onClick={() => setDeletePlanTarget(null)}>{t(lang, 'plans.cancel')}</button>
               <button className="btn-danger" onClick={confirmRemovePlan}>{t(lang, 'plans.delete')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {movePlanTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setMovePlanTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <h3>{t(lang, 'plans.moveTitle')}</h3>
+            <p><strong>{movePlanTarget.product?.name || t(lang, 'plans.defaultPlanName')}</strong></p>
+            <p>{t(lang, 'plans.moveBody')}</p>
+            <div className="move-target-list">
+              {moveTargets.map(target => (
+                <button key={target.id ?? 'personal'} className="move-target-btn" onClick={() => confirmMovePlan(target.id)}>
+                  {target.name}
+                </button>
+              ))}
+            </div>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setMovePlanTarget(null)}>{t(lang, 'plans.cancel')}</button>
             </div>
           </div>
         </div>

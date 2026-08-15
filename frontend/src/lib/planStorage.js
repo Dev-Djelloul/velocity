@@ -1,4 +1,4 @@
-import { fetchPlans, pushPlan, removePlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
+import { fetchPlans, pushPlan, removePlan, movePlan as moveServerPlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
 
 const SHARES_KEY = 'plp_plan_shares'
 
@@ -89,6 +89,34 @@ export function deletePlan(id) {
   const filtered = plans.filter(p => p.id !== id)
   localStorage.setItem(plansKey(activeUserId, activeTeamId), JSON.stringify(filtered))
   removePlan(activeUserId, id, activeTeamId, activeRole)
+}
+
+// Déplace un plan de l'espace actif vers un autre espace (personnel ou une autre équipe).
+// Met à jour les deux caches locaux (retrait de l'espace source, ajout dans l'espace cible)
+// pour que la liste affichée reste cohérente sans attendre un resync serveur complet.
+export async function movePlanToTeam(id, targetTeamId) {
+  if (!activeUserId) return null
+  const plans = getAllPlans()
+  const plan = plans.find(p => p.id === id)
+  if (!plan) return null
+
+  const filtered = plans.filter(p => p.id !== id)
+  localStorage.setItem(plansKey(activeUserId, activeTeamId), JSON.stringify(filtered))
+
+  const movedPlan = { ...plan, team_id: targetTeamId || null, updatedAt: new Date().toISOString() }
+  const destKey = plansKey(activeUserId, targetTeamId)
+  const destPlans = (() => {
+    try {
+      return JSON.parse(localStorage.getItem(destKey) || '[]')
+    } catch {
+      return []
+    }
+  })()
+  destPlans.unshift(movedPlan)
+  localStorage.setItem(destKey, JSON.stringify(destPlans))
+
+  await moveServerPlan(activeUserId, id, activeTeamId, targetTeamId, activeRole)
+  return movedPlan
 }
 
 export async function createShareLink(planId) {

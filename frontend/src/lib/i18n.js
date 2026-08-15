@@ -848,7 +848,13 @@ export const translations = {
       defaultPlanName: 'Ce plan',
       deleteDraftConfirmTitle: 'Supprimer ce brouillon ?',
       deleteDraftConfirmSuffix: 'sera définitivement supprimé. Cette action est irréversible.',
-      defaultDraftName: 'Ce brouillon'
+      defaultDraftName: 'Ce brouillon',
+      move: 'Déplacer',
+      moveTitle: 'Déplacer ce plan',
+      moveBody: "Choisissez l'espace de destination :",
+      movePersonal: 'Personnel',
+      moveNoTargets: "Aucun autre espace disponible pour l'instant.",
+      moveForbidden: "Seul un admin de l'équipe peut déplacer un plan hors de cet espace."
     },
     footer: {
       tagline: 'Générateur intelligent de plan de lancement pour startups',
@@ -1793,7 +1799,13 @@ export const translations = {
       defaultPlanName: 'This plan',
       deleteDraftConfirmTitle: 'Delete this draft?',
       deleteDraftConfirmSuffix: 'will be permanently deleted. This action cannot be undone.',
-      defaultDraftName: 'This draft'
+      defaultDraftName: 'This draft',
+      move: 'Move',
+      moveTitle: 'Move this plan',
+      moveBody: 'Choose the destination space:',
+      movePersonal: 'Personal',
+      moveNoTargets: 'No other space available yet.',
+      moveForbidden: 'Only a team admin can move a plan out of this space.'
     },
     footer: {
       tagline: 'Intelligent SaaS launch plan generator',

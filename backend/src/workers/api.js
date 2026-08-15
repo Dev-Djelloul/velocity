@@ -69,6 +69,18 @@ export async function handleApi(request, env, url) {
     return json({ ok: true })
   }
 
+  const planMoveMatch = pathname.match(/^\/plans\/([^/]+)\/move$/)
+  if (planMoveMatch && method === 'POST') {
+    const { userId, fromTeamId, toTeamId, role } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    // Sortir un plan d'une équipe est réservé aux admins de cette équipe (même règle que
+    // la suppression) ; entrer dans une équipe ou rester en personnel n'a pas cette contrainte.
+    if (fromTeamId && role !== 'org:admin') return json({ error: 'forbidden' }, 403)
+    const moved = await db.movePlan(env, userId, planMoveMatch[1], fromTeamId || null, toTeamId || null)
+    if (!moved) return json({ error: 'not found' }, 404)
+    return json(moved)
+  }
+
   if (pathname === '/drafts' && method === 'GET') {
     const userId = searchParams.get('userId')
     if (!userId) return json({ error: 'userId required' }, 400)
