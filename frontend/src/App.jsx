@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -15,6 +15,7 @@ import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
 import AccountPage from './components/AccountPage'
 import TeamPage from './components/TeamPage'
+import SpacePage from './components/SpacePage'
 import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
 import { PricingModal, ChangelogModal, RoadmapModal } from './components/ProductModals'
@@ -29,7 +30,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team']
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -43,7 +44,8 @@ const PAGE_TO_PATH = {
   questionnaire: '/questionnaire',
   result: '/mon-plan',
   account: '/mon-compte',
-  team: '/mon-equipe'
+  team: '/mon-equipe',
+  space: '/mon-espace'
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
@@ -53,7 +55,8 @@ const PATH_TO_PAGE = {
   '/questionnaire': 'questionnaire',
   '/mon-plan': 'result',
   '/mon-compte': 'account',
-  '/mon-equipe': 'team'
+  '/mon-equipe': 'team',
+  '/mon-espace': 'space'
 }
 
 function pathForPage(page, authMode) {
@@ -486,8 +489,14 @@ export default function App() {
                   </button>
                   {openHeaderMenu === 'space' && (
                     <div className="header-dropdown header-space-dropdown">
-                      <button className="header-dropdown-item header-dropdown-item-primary" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
-                        <IconPlus width={16} height={16} /> {t(lang, 'team.createTeam')}
+                      <button
+                        className="header-dropdown-item header-dropdown-item-primary"
+                        onClick={() => { setOpenHeaderMenu(null); setCurrentPage('space'); window.scrollTo(0, 0) }}
+                      >
+                        <IconBarChart width={16} height={16} /> {lang === 'fr' ? 'Tableau de bord' : 'Dashboard'}
+                      </button>
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
+                        <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
                       </button>
 
                       <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
@@ -654,6 +663,16 @@ export default function App() {
         )}
         {currentPage === 'team' && isSignedIn && (
           <TeamPage lang={lang} onBack={() => setCurrentPage('landing')} />
+        )}
+        {currentPage === 'space' && isSignedIn && (
+          <SpacePage
+            key={dataVersion}
+            lang={lang}
+            onBack={() => setCurrentPage('landing')}
+            onLoadPlan={handleLoadFromHistory}
+            onCreatePlan={handleStartClick}
+            onOpenTeamSettings={() => { setCurrentPage('team'); window.scrollTo(0, 0) }}
+          />
         )}
       </main>
 

@@ -1,0 +1,137 @@
+.space-page {
+  max-width: 860px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.space-page-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.space-page-title {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex: 1;
+  min-width: 220px;
+}
+
+.space-page-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.space-page-avatar-personal {
+  background: rgba(145, 132, 217, 0.14);
+  color: var(--color-primary);
+}
+
+.space-page-title h1 {
+  font-size: var(--font-size-xl);
+  color: var(--color-text-primary);
+  margin-bottom: 0.15rem;
+}
+
+.space-page-title p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.space-page-settings-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.space-dashboard {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.85rem;
+}
+
+.space-dashboard-tile {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  background: var(--color-dashboard, var(--color-bg-secondary));
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: var(--radius-lg);
+  padding: 1rem 1.1rem;
+}
+
+.space-dashboard-icon {
+  color: var(--color-primary);
+  margin-bottom: 0.15rem;
+}
+
+.space-dashboard-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.space-dashboard-value-sm {
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.space-dashboard-label {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.space-page-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.space-page-section-head h3 {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.space-page-new-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.space-page-upsell {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  color: var(--color-primary);
+}
+
+.space-page-upsell h3 {
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.space-page-upsell p {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
