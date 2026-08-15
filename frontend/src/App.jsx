@@ -460,6 +460,10 @@ export default function App() {
                     <button className="header-dropdown-item header-dropdown-item-primary" onClick={() => { setOpenHeaderMenu(null); handleStartClick() }}>
                       <IconSparkle width={16} height={16} /> {lang === 'fr' ? 'Créer un plan' : 'Create a plan'}
                     </button>
+                    <p className="header-space-target">
+                      {lang === 'fr' ? 'Sera créé dans : ' : 'Will be created in: '}
+                      <strong>{team.teamId ? team.teamName : t(lang, 'team.personalSpace')}</strong>
+                    </p>
 
                     <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
                       <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
@@ -467,11 +471,6 @@ export default function App() {
                     <div className="header-dropdown-divider" />
 
                     <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
-                    <p className="header-space-hint">
-                      {lang === 'fr'
-                        ? "Espace personnel : plans visibles par vous seul. Équipe : visibles par tous ses membres."
-                        : 'Personal: plans only you can see. Team: visible to every member.'}
-                    </p>
                     <button
                       className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
                       onClick={() => { team.setActiveTeamId(null) }}
@@ -479,7 +478,10 @@ export default function App() {
                       <span className="header-space-avatar header-space-avatar-personal">
                         <IconUser width={13} height={13} />
                       </span>
-                      <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
+                      <span className="header-space-info">
+                        <span className="header-space-name">{t(lang, 'team.personalSpace')}</span>
+                        <span className="header-space-caption">{lang === 'fr' ? 'Visible par vous seul' : 'Only visible to you'}</span>
+                      </span>
                       {!team.teamId && <IconCheckCircle width={14} height={14} className="header-space-check" />}
                     </button>
                     {team.myTeams.map(tm => (
@@ -491,7 +493,10 @@ export default function App() {
                           <span className="header-space-avatar" style={{ background: teamColor(tm.id) }}>
                             {tm.name.trim().charAt(0).toUpperCase()}
                           </span>
-                          <span className="header-space-name">{tm.name}</span>
+                          <span className="header-space-info">
+                            <span className="header-space-name">{tm.name}</span>
+                            <span className="header-space-caption">{lang === 'fr' ? "Partagé avec l'équipe" : 'Shared with the team'}</span>
+                          </span>
                           {team.teamId === tm.id && <IconCheckCircle width={14} height={14} className="header-space-check" />}
                         </button>
                         <button
