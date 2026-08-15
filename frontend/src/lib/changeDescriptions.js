@@ -7,6 +7,23 @@ import { formatDateShort } from './dateFormat'
 
 const MAX_ITEMS = 3
 
+const SECTION_LABELS = {
+  roadmap: { fr: 'Roadmap', en: 'Roadmap' },
+  planStartDate: { fr: 'Date de démarrage', en: 'Start date' },
+  kpis: { fr: 'KPIs', en: 'KPIs' },
+  metrics: { fr: 'Suivi post-lancement', en: 'Post-launch tracking' },
+  launchDate: { fr: 'Date de lancement', en: 'Launch date' },
+  veille: { fr: 'Veille IA', en: 'AI market watch' },
+  benchmarks: { fr: 'Benchmarks', en: 'Benchmarks' },
+  editorial: { fr: 'Calendrier éditorial', en: 'Editorial calendar' },
+  advertising: { fr: 'Calendrier publicitaire', en: 'Ad calendar' },
+  rgpd: { fr: 'RGPD', en: 'GDPR' }
+}
+
+export function sectionLabel(key, lang) {
+  return SECTION_LABELS[key]?.[lang] || SECTION_LABELS[key]?.fr || key
+}
+
 function joinChanges(items, lang) {
   if (items.length <= MAX_ITEMS) return items.join(' · ')
   const rest = items.length - MAX_ITEMS
@@ -38,7 +55,7 @@ export function describeRoadmapChange(oldRoadmap, newRoadmap, lang) {
       )
     }
   }
-  if (!changes.length) return lang === 'fr' ? 'Roadmap mise à jour' : 'Roadmap updated'
+  if (!changes.length) return lang === 'fr' ? 'Mise à jour' : 'Updated'
   return joinChanges(changes, lang)
 }
 
@@ -50,20 +67,23 @@ export function describeKpisChange(oldKpis, newKpis, lang) {
     if (prev && prev.target !== kpi.target) {
       changes.push(
         lang === 'fr'
-          ? `KPI « ${kpi.name} » : cible ${prev.target ?? '—'} → ${kpi.target ?? '—'}`
-          : `KPI "${kpi.name}": target ${prev.target ?? '—'} → ${kpi.target ?? '—'}`
+          ? `« ${kpi.name} » : cible ${prev.target ?? '—'} → ${kpi.target ?? '—'}`
+          : `"${kpi.name}": target ${prev.target ?? '—'} → ${kpi.target ?? '—'}`
       )
     }
   }
-  if (!changes.length) return lang === 'fr' ? 'KPIs mis à jour' : 'KPIs updated'
+  if (!changes.length) return lang === 'fr' ? 'Mis à jour' : 'Updated'
   return joinChanges(changes, lang)
 }
 
-export function describeDateChange(oldIso, newIso, label, lang) {
+// Le nom de la section (ex. "Date de lancement") est déjà ajouté en préfixe par
+// l'appelant (voir sectionLabel + formatChangeItem dans PlanViewer) — on ne retourne que
+// le détail de la valeur elle-même pour éviter de le répéter deux fois.
+export function describeDateChange(oldIso, newIso, lang) {
   const oldDate = formatDateShort(oldIso, lang)
   const newDate = formatDateShort(newIso, lang)
-  if (!oldDate) return `${label} : ${newDate}`
-  return `${label} : ${oldDate} → ${newDate}`
+  if (!oldDate) return newDate
+  return `${oldDate} → ${newDate}`
 }
 
 export function describeMetricsChange(oldHistory, newHistory, lang) {
@@ -75,5 +95,5 @@ export function describeMetricsChange(oldHistory, newHistory, lang) {
     return lang === 'fr' ? `Point de suivi ajouté${date ? ` (${date})` : ''}` : `Tracking point added${date ? ` (${date})` : ''}`
   }
   if (newLen < oldLen) return lang === 'fr' ? 'Point de suivi supprimé' : 'Tracking point removed'
-  return lang === 'fr' ? 'Suivi post-lancement mis à jour' : 'Post-launch tracking updated'
+  return lang === 'fr' ? 'Mis à jour' : 'Updated'
 }

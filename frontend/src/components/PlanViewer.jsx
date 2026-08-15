@@ -27,7 +27,7 @@ import { savePlan } from '../lib/planStorage'
 import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { describeRoadmapChange, describeKpisChange, describeDateChange, describeMetricsChange } from '../lib/changeDescriptions'
+import { describeRoadmapChange, describeKpisChange, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
 import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
@@ -59,9 +59,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   // Une description précise (pas juste le nom de la section) pour chaque modification,
   // calculée au moment du changement pendant qu'on a encore l'ancienne ET la nouvelle
-  // valeur sous la main — impossible à reconstituer après coup.
-  const markChanged = (description) => {
-    setPendingChanges(prev => [...prev, description])
+  // valeur sous la main — impossible à reconstituer après coup. On garde aussi la section
+  // pour l'afficher en préfixe ("Roadmap — ...").
+  const markChanged = (section, detail) => {
+    setPendingChanges(prev => [...prev, { section, detail }])
   }
 
   const budgetKeyFor = (value) => {
@@ -89,57 +90,59 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // l'utilisateur — avant, chaque régénération (veille, benchmarks...) ou glisser-déposer
   // écrasait silencieusement la version sauvegardée.
   const updateRoadmap = (nextRoadmap) => {
-    markChanged(describeRoadmapChange(plan.roadmap, nextRoadmap, lang))
+    markChanged('roadmap', describeRoadmapChange(plan.roadmap, nextRoadmap, lang))
     setPlan(p => ({ ...p, roadmap: nextRoadmap }))
   }
 
   const updatePlanStartDate = (dateStr) => {
     const nextIso = dateStr + 'T00:00:00Z'
-    markChanged(describeDateChange(plan.planStartDate, nextIso, lang === 'fr' ? 'Date de démarrage' : 'Start date', lang))
+    markChanged('planStartDate', describeDateChange(plan.planStartDate, nextIso, lang))
     setPlan(p => ({ ...p, planStartDate: nextIso }))
   }
 
   const updateKpis = (nextKpis) => {
-    markChanged(describeKpisChange(plan.kpis, nextKpis, lang))
+    markChanged('kpis', describeKpisChange(plan.kpis, nextKpis, lang))
     setPlan(p => ({ ...p, kpis: nextKpis }))
   }
 
   const updateMetricsHistory = (nextHistory) => {
-    markChanged(describeMetricsChange(plan.metricsHistory, nextHistory, lang))
+    markChanged('metrics', describeMetricsChange(plan.metricsHistory, nextHistory, lang))
     setPlan(p => ({ ...p, metricsHistory: nextHistory }))
   }
 
   const updateLaunchDate = (dateStr) => {
     const nextIso = dateStr + 'T00:00:00Z'
-    markChanged(describeDateChange(plan.launchDate, nextIso, lang === 'fr' ? 'Date de lancement' : 'Launch date', lang))
+    markChanged('launchDate', describeDateChange(plan.launchDate, nextIso, lang))
     setPlan(p => ({ ...p, launchDate: nextIso }))
   }
 
   // Veille/benchmarks/éditorial/pub/RGPD sont régénérés en bloc par un agent IA (pas
   // d'édition fine) : la description la plus honnête du changement est "régénéré(e)",
   // ça correspond exactement à ce qui vient de se passer.
+  const regeneratedLabel = lang === 'fr' ? 'Régénéré' : 'Regenerated'
+
   const updateVeille = (nextVeille) => {
-    markChanged(lang === 'fr' ? 'Veille IA régénérée' : 'AI market watch regenerated')
+    markChanged('veille', regeneratedLabel)
     setPlan(p => ({ ...p, veille: nextVeille }))
   }
 
   const updateBenchmarks = (nextBenchmarks) => {
-    markChanged(lang === 'fr' ? 'Benchmarks régénérés' : 'Benchmarks regenerated')
+    markChanged('benchmarks', regeneratedLabel)
     setPlan(p => ({ ...p, benchmarks: nextBenchmarks }))
   }
 
   const updateEditorial = (nextEditorial) => {
-    markChanged(lang === 'fr' ? 'Calendrier éditorial régénéré' : 'Editorial calendar regenerated')
+    markChanged('editorial', regeneratedLabel)
     setPlan(p => ({ ...p, editorial: nextEditorial }))
   }
 
   const updateAdvertising = (nextAdvertising) => {
-    markChanged(lang === 'fr' ? 'Calendrier publicitaire régénéré' : 'Ad calendar regenerated')
+    markChanged('advertising', regeneratedLabel)
     setPlan(p => ({ ...p, advertising: nextAdvertising }))
   }
 
   const updateRgpd = (nextRgpd) => {
-    markChanged(lang === 'fr' ? 'Évaluation RGPD régénérée' : 'GDPR assessment regenerated')
+    markChanged('rgpd', regeneratedLabel)
     setPlan(p => ({ ...p, rgpd: nextRgpd }))
   }
 
@@ -196,13 +199,20 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   const generatedDateTime = formatFullDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
 
+  // Affiche "Section — détail" ; reste compatible avec les entrées enregistrées avant
+  // l'ajout du préfixe de section (simples chaînes) ou avec l'ancien format par sections.
+  const formatChangeItem = (change) => {
+    if (typeof change === 'string') return change
+    return `${sectionLabel(change.section, lang)} — ${change.detail}`
+  }
+
   return (
     <div className="plan-viewer-layout">
       {isDirty && (
         <div className="unsaved-banner" role="status">
           <IconSave width={15} height={15} className="unsaved-banner-icon" />
           <div className="unsaved-banner-text">
-            <span>{t(lang, 'app.justModified')(pendingChanges[pendingChanges.length - 1])}</span>
+            <span>{t(lang, 'app.justModified')(formatChangeItem(pendingChanges[pendingChanges.length - 1]))}</span>
             {pendingChanges.length > 1 && (
               <span className="unsaved-banner-extra">{t(lang, 'app.pendingChangesExtra')(pendingChanges.length - 1)}</span>
             )}
@@ -229,7 +239,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                     <li key={i}>
                       <span className="plan-changelog-date">{formatFullDateTime(entry.date, lang)}</span>
                       <ul className="plan-changelog-details">
-                        {(entry.changes || entry.sections || []).map((change, j) => <li key={j}>{change}</li>)}
+                        {(entry.changes || entry.sections || []).map((change, j) => <li key={j}>{formatChangeItem(change)}</li>)}
                       </ul>
                     </li>
                   ))}
