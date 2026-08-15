@@ -84,6 +84,7 @@ export default function App() {
   const [initialFormData, setInitialFormData] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
+  const [inviteTicketDismissed, setInviteTicketDismissed] = useState(false)
   const [showHistory, setShowHistory] = useState(false)
   const [showDemo, setShowDemo] = useState(false)
   const [showDrafts, setShowDrafts] = useState(false)
@@ -153,6 +154,20 @@ export default function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname])
+
+  // Lien d'invitation d'équipe Clerk (__clerk_ticket dans l'URL) : un visiteur non connecté
+  // doit atterrir sur le formulaire d'inscription pour que <SignUp> (dans AuthPage) prenne
+  // en charge le ticket automatiquement — sans ce routage, l'URL retombe sur la page
+  // d'accueil où aucun composant Clerk n'est monté, et le ticket n'est jamais traité.
+  useEffect(() => {
+    if (!isLoaded || isSignedIn) return
+    if (!new URLSearchParams(location.search).has('__clerk_ticket')) return
+    if (currentPage !== 'auth') {
+      setAuthMode('signup')
+      setCurrentPage('auth')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isLoaded, isSignedIn, location.search])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -398,6 +413,23 @@ export default function App() {
   const remaining = isSignedIn ? remainingCredits(userId) : 0
   const pro = isSignedIn && isPro(userId)
 
+  // Invitation d'équipe ouverte alors qu'une session est déjà active dans ce navigateur
+  // (typiquement : on teste le lien d'invitation soi-même, dans le même navigateur que
+  // celui qui vient de l'envoyer) — Clerk accepte silencieusement l'invitation pour la
+  // session en cours plutôt que de proposer de changer de compte. On le rend visible ici
+  // au lieu de laisser l'utilisateur atterrir sans explication sur l'app déjà connectée.
+  const showInviteTicketAlert = isSignedIn && !inviteTicketDismissed
+    && new URLSearchParams(location.search).has('__clerk_ticket')
+
+  const dismissInviteTicketAlert = () => {
+    setInviteTicketDismissed(true)
+    const params = new URLSearchParams(window.location.search)
+    params.delete('__clerk_ticket')
+    params.delete('__clerk_status')
+    const query = params.toString()
+    window.history.replaceState({}, '', window.location.pathname + (query ? `?${query}` : ''))
+  }
+
   return (
     <div className="app">
       <header className={`header ${currentPage === 'landing' ? 'header-locked-dark' : ''}`}>
@@ -629,6 +661,20 @@ export default function App() {
       </header>
 
       {error && <div className="error-banner">{error}</div>}
+
+      {showInviteTicketAlert && (
+        <div className="invite-ticket-banner" role="status">
+          <span>
+            {lang === 'fr'
+              ? `Vous êtes connecté en tant que ${user?.fullName || user?.firstName || 'ce compte'}. Si cette invitation d'équipe est destinée à quelqu'un d'autre, déconnectez-vous avant de l'accepter.`
+              : `You're signed in as ${user?.fullName || user?.firstName || 'this account'}. If this team invite is meant for someone else, sign out before accepting it.`}
+          </span>
+          <div className="invite-ticket-banner-actions">
+            <button className="btn-secondary" onClick={signOut}>{t(lang, 'auth.signOut')}</button>
+            <button className="btn-secondary" onClick={dismissInviteTicketAlert}>{t(lang, 'export.close')}</button>
+          </div>
+        </div>
+      )}
 
       <main>
         {currentPage === 'landing' && (
