@@ -237,6 +237,19 @@
   transition: background 0.15s ease;
 }
 
+.header-dropdown-item-primary {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  font-weight: 700;
+  margin-bottom: 0.4rem;
+}
+
+.header-dropdown-item-primary:hover {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  filter: brightness(1.1);
+  color: #0b0c10;
+}
+
 .header-dropdown-item.is-current {
   color: var(--color-primary);
   background: rgba(145, 132, 217, 0.1);

@@ -448,6 +448,10 @@ export default function App() {
                       </div>
                     )}
 
+                    <button className="header-dropdown-item header-dropdown-item-primary" onClick={() => { setOpenHeaderMenu(null); handleStartClick() }}>
+                      <IconSparkle width={16} height={16} /> {lang === 'fr' ? 'Créer un plan' : 'Create a plan'}
+                    </button>
+
                     <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
                       <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
                     </button>
