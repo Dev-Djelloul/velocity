@@ -1,10 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import VelocityLaunchLogo from './VelocityLaunchLogo'
+import InfoModal from './InfoModal'
+import { sectionLabel } from '../lib/changeDescriptions'
+import { formatFullDateTime } from '../lib/dateFormat'
 import {
   IconChevronDown, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
-  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge, IconMegaphone, IconLock
+  IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge, IconMegaphone, IconLock,
+  IconClock as IconHistory, IconTrash, IconAlertTriangle
 } from './Icons'
 import '../styles/PlanSidebar.css'
 
@@ -78,12 +82,14 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory }) {
   const [collapsed, setCollapsed] = useState(false)
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(FIRST_ID)
   const [resizing, setResizing] = useState(false)
   const [collapsedGroups, setCollapsedGroups] = useState({})
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [confirmClearHistory, setConfirmClearHistory] = useState(false)
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
   const itemRefs = useRef({})
 
@@ -183,6 +189,53 @@ export default function PlanSidebar({ lang, onNewPlan }) {
         {!collapsed && <span className="plan-sidebar-label plan-sidebar-label-gradient">{t(lang, 'sidebar.createPlan')}</span>}
       </button>
 
+      {!!changeLog?.length && (
+        <div className="plan-sidebar-history">
+          <button
+            className={`plan-sidebar-item plan-sidebar-history-toggle ${historyOpen ? 'open' : ''}`}
+            onClick={() => setHistoryOpen(v => !v)}
+            title={collapsed ? t(lang, 'outputs.historyPanelTitle') : t(lang, historyOpen ? 'outputs.historyCollapse' : 'outputs.historyExpand')}
+          >
+            <span className="plan-sidebar-icon"><IconHistory width={16} height={16} /></span>
+            {!collapsed && (
+              <>
+                <span className="plan-sidebar-label">{t(lang, 'outputs.historyPanelTitle')}</span>
+                <IconChevronDown width={12} height={12} className="plan-sidebar-history-chevron" />
+              </>
+            )}
+          </button>
+
+          {!collapsed && historyOpen && (
+            <div className="plan-sidebar-history-panel">
+              <div className="plan-sidebar-history-list">
+                {changeLog.map((entry, i) => (
+                  <div className="plan-sidebar-history-group" key={i}>
+                    <span className="plan-sidebar-history-date">{formatFullDateTime(entry.date, lang)}</span>
+                    <ul className="change-list">
+                      {(entry.changes || entry.sections || []).map((change, j) => (
+                        <li className="change-row" key={j}>
+                          {typeof change === 'string' ? (
+                            <span className="change-detail">{change}</span>
+                          ) : (
+                            <>
+                              <span className="change-section-tag">{sectionLabel(change.section, lang)}</span>
+                              <span className="change-detail">{change.detail}</span>
+                            </>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))}
+              </div>
+              <button className="plan-sidebar-history-clear" onClick={() => setConfirmClearHistory(true)}>
+                <IconTrash width={13} height={13} /> {t(lang, 'outputs.historyClear')}
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+
       <nav className="plan-sidebar-nav">
         {collapsed
           ? GROUPS.flatMap(g => g.sections).map(renderItem)
@@ -221,6 +274,27 @@ export default function PlanSidebar({ lang, onNewPlan }) {
         onMouseDown={e => e.stopPropagation()}
         title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
       />
+
+      {confirmClearHistory && (
+        <InfoModal
+          icon={<IconAlertTriangle width={22} height={22} />}
+          title={t(lang, 'outputs.historyClearConfirmTitle')}
+          onClose={() => setConfirmClearHistory(false)}
+        >
+          <p className="unsaved-changes-body">{t(lang, 'outputs.historyClearConfirmBody')}</p>
+          <div className="unsaved-changes-actions">
+            <button className="btn-secondary" onClick={() => setConfirmClearHistory(false)}>
+              {t(lang, 'outputs.historyClearCancel')}
+            </button>
+            <button
+              className="btn-primary"
+              onClick={() => { setConfirmClearHistory(false); setHistoryOpen(false); onClearHistory?.() }}
+            >
+              {t(lang, 'outputs.historyClearConfirm')}
+            </button>
+          </div>
+        </InfoModal>
+      )}
     </div>
   )
 }

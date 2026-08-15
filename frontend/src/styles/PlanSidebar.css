@@ -261,6 +261,103 @@
   -webkit-text-fill-color: transparent;
 }
 
+.plan-sidebar-history {
+  flex-shrink: 0;
+  margin-bottom: 0.6rem;
+}
+
+.plan-sidebar-history-toggle {
+  justify-content: flex-start;
+}
+
+.plan-sidebar-history-toggle.open {
+  color: var(--color-text-primary);
+}
+
+.plan-sidebar-history-chevron {
+  margin-left: auto;
+  flex-shrink: 0;
+  transition: transform 0.15s ease;
+}
+
+.plan-sidebar-history-toggle.open .plan-sidebar-history-chevron {
+  transform: rotate(180deg);
+}
+
+/* Fond noir volontairement plus sombre que le reste de la sidebar : distingue le journal,
+   qui se lit comme une console d'activité, du panneau de navigation. */
+.plan-sidebar-history-panel {
+  margin-top: 0.3rem;
+  background: #06070a;
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  border-radius: 9px;
+  padding: 0.6rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.plan-sidebar-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-right: 0.2rem;
+}
+
+.plan-sidebar-history-group {
+  padding-bottom: 0.55rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.plan-sidebar-history-group:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.plan-sidebar-history-date {
+  display: block;
+  color: #06b6d4;
+  font-size: 0.68rem;
+  font-weight: var(--font-weight-semibold);
+  margin-bottom: 0.35rem;
+}
+
+.plan-sidebar-history-panel .change-row {
+  font-size: 0.76rem;
+}
+
+.plan-sidebar-history-panel .change-section-tag {
+  font-size: 0.62rem;
+  padding: 0.05rem 0.4rem;
+}
+
+.plan-sidebar-history-clear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  background: none;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 7px;
+  color: #f87171;
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-medium);
+  padding: 0.4rem;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.plan-sidebar-history-clear:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.45);
+}
+
+.plan-sidebar.collapsed .plan-sidebar-history-panel {
+  display: none;
+}
+
 .plan-sidebar-brand {
   display: flex;
   align-items: center;

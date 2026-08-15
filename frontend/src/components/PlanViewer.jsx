@@ -42,7 +42,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [pendingChanges, setPendingChanges] = useState([])
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
-  const [showFullChangeLog, setShowFullChangeLog] = useState(false)
   const captureRef = useRef(null)
 
   const isDirty = pendingChanges.length > 0
@@ -213,9 +212,19 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     setPendingChanges([])
     setJustSaved(true)
     setTimeout(() => setJustSaved(false), 2500)
-    // Remonte vers le journal en haut de page pour que la modification qu'on vient
-    // d'enregistrer soit immédiatement visible, plutôt que de rester scrollé loin en bas.
+    // Remonte en haut de page après l'enregistrement, pour repartir d'une vue propre
+    // plutôt que de rester scrollé loin en bas de l'édition qu'on vient de faire.
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  // Efface le journal des modifications (pas le plan lui-même) — action immédiate une fois
+  // confirmée dans la popup d'avertissement de PlanSidebar, pas soumise au bouton
+  // "Enregistrer" : l'utilisateur vient de valider explicitement une suppression définitive.
+  const handleClearHistory = () => {
+    if (!plan.id) return
+    const cleared = { ...plan, changeLog: [] }
+    setPlan(cleared)
+    savePlan(cleared)
   }
 
   const handleNewPlanClick = () => {
@@ -254,7 +263,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </ul>
         </div>
       )}
-      <PlanSidebar lang={lang} onNewPlan={handleNewPlanClick} />
+      <PlanSidebar lang={lang} onNewPlan={handleNewPlanClick} changeLog={plan.changeLog} onClearHistory={handleClearHistory} />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
@@ -263,30 +272,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </span>
           <div className="plan-confirmation-text">
             <h3>{justGenerated ? t(lang, 'outputs.planReadyTitle') : t(lang, 'outputs.planLoadedTitle')}</h3>
-            {justGenerated ? (
-              <p>{t(lang, 'outputs.planReadySubtitle')(generatedDateTime)}</p>
-            ) : plan.changeLog?.length ? (
-              <div className="plan-changelog">
-                <p className="plan-changelog-heading">{t(lang, 'outputs.lastChangesTitle')}</p>
-                <div className={showFullChangeLog ? 'plan-changelog-full' : ''}>
-                  {(showFullChangeLog ? plan.changeLog : plan.changeLog.slice(0, 3)).map((entry, i) => (
-                    <div className="plan-changelog-group" key={i}>
-                      <span className="plan-changelog-date">{formatFullDateTime(entry.date, lang)}</span>
-                      <ul className="change-list">
-                        {(entry.changes || entry.sections || []).map((change, j) => <ChangeRow key={j} change={change} />)}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-                {plan.changeLog.length > 3 && (
-                  <button className="plan-changelog-toggle" onClick={() => setShowFullChangeLog(v => !v)}>
-                    {showFullChangeLog ? t(lang, 'outputs.hideFullChangeLog') : t(lang, 'outputs.showFullChangeLog')(plan.changeLog.length)}
-                  </button>
-                )}
-              </div>
-            ) : (
-              <p>{t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
-            )}
+            <p>{justGenerated ? t(lang, 'outputs.planReadySubtitle')(generatedDateTime) : t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
           </div>
         </div>
       )}
