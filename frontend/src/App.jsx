@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
@@ -29,10 +30,40 @@ import './App.css'
 
 const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account']
 
+// Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
+// pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
+// On garde currentPage comme source de vérité pour toute la logique existante (guards,
+// navigation interne...) et on la synchronise avec l'URL dans les deux sens plutôt que de
+// réécrire tous les appels à setCurrentPage en navigate() — bien plus sûr sur une app de
+// cette taille.
+const PAGE_TO_PATH = {
+  landing: '/',
+  howItWorks: '/comment-ca-marche',
+  questionnaire: '/questionnaire',
+  result: '/mon-plan',
+  account: '/mon-compte'
+}
+const PATH_TO_PAGE = {
+  '/': 'landing',
+  '/comment-ca-marche': 'howItWorks',
+  '/connexion': 'auth',
+  '/inscription': 'auth',
+  '/questionnaire': 'questionnaire',
+  '/mon-plan': 'result',
+  '/mon-compte': 'account'
+}
+
+function pathForPage(page, authMode) {
+  if (page === 'auth') return authMode === 'signup' ? '/inscription' : '/connexion'
+  return PAGE_TO_PATH[page] || '/'
+}
+
 export default function App() {
+  const navigate = useNavigate()
+  const location = useLocation()
   const [lang, setLang] = useState(() => localStorage.getItem('plp_lang') || 'fr')
   const [theme, setTheme] = useState(() => localStorage.getItem('plp_theme') || 'dark')
-  const [currentPage, setCurrentPage] = useState('landing') // landing, questionnaire, result, howItWorks, account
+  const [currentPage, setCurrentPage] = useState(() => PATH_TO_PAGE[window.location.pathname] || 'landing')
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
   const [initialFormData, setInitialFormData] = useState(null)
@@ -44,7 +75,7 @@ export default function App() {
   const [activeModal, setActiveModal] = useState(null)
   const [isSharedView, setIsSharedView] = useState(false)
   const [dataVersion, setDataVersion] = useState(0)
-  const [authMode, setAuthMode] = useState('signup')
+  const [authMode, setAuthMode] = useState(() => window.location.pathname === '/connexion' ? 'signin' : 'signup')
   const [authIntent, setAuthIntent] = useState(null)
   const [pendingDemoData, setPendingDemoData] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
@@ -82,6 +113,26 @@ export default function App() {
     document.documentElement.dataset.theme = theme
     localStorage.setItem('plp_theme', theme)
   }, [theme])
+
+  // Reflète currentPage/authMode dans l'URL (navigation interne -> barre d'adresse).
+  useEffect(() => {
+    const target = pathForPage(currentPage, authMode)
+    if (location.pathname !== target) {
+      navigate({ pathname: target, search: location.search }, { replace: false })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, authMode])
+
+  // Reflète l'URL dans currentPage/authMode (bouton précédent/suivant, lien direct, refresh).
+  useEffect(() => {
+    const page = PATH_TO_PAGE[location.pathname] || 'landing'
+    if (page !== currentPage) setCurrentPage(page)
+    if (page === 'auth') {
+      const mode = location.pathname === '/connexion' ? 'signin' : 'signup'
+      if (mode !== authMode) setAuthMode(mode)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)

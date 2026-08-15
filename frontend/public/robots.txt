@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /questionnaire
+Disallow: /mon-plan
+Disallow: /mon-compte
+Disallow: /connexion
+Disallow: /inscription
+
+Sitemap: https://velocity.digitalblueskye.com/sitemap.xml
