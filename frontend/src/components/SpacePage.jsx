@@ -145,6 +145,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                     <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
                     {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
                     {p.createdByName && ` · ${p.createdByName}`}
+                    {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
                   </span>
                 </button>
                 <button className="account-list-item-delete" onClick={() => setDeleteTarget(p)} title="Delete">

@@ -295,8 +295,182 @@
 
 .move-target-btn:hover { border-color: var(--color-accent); color: var(--color-accent); }
 
+.account-notif-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 0.35rem;
+  margin-left: 0.4rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.account-notif-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  align-items: flex-start;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+}
+
+.account-notif-item:last-child { border-bottom: none; }
+
+.account-notif-item.is-unread {
+  background: rgba(145, 132, 217, 0.08);
+}
+
+.account-notif-item:hover { color: var(--color-accent); }
+
+.account-notif-head {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.account-notif-item.is-unread .account-notif-head { color: var(--color-text-primary); }
+
+.account-notif-head strong { color: var(--color-text-primary); }
+.account-notif-head em { font-style: normal; color: var(--color-primary); }
+
+.account-notif-space {
+  margin-left: 0.5rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.account-notif-text {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+  white-space: pre-wrap;
+}
+
+.account-notif-date {
+  font-size: 0.68rem;
+  color: var(--color-text-muted);
+}
+
 .upgrade-note {
   font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   font-style: italic;
 }
+
+.upgrade-modal {
+  position: relative;
+  width: 100%;
+  max-width: 380px;
+  padding: 2rem 1.75rem 1.75rem;
+  border-radius: var(--radius-lg, 16px);
+  text-align: center;
+  background:
+    linear-gradient(var(--color-dashboard, var(--color-bg-secondary)), var(--color-dashboard, var(--color-bg-secondary))) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  border: 1.5px solid transparent;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.upgrade-modal-close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.3rem;
+  border-radius: 6px;
+}
+
+.upgrade-modal-close:hover {
+  color: var(--color-text-primary);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.upgrade-modal-icon {
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+}
+
+.upgrade-modal h3 {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.upgrade-modal-body {
+  color: var(--color-text-muted);
+  font-size: 0.88rem;
+  margin-bottom: 1.25rem;
+}
+
+.upgrade-modal-features {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  text-align: left;
+}
+
+.upgrade-modal-features li {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  font-size: 0.85rem;
+  color: var(--color-text-secondary);
+}
+
+.upgrade-modal-features li svg {
+  flex-shrink: 0;
+  color: #06b6d4;
+}
+
+.upgrade-modal-cta {
+  width: 100%;
+  padding: 0.85rem;
+  border: none;
+  border-radius: var(--radius-md, 10px);
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #0b0c10;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.upgrade-modal-cta:hover:not(:disabled) { filter: brightness(1.1); }
+.upgrade-modal-cta:disabled { opacity: 0.5; cursor: default; }
+
+.upgrade-modal-secondary {
+  width: 100%;
+  margin-top: 0.6rem;
+  padding: 0.7rem;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.upgrade-modal-secondary:hover { color: var(--color-text-primary); }

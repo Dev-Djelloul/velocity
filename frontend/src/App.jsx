@@ -23,7 +23,7 @@ import { PricingModal, ChangelogModal, RoadmapModal } from './components/Product
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
+import { savePlan, getAllPlans, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
@@ -91,6 +91,7 @@ export default function App() {
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [switchingSpace, setSwitchingSpace] = useState(false)
   const [creatingTeam, setCreatingTeam] = useState(false)
+  const [pendingNotificationPlanId, setPendingNotificationPlanId] = useState(null)
   const [newTeamName, setNewTeamName] = useState('')
   const headerMenuRef = useRef(null)
 
@@ -347,6 +348,30 @@ export default function App() {
     setCurrentPage('result')
     window.scrollTo(0, 0)
   }
+
+  // Ouvrir une notification peut demander de changer d'espace actif au préalable (le
+  // commentaire peut venir d'une équipe différente de celle affichée) — le changement est
+  // asynchrone côté Clerk, donc on mémorise l'id à ouvrir et l'effet ci-dessous prend le
+  // relais dès que le nouvel espace est chargé et ses plans resynchronisés.
+  const handleOpenNotification = (item) => {
+    if (item.spaceId === team.teamId) {
+      const found = getAllPlans().find(p => p.id === item.planId)
+      if (found) handleLoadFromHistory(found)
+      return
+    }
+    setPendingNotificationPlanId(item.planId)
+    team.setActiveTeamId(item.spaceId)
+  }
+
+  useEffect(() => {
+    if (!pendingNotificationPlanId || !team.isLoaded) return
+    const found = getAllPlans().find(p => p.id === pendingNotificationPlanId)
+    if (found) {
+      handleLoadFromHistory(found)
+      setPendingNotificationPlanId(null)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pendingNotificationPlanId, team.teamId, team.isLoaded, dataVersion])
 
   const handleLoadDraft = (formData) => {
     setInitialFormData(formData)
@@ -699,6 +724,7 @@ export default function App() {
             lang={lang}
             onBack={() => setCurrentPage('landing')}
             onLoadPlan={handleLoadFromHistory}
+            onOpenNotification={handleOpenNotification}
           />
         )}
         {currentPage === 'team' && isSignedIn && (

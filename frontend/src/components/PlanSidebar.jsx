@@ -4,6 +4,7 @@ import VelocityLaunchLogo from './VelocityLaunchLogo'
 import InfoModal from './InfoModal'
 import { sectionLabel } from '../lib/changeDescriptions'
 import { formatFullDateTime } from '../lib/dateFormat'
+import { getReadIds, markCommentsRead } from '../lib/commentReads'
 import {
   IconChevronDown, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
@@ -105,6 +106,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentTopic, setCommentTopic] = useState('general')
   const [commentText, setCommentText] = useState('')
+  const [readVersion, setReadVersion] = useState(0)
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
   const itemRefs = useRef({})
 
@@ -175,6 +177,22 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
     if (!commentText.trim()) return
     onAddComment?.(commentTopic, commentText)
     setCommentText('')
+  }
+
+  // Non-lus uniquement (pas le total) — sans ça le badge restait affiché même après avoir
+  // ouvert et lu tous les commentaires.
+  const readIds = getReadIds(currentUserId)
+  const unreadComments = (comments || []).filter(c => !readIds.has(c.id)).length
+
+  const toggleComments = () => {
+    setCommentsOpen(v => {
+      const next = !v
+      if (next && comments?.length) {
+        markCommentsRead(currentUserId, comments.map(c => c.id))
+        setReadVersion(x => x + 1)
+      }
+      return next
+    })
   }
 
   const renderItem = ({ id, labelKey, Icon }) => (
@@ -264,7 +282,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
         <div className="plan-sidebar-history">
           <button
             className={`plan-sidebar-item plan-sidebar-history-toggle ${commentsOpen ? 'open' : ''}`}
-            onClick={() => setCommentsOpen(v => !v)}
+            onClick={toggleComments}
             title={collapsed ? (lang === 'fr' ? 'Commentaires' : 'Comments') : undefined}
           >
             <span className="plan-sidebar-icon"><IconMessageCircle width={16} height={16} /></span>
@@ -272,7 +290,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
               <>
                 <span className="plan-sidebar-label">
                   {lang === 'fr' ? 'Commentaires' : 'Comments'}
-                  {!!comments?.length && <span className="plan-sidebar-comments-count">{comments.length}</span>}
+                  {unreadComments > 0 && <span className="plan-sidebar-comments-count">{unreadComments}</span>}
                 </span>
                 <IconChevronDown width={12} height={12} className="plan-sidebar-history-chevron" />
               </>

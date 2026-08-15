@@ -4,7 +4,10 @@ import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider
 import { getAllPlans, deletePlan, movePlanToTeam } from '../lib/planStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
-import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle } from './Icons'
+import { formatFullDateTime } from '../lib/dateFormat'
+import { collectRecentComments } from '../lib/notifications'
+import { getReadIds, markCommentsRead } from '../lib/commentReads'
+import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconCheckCircle, IconMessageCircle } from './Icons'
 
 const PROVIDER_ICONS = {
   google: IconProviderGoogle,
@@ -14,7 +17,7 @@ const PROVIDER_ICONS = {
 import AvatarPicker from './AvatarPicker'
 import '../styles/AccountPage.css'
 
-export default function AccountPage({ lang, onBack, onLoadPlan }) {
+export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotification }) {
   const { user } = useUser()
   const { userId, signOut } = useAuth()
   const openSecurity = useOpenSecurity()
@@ -22,12 +25,23 @@ export default function AccountPage({ lang, onBack, onLoadPlan }) {
   const team = useTeam()
   const ProviderIcon = authProvider ? PROVIDER_ICONS[authProvider] : null
   const [plans, setPlans] = useState(getAllPlans)
+  const [notifications, setNotifications] = useState(() => collectRecentComments(userId, lang))
+  const [readVersion, setReadVersion] = useState(0)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState(false)
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
+
+  const readIds = getReadIds(userId)
+  const unreadNotifications = notifications.filter(n => !readIds.has(n.id)).length
+
+  const openNotification = (item) => {
+    markCommentsRead(userId, [item.id])
+    setReadVersion(v => v + 1)
+    onOpenNotification?.(item)
+  }
 
   // Sortir un plan de son équipe active est réservé aux admins (même règle que la
   // suppression) ; le déplacer depuis le personnel n'a pas cette contrainte.
@@ -120,6 +134,35 @@ export default function AccountPage({ lang, onBack, onLoadPlan }) {
       </div>
 
       <div className="account-section card">
+        <h3>
+          <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
+          {unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}
+        </h3>
+        {notifications.length === 0 ? (
+          <p className="account-empty">{lang === 'fr' ? 'Aucune notification pour le moment.' : 'No notifications yet.'}</p>
+        ) : (
+          <div className="account-list">
+            {notifications.slice(0, 8).map(item => (
+              <button
+                key={item.id}
+                className={`account-notif-item ${readIds.has(item.id) ? '' : 'is-unread'}`}
+                onClick={() => openNotification(item)}
+              >
+                <span className="account-notif-head">
+                  <strong>{item.authorName}</strong>
+                  {lang === 'fr' ? ' a commenté ' : ' commented on '}
+                  <em>{item.planName}</em>
+                  <span className="account-notif-space">{item.spaceId ? (item.spaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}</span>
+                </span>
+                <span className="account-notif-text">{item.text}</span>
+                <span className="account-notif-date">{formatFullDateTime(item.createdAt, lang)}</span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="account-section card">
         <h3><IconClipboard width={16} height={16} /> {t(lang, 'account.plansSectionTitle')}</h3>
         {plans.length === 0 ? (
           <p className="account-empty">{t(lang, 'account.noPlans')}</p>
@@ -134,6 +177,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan }) {
                     <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
                     {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
                     {p.createdByName && ` · ${p.createdByName}`}
+                    {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
                   </span>
                 </button>
                 {canMoveOut && moveTargets.length > 0 && (
@@ -160,21 +204,31 @@ export default function AccountPage({ lang, onBack, onLoadPlan }) {
 
       {showUpgrade && (
         <div className="modal-backdrop" onClick={() => setShowUpgrade(false)}>
-          <div className="modal card" onClick={e => e.stopPropagation()}>
+          <div className="upgrade-modal" onClick={e => e.stopPropagation()}>
+            <button className="upgrade-modal-close" onClick={() => setShowUpgrade(false)} title={t(lang, 'export.close')}>
+              <IconX width={16} height={16} />
+            </button>
+            <div className="upgrade-modal-icon"><IconRocket width={26} height={26} /></div>
             <h3>{t(lang, 'account.upgradeTitle')}</h3>
-            <p>{t(lang, 'account.upgradeBody')}</p>
+            <p className="upgrade-modal-body">{t(lang, 'account.upgradeBody')}</p>
+
+            <ul className="upgrade-modal-features">
+              <li><IconCheckCircle width={15} height={15} /> {lang === 'fr' ? 'Générations de plans illimitées' : 'Unlimited plan generations'}</li>
+              <li><IconCheckCircle width={15} height={15} /> {lang === 'fr' ? 'Accès prioritaire aux futures fonctionnalités' : 'Priority access to upcoming features'}</li>
+              <li><IconCheckCircle width={15} height={15} /> {lang === 'fr' ? 'Support prioritaire' : 'Priority support'}</li>
+            </ul>
+
             {!isServerConfigured && <p className="upgrade-note">{t(lang, 'account.upgradeNote')}</p>}
             {checkoutError && <p className="upgrade-note">{t(lang, 'account.upgradeError')}</p>}
-            <div className="modal-actions">
-              <button
-                className="btn-primary"
-                disabled={!isServerConfigured || checkoutLoading}
-                onClick={startCheckout}
-              >
-                {checkoutLoading ? t(lang, 'account.upgradeLoading') : t(lang, 'account.upgradeConfirm')}
-              </button>
-            </div>
-            <button className="btn-secondary close-btn" onClick={() => setShowUpgrade(false)}>
+
+            <button
+              className="upgrade-modal-cta"
+              disabled={!isServerConfigured || checkoutLoading}
+              onClick={startCheckout}
+            >
+              {checkoutLoading ? t(lang, 'account.upgradeLoading') : t(lang, 'account.upgradeConfirm')}
+            </button>
+            <button className="upgrade-modal-secondary" onClick={() => setShowUpgrade(false)}>
               {t(lang, 'export.close')}
             </button>
           </div>
