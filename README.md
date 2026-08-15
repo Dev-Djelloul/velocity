@@ -34,18 +34,25 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 - **Export & partage** — PDF, PPTX, CSV, JSON, issues GitHub/Jira, capture image, et lien de partage privé (expire après 30 jours).
 - **Historique & brouillons** — tous les plans générés sont sauvegardés localement (`localStorage`) et consultables depuis "Mes plans" ; les réponses en cours peuvent être sauvegardées comme brouillon nommé.
 - **Bilingue FR / EN** — interface, contenu généré et documents exportés s'adaptent à la langue choisie.
-- **Sans compte, sans carte bancaire** — toutes les données restent dans le navigateur par défaut ; rien ne transite vers un serveur sauf partage explicite d'un lien.
+- **Compte & crédits** — connexion via Clerk (Google, Apple, Slack ou email), quota de plans gratuits par utilisateur, passage en illimité via un abonnement Stripe.
+- **Intégrations Notion, Jira et GitHub** — connexion OAuth par utilisateur, export d'une page Notion structurée (roadmap + calendrier éditorial/pub unifiés), création d'Epics/Stories Jira et d'issues/milestones GitHub à partir du plan, avec synchronisation bidirectionnelle idempotente.
 
 ## Stack technique
 
 | Couche | Techno |
 |---|---|
-| Frontend | React 18 + Vite, CSS custom (pas de framework UI) |
+| Frontend | React 18 + Vite, React Router (URLs propres par page), CSS custom (pas de framework UI) |
 | Backend | Cloudflare Workers (JavaScript, sans framework) |
-| Génération IA | OpenRouter (modèle par défaut : Claude Sonnet 5), function calling avec schéma structuré |
+| Authentification | Clerk (Google, Apple, Slack, email) — mode démo local (session simulée) si aucune clé n'est configurée |
+| Paiement | Stripe (abonnement Pro récurrent) |
+| Base de données | Cloudflare D1 (comptes, crédits, tokens OAuth Notion/Jira/GitHub) |
+| Tâches asynchrones | Cloudflare Queues (agents IA) |
+| Intégrations tierces | Notion, Jira, GitHub — OAuth + API REST propres à chaque provider |
+| Génération IA | OpenRouter (modèle configurable via `AI_MODEL`), function calling avec schéma structuré |
 | Génération de secours | Moteur à règles déterministe, 100 % local, aucune dépendance externe |
 | Export | `html2canvas`, `pdfmake`, `pptxgenjs` |
 | Formulaire de contact | Web3Forms (envoi direct sans backend dédié) |
+| SEO | Meta tags/Open Graph, robots.txt + sitemap.xml, prérendu HTML statique des pages publiques |
 | Hébergement frontend | Netlify |
 | Hébergement backend | Cloudflare Workers |
 
@@ -73,6 +80,8 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 ```
 
 Le frontend fonctionne **de manière autonome** sans backend configuré : `VITE_BACKEND_URL` est optionnelle. Sans elle (ou si l'appel échoue), le même moteur à règles tourne directement dans le navigateur (`frontend/src/lib/planGenerator.js`), garantissant un résultat instantané en toutes circonstances.
+
+Le schéma ci-dessus couvre le flux de génération. Le Worker gère aussi, indépendamment : l'authentification et les crédits (Clerk + D1), les abonnements Pro (webhooks Stripe), et les connexions OAuth par utilisateur vers Notion, Jira et GitHub (export et synchronisation du plan).
 
 ## Démarrage rapide
 
@@ -121,6 +130,13 @@ VITE_BACKEND_URL=
 
 # Clé publique Web3Forms pour le formulaire de contact du footer
 VITE_WEB3FORMS_ACCESS_KEY=
+
+# Clé publique Clerk (dashboard.clerk.com > API Keys > Publishable key)
+# Sans elle, l'app tourne en mode démo : connexion simulée en local, aucun compte réel.
+VITE_CLERK_PUBLISHABLE_KEY=
+
+# ID du prix Stripe (mode récurrent) pour l'abonnement Pro
+VITE_STRIPE_PRICE_ID=
 ```
 
 ### Backend (secrets Wrangler)
@@ -133,9 +149,15 @@ npx wrangler secret put OPENROUTER_API_KEY
 | Variable | Requise | Description |
 |---|---|---|
 | `OPENROUTER_API_KEY` | Non | Clé API OpenRouter. Sans elle, le backend bascule automatiquement sur le moteur à règles. |
-| `AI_MODEL` | Non | Modèle OpenRouter à utiliser (défaut : `anthropic/claude-sonnet-5`). |
+| `AI_MODEL` | Non | Modèle OpenRouter à utiliser (voir `wrangler.toml` > `[vars]` pour la valeur par défaut). |
+| `STRIPE_SECRET_KEY` | Pour le paiement | Clé secrète Stripe. |
+| `STRIPE_WEBHOOK_SECRET` | Pour le paiement | Secret du endpoint webhook Stripe (activation du Pro après paiement). |
+| `STRIPE_PRICE_ID` | Pour le paiement | ID du prix Stripe côté serveur. |
+| `NOTION_CLIENT_SECRET` | Pour l'intégration Notion | Secret de l'app OAuth Notion (`NOTION_CLIENT_ID` est en clair dans `wrangler.toml`). |
+| `JIRA_CLIENT_SECRET` | Pour l'intégration Jira | Secret de l'app OAuth Jira. |
+| `GITHUB_CLIENT_SECRET` | Pour l'intégration GitHub | Secret de l'app OAuth GitHub. |
 
-Un binding KV nommé `AI_USAGE` est déclaré dans `wrangler.toml` pour le suivi de consommation IA.
+Bindings déclarés dans `wrangler.toml` : KV `AI_USAGE` (suivi de consommation IA), D1 `DB` (comptes, crédits, tokens OAuth — migrations dans `backend/migrations/`), et une queue `velocity-agent-tasks` (traitement asynchrone des agents IA).
 
 ## Scripts disponibles
 
@@ -152,33 +174,44 @@ Un binding KV nommé `AI_USAGE` est déclaré dans `wrangler.toml` pour le suivi
 | Script | Description |
 |---|---|
 | `npm run dev` | Lance le Worker en local via Wrangler |
-| `npm run deploy` | Déploie le Worker sur l'environnement `production` |
+| `npm run deploy` | Déploie le Worker `velocity-launch` — jamais automatique, à lancer manuellement |
 
 ## Déploiement
 
-- **Frontend** : déployé sur Netlify. Configuration dans `netlify.toml` — build depuis `frontend/` (`npm run build`), publication du dossier `dist`.
-- **Backend** : déployé sur Cloudflare Workers via `npm run deploy` (utilise `wrangler.toml`, environnement `production`).
+- **Frontend** : déployé automatiquement par Netlify à chaque push sur `main`. Configuration dans `netlify.toml` — build depuis `frontend/` (`npm run build`, qui enchaîne `vite build` puis le prérendu des pages publiques), publication du dossier `dist`.
+- **Backend** : déploiement **manuel**, jamais automatique. Depuis `backend/` :
+  ```bash
+  npm run deploy
+  ```
+  Déploie sur le Worker `velocity-launch` (nom défini dans `wrangler.toml`). À relancer après chaque modification dans `backend/`.
 
 ## Structure du projet
 
 ```
 velocity/
-├── frontend/                  # Application React (Vite)
+├── frontend/
 │   ├── src/
-│   │   ├── components/        # Composants React (~30)
-│   │   ├── lib/                # Logique métier : génération, i18n, export, stockage
-│   │   └── styles/             # CSS par composant
-│   ├── assets/                 # Design system de référence
-│   └── public/
-├── backend/                    # Cloudflare Worker
+│   │   ├── components/         # Composants React (~30)
+│   │   ├── lib/                 # Logique métier : génération, auth (Clerk), i18n, export, stockage
+│   │   ├── entry-server.jsx     # Point d'entrée SSR dédié au prérendu (voir scripts/prerender.mjs)
+│   │   └── styles/              # CSS par composant
+│   ├── scripts/prerender.mjs    # Génère le HTML statique des pages publiques après le build
+│   ├── assets/                  # Design system de référence
+│   └── public/                  # robots.txt, sitemap.xml, _redirects (fallback SPA Netlify)
+├── backend/                     # Cloudflare Worker
+│   ├── migrations/              # Schéma D1 (comptes, crédits, tokens OAuth)
 │   └── src/
-│       ├── workers/generate.js # Point d'entrée HTTP
+│       ├── workers/generate.js  # Point d'entrée HTTP
 │       └── lib/
-│           ├── ai/             # Client OpenRouter, schéma de sortie, brand voice
-│           └── generator/      # Moteur à règles (roadmap, marketing, KPIs, financier)
-├── docs/                       # Notes de conception et spécification produit
-├── start.sh                    # Lance frontend + backend en local
-└── netlify.toml                # Configuration de déploiement frontend
+│           ├── ai/              # Client OpenRouter, schéma de sortie, brand voice
+│           ├── generator/       # Moteur à règles (roadmap, marketing, KPIs, financier)
+│           ├── stripe.js        # Abonnement Pro (webhooks)
+│           ├── notion/          # Export Notion (OAuth + API)
+│           ├── jira/            # Sync Jira (OAuth + API)
+│           └── github/          # Sync GitHub (OAuth + API)
+├── docs/                        # Documentation technique (checklist SEO...)
+├── start.sh                     # Lance frontend + backend en local
+└── netlify.toml                 # Configuration de déploiement frontend
 ```
 
 ## Internationalisation

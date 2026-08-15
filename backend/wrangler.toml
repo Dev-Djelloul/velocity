@@ -34,9 +34,3 @@ queue = "velocity-agent-tasks"
 max_batch_size = 5
 max_batch_timeout = 5
 max_retries = 3
-
-[env.production]
-name = "velocity-launch-prod"
-
-[env.development]
-name = "velocity-launch-dev"
