@@ -658,7 +658,6 @@ export default function App() {
             lang={lang}
             onBack={() => setCurrentPage('landing')}
             onLoadPlan={handleLoadFromHistory}
-            onLoadDraft={handleLoadDraft}
           />
         )}
         {currentPage === 'team' && isSignedIn && (
@@ -670,8 +669,10 @@ export default function App() {
             lang={lang}
             onBack={() => setCurrentPage('landing')}
             onLoadPlan={handleLoadFromHistory}
+            onLoadDraft={handleLoadDraft}
             onCreatePlan={handleStartClick}
             onOpenTeamSettings={() => { setCurrentPage('team'); window.scrollTo(0, 0) }}
+            onSeeFullHistory={() => { setCurrentPage('account'); window.scrollTo(0, 0) }}
           />
         )}
       </main>

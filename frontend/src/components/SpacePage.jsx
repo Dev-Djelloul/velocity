@@ -2,18 +2,35 @@ import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useTeam } from '../lib/auth'
 import { getAllPlans, deletePlan } from '../lib/planStorage'
+import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle } from './Icons'
+import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave } from './Icons'
 import '../styles/SpacePage.css'
+
+// Combien de plans "récents" afficher dans l'espace personnel — un aperçu rapide, pas un
+// archivage complet (celui-ci reste dans "Mon compte" → Historique de tous les plans).
+const RECENT_PLANS_LIMIT = 5
+
+function byRecency(a, b) {
+  const dateOf = (p) => p.updatedAt || p.savedAt || p.generatedAt || ''
+  return dateOf(b).localeCompare(dateOf(a))
+}
 
 // Page dédiée à l'espace actif (personnel ou équipe), pour piloter ce qu'il contient sans
 // repasser par "Mon compte" à chaque fois — celui-ci reste focalisé sur l'identité/les
-// crédits, pas sur le contenu d'un espace de travail donné.
-export default function SpacePage({ lang, onBack, onLoadPlan, onCreatePlan, onOpenTeamSettings }) {
+// crédits et sert désormais d'historique complet de tous les plans de l'espace, pendant
+// que cette page ne montre que les derniers plans actifs (personnel) ou le tableau de bord
+// partagé (équipe).
+export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory }) {
   const team = useTeam()
   const isTeam = !!team.teamId
   const [plans, setPlans] = useState(getAllPlans)
+  const [drafts, setDrafts] = useState(isTeam ? [] : getAllDrafts)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
+
+  const sortedPlans = useMemo(() => [...plans].sort(byRecency), [plans])
+  const visiblePlans = isTeam ? sortedPlans : sortedPlans.slice(0, RECENT_PLANS_LIMIT)
 
   const stats = useMemo(() => {
     if (!isTeam) return null
@@ -35,6 +52,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onCreatePlan, onOp
     deletePlan(deleteTarget.id)
     setPlans(getAllPlans())
     setDeleteTarget(null)
+  }
+
+  const confirmDeleteDraft = () => {
+    deleteDraft(deleteDraftTarget.id)
+    setDrafts(getAllDrafts())
+    setDeleteDraftTarget(null)
   }
 
   return (
@@ -92,16 +115,18 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onCreatePlan, onOp
 
       <div className="space-page-section card">
         <div className="space-page-section-head">
-          <h3><IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Plans' : 'Plans'}</h3>
+          <h3><IconClipboard width={16} height={16} /> {isTeam
+            ? (lang === 'fr' ? 'Plans partagés' : 'Shared plans')
+            : (lang === 'fr' ? 'Derniers plans actifs' : 'Recently active plans')}</h3>
           <button className="btn-primary space-page-new-btn" onClick={onCreatePlan}>
             <IconPlus width={14} height={14} /> {t(lang, 'sidebar.createPlan')}
           </button>
         </div>
-        {plans.length === 0 ? (
+        {visiblePlans.length === 0 ? (
           <p className="account-empty">{t(lang, 'account.noPlans')}</p>
         ) : (
           <div className="account-list">
-            {plans.map(p => (
+            {visiblePlans.map(p => (
               <div key={p.id} className="account-list-item">
                 <button className="account-list-item-main" onClick={() => onLoadPlan(p)}>
                   <span className="account-list-item-name">{p.product?.name}</span>
@@ -114,7 +139,34 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onCreatePlan, onOp
             ))}
           </div>
         )}
+        {!isTeam && sortedPlans.length > 0 && (
+          <button className="space-page-see-all" onClick={onSeeFullHistory}>
+            {lang === 'fr' ? "Voir l'historique complet →" : 'See full history →'}
+          </button>
+        )}
       </div>
+
+      {!isTeam && (
+        <div className="space-page-section card">
+          <h3><IconSave width={16} height={16} /> {t(lang, 'account.draftsSectionTitle')}</h3>
+          {drafts.length === 0 ? (
+            <p className="account-empty">{t(lang, 'account.noDrafts')}</p>
+          ) : (
+            <div className="account-list">
+              {drafts.map(d => (
+                <div key={d.id} className="account-list-item">
+                  <button className="account-list-item-main" onClick={() => onLoadDraft(d.data)}>
+                    <span className="account-list-item-name">{d.name}</span>
+                  </button>
+                  <button className="account-list-item-delete" onClick={() => setDeleteDraftTarget(d)} title="Delete">
+                    <IconTrash width={14} height={14} />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {!isTeam && (
         <div className="space-page-section card space-page-upsell">
@@ -137,6 +189,20 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onCreatePlan, onOp
             <div className="confirm-modal-actions">
               <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>{t(lang, 'plans.cancel')}</button>
               <button className="btn-danger" onClick={confirmDelete}>{t(lang, 'plans.delete')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteDraftTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setDeleteDraftTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>{t(lang, 'plans.deleteDraftConfirmTitle')}</h3>
+            <p><strong>{deleteDraftTarget.name || t(lang, 'plans.defaultDraftName')}</strong> {t(lang, 'plans.deleteDraftConfirmSuffix')}</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteDraftTarget(null)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-danger" onClick={confirmDeleteDraft}>{t(lang, 'plans.delete')}</button>
             </div>
           </div>
         </div>

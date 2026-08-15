@@ -119,6 +119,21 @@
   flex-shrink: 0;
 }
 
+.space-page-see-all {
+  display: block;
+  margin: 0.75rem auto 0;
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.space-page-see-all:hover {
+  text-decoration: underline;
+}
+
 .space-page-upsell {
   display: flex;
   align-items: flex-start;

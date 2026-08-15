@@ -2,10 +2,9 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
 import { getAllPlans, deletePlan, movePlanToTeam } from '../lib/planStorage'
-import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
-import { IconUser, IconClipboard, IconSave, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle } from './Icons'
+import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle } from './Icons'
 
 const PROVIDER_ICONS = {
   google: IconProviderGoogle,
@@ -15,7 +14,7 @@ const PROVIDER_ICONS = {
 import AvatarPicker from './AvatarPicker'
 import '../styles/AccountPage.css'
 
-export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
+export default function AccountPage({ lang, onBack, onLoadPlan }) {
   const { user } = useUser()
   const { userId, signOut } = useAuth()
   const openSecurity = useOpenSecurity()
@@ -23,13 +22,11 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
   const team = useTeam()
   const ProviderIcon = authProvider ? PROVIDER_ICONS[authProvider] : null
   const [plans, setPlans] = useState(getAllPlans)
-  const [drafts, setDrafts] = useState(getAllDrafts)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState(false)
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
-  const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
 
   // Sortir un plan de son équipe active est réservé aux admins (même règle que la
@@ -67,12 +64,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
     deletePlan(deletePlanTarget.id)
     setPlans(getAllPlans())
     setDeletePlanTarget(null)
-  }
-
-  const confirmRemoveDraft = () => {
-    deleteDraft(deleteDraftTarget.id)
-    setDrafts(getAllDrafts())
-    setDeleteDraftTarget(null)
   }
 
   const displayName = user?.fullName || user?.firstName || user?.primaryEmailAddress?.emailAddress || 'User'
@@ -154,26 +145,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
         )}
       </div>
 
-      <div className="account-section card">
-        <h3><IconSave width={16} height={16} /> {t(lang, 'account.draftsSectionTitle')}</h3>
-        {drafts.length === 0 ? (
-          <p className="account-empty">{t(lang, 'account.noDrafts')}</p>
-        ) : (
-          <div className="account-list">
-            {drafts.map(d => (
-              <div key={d.id} className="account-list-item">
-                <button className="account-list-item-main" onClick={() => onLoadDraft(d.data)}>
-                  <span className="account-list-item-name">{d.name}</span>
-                </button>
-                <button className="account-list-item-delete" onClick={() => setDeleteDraftTarget(d)} title="Delete">
-                  <IconTrash width={14} height={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-
       {openSecurity && (
         <div className="account-section account-security card">
           <h3><IconShield width={16} height={16} /> {t(lang, 'account.securityTitle')}</h3>
@@ -234,20 +205,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onLoadDraft }) {
             </div>
             <div className="confirm-modal-actions">
               <button className="btn-secondary" onClick={() => setMovePlanTarget(null)}>{t(lang, 'plans.cancel')}</button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {deleteDraftTarget && (
-        <div className="confirm-modal-backdrop" onClick={() => setDeleteDraftTarget(null)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
-            <h3>{t(lang, 'plans.deleteDraftConfirmTitle')}</h3>
-            <p><strong>{deleteDraftTarget.name || t(lang, 'plans.defaultDraftName')}</strong> {t(lang, 'plans.deleteDraftConfirmSuffix')}</p>
-            <div className="confirm-modal-actions">
-              <button className="btn-secondary" onClick={() => setDeleteDraftTarget(null)}>{t(lang, 'plans.cancel')}</button>
-              <button className="btn-danger" onClick={confirmRemoveDraft}>{t(lang, 'plans.delete')}</button>
             </div>
           </div>
         </div>
