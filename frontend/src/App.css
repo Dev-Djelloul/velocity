@@ -286,14 +286,32 @@
   padding: 0.5rem 0.6rem 0.3rem;
 }
 
-.header-dropdown-credits {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-primary);
-  background: rgba(145, 132, 217, 0.12);
+.header-dropdown-credits-hero {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
   border-radius: var(--radius-md);
-  padding: 0.5rem 0.6rem;
-  margin-bottom: 0.25rem;
+  padding: 0.65rem 0.7rem;
+  margin-bottom: 0.4rem;
+  background:
+    linear-gradient(var(--color-dashboard, var(--color-bg-secondary)), var(--color-dashboard, var(--color-bg-secondary))) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  border: 1.5px solid transparent;
+}
+
+.header-dropdown-credits-value {
+  font-size: 1.15rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-dropdown-credits-caption {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--color-text-secondary);
 }
 
 .header-dropdown-divider {

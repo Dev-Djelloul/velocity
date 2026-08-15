@@ -436,10 +436,16 @@ export default function App() {
                 {openHeaderMenu === 'account' && (
                   <div className="header-dropdown header-dropdown-account">
                     {!pro && (
-                      <div className="header-dropdown-credits">
-                        {remaining} {lang === 'fr' ? 'plans restants' : 'plans left'}
+                      <div className="header-dropdown-credits-hero">
+                        <span className="header-dropdown-credits-value">{remaining}</span>
+                        <span className="header-dropdown-credits-caption">{lang === 'fr' ? 'plans restants' : 'plans left'}</span>
                       </div>
                     )}
+
+                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
+                      <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
+                    </button>
+                    <div className="header-dropdown-divider" />
 
                     <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
                     <button
@@ -449,16 +455,21 @@ export default function App() {
                       {!team.teamId && <IconCheckCircle width={14} height={14} />}
                       <span>{t(lang, 'team.personalSpace')}</span>
                     </button>
-                    {!!team.myTeams?.length && team.myTeams.map(tm => (
-                      <button
-                        key={tm.id}
-                        className={`header-dropdown-item ${team.teamId === tm.id ? 'is-current' : ''}`}
-                        onClick={() => { team.setActiveTeamId(tm.id) }}
-                      >
-                        {team.teamId === tm.id && <IconCheckCircle width={14} height={14} />}
-                        <span>{tm.name}</span>
-                      </button>
-                    ))}
+                    {!!team.myTeams?.length && (
+                      <>
+                        <div className="header-dropdown-label">{t(lang, 'team.myTeams')}</div>
+                        {team.myTeams.map(tm => (
+                          <button
+                            key={tm.id}
+                            className={`header-dropdown-item ${team.teamId === tm.id ? 'is-current' : ''}`}
+                            onClick={() => { team.setActiveTeamId(tm.id) }}
+                          >
+                            {team.teamId === tm.id && <IconCheckCircle width={14} height={14} />}
+                            <span>{tm.name}</span>
+                          </button>
+                        ))}
+                      </>
+                    )}
                     {team.teamId && (
                       <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setCurrentPage('team'); window.scrollTo(0, 0) }}>
                         <IconShield width={14} height={14} /> {t(lang, 'team.membersTitle')}
@@ -466,6 +477,11 @@ export default function App() {
                     )}
                     <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
                       <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
+                    </button>
+                    <div className="header-dropdown-divider" />
+
+                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
+                      <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
                     </button>
                     <div className="header-dropdown-divider" />
 
@@ -485,13 +501,6 @@ export default function App() {
                     </div>
                     <div className="header-dropdown-divider" />
 
-                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
-                      <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
-                    </button>
-                    <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
-                      <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
-                    </button>
-                    <div className="header-dropdown-divider" />
                     <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => { setOpenHeaderMenu(null); signOut() }}>
                       <IconLogOut width={16} height={16} /> {t(lang, 'auth.signOut')}
                     </button>
