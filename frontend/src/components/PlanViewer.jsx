@@ -27,6 +27,7 @@ import { savePlan } from '../lib/planStorage'
 import { useAuth } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
+import { describeRoadmapChange, describeKpisChange, describeDateChange, describeMetricsChange } from '../lib/changeDescriptions'
 import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
@@ -38,13 +39,13 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
-  const [changedSections, setChangedSections] = useState(new Set())
+  const [pendingChanges, setPendingChanges] = useState([])
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [showFullChangeLog, setShowFullChangeLog] = useState(false)
   const captureRef = useRef(null)
 
-  const isDirty = changedSections.size > 0
+  const isDirty = pendingChanges.length > 0
 
   // Avertit avant de fermer/rafraîchir l'onglet s'il reste des modifications non
   // enregistrées — les navigateurs ignorent le texte personnalisé et affichent leur
@@ -56,8 +57,11 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     return () => window.removeEventListener('beforeunload', handler)
   }, [isDirty])
 
-  const markChanged = (section) => {
-    setChangedSections(prev => new Set(prev).add(section))
+  // Une description précise (pas juste le nom de la section) pour chaque modification,
+  // calculée au moment du changement pendant qu'on a encore l'ancienne ET la nouvelle
+  // valeur sous la main — impossible à reconstituer après coup.
+  const markChanged = (description) => {
+    setPendingChanges(prev => [...prev, description])
   }
 
   const budgetKeyFor = (value) => {
@@ -85,53 +89,58 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // l'utilisateur — avant, chaque régénération (veille, benchmarks...) ou glisser-déposer
   // écrasait silencieusement la version sauvegardée.
   const updateRoadmap = (nextRoadmap) => {
+    markChanged(describeRoadmapChange(plan.roadmap, nextRoadmap, lang))
     setPlan(p => ({ ...p, roadmap: nextRoadmap }))
-    markChanged('roadmap')
   }
 
   const updatePlanStartDate = (dateStr) => {
-    setPlan(p => ({ ...p, planStartDate: dateStr + 'T00:00:00Z' }))
-    markChanged('planStartDate')
+    const nextIso = dateStr + 'T00:00:00Z'
+    markChanged(describeDateChange(plan.planStartDate, nextIso, lang === 'fr' ? 'Date de démarrage' : 'Start date', lang))
+    setPlan(p => ({ ...p, planStartDate: nextIso }))
   }
 
   const updateKpis = (nextKpis) => {
+    markChanged(describeKpisChange(plan.kpis, nextKpis, lang))
     setPlan(p => ({ ...p, kpis: nextKpis }))
-    markChanged('kpis')
   }
 
   const updateMetricsHistory = (nextHistory) => {
+    markChanged(describeMetricsChange(plan.metricsHistory, nextHistory, lang))
     setPlan(p => ({ ...p, metricsHistory: nextHistory }))
-    markChanged('metrics')
   }
 
   const updateLaunchDate = (dateStr) => {
-    setPlan(p => ({ ...p, launchDate: dateStr + 'T00:00:00Z' }))
-    markChanged('launchDate')
+    const nextIso = dateStr + 'T00:00:00Z'
+    markChanged(describeDateChange(plan.launchDate, nextIso, lang === 'fr' ? 'Date de lancement' : 'Launch date', lang))
+    setPlan(p => ({ ...p, launchDate: nextIso }))
   }
 
+  // Veille/benchmarks/éditorial/pub/RGPD sont régénérés en bloc par un agent IA (pas
+  // d'édition fine) : la description la plus honnête du changement est "régénéré(e)",
+  // ça correspond exactement à ce qui vient de se passer.
   const updateVeille = (nextVeille) => {
+    markChanged(lang === 'fr' ? 'Veille IA régénérée' : 'AI market watch regenerated')
     setPlan(p => ({ ...p, veille: nextVeille }))
-    markChanged('veille')
   }
 
   const updateBenchmarks = (nextBenchmarks) => {
+    markChanged(lang === 'fr' ? 'Benchmarks régénérés' : 'Benchmarks regenerated')
     setPlan(p => ({ ...p, benchmarks: nextBenchmarks }))
-    markChanged('benchmarks')
   }
 
   const updateEditorial = (nextEditorial) => {
+    markChanged(lang === 'fr' ? 'Calendrier éditorial régénéré' : 'Editorial calendar regenerated')
     setPlan(p => ({ ...p, editorial: nextEditorial }))
-    markChanged('editorial')
   }
 
   const updateAdvertising = (nextAdvertising) => {
+    markChanged(lang === 'fr' ? 'Calendrier publicitaire régénéré' : 'Ad calendar regenerated')
     setPlan(p => ({ ...p, advertising: nextAdvertising }))
-    markChanged('advertising')
   }
 
   const updateRgpd = (nextRgpd) => {
+    markChanged(lang === 'fr' ? 'Évaluation RGPD régénérée' : 'GDPR assessment regenerated')
     setPlan(p => ({ ...p, rgpd: nextRgpd }))
-    markChanged('rgpd')
   }
 
   // Jira/GitHub/Notion restent enregistrés immédiatement : ce ne sont pas des éditions de
@@ -166,15 +175,13 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   const handleSave = () => {
     if (!plan.id || !isDirty) return
-    const labels = t(lang, 'outputs.changeLogSectionLabels')
-    const sections = Array.from(changedSections).map(key => labels[key] || key)
     const nextChangeLog = [
-      { date: new Date().toISOString(), sections },
+      { date: new Date().toISOString(), changes: pendingChanges },
       ...(plan.changeLog || [])
     ].slice(0, 50)
     const savedPlan = savePlan({ ...plan, changeLog: nextChangeLog })
     setPlan(savedPlan)
-    setChangedSections(new Set())
+    setPendingChanges([])
     setJustSaved(true)
     setTimeout(() => setJustSaved(false), 2500)
   }
@@ -191,6 +198,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   return (
     <div className="plan-viewer-layout">
+      {isDirty && (
+        <div className="unsaved-banner" role="status">
+          <IconSave width={15} height={15} className="unsaved-banner-icon" />
+          <div className="unsaved-banner-text">
+            <span>{t(lang, 'app.justModified')(pendingChanges[pendingChanges.length - 1])}</span>
+            {pendingChanges.length > 1 && (
+              <span className="unsaved-banner-extra">{t(lang, 'app.pendingChangesExtra')(pendingChanges.length - 1)}</span>
+            )}
+          </div>
+          <button className="unsaved-banner-save" onClick={handleSave}>{t(lang, 'app.save')}</button>
+        </div>
+      )}
       <PlanSidebar lang={lang} onNewPlan={handleNewPlanClick} />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {generatedDateTime && (
@@ -209,7 +228,9 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                   {(showFullChangeLog ? plan.changeLog : plan.changeLog.slice(0, 3)).map((entry, i) => (
                     <li key={i}>
                       <span className="plan-changelog-date">{formatFullDateTime(entry.date, lang)}</span>
-                      <span className="plan-changelog-sections">{entry.sections.join(', ')}</span>
+                      <ul className="plan-changelog-details">
+                        {(entry.changes || entry.sections || []).map((change, j) => <li key={j}>{change}</li>)}
+                      </ul>
                     </li>
                   ))}
                 </ul>

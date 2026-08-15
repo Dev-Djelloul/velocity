@@ -6,6 +6,16 @@ export function formatDateTime(iso, lang) {
   return date.toLocaleString(locale, { dateStyle: 'medium', timeStyle: 'short' })
 }
 
+// Date seule, sans heure ni jour de semaine — pour les descriptions de changement compactes
+// (ex: "Date de lancement : 13 août 2026 → 20 août 2026").
+export function formatDateShort(iso, lang) {
+  if (!iso) return ''
+  const locale = lang === 'en' ? 'en-US' : 'fr-FR'
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 // Version longue avec le jour de la semaine, pour les messages plus personnels (bannière de plan).
 export function formatFullDateTime(iso, lang) {
   if (!iso) return ''

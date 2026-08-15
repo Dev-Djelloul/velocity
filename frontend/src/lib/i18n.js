@@ -10,7 +10,9 @@ export const translations = {
       unsavedChangesTitle: 'Changements non enregistrés',
       unsavedChangesBody: 'Tu as des modifications non enregistrées sur ce plan. Si tu continues sans les enregistrer, elles seront perdues.',
       discardChanges: 'Continuer sans enregistrer',
-      saveAndContinue: 'Enregistrer et continuer'
+      saveAndContinue: 'Enregistrer et continuer',
+      justModified: (change) => `Tu viens de modifier : ${change}`,
+      pendingChangesExtra: (count) => `+ ${count} autre${count > 1 ? 's' : ''} modification${count > 1 ? 's' : ''} en attente`
     },
     steps: ['Produit', 'Marché', 'Ressources', 'Priorités'],
     nav: {
@@ -458,18 +460,6 @@ export const translations = {
       noChangesYet: 'Aucune modification enregistrée pour l\'instant.',
       showFullChangeLog: (count) => `Voir tout l'historique (${count})`,
       hideFullChangeLog: 'Réduire',
-      changeLogSectionLabels: {
-        roadmap: 'Roadmap',
-        planStartDate: 'Date de démarrage',
-        kpis: 'KPIs',
-        metrics: 'Suivi post-lancement',
-        launchDate: 'Date de lancement',
-        veille: 'Veille IA',
-        benchmarks: 'Benchmarks',
-        editorial: 'Calendrier éditorial',
-        advertising: 'Calendrier publicitaire',
-        rgpd: 'RGPD'
-      },
       assets: {
         post: 'Brief de post',
         email: 'Objet email',
@@ -950,7 +940,9 @@ export const translations = {
       unsavedChangesTitle: 'Unsaved changes',
       unsavedChangesBody: 'This plan has unsaved changes. If you continue without saving, they will be lost.',
       discardChanges: 'Continue without saving',
-      saveAndContinue: 'Save and continue'
+      saveAndContinue: 'Save and continue',
+      justModified: (change) => `You just modified: ${change}`,
+      pendingChangesExtra: (count) => `+ ${count} more pending change${count > 1 ? 's' : ''}`
     },
     steps: ['Product', 'Market', 'Resources', 'Priorities'],
     nav: {
@@ -1393,18 +1385,6 @@ export const translations = {
       noChangesYet: 'No changes saved yet.',
       showFullChangeLog: (count) => `See full history (${count})`,
       hideFullChangeLog: 'Collapse',
-      changeLogSectionLabels: {
-        roadmap: 'Roadmap',
-        planStartDate: 'Start date',
-        kpis: 'KPIs',
-        metrics: 'Post-launch tracking',
-        launchDate: 'Launch date',
-        veille: 'AI market watch',
-        benchmarks: 'Benchmarks',
-        editorial: 'Editorial calendar',
-        advertising: 'Ad calendar',
-        rgpd: 'GDPR'
-      },
       assets: {
         post: 'Post brief',
         email: 'Email subject',
