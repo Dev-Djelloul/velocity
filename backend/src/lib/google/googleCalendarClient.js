@@ -81,9 +81,15 @@ export async function listCalendars(accessToken) {
 }
 
 // Lundi de la semaine N après le début du plan (même logique que weekStartDate dans
-// frontend/src/components/GtmCalendarCard.jsx, dupliquée ici côté serveur).
+// frontend/src/components/GtmCalendarCard.jsx, dupliquée ici côté serveur). planStartDate
+// est un champ optionnel, éditable seulement si l'utilisateur le renseigne explicitement
+// (voir updatePlanStartDate dans PlanViewer.jsx) — la référence par défaut est generatedAt
+// (date de génération du plan), jamais "aujourd'hui" : sinon rouvrir l'export des semaines
+// plus tard replace tous les événements sur la date du jour au lieu de garder leurs dates
+// d'origine (bug constaté : tout le calendrier éditorial/pub atterrissait sur la date du
+// re-export au lieu d'être étalé sur les semaines du plan).
 function weekStartDate(planStartDate, week) {
-  const base = planStartDate ? new Date(planStartDate) : new Date()
+  const base = new Date(planStartDate || new Date())
   const start = new Date(Date.UTC(base.getUTCFullYear(), base.getUTCMonth(), base.getUTCDate()))
   start.setUTCDate(start.getUTCDate() + Math.max(0, (week || 1) - 1) * 7)
   return start
@@ -166,7 +172,7 @@ export async function syncPlanToCalendar(accessToken, target, plan, lang) {
   }
 
   for (const item of plan.editorial?.items || []) {
-    const start = weekStartDate(plan.planStartDate, item.week)
+    const start = weekStartDate(plan.planStartDate || plan.generatedAt, item.week)
     const vlId = `editorial:${item.week}:${item.channel}:${(item.title || '').slice(0, 40)}`
     const res = await upsertEvent(accessToken, calendarId, managed, vlId, {
       summary: `📝 ${item.channel} — ${item.title}`.slice(0, 250),
@@ -178,7 +184,7 @@ export async function syncPlanToCalendar(accessToken, target, plan, lang) {
   }
 
   for (const campaign of plan.advertising?.campaigns || []) {
-    const start = weekStartDate(plan.planStartDate, campaign.week)
+    const start = weekStartDate(plan.planStartDate || plan.generatedAt, campaign.week)
     const end = addDays(start, 7)
     const vlId = `advertising:${campaign.week}:${campaign.channel}`
     const res = await upsertEvent(accessToken, calendarId, managed, vlId, {
