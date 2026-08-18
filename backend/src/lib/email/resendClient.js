@@ -37,18 +37,111 @@ const AGENT_TYPE_LABELS = {
   table: { fr: 'tableau IA', en: 'AI table' }
 }
 
-export function agentDoneEmail(lang, { productName, taskType }) {
+function esc(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+// Extrait quelques faits marquants du contenu généré, propres à chaque type — c'est ce
+// qui transforme l'email de "tâche terminée" (creux) en aperçu utile du résultat, sans
+// avoir à ouvrir l'app pour savoir si ça vaut le coup de regarder.
+function extractHighlights(taskType, output, en) {
+  if (!output) return []
+  const L = (fr, e) => (en ? e : fr)
+  try {
+    switch (taskType) {
+      case 'veille': {
+        const lines = []
+        if (output.competitors?.length) lines.push(`${L('Concurrents identifiés', 'Competitors identified')}: ${output.competitors.slice(0, 3).map(c => c.name).join(', ')}`)
+        if (output.trends?.length) lines.push(`${L('Tendance clé', 'Key trend')}: ${output.trends[0]}`)
+        if (output.signals?.length) lines.push(`${L('Signal à surveiller', 'Signal to watch')}: ${output.signals[0]}`)
+        if (output.opportunities?.length) lines.push(`${L('Opportunité', 'Opportunity')}: ${output.opportunities[0]}`)
+        if (output.threats?.length) lines.push(`${L('Menace', 'Threat')}: ${output.threats[0]}`)
+        return lines
+      }
+      case 'benchmarks': {
+        const lines = []
+        if (output.metrics?.length) lines.push(`${L(`${output.metrics.length} métriques comparées au secteur`, `${output.metrics.length} metrics compared to industry`)}`)
+        if (output.metrics?.[0]) lines.push(`${output.metrics[0].label || output.metrics[0].name}: ${output.metrics[0].verdict || output.metrics[0].you || ''}`)
+        if (output.takeaway) lines.push(`${L('À retenir', 'Takeaway')}: ${output.takeaway}`)
+        return lines
+      }
+      case 'editorial': {
+        const lines = []
+        if (output.items?.length) lines.push(L(`${output.items.length} contenus planifiés`, `${output.items.length} content pieces planned`))
+        if (output.items?.[0]) lines.push(`${L('Semaine', 'Week')} ${output.items[0].week} — ${output.items[0].channel} : ${output.items[0].title}`)
+        return lines
+      }
+      case 'advertising': {
+        const lines = []
+        if (output.campaigns?.length) lines.push(L(`${output.campaigns.length} campagnes planifiées`, `${output.campaigns.length} campaigns planned`))
+        if (output.totalBudget != null) lines.push(`${L('Budget total', 'Total budget')}: ${output.totalBudget} €`)
+        if (output.campaigns?.[0]) lines.push(`${L('Semaine', 'Week')} ${output.campaigns[0].week} — ${output.campaigns[0].channel} (${output.campaigns[0].objective})`)
+        return lines
+      }
+      case 'rgpd': {
+        const lines = []
+        if (output.applicability) lines.push(output.applicability)
+        if (output.checklist?.length) {
+          const high = output.checklist.filter(c => c.priority === 'high').length
+          lines.push(L(`${output.checklist.length} points de conformité identifiés (${high} prioritaires)`, `${output.checklist.length} compliance items identified (${high} high priority)`))
+        }
+        if (output.recommendations?.[0]) lines.push(`${L('Recommandation', 'Recommendation')}: ${output.recommendations[0]}`)
+        return lines
+      }
+      case 'table': {
+        const lines = []
+        if (output.title) lines.push(`${L('Titre', 'Title')}: ${output.title}`)
+        if (output.columns?.length && output.rows?.length) lines.push(L(`${output.rows.length} lignes × ${output.columns.length} colonnes`, `${output.rows.length} rows × ${output.columns.length} columns`))
+        if (output.columns?.length) lines.push(`${L('Colonnes', 'Columns')}: ${output.columns.join(', ')}`)
+        return lines
+      }
+      case 'story_brief': {
+        const lines = []
+        if (output.summary) lines.push(output.summary)
+        if (output.steps?.length) lines.push(`${L('Étapes', 'Steps')}: ${output.steps.slice(0, 3).join(' → ')}`)
+        if (output.risks?.length) lines.push(`${L('Risque', 'Risk')}: ${output.risks[0]}`)
+        return lines
+      }
+      case 'recalc_kpis': {
+        const lines = []
+        const adjusted = (output.kpis || []).filter(k => k.newTarget != null)
+        if (adjusted.length) lines.push(L(`${adjusted.length} cible(s) ajustée(s)`, `${adjusted.length} target(s) adjusted`))
+        adjusted.slice(0, 3).forEach(k => lines.push(`${k.name}: → ${k.newTarget} — ${k.rationale || ''}`))
+        return lines
+      }
+      default:
+        return []
+    }
+  } catch {
+    return [] // aperçu best-effort : une forme de donnée inattendue ne doit jamais faire échouer l'email
+  }
+}
+
+export function agentDoneEmail(lang, { productName, taskType, classification, output, appUrl }) {
   const en = lang === 'en'
   const typeLabel = AGENT_TYPE_LABELS[taskType]?.[en ? 'en' : 'fr'] || taskType
+  const highlights = extractHighlights(taskType, output, en)
   const subject = en
     ? `Your AI agent finished — ${productName || 'your plan'}`
     : `Ton agent IA a terminé — ${productName || 'ton plan'}`
+
+  const highlightsHtml = highlights.length
+    ? `<ul style="margin:16px 0;padding-left:20px;color:#1a1a1a;line-height:1.6">${highlights.map(h => `<li style="margin-bottom:6px">${esc(h)}</li>`).join('')}</ul>`
+    : ''
+
+  const ctaHtml = appUrl
+    ? `<p style="margin-top:28px"><a href="${esc(appUrl)}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600">${en ? 'Open the plan' : 'Ouvrir le plan'}</a></p>`
+    : ''
+
   const html = `
-    <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px;color:#1a1a1a">
-      <h2 style="color:#6366f1">${en ? 'Task completed' : 'Tâche terminée'}</h2>
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1a1a1a">
+      <h2 style="color:#6366f1;margin-bottom:4px">${en ? 'Task completed' : 'Tâche terminée'}</h2>
+      <p style="color:#6b7280;font-size:13px;margin-top:0">${esc(productName || (en ? 'Your plan' : 'Ton plan'))}${classification ? ` — ${esc(classification)}` : ''}</p>
       <p>${en
-        ? `The AI agent finished a ${typeLabel} on <strong>${productName || 'your plan'}</strong>.`
-        : `L'agent IA a terminé un ${typeLabel} sur <strong>${productName || 'ton plan'}</strong>.`}</p>
+        ? `The AI agent finished a <strong>${typeLabel}</strong> on <strong>${esc(productName || 'your plan')}</strong>.`
+        : `L'agent IA a terminé un <strong>${typeLabel}</strong> sur <strong>${esc(productName || 'ton plan')}</strong>.`}</p>
+      ${highlightsHtml}
+      ${ctaHtml}
       <p style="color:#6b7280;font-size:13px;margin-top:32px">VelocityLaunch</p>
     </div>`
   return { subject, html }

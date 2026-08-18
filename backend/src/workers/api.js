@@ -21,7 +21,7 @@ import { sendEmail, agentDoneEmail } from '../lib/email/resendClient'
 
 // Email best-effort à la fin d'une génération IA (veille, benchmarks, calendriers, RGPD,
 // tableau IA, ou agent async) — n'échoue jamais la réponse HTTP, même si l'envoi rate.
-async function notifyGenerationDone(env, userId, plan, lang, taskType) {
+async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
   if (!userId) { console.log(`[notify] skipped (${taskType}): no userId`); return }
   try {
     const prefs = await db.getNotificationPrefs(env, userId)
@@ -31,7 +31,10 @@ async function notifyGenerationDone(env, userId, plan, lang, taskType) {
     }
     const { subject, html } = agentDoneEmail(lang || plan?.language || 'fr', {
       productName: plan?.product?.name,
-      taskType
+      classification: plan?.classification,
+      taskType,
+      output,
+      appUrl: env.APP_URL
     })
     await sendEmail(env, { to: prefs.email, subject, html })
   } catch (e) { console.log(`[notify] error (${taskType}): ${e.message}`) }
@@ -171,7 +174,7 @@ export async function handleApi(request, env, url) {
     } catch {
       result = { ...generateTableFromPrompt(prompt), source: 'rules' }
     }
-    await notifyGenerationDone(env, userId, plan, lang, 'table')
+    await notifyGenerationDone(env, userId, plan, lang, 'table', result)
     return json(result)
   }
 
@@ -183,7 +186,7 @@ export async function handleApi(request, env, url) {
     } catch {
       result = { ...generateVeilleFallback(plan, lang || 'fr'), source: 'rules' }
     }
-    await notifyGenerationDone(env, userId, plan, lang, 'veille')
+    await notifyGenerationDone(env, userId, plan, lang, 'veille', result)
     return json(result)
   }
 
@@ -195,7 +198,7 @@ export async function handleApi(request, env, url) {
     } catch {
       result = { ...generateBenchmarksFallback(plan, lang || 'fr'), source: 'rules' }
     }
-    await notifyGenerationDone(env, userId, plan, lang, 'benchmarks')
+    await notifyGenerationDone(env, userId, plan, lang, 'benchmarks', result)
     return json(result)
   }
 
@@ -207,7 +210,7 @@ export async function handleApi(request, env, url) {
     } catch {
       result = { ...generateEditorialFallback(plan, lang || 'fr'), source: 'rules' }
     }
-    await notifyGenerationDone(env, userId, plan, lang, 'editorial')
+    await notifyGenerationDone(env, userId, plan, lang, 'editorial', result)
     return json(result)
   }
 
@@ -219,7 +222,7 @@ export async function handleApi(request, env, url) {
     } catch {
       result = { ...generateAdvertisingFallback(plan, lang || 'fr'), source: 'rules' }
     }
-    await notifyGenerationDone(env, userId, plan, lang, 'advertising')
+    await notifyGenerationDone(env, userId, plan, lang, 'advertising', result)
     return json(result)
   }
 
@@ -231,7 +234,7 @@ export async function handleApi(request, env, url) {
     } catch {
       result = { ...generateRgpdFallback(plan, lang || 'fr'), source: 'rules' }
     }
-    await notifyGenerationDone(env, userId, plan, lang, 'rgpd')
+    await notifyGenerationDone(env, userId, plan, lang, 'rgpd', result)
     return json(result)
   }
 

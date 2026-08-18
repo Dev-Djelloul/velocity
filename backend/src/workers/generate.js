@@ -43,7 +43,7 @@ async function processAgentTask(message, env) {
   try {
     const output = await runner(env, task.input)
     await db.updateAgentTask(env, taskId, { status: 'done', output, attempts: message.attempts })
-    await notifyAgentDone(env, task)
+    await notifyAgentDone(env, task, output)
   } catch (error) {
     await db.updateAgentTask(env, taskId, { status: 'error', error: error.message, attempts: message.attempts })
     throw error // laisse Cloudflare Queues retenter selon max_retries
@@ -52,7 +52,7 @@ async function processAgentTask(message, env) {
 
 // Email best-effort à la fin d'une tâche agent — ne doit jamais faire échouer la tâche
 // elle-même (déjà marquée "done" en base à ce stade).
-async function notifyAgentDone(env, task) {
+async function notifyAgentDone(env, task, output) {
   try {
     const prefs = await db.getNotificationPrefs(env, task.user_id)
     if (!prefs?.agent_done || !prefs.email) {
@@ -62,7 +62,10 @@ async function notifyAgentDone(env, task) {
     const plan = await db.getPlan(env, task.plan_id)
     const { subject, html } = agentDoneEmail(plan?.language || 'fr', {
       productName: plan?.product?.name,
-      taskType: task.type
+      classification: plan?.classification,
+      taskType: task.type,
+      output,
+      appUrl: env.APP_URL
     })
     await sendEmail(env, { to: prefs.email, subject, html })
   } catch (e) { console.log(`[notify] error (agent:${task.type}): ${e.message}`) }
