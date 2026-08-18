@@ -46,9 +46,11 @@ function brandSignature() {
     </table>`
 }
 
-const AGENT_TYPE_LABELS = {
+export const AGENT_TYPE_LABELS = {
   story_brief: { fr: "brief d'exécution", en: 'execution brief' },
   recalc_kpis: { fr: 'recalcul des KPIs', en: 'KPI recalculation' },
+  risk_analysis: { fr: 'analyse des risques', en: 'risk analysis' },
+  budget_optimization: { fr: 'optimisation budgétaire', en: 'budget optimization' },
   veille: { fr: 'veille IA', en: 'AI market watch' },
   benchmarks: { fr: 'benchmarks', en: 'benchmarks' },
   editorial: { fr: 'calendrier éditorial', en: 'editorial calendar' },
@@ -80,7 +82,7 @@ function tablePreviewHtml(output) {
 // Extrait quelques faits marquants du contenu généré, propres à chaque type — c'est ce
 // qui transforme l'email de "tâche terminée" (creux) en aperçu utile du résultat, sans
 // avoir à ouvrir l'app pour savoir si ça vaut le coup de regarder.
-function extractHighlights(taskType, output, en) {
+export function extractHighlights(taskType, output, en) {
   if (!output) return []
   const L = (fr, e) => (en ? e : fr)
   try {
@@ -148,6 +150,23 @@ function extractHighlights(taskType, output, en) {
         adjusted.slice(0, 3).forEach(k => lines.push(`${k.name}: → ${k.newTarget} — ${k.rationale || ''}`))
         return lines
       }
+      case 'risk_analysis': {
+        const lines = []
+        const sevLabel = { high: L('Élevé', 'High'), medium: L('Moyen', 'Medium'), low: L('Faible', 'Low') }
+        ;(output.risks || []).slice(0, 4).forEach(r => {
+          lines.push(`[${sevLabel[r.severity] || r.severity}] ${r.risk} — ${r.mitigation}`)
+        })
+        return lines
+      }
+      case 'budget_optimization': {
+        const lines = []
+        if (output.assessment) lines.push(output.assessment)
+        const dirLabel = { increase: L('↑ augmenter', '↑ increase'), decrease: L('↓ réduire', '↓ decrease'), maintain: L('= maintenir', '= maintain') }
+        ;(output.moves || []).slice(0, 4).forEach(m => {
+          lines.push(`${m.channel} (${dirLabel[m.direction] || m.direction}) — ${m.rationale}`)
+        })
+        return lines
+      }
       default:
         return []
     }
@@ -182,6 +201,31 @@ export function agentDoneEmail(lang, { productName, taskType, classification, ou
         : `L'agent IA a terminé un <strong>${typeLabel}</strong> sur <strong>${esc(productName || 'ton plan')}</strong>.`}</p>
       ${highlightsHtml}
       ${tableHtml}
+      ${ctaHtml}
+      ${brandSignature()}
+    </div>`
+  return { subject, html }
+}
+
+export function veilleUpdateEmail(lang, { productName, newItems, appUrl }) {
+  const en = lang === 'en'
+  const subject = en
+    ? `New market watch findings — ${productName || 'your plan'}`
+    : `Nouveautés en veille — ${productName || 'ton plan'}`
+  const listHtml = newItems.length
+    ? `<ul style="margin:16px 0;padding-left:20px;color:#1a1a1a;line-height:1.6">${newItems.slice(0, 6).map(h => `<li style="margin-bottom:6px">${esc(h)}</li>`).join('')}</ul>`
+    : ''
+  const ctaHtml = appUrl
+    ? `<p style="margin-top:28px"><a href="${esc(appUrl)}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600">${en ? 'Open the plan' : 'Ouvrir le plan'}</a></p>`
+    : ''
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1a1a1a">
+      <h2 style="color:#6366f1;margin-bottom:4px">${en ? 'New in your market watch' : 'Nouveau dans ta veille'}</h2>
+      <p style="color:#6b7280;font-size:13px;margin-top:0">${esc(productName || (en ? 'Your plan' : 'Ton plan'))}</p>
+      <p>${en
+        ? `The weekly market watch refresh on <strong>${esc(productName || 'your plan')}</strong> found something new.`
+        : `Le rafraîchissement hebdomadaire de la veille sur <strong>${esc(productName || 'ton plan')}</strong> a trouvé du nouveau.`}</p>
+      ${listHtml}
       ${ctaHtml}
       ${brandSignature()}
     </div>`

@@ -3,24 +3,52 @@ import { t } from '../lib/i18n'
 import { fetchNotificationPrefs, saveNotificationPrefs } from '../lib/serverStorage'
 import { useUser } from '../lib/auth'
 
-// Préférences de notification par email (agent IA terminé, plan inactif). L'email est
-// pris depuis le compte connecté (Clerk) — pas de champ libre pour éviter d'envoyer à
-// une adresse non vérifiée.
+const SLACK_WEBHOOK_DOCS_URL = 'https://api.slack.com/messaging/webhooks'
+
+// Préférences de notification : email (agent IA terminé, plan inactif) et Slack (même
+// déclencheurs, canal indépendant — un utilisateur peut n'activer que l'un des deux).
+// L'email est pris depuis le compte connecté (Clerk) ; Slack passe par un Incoming
+// Webhook que l'utilisateur crée lui-même côté Slack (pas d'app à publier/OAuth).
 export default function NotificationsSection({ lang, userId }) {
   const { user } = useUser()
   const email = user?.primaryEmailAddress?.emailAddress || null
   const [prefs, setPrefs] = useState(null) // null = chargement
+  const [webhookInput, setWebhookInput] = useState('')
+  const [webhookSaved, setWebhookSaved] = useState(false)
 
   useEffect(() => {
     if (!userId) return
-    fetchNotificationPrefs(userId).then(r => setPrefs(r || { agentDone: false, inactivityReminder: false }))
+    fetchNotificationPrefs(userId).then(r => {
+      const next = r || { agentDone: false, inactivityReminder: false, slackWebhookUrl: null, slackEnabled: false, veilleAutoRefresh: false }
+      setPrefs(next)
+      setWebhookInput(next.slackWebhookUrl || '')
+    })
   }, [userId])
 
-  const toggle = (key) => {
-    if (!prefs || !userId || !email) return
-    const next = { ...prefs, [key]: !prefs[key] }
+  const persist = (patch) => {
+    if (!userId) return
+    const next = { ...prefs, ...patch }
     setPrefs(next)
-    saveNotificationPrefs(userId, { email, agentDone: next.agentDone, inactivityReminder: next.inactivityReminder })
+    saveNotificationPrefs(userId, {
+      email,
+      agentDone: next.agentDone,
+      inactivityReminder: next.inactivityReminder,
+      slackWebhookUrl: next.slackWebhookUrl,
+      slackEnabled: next.slackEnabled,
+      veilleAutoRefresh: next.veilleAutoRefresh
+    })
+  }
+
+  const toggle = (key) => {
+    if (!prefs || !userId) return
+    persist({ [key]: !prefs[key] })
+  }
+
+  const saveWebhook = () => {
+    if (!prefs || !userId) return
+    setWebhookSaved(true)
+    persist({ slackWebhookUrl: webhookInput.trim() || null })
+    setTimeout(() => setWebhookSaved(false), 2000)
   }
 
   if (!userId || prefs === null) return null
@@ -55,6 +83,50 @@ export default function NotificationsSection({ lang, userId }) {
           role="switch"
           aria-checked={prefs.inactivityReminder}
           onClick={() => toggle('inactivityReminder')}
+        >
+          <span className="settings-switch-thumb" />
+        </button>
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <p className="settings-row-label">{t(lang, 'settings.notifVeilleAutoLabel')}</p>
+          <p className="account-security-note">{t(lang, 'settings.notifVeilleAutoBody')}</p>
+        </div>
+        <button
+          className={`settings-switch ${prefs.veilleAutoRefresh ? 'is-on' : ''}`}
+          role="switch"
+          aria-checked={prefs.veilleAutoRefresh}
+          onClick={() => toggle('veilleAutoRefresh')}
+        >
+          <span className="settings-switch-thumb" />
+        </button>
+      </div>
+
+      <div className="settings-row notif-slack-row">
+        <div className="notif-slack-field">
+          <p className="settings-row-label">{t(lang, 'settings.notifSlackLabel')}</p>
+          <p className="account-security-note">
+            {t(lang, 'settings.notifSlackBody')} <a href={SLACK_WEBHOOK_DOCS_URL} target="_blank" rel="noopener noreferrer">{t(lang, 'settings.notifSlackDocsLink')}</a>
+          </p>
+          <div className="notif-slack-input-row">
+            <input
+              type="url"
+              className="settings-select"
+              placeholder="https://hooks.slack.com/services/…"
+              value={webhookInput}
+              onChange={e => setWebhookInput(e.target.value)}
+            />
+            <button className="btn-secondary" onClick={saveWebhook}>
+              {webhookSaved ? t(lang, 'settings.notifSlackSaved') : t(lang, 'settings.notifSlackSave')}
+            </button>
+          </div>
+        </div>
+        <button
+          className={`settings-switch ${prefs.slackEnabled ? 'is-on' : ''}`}
+          role="switch"
+          aria-checked={prefs.slackEnabled}
+          onClick={() => toggle('slackEnabled')}
         >
           <span className="settings-switch-thumb" />
         </button>

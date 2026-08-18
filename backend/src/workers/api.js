@@ -17,27 +17,40 @@ import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as github from '../lib/github/githubClient'
-import { sendEmail, agentDoneEmail } from '../lib/email/resendClient'
+import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
+import { sendSlackMessage, agentDoneSlackMessage } from '../lib/slack/slackClient'
 
-// Email best-effort à la fin d'une génération IA (veille, benchmarks, calendriers, RGPD,
-// tableau IA, ou agent async) — n'échoue jamais la réponse HTTP, même si l'envoi rate.
+// Email + Slack best-effort à la fin d'une génération IA (veille, benchmarks, calendriers,
+// RGPD, tableau IA, ou agent async) — deux canaux indépendants (un utilisateur peut n'activer
+// que l'un des deux) ; n'échoue jamais la réponse HTTP, même si un envoi rate.
 async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
   if (!userId) { console.log(`[notify] skipped (${taskType}): no userId`); return }
-  try {
-    const prefs = await db.getNotificationPrefs(env, userId)
-    if (!prefs?.agent_done || !prefs.email) {
-      console.log(`[notify] skipped (${taskType}): agent_done=${prefs?.agent_done} email=${prefs?.email}`)
-      return
-    }
-    const { subject, html } = agentDoneEmail(lang || plan?.language || 'fr', {
-      productName: plan?.product?.name,
-      classification: plan?.classification,
-      taskType,
-      output,
-      appUrl: env.APP_URL
-    })
-    await sendEmail(env, { to: prefs.email, subject, html })
-  } catch (e) { console.log(`[notify] error (${taskType}): ${e.message}`) }
+  const prefs = await db.getNotificationPrefs(env, userId).catch(() => null)
+  if (!prefs) { console.log(`[notify] skipped (${taskType}): no prefs`); return }
+  const resolvedLang = lang || plan?.language || 'fr'
+
+  if (prefs.agent_done && prefs.email) {
+    try {
+      const { subject, html } = agentDoneEmail(resolvedLang, {
+        productName: plan?.product?.name,
+        classification: plan?.classification,
+        taskType,
+        output,
+        appUrl: env.APP_URL
+      })
+      await sendEmail(env, { to: prefs.email, subject, html })
+    } catch (e) { console.log(`[notify] email error (${taskType}): ${e.message}`) }
+  }
+
+  if (prefs.slack_enabled && prefs.slack_webhook_url) {
+    try {
+      const en = resolvedLang === 'en'
+      const typeLabel = AGENT_TYPE_LABELS[taskType]?.[en ? 'en' : 'fr'] || taskType
+      const highlights = extractHighlights(taskType, output, en)
+      const msg = agentDoneSlackMessage(resolvedLang, { productName: plan?.product?.name, taskType, typeLabel, highlights, appUrl: env.APP_URL })
+      await sendSlackMessage(prefs.slack_webhook_url, msg)
+    } catch (e) { console.log(`[notify] slack error (${taskType}): ${e.message}`) }
+  }
 }
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -477,14 +490,17 @@ export async function handleApi(request, env, url) {
     return json({
       email: prefs?.email || null,
       agentDone: !!prefs?.agent_done,
-      inactivityReminder: !!prefs?.inactivity_reminder
+      inactivityReminder: !!prefs?.inactivity_reminder,
+      slackWebhookUrl: prefs?.slack_webhook_url || null,
+      slackEnabled: !!prefs?.slack_enabled,
+      veilleAutoRefresh: !!prefs?.veille_auto_refresh
     })
   }
 
   if (pathname === '/notifications/prefs' && method === 'POST') {
-    const { userId, email, agentDone, inactivityReminder } = await request.json()
+    const { userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh } = await request.json()
     if (!userId) return json({ error: 'userId required' }, 400)
-    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder })
+    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh })
     return json({ ok: true })
   }
 

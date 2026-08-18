@@ -261,11 +261,11 @@ export function fetchNotificationPrefs(userId) {
   return safeFetch(`/notifications/prefs?userId=${encodeURIComponent(userId)}`)
 }
 
-export function saveNotificationPrefs(userId, { email, agentDone, inactivityReminder }) {
+export function saveNotificationPrefs(userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh }) {
   return safeFetch('/notifications/prefs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, email, agentDone, inactivityReminder })
+    body: JSON.stringify({ userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh })
   })
 }
 

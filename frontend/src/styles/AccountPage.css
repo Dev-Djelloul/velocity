@@ -595,3 +595,31 @@
     overflow-wrap: break-word;
   }
 }
+
+.notif-slack-row {
+  align-items: flex-start;
+}
+
+.notif-slack-field {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-slack-field a {
+  color: var(--color-primary);
+}
+
+.notif-slack-input-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.notif-slack-input-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-slack-input-row .btn-secondary {
+  flex-shrink: 0;
+}

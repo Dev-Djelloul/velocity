@@ -1021,7 +1021,14 @@ export const translations = {
       notifAgentDoneLabel: 'Génération IA terminée',
       notifAgentDoneBody: "Un email à chaque génération IA (veille, benchmarks, calendriers, RGPD, tableau IA, agents de backlog...).",
       notifInactiveLabel: 'Rappel plan inactif',
-      notifInactiveBody: 'Un email si un plan reste sans activité depuis plus de 14 jours.'
+      notifInactiveBody: 'Un email si un plan reste sans activité depuis plus de 14 jours.',
+      notifSlackLabel: 'Notifications Slack',
+      notifSlackBody: 'Même déclencheurs, envoyés dans un canal Slack via un Incoming Webhook (créé de ton côté, aucune app à installer).',
+      notifSlackDocsLink: 'Créer un webhook →',
+      notifSlackSave: 'Enregistrer',
+      notifSlackSaved: 'Enregistré ✓',
+      notifVeilleAutoLabel: 'Veille IA automatique',
+      notifVeilleAutoBody: "Régénère chaque lundi la veille des plans qui en ont déjà une, et te prévient uniquement si du contenu nouveau apparaît."
     }
   },
   en: {
@@ -2041,7 +2048,14 @@ export const translations = {
       notifAgentDoneLabel: 'AI generation completed',
       notifAgentDoneBody: 'An email on every AI generation (market watch, benchmarks, calendars, GDPR, AI table, backlog agents...).',
       notifInactiveLabel: 'Inactive plan reminder',
-      notifInactiveBody: 'An email if a plan has had no activity for more than 14 days.'
+      notifInactiveBody: 'An email if a plan has had no activity for more than 14 days.',
+      notifSlackLabel: 'Slack notifications',
+      notifSlackBody: 'Same triggers, sent to a Slack channel via an Incoming Webhook (you create it, no app to install).',
+      notifSlackDocsLink: 'Create a webhook →',
+      notifSlackSave: 'Save',
+      notifSlackSaved: 'Saved ✓',
+      notifVeilleAutoLabel: 'Automatic AI market watch',
+      notifVeilleAutoBody: 'Refreshes every Monday for plans that already have a market watch, and only notifies you when something new shows up.'
     }
   }
 }

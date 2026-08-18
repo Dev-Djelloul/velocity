@@ -339,13 +339,52 @@ export async function getNotificationPrefs(env, userId) {
   return env.DB.prepare('SELECT * FROM notification_prefs WHERE user_id = ?').bind(userId).first()
 }
 
-export async function setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder }) {
+// Merge partiel avec la ligne existante : un appelant qui ne touche qu'au toggle email
+// (ex: NotificationsSection) ne doit jamais effacer un webhook Slack déjà enregistré, et
+// inversement — chaque champ omis (undefined) conserve sa valeur actuelle en base.
+export async function setNotificationPrefs(env, userId, patch) {
+  const existing = await getNotificationPrefs(env, userId)
+  const next = {
+    email: patch.email !== undefined ? patch.email : existing?.email,
+    agentDone: patch.agentDone !== undefined ? patch.agentDone : !!existing?.agent_done,
+    inactivityReminder: patch.inactivityReminder !== undefined ? patch.inactivityReminder : !!existing?.inactivity_reminder,
+    slackWebhookUrl: patch.slackWebhookUrl !== undefined ? patch.slackWebhookUrl : existing?.slack_webhook_url,
+    slackEnabled: patch.slackEnabled !== undefined ? patch.slackEnabled : !!existing?.slack_enabled,
+    veilleAutoRefresh: patch.veilleAutoRefresh !== undefined ? patch.veilleAutoRefresh : !!existing?.veille_auto_refresh
+  }
   await env.DB.prepare(
-    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, updated_at)
-     VALUES (?, ?, ?, ?, datetime('now'))
+    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, slack_webhook_url, slack_enabled, veille_auto_refresh, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
      ON CONFLICT(user_id) DO UPDATE SET email = excluded.email, agent_done = excluded.agent_done,
-       inactivity_reminder = excluded.inactivity_reminder, updated_at = datetime('now')`
-  ).bind(userId, email || null, agentDone ? 1 : 0, inactivityReminder ? 1 : 0).run()
+       inactivity_reminder = excluded.inactivity_reminder, slack_webhook_url = excluded.slack_webhook_url,
+       slack_enabled = excluded.slack_enabled, veille_auto_refresh = excluded.veille_auto_refresh, updated_at = datetime('now')`
+  ).bind(userId, next.email || null, next.agentDone ? 1 : 0, next.inactivityReminder ? 1 : 0, next.slackWebhookUrl || null, next.slackEnabled ? 1 : 0, next.veilleAutoRefresh ? 1 : 0).run()
+}
+
+// Plans dont le propriétaire a activé le rafraîchissement hebdomadaire de la veille —
+// filtré uniquement sur la préférence utilisateur ici ; c'est le job (generate.js) qui
+// vérifie ensuite, plan par plan, que la veille existe déjà (pas de sens à en générer
+// une toute neuve en tâche de fond, sans que l'utilisateur l'ait demandée une 1ère fois).
+export async function getPlansForVeilleRefresh(env) {
+  const res = await env.DB.prepare(
+    `SELECT p.id, p.user_id
+     FROM plans p
+     JOIN notification_prefs n ON n.user_id = p.user_id
+     WHERE n.veille_auto_refresh = 1`
+  ).all()
+  return res.results || []
+}
+
+// Remplace uniquement le champ "veille" d'un plan existant, sans toucher au reste —
+// utilisé par le rafraîchissement hebdomadaire automatique (tâche de fond, pas une
+// sauvegarde utilisateur classique donc pas d'appel à upsertPlan). updated_at n'est
+// délibérément PAS touché : un refresh automatique ne doit pas faire paraître un plan
+// "actif" et ainsi masquer le rappel d'inactivité (getPlansNeedingInactivityReminder).
+export async function updatePlanVeille(env, planId, veille) {
+  const row = await env.DB.prepare('SELECT data FROM plans WHERE id = ?').bind(planId).first()
+  if (!row) return
+  const data = { ...JSON.parse(row.data), veille }
+  await env.DB.prepare('UPDATE plans SET data = ? WHERE id = ?').bind(JSON.stringify(data), planId).run()
 }
 
 // Plans inactifs depuis >= 14 jours, dont le propriétaire a activé le rappel et dont on
@@ -353,11 +392,11 @@ export async function setNotificationPrefs(env, userId, { email, agentDone, inac
 // récent que updated_at => déjà notifié depuis la dernière modification).
 export async function getPlansNeedingInactivityReminder(env) {
   const res = await env.DB.prepare(
-    `SELECT p.id, p.user_id, p.product_name, p.updated_at, n.email
+    `SELECT p.id, p.user_id, p.product_name, p.updated_at, n.email, n.slack_webhook_url, n.slack_enabled
      FROM plans p
      JOIN notification_prefs n ON n.user_id = p.user_id
      WHERE n.inactivity_reminder = 1
-       AND n.email IS NOT NULL
+       AND (n.email IS NOT NULL OR (n.slack_enabled = 1 AND n.slack_webhook_url IS NOT NULL))
        AND p.updated_at <= datetime('now', '-14 days')
        AND (p.reminder_sent_at IS NULL OR p.reminder_sent_at < p.updated_at)`
   ).all()

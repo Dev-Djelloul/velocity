@@ -6,9 +6,11 @@ import { generatePersona, classifyProduct, classificationLabel } from '../lib/en
 import { generatePlanWithAI } from '../lib/ai/client'
 import { recordUsage } from '../lib/ai/usageTracker'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
+import { generateVeilleWithAI } from '../lib/ai/veilleClient'
 import * as db from '../lib/db'
 import { handleApi, CORS_HEADERS } from './api'
-import { sendEmail, agentDoneEmail, inactivityReminderEmail } from '../lib/email/resendClient'
+import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
+import { sendSlackMessage, agentDoneSlackMessage, inactivityReminderSlackMessage, veilleUpdateSlackMessage } from '../lib/slack/slackClient'
 
 function generateWithRules(data, lang) {
   const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
@@ -53,23 +55,34 @@ async function processAgentTask(message, env) {
 // Email best-effort à la fin d'une tâche agent — ne doit jamais faire échouer la tâche
 // elle-même (déjà marquée "done" en base à ce stade).
 async function notifyAgentDone(env, task, output) {
-  try {
-    // getAgentTask() renvoie des clés camelCase (userId/planId), pas les colonnes SQL brutes.
-    const prefs = await db.getNotificationPrefs(env, task.userId)
-    if (!prefs?.agent_done || !prefs.email) {
-      console.log(`[notify] skipped (agent:${task.type}): userId=${task.userId} agent_done=${prefs?.agent_done} email=${prefs?.email}`)
-      return
-    }
-    const plan = await db.getPlan(env, task.planId)
-    const { subject, html } = agentDoneEmail(plan?.language || 'fr', {
-      productName: plan?.product?.name,
-      classification: plan?.classification,
-      taskType: task.type,
-      output,
-      appUrl: env.APP_URL
-    })
-    await sendEmail(env, { to: prefs.email, subject, html })
-  } catch (e) { console.log(`[notify] error (agent:${task.type}): ${e.message}`) }
+  // getAgentTask() renvoie des clés camelCase (userId/planId), pas les colonnes SQL brutes.
+  const prefs = await db.getNotificationPrefs(env, task.userId).catch(() => null)
+  if (!prefs) { console.log(`[notify] skipped (agent:${task.type}): no prefs for userId=${task.userId}`); return }
+  const plan = await db.getPlan(env, task.planId)
+  const lang = plan?.language || 'fr'
+
+  if (prefs.agent_done && prefs.email) {
+    try {
+      const { subject, html } = agentDoneEmail(lang, {
+        productName: plan?.product?.name,
+        classification: plan?.classification,
+        taskType: task.type,
+        output,
+        appUrl: env.APP_URL
+      })
+      await sendEmail(env, { to: prefs.email, subject, html })
+    } catch (e) { console.log(`[notify] email error (agent:${task.type}): ${e.message}`) }
+  }
+
+  if (prefs.slack_enabled && prefs.slack_webhook_url) {
+    try {
+      const en = lang === 'en'
+      const typeLabel = AGENT_TYPE_LABELS[task.type]?.[en ? 'en' : 'fr'] || task.type
+      const highlights = extractHighlights(task.type, output, en)
+      const msg = agentDoneSlackMessage(lang, { productName: plan?.product?.name, taskType: task.type, typeLabel, highlights, appUrl: env.APP_URL })
+      await sendSlackMessage(prefs.slack_webhook_url, msg)
+    } catch (e) { console.log(`[notify] slack error (agent:${task.type}): ${e.message}`) }
+  }
 }
 
 // Cron quotidien (voir wrangler.toml [triggers]) — envoie un rappel pour chaque plan
@@ -80,18 +93,78 @@ async function sendInactivityReminders(env) {
   for (const row of plans) {
     try {
       const plan = await db.getPlan(env, row.id)
-      const { subject, html } = inactivityReminderEmail(plan?.language || 'fr', {
-        productName: row.product_name,
-        updatedAt: new Date(row.updated_at).toLocaleDateString('fr-FR')
-      })
-      await sendEmail(env, { to: row.email, subject, html })
+      const lang = plan?.language || 'fr'
+      const updatedAt = new Date(row.updated_at).toLocaleDateString('fr-FR')
+
+      if (row.email) {
+        const { subject, html } = inactivityReminderEmail(lang, { productName: row.product_name, updatedAt })
+        await sendEmail(env, { to: row.email, subject, html }).catch(e => console.log(`[notify] reminder email error: ${e.message}`))
+      }
+      if (row.slack_enabled && row.slack_webhook_url) {
+        const msg = inactivityReminderSlackMessage(lang, { productName: row.product_name, updatedAt, appUrl: env.APP_URL })
+        await sendSlackMessage(row.slack_webhook_url, msg).catch(e => console.log(`[notify] reminder slack error: ${e.message}`))
+      }
       await db.markReminderSent(env, row.id)
     } catch { /* on continue avec les plans suivants même si un envoi échoue */ }
   }
 }
 
+// Compare deux veilles et retourne les libellés apparus dans la nouvelle mais absents de
+// l'ancienne (concurrents, tendances, signaux, opportunités, menaces confondus) — c'est
+// cette liste qui décide si le rafraîchissement hebdomadaire mérite une notification.
+function diffVeilleItems(oldVeille, newVeille) {
+  const flatten = (v) => new Set([
+    ...(v?.competitors || []).map(c => c.name),
+    ...(v?.trends || []),
+    ...(v?.signals || []),
+    ...(v?.opportunities || []),
+    ...(v?.threats || [])
+  ].filter(Boolean))
+  const before = flatten(oldVeille)
+  const after = flatten(newVeille)
+  return [...after].filter(item => !before.has(item))
+}
+
+// Cron hebdomadaire (voir wrangler.toml [triggers]) — ne régénère la veille QUE pour les
+// plans qui en ont déjà une (générée manuellement au moins une fois) et dont le
+// propriétaire a explicitement activé le rafraîchissement automatique. N'envoie une
+// notification que si du contenu réellement nouveau apparaît, pour ne pas spammer chaque
+// semaine sans raison. Ne touche jamais updated_at (voir db.updatePlanVeille).
+async function refreshVeilleForSubscribedPlans(env) {
+  const candidates = await db.getPlansForVeilleRefresh(env)
+  for (const row of candidates) {
+    try {
+      const plan = await db.getPlan(env, row.id)
+      if (!plan?.veille) continue // jamais générée manuellement : rien à rafraîchir en tâche de fond
+      const lang = plan.language || 'fr'
+      const fresh = await generateVeilleWithAI(plan, lang, env).catch(() => null)
+      if (!fresh) continue
+
+      const newItems = diffVeilleItems(plan.veille, fresh)
+      await db.updatePlanVeille(env, row.id, fresh)
+      if (!newItems.length) continue
+
+      const prefs = await db.getNotificationPrefs(env, row.user_id)
+      if (prefs?.agent_done && prefs.email) {
+        const { subject, html } = veilleUpdateEmail(lang, { productName: plan.product?.name, newItems, appUrl: env.APP_URL })
+        await sendEmail(env, { to: prefs.email, subject, html }).catch(e => console.log(`[notify] veille email error: ${e.message}`))
+      }
+      if (prefs?.slack_enabled && prefs.slack_webhook_url) {
+        const msg = veilleUpdateSlackMessage(lang, { productName: plan.product?.name, newItems, appUrl: env.APP_URL })
+        await sendSlackMessage(prefs.slack_webhook_url, msg).catch(e => console.log(`[notify] veille slack error: ${e.message}`))
+      }
+    } catch (e) { console.log(`[notify] veille refresh error (plan ${row.id}): ${e.message}`) }
+  }
+}
+
 export default {
   async scheduled(event, env) {
+    // Deux crons distincts (voir wrangler.toml [triggers]) partagent ce handler ;
+    // event.cron correspond exactement à l'expression qui a déclenché l'appel.
+    if (event.cron === '0 8 * * 1') {
+      await refreshVeilleForSubscribedPlans(env)
+      return
+    }
     await sendInactivityReminders(env)
   },
 
