@@ -521,13 +521,49 @@
   .plan-sidebar {
     position: static;
     width: 100% !important;
+    height: auto;
     max-height: none;
   }
-  .plan-sidebar-resize-handle { display: none; }
   .plan-sidebar-nav {
+    height: auto;
+    max-height: 50vh;
+  }
+  .plan-sidebar-resize-handle { display: none; }
+
+  /* Repliée par défaut sur mobile (voir PlanSidebar.jsx) : la liste plate d'icônes se
+     présente en grille compacte plutôt qu'en colonne pleine hauteur. Dépliée (choix
+     explicite de l'utilisateur), les groupes restent en colonne — un flex-wrap y casserait
+     la mise en page des en-têtes de groupe. */
+  .plan-sidebar.collapsed .plan-sidebar-nav {
     flex-direction: row;
     flex-wrap: wrap;
+    align-content: flex-start;
   }
-  .plan-sidebar-item { flex: 1 1 auto; }
+  .plan-sidebar.collapsed .plan-sidebar-item {
+    width: 44px;
+    flex: 0 0 auto;
+  }
+
   .plan-viewer-main { width: 100%; }
+
+  /* Le petit tiret de 8px positionné à cheval sur le bord droit (pensé pour un pointeur de
+     souris entre sidebar et contenu sur desktop) est illisible et quasi impossible à taper
+     au doigt une fois la sidebar en pleine largeur — on le transforme en vrai bouton visible
+     dans le coin de la sidebar. */
+  .plan-sidebar-collapse-handle {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+    opacity: 1;
+    mask-size: 14px;
+    -webkit-mask-size: 14px;
+    mask-position: center;
+    -webkit-mask-position: center;
+    mask-repeat: no-repeat;
+    -webkit-mask-repeat: no-repeat;
+  }
 }

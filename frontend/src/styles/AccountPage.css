@@ -547,3 +547,22 @@
 }
 
 .upgrade-modal-secondary:hover { color: var(--color-text-primary); }
+
+@media (max-width: 480px) {
+  .account-header {
+    flex-wrap: wrap;
+  }
+
+  .account-header > .btn-secondary {
+    width: 100%;
+    order: 3;
+  }
+
+  .account-identity {
+    min-width: 0;
+  }
+
+  .account-email {
+    overflow-wrap: break-word;
+  }
+}

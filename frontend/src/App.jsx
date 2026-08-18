@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart, IconMessageCircle } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart, IconMessageCircle, IconMenu, IconX } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -99,6 +99,7 @@ export default function App() {
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [pendingAccountAction, setPendingAccountAction] = useState(null) // 'plans' | 'upgrade' | null
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [switchingSpace, setSwitchingSpace] = useState(false)
   const [creatingTeam, setCreatingTeam] = useState(false)
@@ -116,6 +117,10 @@ export default function App() {
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [openHeaderMenu])
+
+  useEffect(() => {
+    setMobileNavOpen(false)
+  }, [currentPage])
 
   const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
@@ -545,23 +550,33 @@ export default function App() {
             <Wordmark size={34} animated />
           </button>
 
-          <nav className="header-nav">
-            <button className="header-nav-link" onClick={() => handleNavAnchor('features')}>
+          <button
+            className={`header-hamburger-btn ${mobileNavOpen ? 'active' : ''}`}
+            onClick={() => setMobileNavOpen(o => !o)}
+            title={lang === 'fr' ? 'Menu' : 'Menu'}
+            aria-label={lang === 'fr' ? 'Menu' : 'Menu'}
+            aria-expanded={mobileNavOpen}
+          >
+            {mobileNavOpen ? <IconX width={20} height={20} /> : <IconMenu width={20} height={20} />}
+          </button>
+
+          <nav className={`header-nav ${mobileNavOpen ? 'is-open' : ''}`}>
+            <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('features') }}>
               {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
             </button>
             <button
               className={`header-nav-link ${currentPage === 'howItWorks' ? 'active' : ''}`}
-              onClick={handleShowHowItWorks}
+              onClick={() => { setMobileNavOpen(false); handleShowHowItWorks() }}
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
             {!isSignedIn && (
-              <button className="header-nav-link" onClick={() => setShowDemo(true)}>
+              <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); setShowDemo(true) }}>
                 {lang === 'fr' ? 'Démo' : 'Demo'}
               </button>
             )}
             {!isSignedIn && (
-              <button className="btn-header-cta" onClick={handleStartClick}>
+              <button className="btn-header-cta" onClick={() => { setMobileNavOpen(false); handleStartClick() }}>
                 <IconSparkle width={14} height={14} />
                 <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
               </button>

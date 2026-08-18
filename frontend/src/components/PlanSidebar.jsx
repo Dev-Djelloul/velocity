@@ -96,7 +96,10 @@ const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
 export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId }) {
-  const [collapsed, setCollapsed] = useState(false)
+  // Repliée par défaut sous 900px (tablette/mobile) — en pleine largeur forcée par le CSS
+  // responsive, la version dépliée (groupes + libellés) occupe toute la hauteur de l'écran
+  // et masque le contenu du plan tant qu'on n'a pas scrollé plusieurs écrans plus bas.
+  const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.innerWidth < 900)
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(FIRST_ID)
   const [resizing, setResizing] = useState(false)
