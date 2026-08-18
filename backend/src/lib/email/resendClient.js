@@ -18,7 +18,13 @@ export async function sendEmail(env, { to, subject, html }) {
 
 const AGENT_TYPE_LABELS = {
   story_brief: { fr: "brief d'exécution", en: 'execution brief' },
-  recalc_kpis: { fr: 'recalcul des KPIs', en: 'KPI recalculation' }
+  recalc_kpis: { fr: 'recalcul des KPIs', en: 'KPI recalculation' },
+  veille: { fr: 'veille IA', en: 'AI market watch' },
+  benchmarks: { fr: 'benchmarks', en: 'benchmarks' },
+  editorial: { fr: 'calendrier éditorial', en: 'editorial calendar' },
+  advertising: { fr: 'calendrier publicitaire', en: 'advertising calendar' },
+  rgpd: { fr: 'conformité RGPD', en: 'GDPR compliance' },
+  table: { fr: 'tableau IA', en: 'AI table' }
 }
 
 export function agentDoneEmail(lang, { productName, taskType }) {

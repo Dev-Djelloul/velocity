@@ -17,6 +17,22 @@ import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as github from '../lib/github/githubClient'
+import { sendEmail, agentDoneEmail } from '../lib/email/resendClient'
+
+// Email best-effort à la fin d'une génération IA (veille, benchmarks, calendriers, RGPD,
+// tableau IA, ou agent async) — n'échoue jamais la réponse HTTP, même si l'envoi rate.
+async function notifyGenerationDone(env, userId, plan, lang, taskType) {
+  if (!userId) return
+  try {
+    const prefs = await db.getNotificationPrefs(env, userId)
+    if (!prefs?.agent_done || !prefs.email) return
+    const { subject, html } = agentDoneEmail(lang || plan?.language || 'fr', {
+      productName: plan?.product?.name,
+      taskType
+    })
+    await sendEmail(env, { to: prefs.email, subject, html })
+  } catch { /* best-effort, ne doit jamais faire échouer la génération */ }
+}
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
 
@@ -144,64 +160,76 @@ export async function handleApi(request, env, url) {
   }
 
   if (pathname === '/generate-table' && method === 'POST') {
-    const { prompt, plan, lang } = await request.json()
+    const { prompt, plan, lang, userId } = await request.json()
     if (!prompt) return json({ error: 'prompt required' }, 400)
+    let result
     try {
-      const table = await generateTableWithAI(prompt, plan, lang || 'fr', env)
-      return json({ ...table, source: 'ai' })
+      result = { ...(await generateTableWithAI(prompt, plan, lang || 'fr', env)), source: 'ai' }
     } catch {
-      return json({ ...generateTableFromPrompt(prompt), source: 'rules' })
+      result = { ...generateTableFromPrompt(prompt), source: 'rules' }
     }
+    await notifyGenerationDone(env, userId, plan, lang, 'table')
+    return json(result)
   }
 
   if (pathname === '/generate-veille' && method === 'POST') {
-    const { plan, lang } = await request.json()
+    const { plan, lang, userId } = await request.json()
+    let result
     try {
-      const veille = await generateVeilleWithAI(plan, lang || 'fr', env)
-      return json({ ...veille, source: 'ai' })
+      result = { ...(await generateVeilleWithAI(plan, lang || 'fr', env)), source: 'ai' }
     } catch {
-      return json({ ...generateVeilleFallback(plan, lang || 'fr'), source: 'rules' })
+      result = { ...generateVeilleFallback(plan, lang || 'fr'), source: 'rules' }
     }
+    await notifyGenerationDone(env, userId, plan, lang, 'veille')
+    return json(result)
   }
 
   if (pathname === '/generate-benchmarks' && method === 'POST') {
-    const { plan, lang } = await request.json()
+    const { plan, lang, userId } = await request.json()
+    let result
     try {
-      const benchmarks = await generateBenchmarksWithAI(plan, lang || 'fr', env)
-      return json({ ...benchmarks, source: 'ai' })
+      result = { ...(await generateBenchmarksWithAI(plan, lang || 'fr', env)), source: 'ai' }
     } catch {
-      return json({ ...generateBenchmarksFallback(plan, lang || 'fr'), source: 'rules' })
+      result = { ...generateBenchmarksFallback(plan, lang || 'fr'), source: 'rules' }
     }
+    await notifyGenerationDone(env, userId, plan, lang, 'benchmarks')
+    return json(result)
   }
 
   if (pathname === '/generate-editorial' && method === 'POST') {
-    const { plan, lang } = await request.json()
+    const { plan, lang, userId } = await request.json()
+    let result
     try {
-      const editorial = await generateEditorialWithAI(plan, lang || 'fr', env)
-      return json({ ...editorial, source: 'ai' })
+      result = { ...(await generateEditorialWithAI(plan, lang || 'fr', env)), source: 'ai' }
     } catch {
-      return json({ ...generateEditorialFallback(plan, lang || 'fr'), source: 'rules' })
+      result = { ...generateEditorialFallback(plan, lang || 'fr'), source: 'rules' }
     }
+    await notifyGenerationDone(env, userId, plan, lang, 'editorial')
+    return json(result)
   }
 
   if (pathname === '/generate-advertising' && method === 'POST') {
-    const { plan, lang } = await request.json()
+    const { plan, lang, userId } = await request.json()
+    let result
     try {
-      const advertising = await generateAdvertisingWithAI(plan, lang || 'fr', env)
-      return json({ ...advertising, source: 'ai' })
+      result = { ...(await generateAdvertisingWithAI(plan, lang || 'fr', env)), source: 'ai' }
     } catch {
-      return json({ ...generateAdvertisingFallback(plan, lang || 'fr'), source: 'rules' })
+      result = { ...generateAdvertisingFallback(plan, lang || 'fr'), source: 'rules' }
     }
+    await notifyGenerationDone(env, userId, plan, lang, 'advertising')
+    return json(result)
   }
 
   if (pathname === '/generate-rgpd' && method === 'POST') {
-    const { plan, lang } = await request.json()
+    const { plan, lang, userId } = await request.json()
+    let result
     try {
-      const rgpd = await generateRgpdWithAI(plan, lang || 'fr', env)
-      return json({ ...rgpd, source: 'ai' })
+      result = { ...(await generateRgpdWithAI(plan, lang || 'fr', env)), source: 'ai' }
     } catch {
-      return json({ ...generateRgpdFallback(plan, lang || 'fr'), source: 'rules' })
+      result = { ...generateRgpdFallback(plan, lang || 'fr'), source: 'rules' }
     }
+    await notifyGenerationDone(env, userId, plan, lang, 'rgpd')
+    return json(result)
   }
 
   // --- Intégration Notion (OAuth + export de page) ---

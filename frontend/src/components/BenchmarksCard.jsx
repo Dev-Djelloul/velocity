@@ -7,7 +7,7 @@ import '../styles/BenchmarksCard.css'
 
 const CHANNEL_PALETTE = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#f472b6', '#eab308']
 
-export default function BenchmarksCard({ plan, lang, onBenchmarksChange }) {
+export default function BenchmarksCard({ plan, lang, onBenchmarksChange, userId }) {
   const [loading, setLoading] = useState(false)
   const benchmarks = plan.benchmarks
 
@@ -15,7 +15,7 @@ export default function BenchmarksCard({ plan, lang, onBenchmarksChange }) {
     if (loading) return
     setLoading(true)
     try {
-      const result = await generateBenchmarks(plan, lang)
+      const result = await generateBenchmarks(plan, lang, userId)
       onBenchmarksChange(result || generateBenchmarksFallback(plan, lang))
     } catch {
       onBenchmarksChange(generateBenchmarksFallback(plan, lang))

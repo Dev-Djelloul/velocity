@@ -105,51 +105,51 @@ export function resolveShare(shareId) {
   return safeFetch(`/shares/${encodeURIComponent(shareId)}`)
 }
 
-export function generateTable(prompt, plan, lang) {
+export function generateTable(prompt, plan, lang, userId) {
   return safeFetch('/generate-table', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ prompt, plan, lang })
+    body: JSON.stringify({ prompt, plan, lang, userId })
   })
 }
 
-export function generateVeille(plan, lang) {
+export function generateVeille(plan, lang, userId) {
   return safeFetch('/generate-veille', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan, lang })
+    body: JSON.stringify({ plan, lang, userId })
   })
 }
 
-export function generateBenchmarks(plan, lang) {
+export function generateBenchmarks(plan, lang, userId) {
   return safeFetch('/generate-benchmarks', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan, lang })
+    body: JSON.stringify({ plan, lang, userId })
   })
 }
 
-export function generateEditorial(plan, lang) {
+export function generateEditorial(plan, lang, userId) {
   return safeFetch('/generate-editorial', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan, lang })
+    body: JSON.stringify({ plan, lang, userId })
   })
 }
 
-export function generateAdvertising(plan, lang) {
+export function generateAdvertising(plan, lang, userId) {
   return safeFetch('/generate-advertising', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan, lang })
+    body: JSON.stringify({ plan, lang, userId })
   })
 }
 
-export function generateRgpd(plan, lang) {
+export function generateRgpd(plan, lang, userId) {
   return safeFetch('/generate-rgpd', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ plan, lang })
+    body: JSON.stringify({ plan, lang, userId })
   })
 }
 

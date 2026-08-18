@@ -101,7 +101,7 @@ function downloadCsv(content, filename) {
   URL.revokeObjectURL(url)
 }
 
-export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdvertisingChange }) {
+export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdvertisingChange, userId }) {
   const [loadingContent, setLoadingContent] = useState(false)
   const [loadingPaid, setLoadingPaid] = useState(false)
   const editorial = plan.editorial
@@ -120,7 +120,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
   const generateContent = async () => {
     setLoadingContent(true)
     try {
-      const result = await generateEditorial(plan, lang)
+      const result = await generateEditorial(plan, lang, userId)
       onEditorialChange(result || generateEditorialFallback(plan, lang))
     } catch {
       onEditorialChange(generateEditorialFallback(plan, lang))
@@ -132,7 +132,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
   const generatePaid = async () => {
     setLoadingPaid(true)
     try {
-      const result = await generateAdvertising(plan, lang)
+      const result = await generateAdvertising(plan, lang, userId)
       onAdvertisingChange(result || generateAdvertisingFallback(plan, lang))
     } catch {
       onAdvertisingChange(generateAdvertisingFallback(plan, lang))

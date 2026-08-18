@@ -5,7 +5,7 @@ import { generateVeilleFallback } from '../lib/veilleFallback'
 import { IconRadar, IconSparkle, IconTrendingUp, IconTarget, IconAlertTriangle, IconCompass, IconClipboard } from './Icons'
 import '../styles/VeilleCard.css'
 
-export default function VeilleCard({ plan, lang, onVeilleChange }) {
+export default function VeilleCard({ plan, lang, onVeilleChange, userId }) {
   const [loading, setLoading] = useState(false)
   const veille = plan.veille
 
@@ -13,7 +13,7 @@ export default function VeilleCard({ plan, lang, onVeilleChange }) {
     if (loading) return
     setLoading(true)
     try {
-      const result = await generateVeille(plan, lang)
+      const result = await generateVeille(plan, lang, userId)
       onVeilleChange(result || generateVeilleFallback(plan, lang))
     } catch {
       onVeilleChange(generateVeilleFallback(plan, lang))

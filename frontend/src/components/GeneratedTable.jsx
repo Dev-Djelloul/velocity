@@ -39,7 +39,7 @@ function autoResize(el) {
   el.style.height = `${el.scrollHeight}px`
 }
 
-export default function GeneratedTable({ lang, plan }) {
+export default function GeneratedTable({ lang, plan, userId }) {
   const [prompt, setPrompt] = useState('')
   const [table, setTable] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -63,7 +63,7 @@ export default function GeneratedTable({ lang, plan }) {
     setLoading(true)
     setTried(true)
     try {
-      const result = await generateTable(value.trim(), plan, lang)
+      const result = await generateTable(value.trim(), plan, lang, userId)
       setTable(result || generateTableFromPrompt(value.trim()))
     } finally {
       setLoading(false)

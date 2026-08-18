@@ -1002,8 +1002,8 @@ export const translations = {
       deleteAccountCancel: 'Annuler',
       notificationsTitle: 'Notifications par email',
       notificationsBody: (email) => `Envoyées à ${email}.`,
-      notifAgentDoneLabel: 'Agent IA terminé',
-      notifAgentDoneBody: "Un email quand une tâche IA longue (veille, benchmarks...) se termine.",
+      notifAgentDoneLabel: 'Génération IA terminée',
+      notifAgentDoneBody: "Un email à chaque génération IA (veille, benchmarks, calendriers, RGPD, tableau IA, agents de backlog...).",
       notifInactiveLabel: 'Rappel plan inactif',
       notifInactiveBody: 'Un email si un plan reste sans activité depuis plus de 14 jours.'
     }
@@ -2006,8 +2006,8 @@ export const translations = {
       deleteAccountCancel: 'Cancel',
       notificationsTitle: 'Email notifications',
       notificationsBody: (email) => `Sent to ${email}.`,
-      notifAgentDoneLabel: 'AI agent completed',
-      notifAgentDoneBody: 'An email when a long AI task (research, benchmarks...) finishes.',
+      notifAgentDoneLabel: 'AI generation completed',
+      notifAgentDoneBody: 'An email on every AI generation (market watch, benchmarks, calendars, GDPR, AI table, backlog agents...).',
       notifInactiveLabel: 'Inactive plan reminder',
       notifInactiveBody: 'An email if a plan has had no activity for more than 14 days.'
     }

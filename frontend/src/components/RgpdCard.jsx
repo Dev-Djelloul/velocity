@@ -5,7 +5,7 @@ import { generateRgpdFallback } from '../lib/rgpdFallback'
 import { IconLock, IconSparkle, IconCheckCircle, IconAlertTriangle, IconExternalLink } from './Icons'
 import '../styles/RgpdCard.css'
 
-export default function RgpdCard({ plan, lang, onRgpdChange }) {
+export default function RgpdCard({ plan, lang, onRgpdChange, userId }) {
   const [loading, setLoading] = useState(false)
   const rgpd = plan.rgpd
 
@@ -13,7 +13,7 @@ export default function RgpdCard({ plan, lang, onRgpdChange }) {
     if (loading) return
     setLoading(true)
     try {
-      const result = await generateRgpd(plan, lang)
+      const result = await generateRgpd(plan, lang, userId)
       onRgpdChange(result || generateRgpdFallback(plan, lang))
     } catch {
       onRgpdChange(generateRgpdFallback(plan, lang))
