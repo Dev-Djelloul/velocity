@@ -3,6 +3,7 @@ import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings } from './Ico
 import IntegrationsPanel from './IntegrationsPanel'
 import NotificationsSection from './NotificationsSection'
 import WebhooksSection from './WebhooksSection'
+import ExportBrandingSection from './ExportBrandingSection'
 import PrivacySection from './PrivacySection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
@@ -22,7 +23,7 @@ export default function SettingsPage({
   lang, theme, onToggleTheme, onChangeLang, timezone, onChangeTimezone,
   reduceMotion, onToggleReduceMotion, fontSize, onChangeFontSize,
   highContrast, onToggleHighContrast, dateFormat, onChangeDateFormat,
-  currency, onChangeCurrency, userId, onBack
+  currency, onChangeCurrency, userId, isPro, onRequestUpgrade, onBack
 }) {
   return (
     <div className="account-page">
@@ -150,6 +151,7 @@ export default function SettingsPage({
       <NotificationsSection lang={lang} userId={userId} />
       <IntegrationsPanel lang={lang} userId={userId} />
       <WebhooksSection lang={lang} userId={userId} />
+      <ExportBrandingSection lang={lang} userId={userId} isPro={isPro} onRequestUpgrade={onRequestUpgrade} />
       <PrivacySection lang={lang} userId={userId} />
     </div>
   )

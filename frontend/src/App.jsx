@@ -941,6 +941,8 @@ export default function App() {
             currency={currency}
             onChangeCurrency={setCurrency}
             userId={userId}
+            isPro={pro}
+            onRequestUpgrade={goToUpgrade}
             onBack={() => setCurrentPage('landing')}
           />
         )}

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../lib/pdfExport'
+import { getExportBranding } from '../lib/exportBranding'
 import {
   notionExport, notionAuthorizeUrl, notionStatus,
   jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect,
@@ -365,10 +366,10 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
       <div className="modal card export-modal" onClick={e => e.stopPropagation()}>
         <h3>{t(lang, 'export.title')}</h3>
         <div className="modal-actions">
-          <button className="btn-primary" onClick={() => exportPDF(plan, lang)}>{t(lang, 'export.pdf')}</button>
+          <button className="btn-primary" onClick={() => exportPDF(plan, lang, getExportBranding(userId))}>{t(lang, 'export.pdf')}</button>
           <button
             className="btn-primary"
-            onClick={() => isPro ? exportPPTX(plan, lang) : onRequestUpgrade?.()}
+            onClick={() => isPro ? exportPPTX(plan, lang, getExportBranding(userId)) : onRequestUpgrade?.()}
           >
             {t(lang, 'export.pptx')} {!isPro && <span className="export-pro-badge">PRO</span>}
           </button>

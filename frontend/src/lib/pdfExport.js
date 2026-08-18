@@ -118,16 +118,24 @@ export function exportCSV(plan, lang) {
   downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.csv`)
 }
 
-export async function exportPDF(plan, lang) {
+// branding : { enabled, logo } (voir lib/exportBranding.js, Pro) — le logo personnalisé
+// vient s'AJOUTER en évidence en tête de document, il ne remplace jamais le petit crédit
+// "VelocityLaunch" du pied de page (voir footer plus bas) : décision produit assumée, pas
+// un vrai marque-blanche qui supprimerait toute trace de VelocityLaunch.
+export async function exportPDF(plan, lang, branding) {
   const { default: pdfMake } = await import('pdfmake/build/pdfmake')
   const { default: pdfFonts } = await import('pdfmake/build/vfs_fonts')
   pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs
 
-  const content = [
+  const content = []
+  if (branding?.enabled && branding.logo) {
+    content.push({ image: branding.logo, width: 90, margin: [0, 0, 0, 12] })
+  }
+  content.push(
     { text: plan.product?.name || 'Launch Plan', style: 'header' },
     { text: plan.classification, style: 'subheader' },
     { text: plan.product?.pitch || '', margin: [0, 0, 0, 10] }
-  ]
+  )
 
   if (plan.executiveSummary) {
     content.push(
@@ -269,6 +277,19 @@ const IMG = {
 }
 const abs = (path) => (typeof window !== 'undefined' ? window.location.origin + path : path)
 
+// pptxgenjs ne fait aucun retour à la ligne automatique de la hauteur d'une zone de texte
+// sur sa propre boîte : une zone à hauteur fixe trop courte pour son contenu ne s'agrandit
+// jamais, le texte déborde simplement par-dessus tout ce qui est positionné en dessous
+// (bug constaté sur la diapo de couverture : le pitch, quand il fait plusieurs phrases,
+// recouvrait la ligne USP juste en dessous). Estimation grossière mais suffisante du
+// nombre de lignes (largeur de caractère moyenne ≈ fontSize * 0.52 en pt) pour calculer une
+// hauteur de boîte réaliste avant de positionner l'élément suivant.
+function estimateTextHeight(text, widthIn, fontSize, lineHeightMult = 1.3) {
+  const charsPerLine = Math.max(1, Math.floor((widthIn * 72) / (fontSize * 0.52)))
+  const lines = Math.max(1, Math.ceil(String(text || '').length / charsPerLine))
+  return (lines * fontSize * lineHeightMult) / 72
+}
+
 // pptxgenjs (4.0.1) ne mesure jamais les dimensions réelles de l'image pour calculer un
 // recadrage sizing:{type:'cover'|'contain'} — son code initialise la taille "source" avec
 // celle de la boîte de destination elle-même, ce qui annule mathématiquement tout calcul de
@@ -350,7 +371,10 @@ async function preloadImages(imgMap) {
   return Object.fromEntries(entries)
 }
 
-export async function exportPPTX(plan, lang) {
+// branding : { enabled, logo } (Pro) — ajoute le logo du client en évidence sur les diapos
+// de couverture/clôture, en plus du crédit VelocityLaunch déjà présent en pied de chaque
+// diapo (stamp()), jamais à sa place — voir la note sur exportPDF ci-dessus.
+export async function exportPPTX(plan, lang, branding) {
   const { default: PptxGenJS } = await import('pptxgenjs')
   const pptx = new PptxGenJS()
   pptx.defineLayout({ name: 'VL', width: 10, height: 5.63 })
@@ -394,11 +418,30 @@ export async function exportPPTX(plan, lang) {
     { x: opts.x || 0.5, y: opts.y || 1.35, w: opts.w || 9, colW, border: { type: 'solid', color: '2C3340', pt: 0.5 }, rowH: opts.rowH || 0.32, valign: 'middle' }
   )
 
+  // Place une image "contain" (jamais déformée) centrée dans une boîte — même logique que
+  // la diapo Solution plus bas, factorisée ici pour être réutilisée par le logo du client
+  // (branding) sans dupliquer le calcul de ratio.
+  const addContainImage = async (slide, dataUrl, boxX, boxY, boxW, boxH) => {
+    if (!dataUrl) return
+    try {
+      const img = await loadImageEl(dataUrl)
+      const ratio = img.naturalWidth / img.naturalHeight
+      const boxRatio = boxW / boxH
+      const w = ratio > boxRatio ? boxW : boxH * ratio
+      const h = ratio > boxRatio ? boxW / ratio : boxH
+      slide.addImage({ data: dataUrl, x: boxX + (boxW - w) / 2, y: boxY + (boxH - h) / 2, w, h })
+    } catch { /* logo optionnel */ }
+  }
+  const customLogo = branding?.enabled && branding.logo ? branding.logo : null
+
   // ---------- 1. Couverture ----------
   const cover = pptx.addSlide()
   cover.background = { color: BRAND_DARK }
   try { cover.addImage({ data: dataOf('hero'), x: 0, y: 0, w: 10, h: 5.63, transparency: 65 }) } catch { /* image optionnelle */ }
   cover.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.2, h: 5.63, fill: { color: BRAND_VIOLET }, line: { color: BRAND_VIOLET } })
+  // Logo du client : ajouté en évidence à côté du wordmark VelocityLaunch, jamais à sa
+  // place (voir note en tête de fonction).
+  await addContainImage(cover, customLogo, 7.8, 0.4, 1.6, 0.8)
   cover.addImage({ data: LOGO_DATA, x: 0.6, y: 0.5, w: 0.6, h: 0.6 })
   cover.addText([
     { text: 'elocity', options: { color: 'FFFFFF', bold: true } },
@@ -406,8 +449,19 @@ export async function exportPPTX(plan, lang) {
   ], { x: 1.3, y: 0.55, w: 4, h: 0.5, fontSize: 18 })
   cover.addText(plan.product?.name || 'Launch Plan', { x: 0.6, y: 2, w: 8.8, h: 1, fontSize: 40, bold: true, color: 'FFFFFF' })
   cover.addText(plan.classification || '', { x: 0.6, y: 2.95, w: 8.8, h: 0.5, fontSize: 15, color: BRAND_VIOLET, bold: true })
-  cover.addText(plan.product?.pitch || '', { x: 0.6, y: 3.55, w: 8.8, h: 1, fontSize: 13, color: BRAND_GRAY })
-  if (plan.product?.usp) cover.addText(`USP — ${plan.product.usp}`, { x: 0.6, y: 4.55, w: 8.8, h: 0.5, fontSize: 11, color: 'FFFFFF', italic: true })
+  const pitchY = 3.55
+  const pitchW = 8.8
+  const pitchFontSize = 13
+  const pitchText = plan.product?.pitch || ''
+  const pitchH = Math.max(0.4, estimateTextHeight(pitchText, pitchW, pitchFontSize))
+  cover.addText(pitchText, { x: 0.6, y: pitchY, w: pitchW, h: pitchH, fontSize: pitchFontSize, color: BRAND_GRAY })
+  if (plan.product?.usp) {
+    // Plafonné à 4.85 : au-delà, la ligne USP empièterait sur le pied de page (logo/mentions
+    // à y=5.24+, voir stamp()) — mieux vaut un chevauchement léger avec un pitch
+    // exceptionnellement long que de déborder complètement de la diapo.
+    const uspY = Math.min(pitchY + pitchH + 0.15, 4.85)
+    cover.addText(`USP — ${plan.product.usp}`, { x: 0.6, y: uspY, w: 8.8, h: 0.5, fontSize: 11, color: 'FFFFFF', italic: true })
+  }
 
   // ---------- 2. Le problème (persona) ----------
   if (plan.persona) {
@@ -555,6 +609,7 @@ export async function exportPPTX(plan, lang) {
   try { closing.addImage({ data: dataOf('hero'), x: 0, y: 0, w: 10, h: 5.63, transparency: 75 }) } catch { /* skip */ }
   closing.addShape(pptx.ShapeType.rect, { x: 0, y: 0, w: 0.2, h: 5.63, fill: { color: BRAND_VIOLET }, line: { color: BRAND_VIOLET } })
   closing.addImage({ data: LOGO_DATA, x: 4.5, y: 1.3, w: 1, h: 1 })
+  await addContainImage(closing, customLogo, 3.9, 0.35, 2.2, 0.85)
   closing.addText(en ? 'Ready to launch' : 'Prêt à lancer', { x: 0.6, y: 2.5, w: 8.8, h: 0.9, fontSize: 32, bold: true, color: 'FFFFFF', align: 'center' })
   closing.addText(plan.product?.name ? `${plan.product.name}${plan.classification ? ' — ' + plan.classification : ''}` : '', { x: 0.6, y: 3.4, w: 8.8, h: 0.5, fontSize: 14, color: BRAND_VIOLET, align: 'center' })
   closing.addText([

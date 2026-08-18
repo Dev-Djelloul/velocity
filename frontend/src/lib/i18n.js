@@ -1097,7 +1097,15 @@ export const translations = {
       webhookError: "Impossible de créer le webhook. Vérifie l'URL (doit être en https) et qu'au moins un événement est coché.",
       webhookSecretTitle: 'Secret de signature — à copier maintenant',
       webhookSecretBody: 'Ce secret ne sera plus jamais affiché. Utilise-le pour vérifier la signature HMAC-SHA256 de chaque livraison.',
-      webhookSecretDismiss: "J'ai copié le secret"
+      webhookSecretDismiss: "J'ai copié le secret",
+      brandingTitle: 'Marque personnalisée sur les exports',
+      brandingBody: "Ajoute ton logo à côté du crédit VelocityLaunch sur la couverture et la clôture du pitch deck (PPTX), et en tête du PDF. Le crédit \"Généré avec VelocityLaunch\" reste toujours affiché — ce n'est pas un marque blanche complet.",
+      brandingUpgrade: 'Passer Pro pour activer',
+      brandingUpload: 'Importer un logo',
+      brandingChange: 'Changer le logo',
+      brandingRemove: 'Supprimer',
+      brandingEnableLabel: 'Afficher mon logo sur les exports',
+      brandingEnableBody: 'Désactive sans supprimer le logo importé.'
     }
   },
   en: {
@@ -2193,7 +2201,15 @@ export const translations = {
       webhookError: 'Could not create the webhook. Check the URL (must be https) and that at least one event is checked.',
       webhookSecretTitle: 'Signing secret — copy it now',
       webhookSecretBody: "This secret will never be shown again. Use it to verify each delivery's HMAC-SHA256 signature.",
-      webhookSecretDismiss: "I've copied the secret"
+      webhookSecretDismiss: "I've copied the secret",
+      brandingTitle: 'Custom branding on exports',
+      brandingBody: 'Add your logo next to the VelocityLaunch credit on the pitch deck cover/closing slides (PPTX) and at the top of the PDF. The "Generated with VelocityLaunch" credit always stays — this is not a full white-label.',
+      brandingUpgrade: 'Upgrade to Pro to enable',
+      brandingUpload: 'Upload a logo',
+      brandingChange: 'Change logo',
+      brandingRemove: 'Remove',
+      brandingEnableLabel: 'Show my logo on exports',
+      brandingEnableBody: 'Turn off without deleting the uploaded logo.'
     }
   }
 }
