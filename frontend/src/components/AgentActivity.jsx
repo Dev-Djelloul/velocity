@@ -15,13 +15,18 @@ export default function AgentActivity({ plan, userId, lang }) {
   const [selectedStoryId, setSelectedStoryId] = useState('')
   const [busy, setBusy] = useState(false)
   const pollRef = useRef(null)
+  // Ids supprimés localement mais dont un refresh() déjà en vol (poll précédent) peut
+  // encore renvoyer une version pré-suppression — sans ce filtre, cette réponse tardive
+  // réinjecte la tâche dans l'état juste après le clic "Supprimer", qui semble alors
+  // n'avoir rien fait (et reste ainsi si le polling s'arrête juste après).
+  const deletedIdsRef = useRef(new Set())
 
   const planId = plan.id
 
   const refresh = async () => {
     if (!planId) return
     const next = await fetchAgentTasks(planId)
-    setTasks(next)
+    setTasks(next.filter(t => !deletedIdsRef.current.has(t.id)))
   }
 
   useEffect(() => { refresh() }, [planId])
@@ -111,9 +116,13 @@ export default function AgentActivity({ plan, userId, lang }) {
   }
 
   const deleteTask = async (taskId) => {
+    deletedIdsRef.current.add(taskId)
     setTasks(prev => prev.filter(task => task.id !== taskId))
     const ok = await removeAgentTask(userId, taskId)
-    if (!ok) await refresh() // échec silencieux côté serveur : on resynchronise pour ne pas rester désynchro
+    if (!ok) {
+      deletedIdsRef.current.delete(taskId)
+      await refresh() // échec silencieux côté serveur : on resynchronise pour ne pas rester désynchro
+    }
   }
 
   const statusIcon = (status) => {

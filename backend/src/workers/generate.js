@@ -54,12 +54,13 @@ async function processAgentTask(message, env) {
 // elle-même (déjà marquée "done" en base à ce stade).
 async function notifyAgentDone(env, task, output) {
   try {
-    const prefs = await db.getNotificationPrefs(env, task.user_id)
+    // getAgentTask() renvoie des clés camelCase (userId/planId), pas les colonnes SQL brutes.
+    const prefs = await db.getNotificationPrefs(env, task.userId)
     if (!prefs?.agent_done || !prefs.email) {
-      console.log(`[notify] skipped (agent:${task.type}): user_id=${task.user_id} agent_done=${prefs?.agent_done} email=${prefs?.email}`)
+      console.log(`[notify] skipped (agent:${task.type}): userId=${task.userId} agent_done=${prefs?.agent_done} email=${prefs?.email}`)
       return
     }
-    const plan = await db.getPlan(env, task.plan_id)
+    const plan = await db.getPlan(env, task.planId)
     const { subject, html } = agentDoneEmail(plan?.language || 'fr', {
       productName: plan?.product?.name,
       classification: plan?.classification,
