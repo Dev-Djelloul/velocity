@@ -471,7 +471,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-dashboard" className={`plan-section-anchor ${mobileSectionId === 'section-dashboard' ? 'is-active' : ''}`}><DashboardBI plan={plan} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.market')}</h2>
-        <div id="section-persona" className={`plan-section-anchor ${mobileSectionId === 'section-persona' ? 'is-active' : ''}`}><PersonaCard persona={plan.persona} lang={lang} /></div>
+        <div id="section-persona" className={`plan-section-anchor ${mobileSectionId === 'section-persona' ? 'is-active' : ''}`}>
+          <div className="persona-cards-row">
+            <PersonaCard persona={plan.persona} lang={lang} />
+            {(plan.personas || []).map((p, i) => <PersonaCard key={i} persona={p} lang={lang} />)}
+          </div>
+        </div>
         <div id="section-veille" className={`plan-section-anchor ${mobileSectionId === 'section-veille' ? 'is-active' : ''}`}><VeilleCard plan={plan} lang={lang} onVeilleChange={updateVeille} userId={userId} /></div>
         <div id="section-strategy" className={`plan-section-anchor ${mobileSectionId === 'section-strategy' ? 'is-active' : ''}`}><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
 

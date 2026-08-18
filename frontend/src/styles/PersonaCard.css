@@ -2,6 +2,18 @@
   grid-column: 1 / -1;
 }
 
+.persona-cards-row {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.persona-cards-row .persona-card {
+  grid-column: auto;
+  flex: 1 1 320px;
+}
+
 .persona-card-header {
   display: flex;
   align-items: center;
