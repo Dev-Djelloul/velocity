@@ -337,7 +337,7 @@
 
 .preview-card-caption {
   position: absolute;
-  inset auto 0 0 0;
+  inset: auto 0 0 0;
   padding: 1.5rem 1.25rem 1.1rem;
   background: linear-gradient(0deg, rgba(10, 12, 18, 0.92) 0%, rgba(10, 12, 18, 0.5) 60%, transparent 100%);
 }
@@ -726,12 +726,26 @@
   }
 
   .preview-grid {
-    grid-template-columns: repeat(2, 1fr);
+    display: flex;
+    grid-template-columns: unset;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    padding-bottom: 0.75rem;
+    scrollbar-width: none;
+  }
+
+  .preview-grid::-webkit-scrollbar { display: none; }
+
+  .preview-card {
+    flex: 0 0 46%;
+    scroll-snap-align: center;
   }
 
   .preview-card:nth-child(3) {
-    grid-column: span 2;
-    aspect-ratio: 16 / 9;
+    grid-column: auto;
+    aspect-ratio: 4 / 5;
   }
 }
 
@@ -746,7 +760,7 @@
   }
 
   .hero-title {
-    font-size: 2rem;
+    font-size: 3rem;
   }
 
   .hero-subtitle {
@@ -783,9 +797,26 @@
     margin: 2rem 0;
   }
 
+  /* Carrousel défilable au doigt plutôt que 3 cartes empilées verticalement — beaucoup
+     plus rapide à parcourir sur mobile, et le scroll-snap centre proprement chaque carte
+     sans JS ni librairie externe. */
   .preview-grid {
-    grid-template-columns: 1fr;
-    margin-top: 2rem;
+    display: flex;
+    grid-template-columns: unset;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    gap: 1rem;
+    margin: 2rem -1rem 0;
+    padding: 0 1rem 0.75rem;
+    scrollbar-width: none;
+  }
+
+  .preview-grid::-webkit-scrollbar { display: none; }
+
+  .preview-card {
+    flex: 0 0 82%;
+    scroll-snap-align: center;
   }
 
   .preview-card:nth-child(3) {
@@ -822,7 +853,7 @@
   }
 
   .hero-title {
-    font-size: 1.5rem;
+    font-size: 3rem;
     margin-bottom: 1rem;
   }
 

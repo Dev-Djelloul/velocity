@@ -144,11 +144,27 @@
 
   .plan-actions {
     width: 100%;
+    flex-wrap: wrap;
   }
 
   .plan-actions .btn-secondary,
   .btn-plan-danger {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
+    white-space: nowrap;
+  }
+}
+
+@media (max-width: 400px) {
+  /* En dessous de 400px, même avec flex-wrap, 3 boutons "Charger / Partager /
+     Supprimer" côte à côte n'ont plus la place de respirer — on les empile. */
+  .plan-actions {
+    flex-direction: column;
+  }
+
+  .plan-actions .btn-secondary,
+  .btn-plan-danger {
+    width: 100%;
   }
 
   .share-link-group {

@@ -95,7 +95,7 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect }) {
   // Repliée par défaut sous 900px (tablette/mobile) — en pleine largeur forcée par le CSS
   // responsive, la version dépliée (groupes + libellés) occupe toute la hauteur de l'écran
   // et masque le contenu du plan tant qu'on n'a pas scrollé plusieurs écrans plus bas.
@@ -113,7 +113,10 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
   const itemRefs = useRef({})
 
-  const goTo = (id) => setActiveId(id)
+  const goTo = (id) => {
+    setActiveId(id)
+    onSectionSelect?.(id)
+  }
   const toggleGroup = (key) => setCollapsedGroups(prev => ({ ...prev, [key]: !prev[key] }))
 
   const groupOf = useCallback((id) => GROUPS.find(g => g.sections.some(s => s.id === id))?.key, [])

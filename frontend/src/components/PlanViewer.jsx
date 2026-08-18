@@ -28,9 +28,37 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
+
+// Même ordre et mêmes ids que GROUPS dans PlanSidebar.jsx (dupliqué volontairement : les
+// deux fichiers ont des besoins différents — ici juste id + libellé pour la navigation
+// pas-à-pas mobile, là-bas la structure par groupe pour le sommaire complet). Sert à
+// paginer le plan en mode mobile/tablette (voir mobileSectionId ci-dessous) au lieu du
+// défilement continu, qui repartait toujours en haut de page sur iOS.
+const SECTION_LIST = [
+  { id: 'section-dashboard', labelKey: 'dashboardBi.title' },
+  { id: 'section-persona', labelKey: 'sidebar.persona' },
+  { id: 'section-veille', labelKey: 'veille.title' },
+  { id: 'section-strategy', labelKey: 'outputs.strategy.title' },
+  { id: 'section-calendar', labelKey: 'calendar.title' },
+  { id: 'section-roadmap', labelKey: 'outputs.roadmap' },
+  { id: 'section-backlog', labelKey: 'backlog.title' },
+  { id: 'section-gantt', labelKey: 'gantt.title' },
+  { id: 'section-burndown', labelKey: 'burndown.title' },
+  { id: 'section-marketing', labelKey: 'outputs.marketing' },
+  { id: 'section-gtm-calendar', labelKey: 'gtm.title' },
+  { id: 'section-kpis', labelKey: 'outputs.kpis' },
+  { id: 'section-abtest', labelKey: 'outputs.abTest' },
+  { id: 'section-benchmarks', labelKey: 'benchmarks.title' },
+  { id: 'section-financials', labelKey: 'outputs.financials.title' },
+  { id: 'section-rgpd', labelKey: 'rgpd.title' },
+  { id: 'section-table', labelKey: 'genTable.title' },
+  { id: 'section-agents', labelKey: 'agents.title' },
+  { id: 'section-tracking', labelKey: 'tracking.title' },
+  { id: 'section-whatif', labelKey: 'whatif.title' }
+]
 
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade }) {
   const { userId } = useAuth()
@@ -44,9 +72,22 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [pendingChanges, setPendingChanges] = useState([])
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
   const captureRef = useRef(null)
 
   const isDirty = pendingChanges.length > 0
+  const mobileSectionIndex = SECTION_LIST.findIndex(s => s.id === mobileSectionId)
+
+  // Change de section (sommaire replié en grille d'icônes sur mobile, ou boutons
+  // précédent/suivant) — remonte en haut du contenu principal à chaque changement, sinon
+  // on resterait scrollé au milieu d'une section qui vient de disparaître.
+  const goToMobileSection = (id) => {
+    setMobileSectionId(id)
+    // Ne force le retour en haut de page qu'en layout mobile/tablette paginé (voir le
+    // @media de PlanSidebar.css) — en desktop, le clic vient du sommaire qui gère déjà son
+    // propre scroll-vers-la-section via l'ancre native, un window.scrollTo ici l'écraserait.
+    if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 
   // Avertit avant de fermer/rafraîchir l'onglet s'il reste des modifications non
   // enregistrées — les navigateurs ignorent le texte personnalisé et affichent leur
@@ -301,8 +342,31 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         onAddComment={addComment}
         onDeleteComment={deleteComment}
         currentUserId={userId}
+        onSectionSelect={goToMobileSection}
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
+      <div className="mobile-section-nav">
+        <button
+          className="mobile-section-nav-btn"
+          disabled={mobileSectionIndex <= 0}
+          onClick={() => goToMobileSection(SECTION_LIST[mobileSectionIndex - 1].id)}
+          aria-label={lang === 'fr' ? 'Section précédente' : 'Previous section'}
+        >
+          <IconChevronLeft width={16} height={16} />
+        </button>
+        <span className="mobile-section-nav-label">
+          <span className="mobile-section-nav-index">{mobileSectionIndex + 1}/{SECTION_LIST.length}</span>
+          {t(lang, SECTION_LIST[mobileSectionIndex].labelKey)}
+        </span>
+        <button
+          className="mobile-section-nav-btn"
+          disabled={mobileSectionIndex >= SECTION_LIST.length - 1}
+          onClick={() => goToMobileSection(SECTION_LIST[mobileSectionIndex + 1].id)}
+          aria-label={lang === 'fr' ? 'Section suivante' : 'Next section'}
+        >
+          <IconChevronRight width={16} height={16} />
+        </button>
+      </div>
       {generatedDateTime && (
         <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
           <span className="plan-confirmation-icon" aria-hidden="true">
@@ -387,40 +451,40 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
       <div className="plan-grid">
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.synthese')}</h2>
-        <div id="section-dashboard" className="plan-section-anchor"><DashboardBI plan={plan} lang={lang} /></div>
+        <div id="section-dashboard" className={`plan-section-anchor ${mobileSectionId === 'section-dashboard' ? 'is-active' : ''}`}><DashboardBI plan={plan} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.market')}</h2>
-        <div id="section-persona" className="plan-section-anchor"><PersonaCard persona={plan.persona} lang={lang} /></div>
-        <div id="section-veille" className="plan-section-anchor"><VeilleCard plan={plan} lang={lang} onVeilleChange={updateVeille} /></div>
-        <div id="section-strategy" className="plan-section-anchor"><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
+        <div id="section-persona" className={`plan-section-anchor ${mobileSectionId === 'section-persona' ? 'is-active' : ''}`}><PersonaCard persona={plan.persona} lang={lang} /></div>
+        <div id="section-veille" className={`plan-section-anchor ${mobileSectionId === 'section-veille' ? 'is-active' : ''}`}><VeilleCard plan={plan} lang={lang} onVeilleChange={updateVeille} /></div>
+        <div id="section-strategy" className={`plan-section-anchor ${mobileSectionId === 'section-strategy' ? 'is-active' : ''}`}><StrategyToolkitCard strategyToolkit={plan.strategyToolkit} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.execution')}</h2>
-        <div id="section-calendar" className="plan-section-anchor"><CalendarView plan={plan} roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} launchDate={plan.launchDate} marketing={plan.marketing} /></div>
-        <div id="section-roadmap" className="plan-section-anchor"><RoadmapCard roadmap={plan.roadmap} lang={lang} planStartDate={plan.planStartDate || plan.generatedAt} onPlanStartDateChange={updatePlanStartDate} onRoadmapChange={updateRoadmap} /></div>
-        <div id="section-backlog" className="plan-section-anchor"><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} isPro={isPro} onRequestUpgrade={onRequestUpgrade} onNotionStoriesSynced={updateNotion} teamMembers={team.teamId ? team.members : []} /></div>
-        <div id="section-gantt" className="plan-section-anchor"><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmapFromGantt} /></div>
-        <div id="section-burndown" className="plan-section-anchor"><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
+        <div id="section-calendar" className={`plan-section-anchor ${mobileSectionId === 'section-calendar' ? 'is-active' : ''}`}><CalendarView plan={plan} roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} launchDate={plan.launchDate} marketing={plan.marketing} /></div>
+        <div id="section-roadmap" className={`plan-section-anchor ${mobileSectionId === 'section-roadmap' ? 'is-active' : ''}`}><RoadmapCard roadmap={plan.roadmap} lang={lang} planStartDate={plan.planStartDate || plan.generatedAt} onPlanStartDateChange={updatePlanStartDate} onRoadmapChange={updateRoadmap} /></div>
+        <div id="section-backlog" className={`plan-section-anchor ${mobileSectionId === 'section-backlog' ? 'is-active' : ''}`}><BacklogCard roadmap={plan.roadmap} lang={lang} onRoadmapChange={updateRoadmapFromBacklog} jira={plan.jira} plan={plan} userId={userId} isPro={isPro} onRequestUpgrade={onRequestUpgrade} onNotionStoriesSynced={updateNotion} teamMembers={team.teamId ? team.members : []} /></div>
+        <div id="section-gantt" className={`plan-section-anchor ${mobileSectionId === 'section-gantt' ? 'is-active' : ''}`}><GanttChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} onRoadmapChange={updateRoadmapFromGantt} /></div>
+        <div id="section-burndown" className={`plan-section-anchor ${mobileSectionId === 'section-burndown' ? 'is-active' : ''}`}><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>
-        <div id="section-marketing" className="plan-section-anchor"><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={setBudget} /></div>
-        <div id="section-gtm-calendar" className="plan-section-anchor"><GtmCalendarCard plan={{ ...plan, marketing: liveMarketing }} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} /></div>
+        <div id="section-marketing" className={`plan-section-anchor ${mobileSectionId === 'section-marketing' ? 'is-active' : ''}`}><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={setBudget} /></div>
+        <div id="section-gtm-calendar" className={`plan-section-anchor ${mobileSectionId === 'section-gtm-calendar' ? 'is-active' : ''}`}><GtmCalendarCard plan={{ ...plan, marketing: liveMarketing }} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.performance')}</h2>
-        <div id="section-kpis" className="plan-section-anchor"><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
-        <div id="section-abtest" className="plan-section-anchor"><ABTestCalculatorCard lang={lang} /></div>
-        <div id="section-benchmarks" className="plan-section-anchor"><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
-        <div id="section-financials" className="plan-section-anchor"><FinancialsCard financials={plan.financials} lang={lang} /></div>
+        <div id="section-kpis" className={`plan-section-anchor ${mobileSectionId === 'section-kpis' ? 'is-active' : ''}`}><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
+        <div id="section-abtest" className={`plan-section-anchor ${mobileSectionId === 'section-abtest' ? 'is-active' : ''}`}><ABTestCalculatorCard lang={lang} /></div>
+        <div id="section-benchmarks" className={`plan-section-anchor ${mobileSectionId === 'section-benchmarks' ? 'is-active' : ''}`}><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} /></div>
+        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={plan.financials} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.compliance')}</h2>
-        <div id="section-rgpd" className="plan-section-anchor"><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} /></div>
+        <div id="section-rgpd" className={`plan-section-anchor ${mobileSectionId === 'section-rgpd' ? 'is-active' : ''}`}><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.aitools')}</h2>
-        <div id="section-table" className="plan-section-anchor"><GeneratedTable lang={lang} plan={{ ...plan, marketing: liveMarketing }} /></div>
-        <div id="section-agents" className="plan-section-anchor"><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
+        <div id="section-table" className={`plan-section-anchor ${mobileSectionId === 'section-table' ? 'is-active' : ''}`}><GeneratedTable lang={lang} plan={{ ...plan, marketing: liveMarketing }} /></div>
+        <div id="section-agents" className={`plan-section-anchor ${mobileSectionId === 'section-agents' ? 'is-active' : ''}`}><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.postlaunch')}</h2>
-        <div id="section-tracking" className="plan-section-anchor"><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
-        <div id="section-whatif" className="plan-section-anchor"><WhatIfScenarios plan={plan} lang={lang} /></div>
+        <div id="section-tracking" className={`plan-section-anchor ${mobileSectionId === 'section-tracking' ? 'is-active' : ''}`}><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
+        <div id="section-whatif" className={`plan-section-anchor ${mobileSectionId === 'section-whatif' ? 'is-active' : ''}`}><WhatIfScenarios plan={plan} lang={lang} /></div>
       </div>
 
       {showExport && (
