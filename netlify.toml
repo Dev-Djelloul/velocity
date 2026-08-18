@@ -2,11 +2,15 @@
 base = "frontend"
 command = "npm run build"
 publish = "dist"
+# Chemin résolu relativement à base ("frontend") — le déploiement précédent (commit
+# 93ab84d) avait le dossier à la racine du repo et Netlify ne l'a jamais détecté
+# (available_functions: [], edge_functions_present: null côté API) : la config edge
+# functions suit bien base, contrairement à ce qu'on pouvait supposer par analogie avec
+# Cloudflare Pages Functions (qui, elles, ignorent la racine du monorepo).
+edge_functions = "netlify/edge-functions"
 
 # Injecte les meta og:image/og:title spécifiques à un plan pour les liens de partage
-# (/s/:id) et les plans publics de la galerie (/p/:id) — voir netlify/edge-functions/.
-# edge_functions se déclare toujours à la racine du repo (pas sous [build], même avec
-# base = "frontend") : le chemin function pointe vers netlify/edge-functions/<nom>.js.
+# (/s/:id) et les plans publics de la galerie (/p/:id) — voir frontend/netlify/edge-functions/.
 [[edge_functions]]
 path = "/s/*"
 function = "og-share"
