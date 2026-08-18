@@ -195,15 +195,12 @@ export async function syncPlanToCalendar(accessToken, target, plan, lang) {
     track(res)
   }
 
-  // Lien vers la vue du calendrier, jamais vers un événement précis : un lien d'événement
-  // (htmlLink) ne se résout que si le navigateur ouvre la page sous le même compte Google
-  // que celui utilisé pour l'export (voir authuser=N dans l'URL Google) — avec plusieurs
-  // comptes connectés dans le même navigateur, ça donne "Impossible de trouver
-  // l'événement demandé" au lieu d'ouvrir le calendrier. La vue du calendrier, elle,
-  // fonctionne quel que soit le compte actif (elle propose juste de changer de compte si besoin).
-  const calendarUrl = calendarId === 'primary'
-    ? 'https://calendar.google.com/calendar/u/0/r'
-    : `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(calendarId)}`
-
-  return { created, updated, calendarUrl }
+  // Lien vers la vue générale de l'agenda, jamais vers un événement précis (voir commit
+  // précédent : un lien d'événement ne se résout que sous le même compte Google que celui
+  // utilisé pour l'export) ni vers ?cid=<calendarId> (ce paramètre déclenche un flux
+  // "s'abonner à cet agenda" côté Google — utile pour ajouter le calendrier de quelqu'un
+  // d'autre, pas pour ouvrir un agenda qu'on possède déjà, ce qui produit une popup "Ajouter
+  // un agenda" au lieu de naviguer dedans). Le calendrier choisi appartient déjà à
+  // l'utilisateur et apparaît par défaut dans "Mes agendas" — la vue racine suffit.
+  return { created, updated, calendarUrl: 'https://calendar.google.com/calendar/u/0/r' }
 }
