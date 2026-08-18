@@ -219,6 +219,30 @@ export async function handleApi(request, env, url) {
     return json(resolved)
   }
 
+  // --- Galerie publique (opt-in, plan.isPublic) — routes publiques, sans userId ---
+
+  if (pathname === '/gallery' && method === 'GET') {
+    const limit = Math.min(Number(searchParams.get('limit')) || 24, 50)
+    const offset = Number(searchParams.get('offset')) || 0
+    const plans = await db.listPublicPlans(env, { limit, offset })
+    // Aperçu léger pour la grille — le détail complet n'est chargé qu'au clic (GET /gallery/:id).
+    return json(plans.map(p => ({
+      id: p.id,
+      productName: p.product?.name || null,
+      pitch: p.product?.pitch || null,
+      classification: p.classification || null,
+      executiveSummary: p.executiveSummary || null,
+      updatedAt: p.updatedAt
+    })))
+  }
+
+  const galleryDetailMatch = pathname.match(/^\/gallery\/([^/]+)$/)
+  if (galleryDetailMatch && method === 'GET') {
+    const plan = await db.getPublicPlan(env, galleryDetailMatch[1])
+    if (!plan) return json({ error: 'not found' }, 404)
+    return json({ plan })
+  }
+
   if (pathname === '/generate-table' && method === 'POST') {
     const { prompt, plan, lang, userId } = await request.json()
     if (!prompt) return json({ error: 'prompt required' }, 400)

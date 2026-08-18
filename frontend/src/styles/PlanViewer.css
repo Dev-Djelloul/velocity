@@ -156,6 +156,12 @@
 
 .plan-actions { display: flex; gap: 0.5rem; }
 
+.plan-public-toggle.is-public {
+  background: rgba(52, 211, 153, 0.15);
+  border-color: rgba(52, 211, 153, 0.4);
+  color: #34d399;
+}
+
 .plan-save-btn {
   display: inline-flex;
   align-items: center;

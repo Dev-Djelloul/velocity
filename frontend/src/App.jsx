@@ -13,6 +13,7 @@ import PlansHistory from './components/PlansHistory'
 import DraftsModal from './components/DraftsModal'
 import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
+import GalleryPage from './components/GalleryPage'
 import AccountPage from './components/AccountPage'
 import TeamPage from './components/TeamPage'
 import TeamAvatar from './components/TeamAvatar'
@@ -25,6 +26,7 @@ import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
 import { savePlan, getAllPlans, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
+import { fetchGalleryPlan } from './lib/serverStorage'
 import { collectRecentComments } from './lib/notifications'
 import { getReadIds } from './lib/commentReads'
 import { getPersonalSpace } from './lib/personalSpace'
@@ -237,7 +239,32 @@ export default function App() {
         }
       })()
     }
+    const galleryId = params.get('gallery')
+    if (galleryId) {
+      (async () => {
+        const res = await fetchGalleryPlan(galleryId)
+        if (res?.plan) {
+          setPlan(res.plan)
+          setJustGenerated(false)
+          setIsSharedView(true)
+          setCurrentPage('result')
+        }
+      })()
+    }
   }, [])
+
+  // Ouvre un plan de la galerie publique — consultable sans compte, comme un lien de
+  // partage (voir isSharedView plus haut). onOpenPlan(id) plutôt qu'une navigation d'URL :
+  // évite un aller-retour rechargement de page pour un simple clic sur une carte.
+  const handleOpenGalleryPlan = async (id) => {
+    const res = await fetchGalleryPlan(id)
+    if (res?.plan) {
+      setPlan(res.plan)
+      setJustGenerated(false)
+      setIsSharedView(true)
+      setCurrentPage('result')
+    }
+  }
 
   // Flux demandé : Commencer -> page de connexion dédiée -> atterrit directement sur le
   // formulaire (questionnaire). Un simple "Se connecter" depuis le header ramène vers "Mon
@@ -592,6 +619,12 @@ export default function App() {
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
+            <button
+              className={`header-nav-link ${currentPage === 'gallery' ? 'active' : ''}`}
+              onClick={() => { setMobileNavOpen(false); setCurrentPage('gallery'); window.scrollTo(0, 0) }}
+            >
+              {lang === 'fr' ? 'Galerie' : 'Gallery'}
+            </button>
             {!isSignedIn && (
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); setShowDemo(true) }}>
                 {lang === 'fr' ? 'Démo' : 'Demo'}
@@ -843,6 +876,9 @@ export default function App() {
         )}
         {currentPage === 'howItWorks' && (
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
+        )}
+        {currentPage === 'gallery' && (
+          <GalleryPage lang={lang} onOpenPlan={handleOpenGalleryPlan} />
         )}
         {currentPage === 'auth' && !isSignedIn && (
           <AuthPage

@@ -7,6 +7,10 @@ export const translations = {
       export: 'Exporter',
       save: 'Enregistrer',
       saved: 'Enregistré',
+      publicOn: 'Public',
+      publicOff: 'Privé',
+      publicOnBody: "Ce plan est visible dans la galerie publique. Cliquer pour le rendre privé.",
+      publicOffBody: "Rendre ce plan visible dans la galerie publique (n'importe qui avec le lien pourra le consulter sans compte).",
       unsavedChangesTitle: 'Changements non enregistrés',
       unsavedChangesBody: 'Tu as des modifications non enregistrées sur ce plan. Si tu continues sans les enregistrer, elles seront perdues.',
       discardChanges: 'Continuer sans enregistrer',
@@ -877,6 +881,12 @@ export const translations = {
       delete: 'Supprimer',
       confirmDelete: 'Confirmer ?'
     },
+    gallery: {
+      title: 'Galerie publique',
+      subtitle: 'Plans de lancement partagés publiquement par leurs auteurs, pour inspiration.',
+      loading: 'Chargement...',
+      empty: "Aucun plan public pour l'instant. Rendez le vôtre visible depuis sa page pour être le premier !"
+    },
     plans: {
       title: 'Mes plans',
       emptyTitle: 'Historique des plans',
@@ -1094,6 +1104,10 @@ export const translations = {
       export: 'Export',
       save: 'Save',
       saved: 'Saved',
+      publicOn: 'Public',
+      publicOff: 'Private',
+      publicOnBody: 'This plan is visible in the public gallery. Click to make it private.',
+      publicOffBody: 'Make this plan visible in the public gallery (anyone with the link can view it without an account).',
       unsavedChangesTitle: 'Unsaved changes',
       unsavedChangesBody: 'This plan has unsaved changes. If you continue without saving, they will be lost.',
       discardChanges: 'Continue without saving',
@@ -1958,6 +1972,12 @@ export const translations = {
       rename: 'Rename',
       delete: 'Delete',
       confirmDelete: 'Confirm?'
+    },
+    gallery: {
+      title: 'Public gallery',
+      subtitle: 'Launch plans shared publicly by their authors, for inspiration.',
+      loading: 'Loading...',
+      empty: 'No public plans yet. Make yours visible from its page to be the first!'
     },
     plans: {
       title: 'My plans',

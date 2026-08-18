@@ -145,6 +145,15 @@ export function deleteWebhookRequest(userId, id) {
   return safeFetch(`/webhooks/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
 }
 
+export function fetchGallery(limit, offset) {
+  const params = new URLSearchParams({ limit: String(limit || 24), offset: String(offset || 0) })
+  return safeFetch(`/gallery?${params.toString()}`).then(r => r || [])
+}
+
+export function fetchGalleryPlan(id) {
+  return safeFetch(`/gallery/${encodeURIComponent(id)}`)
+}
+
 export function copilotChat(plan, message, history, lang, userId) {
   return safeFetch('/copilot/chat', {
     method: 'POST',

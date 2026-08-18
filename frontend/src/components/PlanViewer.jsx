@@ -232,6 +232,16 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  // Visibilité dans la galerie publique : pas soumis au bouton "Enregistrer" (comme les
+  // liens Jira/GitHub/Notion plus haut) — un toggle de visibilité doit s'appliquer
+  // immédiatement, pas rester en attente derrière d'éventuelles autres modifications non liées.
+  const toggleIsPublic = () => {
+    if (!plan.id) return
+    const nextPlan = { ...plan, isPublic: !plan.isPublic }
+    setPlan(nextPlan)
+    savePlan(nextPlan)
+  }
+
   const updateGoogleCalendar = (nextGoogleCalendar) => {
     const nextPlan = { ...plan, googleCalendar: nextGoogleCalendar }
     setPlan(nextPlan)
@@ -454,6 +464,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </div>
         </div>
         <div className="plan-actions">
+          {plan.id && (
+            <button
+              className={`btn-secondary plan-public-toggle ${plan.isPublic ? 'is-public' : ''}`}
+              onClick={toggleIsPublic}
+              title={plan.isPublic ? t(lang, 'app.publicOnBody') : t(lang, 'app.publicOffBody')}
+            >
+              {plan.isPublic ? t(lang, 'app.publicOn') : t(lang, 'app.publicOff')}
+            </button>
+          )}
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
           <button
             className={`plan-save-btn ${isDirty ? 'is-dirty' : ''} ${justSaved ? 'just-saved' : ''}`}
