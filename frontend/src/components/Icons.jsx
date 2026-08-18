@@ -101,6 +101,15 @@ export function IconSparkle(props) {
   )
 }
 
+export function IconCrown(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 8l4 4 5-7 5 7 4-4-2 10H5z" />
+      <path d="M5 21h14" />
+    </svg>
+  )
+}
+
 export function IconDownload(props) {
   return (
     <svg {...base} {...props}>

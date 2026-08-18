@@ -26,6 +26,26 @@ export async function sendEmail(env, { to, subject, html }) {
   return data
 }
 
+// Logo officiel (chevron dégradé), hébergé sur le site — un data URI serait filtré par
+// Gmail, qui n'affiche que les images distantes (https) dans le corps des emails.
+const LOGO_URL = 'https://velocity.digitalblueskye.com/favicon.svg'
+
+// Pied de page de marque : logo + wordmark (deux teintes solides — les dégradés CSS via
+// background-clip:text ne sont pas fiables dans les clients email, contrairement au web).
+function brandSignature() {
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" style="margin-top:32px;border-top:1px solid #e5e7eb;padding-top:16px">
+      <tr>
+        <td style="vertical-align:middle;padding-right:8px">
+          <img src="${LOGO_URL}" width="20" height="20" alt="VelocityLaunch" style="display:block" />
+        </td>
+        <td style="vertical-align:middle;font-size:13px;font-weight:600">
+          <span style="color:#1a1a1a">elocity</span><span style="color:#6366f1">Launch</span>
+        </td>
+      </tr>
+    </table>`
+}
+
 const AGENT_TYPE_LABELS = {
   story_brief: { fr: "brief d'exécution", en: 'execution brief' },
   recalc_kpis: { fr: 'recalcul des KPIs', en: 'KPI recalculation' },
@@ -142,7 +162,7 @@ export function agentDoneEmail(lang, { productName, taskType, classification, ou
         : `L'agent IA a terminé un <strong>${typeLabel}</strong> sur <strong>${esc(productName || 'ton plan')}</strong>.`}</p>
       ${highlightsHtml}
       ${ctaHtml}
-      <p style="color:#6b7280;font-size:13px;margin-top:32px">VelocityLaunch</p>
+      ${brandSignature()}
     </div>`
   return { subject, html }
 }
@@ -158,7 +178,7 @@ export function inactivityReminderEmail(lang, { productName, updatedAt }) {
       <p>${en
         ? `<strong>${productName || 'Your plan'}</strong> hasn't been updated since ${updatedAt}. Pick it back up whenever you're ready.`
         : `<strong>${productName || 'Ton plan'}</strong> n'a pas été mis à jour depuis le ${updatedAt}. Reprends-le quand tu veux.`}</p>
-      <p style="color:#6b7280;font-size:13px;margin-top:32px">VelocityLaunch</p>
+      ${brandSignature()}
     </div>`
   return { subject, html }
 }

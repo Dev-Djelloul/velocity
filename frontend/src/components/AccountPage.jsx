@@ -8,7 +8,7 @@ import { formatFullDateTime } from '../lib/dateFormat'
 import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
 import { getReadIds, markCommentsRead, getDismissedIds, dismissComments } from '../lib/commentReads'
 import { getPersonalSpace } from '../lib/personalSpace'
-import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconMessageCircle } from './Icons'
+import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconMessageCircle, IconCrown } from './Icons'
 
 const PROVIDER_ICONS = {
   google: IconProviderGoogle,
@@ -192,7 +192,13 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       <div className="account-credits card">
         <h3>{t(lang, 'account.creditsTitle')}</h3>
         {pro ? (
-          <p className="credits-pro">{t(lang, 'account.creditsPro')}</p>
+          <div className="credits-pro-badge">
+            <span className="credits-pro-badge-icon"><IconCrown width={20} height={20} /></span>
+            <div>
+              <p className="credits-pro-badge-title">{t(lang, 'account.creditsProTitle')}</p>
+              <p className="credits-pro-badge-subtitle">{t(lang, 'account.creditsProSubtitle')}</p>
+            </div>
+          </div>
         ) : (
           <>
             <div className="credits-gauge">
