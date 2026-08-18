@@ -563,6 +563,21 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '18 août 2026',
+            title: 'Intégration Jira, notifications par email et Paramètres enrichis',
+            items: [
+              'Intégration Jira complète (OAuth) : création automatique d\'Epics par phase et de Stories liées, story points, priorité, dates, assigné, sync incrémental sans doublon, deep-links vers les tickets depuis le Backlog',
+              'Export Notion enrichi : roadmap et calendriers en bases de données Notion natives (au lieu de simples listes), dates réelles pour les vues Calendrier/Chronologie, image de couverture et icône de marque',
+              'Notifications par email (via Resend) : un email à chaque génération IA terminée (veille, benchmarks, calendriers, RGPD, tableau IA, agents de backlog) avec un aperçu concret du résultat — vraie table pour le tableau IA, plusieurs items datés pour les calendriers — et rappel automatique pour les plans inactifs depuis 14 jours',
+              'Page Paramètres enrichie : taille de police et contraste renforcé, format de date (JJ/MM ou MM/JJ), devise d\'affichage (€/$/£), export RGPD de toutes les données et suppression de compte, panneau récapitulatif des intégrations connectées (Notion/Jira) avec déconnexion',
+              'Export pitch deck (PPTX) repensé : présentation en 9 diapositives (couverture, problème, solution, marché, roadmap, go-to-market, KPIs, finances, clôture), logo et wordmark de marque, images de contexte, mise en page sans chevauchement',
+              'Badge "Membre Pro" sur Mon compte : icône couronne dégradée à la place du texte plat',
+              'Modal d\'export recentré (ne chevauche plus le header) et boutons aux couleurs du dégradé de marque',
+              'Sommaire du plan réorganisé en 8 groupes thématiques repliables suivant le cycle de vie du lancement',
+              'Footer entièrement centré et réharmonisé en mobile/tablette (jusqu\'à l\'iPad Pro), les 3 colonnes de liens restant côte à côte'
+            ]
+          },
+          {
             date: '15 août 2026',
             title: 'Espaces d\'équipe, tarification Pro et page Paramètres',
             items: [
@@ -1567,6 +1582,21 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 18, 2026',
+            title: 'Jira integration, email notifications and richer Settings',
+            items: [
+              'Full Jira integration (OAuth): auto-creates Epics per phase and linked Stories, story points, priority, dates, assignee, no-duplicate incremental sync, deep-links to tickets from the Backlog',
+              'Richer Notion export: roadmap and calendars as native Notion databases (instead of plain lists), real dates for Calendar/Timeline views, cover image and brand icon',
+              'Email notifications (via Resend): an email on every finished AI generation (market watch, benchmarks, calendars, GDPR, AI table, backlog agents) with a real preview of the result — an actual table for the AI table, several dated items for calendars — plus an automatic reminder for plans inactive for 14 days',
+              'Richer Settings page: font size and high contrast, date format (DD/MM or MM/DD), display currency (€/$/£), GDPR export of all data and account deletion, a connected-integrations panel (Notion/Jira) with disconnect',
+              'Reworked pitch deck (PPTX) export: a 9-slide presentation (cover, problem, solution, market, roadmap, go-to-market, KPIs, finances, closing), brand logo and wordmark, contextual images, overlap-free layout',
+              '"Pro member" badge on My account: gradient crown icon instead of plain text',
+              'Export modal recentered (no longer overlaps the header) and buttons in the brand gradient',
+              'Plan sidebar reorganized into 8 collapsible thematic groups following the launch lifecycle',
+              'Footer fully centered and reworked on mobile/tablet (up to iPad Pro), the 3 link columns staying side by side'
+            ]
+          },
           {
             date: 'August 15, 2026',
             title: 'Team spaces, Pro pricing and Settings page',
