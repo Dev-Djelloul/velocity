@@ -14,6 +14,7 @@ import { generateAdvertisingFallback } from '../lib/generator/advertisingFallbac
 import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
 import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
+import { runCopilotChat } from '../lib/ai/copilotClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as github from '../lib/github/githubClient'
@@ -189,6 +190,18 @@ export async function handleApi(request, env, url) {
     }
     await notifyGenerationDone(env, userId, plan, lang, 'table', result)
     return json(result)
+  }
+
+  if (pathname === '/copilot/chat' && method === 'POST') {
+    const { plan, message, history, lang } = await request.json()
+    if (!plan || !message) return json({ error: 'plan and message required' }, 400)
+    try {
+      const result = await runCopilotChat(env, { plan, message, history, lang })
+      return json(result)
+    } catch (e) {
+      console.log(`[copilot] error: ${e.message}`)
+      return json({ error: 'copilot_failed' }, 502)
+    }
   }
 
   if (pathname === '/generate-veille' && method === 'POST') {

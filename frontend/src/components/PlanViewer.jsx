@@ -22,6 +22,7 @@ import PostLaunchTracking from './PostLaunchTracking'
 import WhatIfScenarios from './WhatIfScenarios'
 import ExportModal from './ExportModal'
 import InfoModal from './InfoModal'
+import CopilotChat from './CopilotChat'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
 import { useAuth, useUser, useTeam } from '../lib/auth'
@@ -234,6 +235,21 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const nextPlan = { ...plan, notion: nextNotion }
     setPlan(nextPlan)
     if (plan.id) savePlan(nextPlan)
+  }
+
+  // Copilote IA conversationnel (voir CopilotChat.jsx) : chaque section modifiée passe par
+  // le même circuit que les autres éditions (markChanged + pendingChanges) plutôt que
+  // d'écraser directement le plan sauvegardé — l'utilisateur valide toujours via "Enregistrer".
+  const applyCopilotChanges = (changes) => {
+    if (!changes?.length) return
+    setPlan(p => {
+      const next = { ...p }
+      changes.forEach(({ section, value }) => { next[section] = value })
+      return next
+    })
+    changes.forEach(({ section, summary }) => {
+      markChanged(section, section, summary || (lang === 'fr' ? 'Modifié via le copilote' : 'Edited via copilot'))
+    })
   }
 
   const copySummary = async () => {
@@ -519,6 +535,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </div>
         </InfoModal>
       )}
+
+      <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} />
       </div>
     </div>
   )

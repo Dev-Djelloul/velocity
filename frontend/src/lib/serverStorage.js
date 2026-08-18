@@ -113,6 +113,14 @@ export function generateTable(prompt, plan, lang, userId) {
   })
 }
 
+export function copilotChat(plan, message, history, lang, userId) {
+  return safeFetch('/copilot/chat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan, message, history, lang, userId })
+  })
+}
+
 export function generateVeille(plan, lang, userId) {
   return safeFetch('/generate-veille', {
     method: 'POST',
