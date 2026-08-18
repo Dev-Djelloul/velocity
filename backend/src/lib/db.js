@@ -358,6 +358,38 @@ export async function deleteLinearToken(env, userId) {
   await env.DB.prepare('DELETE FROM linear_tokens WHERE user_id = ?').bind(userId).run()
 }
 
+// --- Jetons OAuth Google Calendar ---
+
+export async function saveGoogleCalendarToken(env, userId, { accessToken, refreshToken, expiresAt }) {
+  await env.DB.prepare(
+    `INSERT INTO google_calendar_tokens (user_id, access_token, refresh_token, expires_at, created_at)
+     VALUES (?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET access_token = excluded.access_token,
+       refresh_token = excluded.refresh_token, expires_at = excluded.expires_at, created_at = datetime('now')`
+  ).bind(userId, accessToken, refreshToken, expiresAt).run()
+}
+
+export async function updateGoogleCalendarTokens(env, userId, { accessToken, expiresAt }) {
+  await env.DB.prepare(
+    'UPDATE google_calendar_tokens SET access_token = ?, expires_at = ? WHERE user_id = ?'
+  ).bind(accessToken, expiresAt, userId).run()
+}
+
+// Mémorise le calendrier Google sélectionné par l'utilisateur.
+export async function setGoogleCalendarTarget(env, userId, { calendarId, calendarName }) {
+  await env.DB.prepare(
+    'UPDATE google_calendar_tokens SET calendar_id = ?, calendar_name = ? WHERE user_id = ?'
+  ).bind(calendarId || null, calendarName || null, userId).run()
+}
+
+export async function getGoogleCalendarToken(env, userId) {
+  return env.DB.prepare('SELECT * FROM google_calendar_tokens WHERE user_id = ?').bind(userId).first()
+}
+
+export async function deleteGoogleCalendarToken(env, userId) {
+  await env.DB.prepare('DELETE FROM google_calendar_tokens WHERE user_id = ?').bind(userId).run()
+}
+
 // --- Préférences de notification par email ---
 
 export async function getNotificationPrefs(env, userId) {

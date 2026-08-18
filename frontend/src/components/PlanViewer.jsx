@@ -232,6 +232,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateGoogleCalendar = (nextGoogleCalendar) => {
+    const nextPlan = { ...plan, googleCalendar: nextGoogleCalendar }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const updateGithub = (nextGithub) => {
     const nextPlan = { ...plan, github: nextGithub }
     setPlan(nextPlan)
@@ -533,6 +539,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           onJiraExported={updateJira}
           onGithubExported={updateGithub}
           onLinearExported={updateLinear}
+          onGoogleCalendarExported={updateGoogleCalendar}
         />
       )}
 

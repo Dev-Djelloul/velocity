@@ -18,6 +18,7 @@ import { runCopilotChat } from '../lib/ai/copilotClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as linear from '../lib/linear/linearClient'
+import * as googleCalendar from '../lib/google/googleCalendarClient'
 import * as github from '../lib/github/githubClient'
 import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
@@ -515,6 +516,84 @@ export async function handleApi(request, env, url) {
       return json(result)
     } catch {
       return json({ error: 'linear_export_failed' }, 500)
+    }
+  }
+
+  // --- Intégration Google Calendar (OAuth + sync calendrier éditorial/pub + date de lancement) ---
+
+  if (pathname === '/google-calendar/status' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getGoogleCalendarToken(env, userId)
+    return json({
+      connected: !!token,
+      calendar: token?.calendar_id ? { id: token.calendar_id, name: token.calendar_name } : null
+    })
+  }
+
+  if (pathname === '/google-calendar/authorize-url' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    if (!env.GOOGLE_CALENDAR_CLIENT_ID) return json({ error: 'google_calendar_not_configured' }, 500)
+    return json({ url: googleCalendar.buildAuthorizeUrl(env, userId) })
+  }
+
+  if (pathname === '/google-calendar/callback' && method === 'GET') {
+    const code = searchParams.get('code')
+    const state = searchParams.get('state') // = userId
+    const appUrl = env.APP_URL || '/'
+    if (!code || !state) return Response.redirect(`${appUrl}?googleCalendar=error`, 302)
+    try {
+      const tokenData = await googleCalendar.exchangeCode(env, code)
+      if (!tokenData.refreshToken) return Response.redirect(`${appUrl}?googleCalendar=error`, 302)
+      await db.saveGoogleCalendarToken(env, state, tokenData)
+      return Response.redirect(`${appUrl}?googleCalendar=connected`, 302)
+    } catch {
+      return Response.redirect(`${appUrl}?googleCalendar=error`, 302)
+    }
+  }
+
+  if (pathname === '/google-calendar/disconnect' && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteGoogleCalendarToken(env, userId)
+    return json({ ok: true })
+  }
+
+  if (pathname === '/google-calendar/calendars' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getGoogleCalendarToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    try {
+      const accessToken = await googleCalendar.ensureAccessToken(env, userId, token)
+      const calendars = await googleCalendar.listCalendars(accessToken)
+      return json({ calendars })
+    } catch {
+      return json({ error: 'google_calendar_list_failed' }, 500)
+    }
+  }
+
+  if (pathname === '/google-calendar/select' && method === 'POST') {
+    const { userId, calendarId, calendarName } = await request.json()
+    if (!userId || !calendarId) return json({ error: 'userId and calendarId required' }, 400)
+    await db.setGoogleCalendarTarget(env, userId, { calendarId, calendarName })
+    return json({ ok: true })
+  }
+
+  if (pathname === '/google-calendar/export' && method === 'POST') {
+    const { userId, plan, lang } = await request.json()
+    if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
+    const token = await db.getGoogleCalendarToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    if (!token.calendar_id) return json({ needsProject: true })
+    try {
+      const accessToken = await googleCalendar.ensureAccessToken(env, userId, token)
+      const result = await googleCalendar.syncPlanToCalendar(accessToken, token, plan, lang || 'fr')
+      return json(result)
+    } catch {
+      return json({ error: 'google_calendar_export_failed' }, 500)
     }
   }
 

@@ -5,12 +5,14 @@ import {
   notionExport, notionAuthorizeUrl, notionStatus,
   jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect,
   githubExport, githubAuthorizeUrl, githubStatus, githubRepos, githubSelect, githubDisconnect,
-  linearExport, linearConnect, linearTeams, linearSelect, linearDisconnect
+  linearExport, linearConnect, linearTeams, linearSelect, linearDisconnect,
+  googleCalendarExport, googleCalendarAuthorizeUrl, googleCalendarStatus, googleCalendarCalendars, googleCalendarSelect, googleCalendarDisconnect
 } from '../lib/serverStorage'
 import { waitForConnection } from '../lib/oauthConnect'
+import { IconCalendar } from './Icons'
 import '../styles/ExportModal.css'
 
-export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrade, onClose, captureRef, onJiraExported, onGithubExported, onLinearExported }) {
+export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrade, onClose, captureRef, onJiraExported, onGithubExported, onLinearExported, onGoogleCalendarExported }) {
   // Notion (export page complète)
   const [notionState, setNotionState] = useState('idle')
   const [notionUrl, setNotionUrl] = useState(null)
@@ -30,6 +32,13 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
   const [linearPick, setLinearPick] = useState('')
   const [linearResult, setLinearResult] = useState(null)
   const [linearMsg, setLinearMsg] = useState('')
+
+  // Google Calendar
+  const [gcalState, setGcalState] = useState('idle') // idle | working | connecting | choosingCalendar | done | error
+  const [gcalList, setGcalList] = useState([])
+  const [gcalPick, setGcalPick] = useState('')
+  const [gcalResult, setGcalResult] = useState(null)
+  const [gcalMsg, setGcalMsg] = useState('')
 
   // GitHub
   const [githubState, setGithubState] = useState('idle') // idle | working | connecting | choosingRepo | done | error
@@ -208,6 +217,70 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
 
   const linearLabel = linearState === 'working' ? t(lang, 'export.linearExporting')
     : t(lang, 'export.linear')
+
+  // ---------- Google Calendar ----------
+  const finishGcalExport = async () => {
+    const res = await googleCalendarExport(userId, plan, lang)
+    if (res?.calendarUrl !== undefined && res.error === undefined && !res.needsAuth && !res.needsProject) {
+      setGcalResult(res); setGcalState('done')
+      if (onGoogleCalendarExported) onGoogleCalendarExported({ calendarId: res.calendarId })
+      if (res.calendarUrl) window.open(res.calendarUrl, '_blank', 'noopener')
+      return true
+    }
+    return res
+  }
+
+  const loadCalendars = async () => {
+    const res = await googleCalendarCalendars(userId)
+    const calendars = res?.calendars || []
+    if (!calendars.length) { setGcalMsg(t(lang, 'export.gcalNoCalendars')); setGcalState('error'); return }
+    setGcalList(calendars)
+    setGcalPick((calendars.find(c => c.primary) || calendars[0]).id)
+    setGcalState('choosingCalendar')
+  }
+
+  const handleGcal = async () => {
+    if (!isPro) { onRequestUpgrade?.(); return }
+    if (!userId) { setGcalMsg(t(lang, 'export.gcalSignIn')); setGcalState('error'); return }
+    setGcalState('working'); setGcalMsg(''); setGcalResult(null)
+    try {
+      const res = await finishGcalExport()
+      if (res === true) return
+      if (res && res.needsAuth) {
+        const auth = await googleCalendarAuthorizeUrl(userId)
+        if (!auth?.url) { setGcalMsg(t(lang, 'export.gcalUnavailable')); setGcalState('error'); return }
+        setGcalState('connecting')
+        const popup = window.open(auth.url, 'google-calendar-oauth', 'width=520,height=680')
+        const connected = await waitForConnection(googleCalendarStatus, userId, popup)
+        if (!connected) { setGcalMsg(t(lang, 'export.gcalCancelled')); setGcalState('error'); return }
+        await loadCalendars()
+      } else if (res && res.needsProject) {
+        await loadCalendars()
+      } else { setGcalMsg(t(lang, 'export.gcalUnavailable')); setGcalState('error') }
+    } catch { setGcalMsg(t(lang, 'export.gcalUnavailable')); setGcalState('error') }
+  }
+
+  const confirmCalendar = async () => {
+    const cal = gcalList.find(c => c.id === gcalPick)
+    if (!cal) return
+    setGcalState('working')
+    try {
+      await googleCalendarSelect(userId, { calendarId: cal.id, calendarName: cal.name })
+      const done = await finishGcalExport()
+      if (done !== true) { setGcalMsg(t(lang, 'export.gcalUnavailable')); setGcalState('error') }
+    } catch { setGcalMsg(t(lang, 'export.gcalUnavailable')); setGcalState('error') }
+  }
+
+  const reconnectGcal = async () => {
+    if (!userId) return
+    setGcalState('working'); setGcalMsg('')
+    try { await googleCalendarDisconnect(userId) } catch { /* ignore */ }
+    await handleGcal()
+  }
+
+  const gcalLabel = gcalState === 'working' ? t(lang, 'export.gcalExporting')
+    : gcalState === 'connecting' ? t(lang, 'export.gcalConnecting')
+    : t(lang, 'export.gcal')
 
   // ---------- GitHub ----------
   const finishGithubExport = async () => {
@@ -399,6 +472,40 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
               <span className="export-notion-error">{linearMsg}</span>
               <button className="export-reconnect-link" onClick={reconnectLinear}>
                 {t(lang, 'export.linearReconnect')}
+              </button>
+            </>
+          )}
+
+          <button className="btn-integration btn-jira" onClick={handleGcal} disabled={gcalState === 'working' || gcalState === 'connecting'}>
+            <IconCalendar width={16} height={16} className="btn-notion-icon" />
+            {gcalLabel}
+          </button>
+
+          {gcalState === 'choosingCalendar' && (
+            <div className="jira-picker">
+              <label className="jira-picker-field">
+                <span>{t(lang, 'export.gcalCalendar')}</span>
+                <select value={gcalPick} onChange={e => setGcalPick(e.target.value)}>
+                  {gcalList.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                </select>
+              </label>
+              <button className="btn-integration btn-jira" onClick={confirmCalendar} disabled={!gcalPick}>
+                {t(lang, 'export.gcalConfirm')}
+              </button>
+            </div>
+          )}
+
+          {gcalState === 'done' && gcalResult && (
+            <div className="jira-result">
+              <span className="export-notion-link">{t(lang, 'export.gcalDone')(gcalResult.created, gcalResult.updated)}</span>
+              {gcalResult.calendarUrl && <a className="export-notion-link" href={gcalResult.calendarUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.gcalOpen')}</a>}
+            </div>
+          )}
+          {gcalState === 'error' && gcalMsg && (
+            <>
+              <span className="export-notion-error">{gcalMsg}</span>
+              <button className="export-reconnect-link" onClick={reconnectGcal}>
+                {t(lang, 'export.gcalReconnect')}
               </button>
             </>
           )}

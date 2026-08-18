@@ -277,6 +277,42 @@ export function linearExport(userId, plan, lang) {
   })
 }
 
+export function googleCalendarStatus(userId) {
+  return safeFetch(`/google-calendar/status?userId=${encodeURIComponent(userId)}`)
+}
+
+export function googleCalendarAuthorizeUrl(userId) {
+  return safeFetch(`/google-calendar/authorize-url?userId=${encodeURIComponent(userId)}`)
+}
+
+export function googleCalendarCalendars(userId) {
+  return safeFetch(`/google-calendar/calendars?userId=${encodeURIComponent(userId)}`)
+}
+
+export function googleCalendarSelect(userId, target) {
+  return safeFetch('/google-calendar/select', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, ...target })
+  })
+}
+
+export function googleCalendarDisconnect(userId) {
+  return safeFetch('/google-calendar/disconnect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
+export function googleCalendarExport(userId, plan, lang) {
+  return safeFetch('/google-calendar/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
 export function githubStatus(userId) {
   return safeFetch(`/github/status?userId=${encodeURIComponent(userId)}`)
 }
