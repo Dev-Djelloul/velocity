@@ -61,6 +61,22 @@ function esc(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
+function truncate(s, max) {
+  const str = String(s ?? '')
+  return str.length > max ? `${str.slice(0, max - 1)}…` : str
+}
+
+// Aperçu HTML du tableau IA généré : un vrai <table> (en-têtes + 4 premières lignes) plutôt
+// qu'une simple liste de noms de colonnes — bien plus lisible pour un contenu tabulaire.
+function tablePreviewHtml(output) {
+  if (!output?.columns?.length || !output?.rows?.length) return ''
+  const th = (s) => `<th style="text-align:left;padding:6px 10px;background:#f3f4f6;border:1px solid #e5e7eb;font-size:12px;color:#374151">${esc(s)}</th>`
+  const td = (s) => `<td style="padding:6px 10px;border:1px solid #e5e7eb;font-size:12px;color:#1a1a1a">${esc(truncate(s, 40))}</td>`
+  const headerRow = `<tr>${output.columns.map(th).join('')}</tr>`
+  const bodyRows = output.rows.slice(0, 4).map(row => `<tr>${row.map(td).join('')}</tr>`).join('')
+  return `<table role="presentation" cellpadding="0" cellspacing="0" style="border-collapse:collapse;margin:16px 0;width:100%">${headerRow}${bodyRows}</table>`
+}
+
 // Extrait quelques faits marquants du contenu généré, propres à chaque type — c'est ce
 // qui transforme l'email de "tâche terminée" (creux) en aperçu utile du résultat, sans
 // avoir à ouvrir l'app pour savoir si ça vaut le coup de regarder.
@@ -88,14 +104,18 @@ function extractHighlights(taskType, output, en) {
       case 'editorial': {
         const lines = []
         if (output.items?.length) lines.push(L(`${output.items.length} contenus planifiés`, `${output.items.length} content pieces planned`))
-        if (output.items?.[0]) lines.push(`${L('Semaine', 'Week')} ${output.items[0].week} — ${output.items[0].channel} : ${output.items[0].title}`)
+        output.items?.slice(0, 4).forEach(it => {
+          lines.push(`${L('S', 'W')}${it.week} — ${it.channel}${it.format ? ` (${it.format})` : ''} : ${truncate(it.title, 70)}`)
+        })
         return lines
       }
       case 'advertising': {
         const lines = []
         if (output.campaigns?.length) lines.push(L(`${output.campaigns.length} campagnes planifiées`, `${output.campaigns.length} campaigns planned`))
         if (output.totalBudget != null) lines.push(`${L('Budget total', 'Total budget')}: ${output.totalBudget} €`)
-        if (output.campaigns?.[0]) lines.push(`${L('Semaine', 'Week')} ${output.campaigns[0].week} — ${output.campaigns[0].channel} (${output.campaigns[0].objective})`)
+        output.campaigns?.slice(0, 4).forEach(c => {
+          lines.push(`${L('S', 'W')}${c.week} — ${c.channel} (${c.objective})${c.budget != null ? ` — ${c.budget} €` : ''}`)
+        })
         return lines
       }
       case 'rgpd': {
@@ -112,7 +132,6 @@ function extractHighlights(taskType, output, en) {
         const lines = []
         if (output.title) lines.push(`${L('Titre', 'Title')}: ${output.title}`)
         if (output.columns?.length && output.rows?.length) lines.push(L(`${output.rows.length} lignes × ${output.columns.length} colonnes`, `${output.rows.length} rows × ${output.columns.length} columns`))
-        if (output.columns?.length) lines.push(`${L('Colonnes', 'Columns')}: ${output.columns.join(', ')}`)
         return lines
       }
       case 'story_brief': {
@@ -148,6 +167,7 @@ export function agentDoneEmail(lang, { productName, taskType, classification, ou
   const highlightsHtml = highlights.length
     ? `<ul style="margin:16px 0;padding-left:20px;color:#1a1a1a;line-height:1.6">${highlights.map(h => `<li style="margin-bottom:6px">${esc(h)}</li>`).join('')}</ul>`
     : ''
+  const tableHtml = taskType === 'table' ? tablePreviewHtml(output) : ''
 
   const ctaHtml = appUrl
     ? `<p style="margin-top:28px"><a href="${esc(appUrl)}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600">${en ? 'Open the plan' : 'Ouvrir le plan'}</a></p>`
@@ -161,6 +181,7 @@ export function agentDoneEmail(lang, { productName, taskType, classification, ou
         ? `The AI agent finished a <strong>${typeLabel}</strong> on <strong>${esc(productName || 'your plan')}</strong>.`
         : `L'agent IA a terminé un <strong>${typeLabel}</strong> sur <strong>${esc(productName || 'ton plan')}</strong>.`}</p>
       ${highlightsHtml}
+      ${tableHtml}
       ${ctaHtml}
       ${brandSignature()}
     </div>`
