@@ -131,7 +131,7 @@ async function upsertEvent(accessToken, calendarId, managed, vlId, fields) {
   })
   if (!res.ok) return { ok: false, created: false }
   const data = await res.json()
-  return { ok: true, created: true, id: data.id, htmlLink: data.htmlLink }
+  return { ok: true, created: true, id: data.id }
 }
 
 // Synchronise la date de lancement + le calendrier éditorial + le calendrier publicitaire
@@ -147,11 +147,10 @@ export async function syncPlanToCalendar(accessToken, target, plan, lang) {
 
   let created = 0
   let updated = 0
-  let firstHtmlLink = null
 
   const track = (res) => {
     if (!res.ok) return
-    if (res.created) { created++; if (!firstHtmlLink && res.htmlLink) firstHtmlLink = res.htmlLink }
+    if (res.created) created++
     else updated++
   }
 
@@ -196,5 +195,15 @@ export async function syncPlanToCalendar(accessToken, target, plan, lang) {
     track(res)
   }
 
-  return { created, updated, calendarUrl: firstHtmlLink || `https://calendar.google.com/calendar/u/0/r` }
+  // Lien vers la vue du calendrier, jamais vers un événement précis : un lien d'événement
+  // (htmlLink) ne se résout que si le navigateur ouvre la page sous le même compte Google
+  // que celui utilisé pour l'export (voir authuser=N dans l'URL Google) — avec plusieurs
+  // comptes connectés dans le même navigateur, ça donne "Impossible de trouver
+  // l'événement demandé" au lieu d'ouvrir le calendrier. La vue du calendrier, elle,
+  // fonctionne quel que soit le compte actif (elle propose juste de changer de compte si besoin).
+  const calendarUrl = calendarId === 'primary'
+    ? 'https://calendar.google.com/calendar/u/0/r'
+    : `https://calendar.google.com/calendar/u/0/r?cid=${encodeURIComponent(calendarId)}`
+
+  return { created, updated, calendarUrl }
 }
