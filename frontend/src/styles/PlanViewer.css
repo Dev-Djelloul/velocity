@@ -90,32 +90,50 @@
 
 .plan-header-main { flex: 1; min-width: 260px; }
 
-.plan-cover-btn {
-  flex-shrink: 0;
-  width: 76px;
-  height: 76px;
-  border-radius: 12px;
+/* Bannière de couverture pleine largeur façon Notion : image (ou fond dégradé de
+   substitution) sur toute la largeur du contenu, avec un petit bouton flottant pour la
+   changer plutôt qu'un contrôle qui prend de la place en permanence. */
+.plan-cover-banner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: var(--border-radius);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: var(--color-bg-primary);
-  cursor: pointer;
-  padding: 0;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
 }
 
-.plan-cover-img {
+.plan-cover-banner.has-image { background: var(--color-bg-primary); }
+
+.plan-cover-banner-img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.plan-cover-placeholder {
-  width: 100%;
-  height: 100%;
+.plan-cover-banner-btn {
+  position: absolute;
+  right: 0.85rem;
+  bottom: 0.85rem;
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: var(--color-text-muted);
+  gap: 0.4rem;
+  background: rgba(15, 15, 20, 0.55);
+  backdrop-filter: blur(4px);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+  padding: 0.4rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.plan-cover-banner-btn:hover { background: rgba(15, 15, 20, 0.75); }
+
+@media (max-width: 640px) {
+  .plan-cover-banner { height: 140px; }
 }
 
 .plan-header-top {

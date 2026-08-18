@@ -438,18 +438,20 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         </div>
       )}
 
-      <div className="plan-header card">
-        {plan.id && (
+      {plan.id && (
+        <div className={`plan-cover-banner ${plan.coverImage ? 'has-image' : ''}`}>
+          {plan.coverImage && <img src={plan.coverImage} alt="" className="plan-cover-banner-img" />}
           <button
-            className="plan-cover-btn"
+            className="plan-cover-banner-btn"
             onClick={() => setShowCoverPicker(true)}
-            title={t(lang, 'app.coverImageEdit')}
           >
-            {plan.coverImage
-              ? <img src={plan.coverImage} alt="" className="plan-cover-img" />
-              : <span className="plan-cover-placeholder"><IconImage width={20} height={20} /></span>}
+            <IconImage width={14} height={14} />
+            {plan.coverImage ? t(lang, 'app.coverImageChange') : t(lang, 'app.coverImageAdd')}
           </button>
-        )}
+        </div>
+      )}
+
+      <div className="plan-header card">
         <div className="plan-header-main">
           <div className="plan-header-top">
             <h2>{plan.product?.name}</h2>
