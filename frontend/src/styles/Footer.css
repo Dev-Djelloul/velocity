@@ -141,9 +141,10 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Responsive : mobile/tablette — marque centrée en pleine largeur au-dessus,
-   les 3 colonnes de liens restent côte à côte (au lieu de s'empiler) mais centrées. */
-@media (max-width: 768px) {
+/* Responsive : mobile/tablette (jusqu'à l'iPad Pro 1024px) — marque centrée en
+   pleine largeur au-dessus, les 3 colonnes de liens restent côte à côte (au lieu
+   de s'empiler) mais centrées. */
+@media (max-width: 1024px) {
   .footer {
     padding: 3rem 1.25rem 1.5rem;
     margin-top: 3rem;
