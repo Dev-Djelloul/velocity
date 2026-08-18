@@ -237,6 +237,46 @@ export function jiraExport(userId, plan, lang) {
   })
 }
 
+export function linearStatus(userId) {
+  return safeFetch(`/linear/status?userId=${encodeURIComponent(userId)}`)
+}
+
+export function linearConnect(userId, apiKey) {
+  return safeFetch('/linear/connect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, apiKey })
+  })
+}
+
+export function linearTeams(userId) {
+  return safeFetch(`/linear/teams?userId=${encodeURIComponent(userId)}`)
+}
+
+export function linearSelect(userId, target) {
+  return safeFetch('/linear/select', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, ...target })
+  })
+}
+
+export function linearDisconnect(userId) {
+  return safeFetch('/linear/disconnect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
+export function linearExport(userId, plan, lang) {
+  return safeFetch('/linear/export', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
 export function githubStatus(userId) {
   return safeFetch(`/github/status?userId=${encodeURIComponent(userId)}`)
 }

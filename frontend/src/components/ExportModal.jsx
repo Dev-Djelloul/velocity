@@ -4,12 +4,13 @@ import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../li
 import {
   notionExport, notionAuthorizeUrl, notionStatus,
   jiraExport, jiraAuthorizeUrl, jiraStatus, jiraProjects, jiraSelect, jiraDisconnect,
-  githubExport, githubAuthorizeUrl, githubStatus, githubRepos, githubSelect, githubDisconnect
+  githubExport, githubAuthorizeUrl, githubStatus, githubRepos, githubSelect, githubDisconnect,
+  linearExport, linearConnect, linearTeams, linearSelect, linearDisconnect
 } from '../lib/serverStorage'
 import { waitForConnection } from '../lib/oauthConnect'
 import '../styles/ExportModal.css'
 
-export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrade, onClose, captureRef, onJiraExported, onGithubExported }) {
+export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrade, onClose, captureRef, onJiraExported, onGithubExported, onLinearExported }) {
   // Notion (export page complète)
   const [notionState, setNotionState] = useState('idle')
   const [notionUrl, setNotionUrl] = useState(null)
@@ -21,6 +22,14 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
   const [jiraPick, setJiraPick] = useState({ cloudId: '', projectKey: '' })
   const [jiraResult, setJiraResult] = useState(null)
   const [jiraMsg, setJiraMsg] = useState('')
+
+  // Linear (pas d'OAuth : clé API personnelle collée par l'utilisateur)
+  const [linearState, setLinearState] = useState('idle') // idle | working | enteringKey | choosingTeam | done | error
+  const [linearKeyInput, setLinearKeyInput] = useState('')
+  const [linearTeamList, setLinearTeamList] = useState([])
+  const [linearPick, setLinearPick] = useState('')
+  const [linearResult, setLinearResult] = useState(null)
+  const [linearMsg, setLinearMsg] = useState('')
 
   // GitHub
   const [githubState, setGithubState] = useState('idle') // idle | working | connecting | choosingRepo | done | error
@@ -132,6 +141,73 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
   const jiraLabel = jiraState === 'working' ? t(lang, 'export.jiraExporting')
     : jiraState === 'connecting' ? t(lang, 'export.jiraConnecting')
     : t(lang, 'export.jira')
+
+  // ---------- Linear ----------
+  const finishLinearExport = async () => {
+    const res = await linearExport(userId, plan, lang)
+    if (res?.boardUrl !== undefined && res.error === undefined && !res.needsAuth && !res.needsProject) {
+      setLinearResult(res); setLinearState('done')
+      if (onLinearExported) onLinearExported({ teamKey: res.teamKey, links: res.links || {} })
+      if (res.boardUrl) window.open(res.boardUrl, '_blank', 'noopener')
+      return true
+    }
+    return res
+  }
+
+  const loadLinearTeams = async () => {
+    const res = await linearTeams(userId)
+    const teamList = res?.teams || []
+    if (!teamList.length) { setLinearMsg(t(lang, 'export.linearNoTeams')); setLinearState('error'); return }
+    setLinearTeamList(teamList)
+    setLinearPick(teamList[0].id)
+    setLinearState('choosingTeam')
+  }
+
+  const handleLinear = async () => {
+    if (!isPro) { onRequestUpgrade?.(); return }
+    if (!userId) { setLinearMsg(t(lang, 'export.linearSignIn')); setLinearState('error'); return }
+    setLinearState('working'); setLinearMsg(''); setLinearResult(null)
+    try {
+      const res = await finishLinearExport()
+      if (res === true) return
+      if (res && res.needsAuth) {
+        setLinearKeyInput('')
+        setLinearState('enteringKey')
+      } else if (res && res.needsProject) {
+        await loadLinearTeams()
+      } else { setLinearMsg(t(lang, 'export.linearUnavailable')); setLinearState('error') }
+    } catch { setLinearMsg(t(lang, 'export.linearUnavailable')); setLinearState('error') }
+  }
+
+  const confirmLinearKey = async () => {
+    const key = linearKeyInput.trim()
+    if (!key) return
+    setLinearState('working'); setLinearMsg('')
+    const res = await linearConnect(userId, key)
+    if (!res?.ok) { setLinearMsg(t(lang, 'export.linearInvalidKey')); setLinearState('error'); return }
+    await loadLinearTeams()
+  }
+
+  const confirmTeam = async () => {
+    const team = linearTeamList.find(t => t.id === linearPick)
+    if (!team) return
+    setLinearState('working')
+    try {
+      await linearSelect(userId, { teamId: team.id, teamKey: team.key, teamName: team.name })
+      const done = await finishLinearExport()
+      if (done !== true) { setLinearMsg(t(lang, 'export.linearUnavailable')); setLinearState('error') }
+    } catch { setLinearMsg(t(lang, 'export.linearUnavailable')); setLinearState('error') }
+  }
+
+  const reconnectLinear = async () => {
+    if (!userId) return
+    setLinearState('working'); setLinearMsg('')
+    try { await linearDisconnect(userId) } catch { /* ignore */ }
+    await handleLinear()
+  }
+
+  const linearLabel = linearState === 'working' ? t(lang, 'export.linearExporting')
+    : t(lang, 'export.linear')
 
   // ---------- GitHub ----------
   const finishGithubExport = async () => {
@@ -269,6 +345,60 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
               <span className="export-notion-error">{jiraMsg}</span>
               <button className="export-reconnect-link" onClick={reconnectJira}>
                 {t(lang, 'export.jiraReconnect')}
+              </button>
+            </>
+          )}
+
+          <button className="btn-integration btn-jira" onClick={handleLinear} disabled={linearState === 'working'}>
+            <img className="btn-notion-icon" src="/assets/icons/linear-dark.png" alt="" aria-hidden="true" />
+            {linearLabel}
+          </button>
+
+          {linearState === 'enteringKey' && (
+            <div className="jira-picker">
+              <label className="jira-picker-field">
+                <span>{t(lang, 'export.linearApiKey')}</span>
+                <input
+                  type="password"
+                  value={linearKeyInput}
+                  onChange={e => setLinearKeyInput(e.target.value)}
+                  placeholder="lin_api_…"
+                />
+              </label>
+              <p className="account-security-note">
+                {t(lang, 'export.linearApiKeyHelp')} <a href="https://linear.app/settings/account/security" target="_blank" rel="noopener noreferrer">{t(lang, 'export.linearApiKeyLink')}</a>
+              </p>
+              <button className="btn-integration btn-jira" onClick={confirmLinearKey} disabled={!linearKeyInput.trim()}>
+                {t(lang, 'export.linearConnect')}
+              </button>
+            </div>
+          )}
+
+          {linearState === 'choosingTeam' && (
+            <div className="jira-picker">
+              <label className="jira-picker-field">
+                <span>{t(lang, 'export.linearTeam')}</span>
+                <select value={linearPick} onChange={e => setLinearPick(e.target.value)}>
+                  {linearTeamList.map(team => <option key={team.id} value={team.id}>{team.name} ({team.key})</option>)}
+                </select>
+              </label>
+              <button className="btn-integration btn-jira" onClick={confirmTeam} disabled={!linearPick}>
+                {t(lang, 'export.linearConfirm')}
+              </button>
+            </div>
+          )}
+
+          {linearState === 'done' && linearResult && (
+            <div className="jira-result">
+              <span className="export-notion-link">{t(lang, 'export.linearDone')(linearResult.created, linearResult.updated)}</span>
+              {linearResult.boardUrl && <a className="export-notion-link" href={linearResult.boardUrl} target="_blank" rel="noopener noreferrer">{t(lang, 'export.linearOpen')}</a>}
+            </div>
+          )}
+          {linearState === 'error' && linearMsg && (
+            <>
+              <span className="export-notion-error">{linearMsg}</span>
+              <button className="export-reconnect-link" onClick={reconnectLinear}>
+                {t(lang, 'export.linearReconnect')}
               </button>
             </>
           )}

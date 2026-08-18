@@ -17,6 +17,7 @@ import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { runCopilotChat } from '../lib/ai/copilotClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
+import * as linear from '../lib/linear/linearClient'
 import * as github from '../lib/github/githubClient'
 import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
@@ -446,6 +447,74 @@ export async function handleApi(request, env, url) {
       return json(result)
     } catch {
       return json({ error: 'jira_export_failed' }, 500)
+    }
+  }
+
+  // --- Intégration Linear (clé API personnelle, pas d'OAuth + création/mise à jour d'issues) ---
+
+  if (pathname === '/linear/status' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getLinearToken(env, userId)
+    return json({
+      connected: !!token,
+      team: token?.team_key ? { key: token.team_key, name: token.team_name } : null
+    })
+  }
+
+  // Pas de popup OAuth pour Linear : l'utilisateur colle sa clé API personnelle, validée
+  // ici en un appel avant d'être enregistrée.
+  if (pathname === '/linear/connect' && method === 'POST') {
+    const { userId, apiKey } = await request.json()
+    if (!userId || !apiKey) return json({ error: 'userId and apiKey required' }, 400)
+    try {
+      await linear.validateApiKey(apiKey)
+      await db.saveLinearToken(env, userId, apiKey)
+      return json({ ok: true })
+    } catch {
+      return json({ error: 'invalid_api_key' }, 400)
+    }
+  }
+
+  if (pathname === '/linear/disconnect' && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteLinearToken(env, userId)
+    return json({ ok: true })
+  }
+
+  if (pathname === '/linear/teams' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const token = await db.getLinearToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    try {
+      const teams = await linear.listTeams(token.api_key)
+      return json({ teams })
+    } catch {
+      return json({ error: 'linear_teams_failed' }, 500)
+    }
+  }
+
+  if (pathname === '/linear/select' && method === 'POST') {
+    const { userId, teamId, teamKey, teamName } = await request.json()
+    if (!userId || !teamId) return json({ error: 'userId and teamId required' }, 400)
+    await db.setLinearTarget(env, userId, { teamId, teamKey, teamName })
+    return json({ ok: true })
+  }
+
+  if (pathname === '/linear/export' && method === 'POST') {
+    const { userId, plan, lang } = await request.json()
+    if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
+    const token = await db.getLinearToken(env, userId)
+    if (!token) return json({ needsAuth: true })
+    if (!token.team_id) return json({ needsProject: true })
+    try {
+      const result = await linear.exportPlanToLinear(token.api_key, token, plan, lang || 'fr')
+      return json(result)
+    } catch {
+      return json({ error: 'linear_export_failed' }, 500)
     }
   }
 

@@ -333,6 +333,31 @@ export async function deleteGithubToken(env, userId) {
   await env.DB.prepare('DELETE FROM github_tokens WHERE user_id = ?').bind(userId).run()
 }
 
+// --- Clé API Linear ---
+
+export async function saveLinearToken(env, userId, apiKey) {
+  await env.DB.prepare(
+    `INSERT INTO linear_tokens (user_id, api_key, created_at)
+     VALUES (?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET api_key = excluded.api_key, created_at = datetime('now')`
+  ).bind(userId, apiKey).run()
+}
+
+// Mémorise l'équipe Linear sélectionnée par l'utilisateur.
+export async function setLinearTarget(env, userId, { teamId, teamKey, teamName }) {
+  await env.DB.prepare(
+    'UPDATE linear_tokens SET team_id = ?, team_key = ?, team_name = ? WHERE user_id = ?'
+  ).bind(teamId || null, teamKey || null, teamName || null, userId).run()
+}
+
+export async function getLinearToken(env, userId) {
+  return env.DB.prepare('SELECT * FROM linear_tokens WHERE user_id = ?').bind(userId).first()
+}
+
+export async function deleteLinearToken(env, userId) {
+  await env.DB.prepare('DELETE FROM linear_tokens WHERE user_id = ?').bind(userId).run()
+}
+
 // --- Préférences de notification par email ---
 
 export async function getNotificationPrefs(env, userId) {

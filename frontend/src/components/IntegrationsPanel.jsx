@@ -1,17 +1,19 @@
 import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n'
-import { notionStatus, notionDisconnect, jiraStatus, jiraDisconnect } from '../lib/serverStorage'
+import { notionStatus, notionDisconnect, jiraStatus, jiraDisconnect, linearStatus, linearDisconnect } from '../lib/serverStorage'
 
-// Récap des intégrations tierces connectées (Notion, Jira), avec bouton de déconnexion —
-// évite d'avoir à ouvrir chaque modal d'export pour savoir si le compte est connecté.
+// Récap des intégrations tierces connectées (Notion, Jira, Linear), avec bouton de
+// déconnexion — évite d'avoir à ouvrir chaque modal d'export pour savoir si le compte est connecté.
 export default function IntegrationsPanel({ lang, userId }) {
   const [notion, setNotion] = useState(null) // null = chargement
   const [jira, setJira] = useState(null)
+  const [linear, setLinear] = useState(null)
 
   useEffect(() => {
-    if (!userId) { setNotion({ connected: false }); setJira({ connected: false }); return }
+    if (!userId) { setNotion({ connected: false }); setJira({ connected: false }); setLinear({ connected: false }); return }
     notionStatus(userId).then(r => setNotion(r || { connected: false }))
     jiraStatus(userId).then(r => setJira(r || { connected: false }))
+    linearStatus(userId).then(r => setLinear(r || { connected: false }))
   }, [userId])
 
   const disconnectNotion = async () => {
@@ -22,6 +24,11 @@ export default function IntegrationsPanel({ lang, userId }) {
   const disconnectJira = async () => {
     await jiraDisconnect(userId)
     setJira({ connected: false })
+  }
+
+  const disconnectLinear = async () => {
+    await linearDisconnect(userId)
+    setLinear({ connected: false })
   }
 
   if (!userId) return null
@@ -60,6 +67,22 @@ export default function IntegrationsPanel({ lang, userId }) {
         </div>
         {jira?.connected && (
           <button className="btn-secondary" onClick={disconnectJira}>{t(lang, 'settings.integrationsDisconnect')}</button>
+        )}
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <p className="settings-row-label">Linear</p>
+          <p className="account-security-note">
+            {linear === null
+              ? t(lang, 'settings.integrationsLoading')
+              : linear.connected
+                ? t(lang, 'settings.integrationsConnected')(linear.team?.name)
+                : t(lang, 'settings.integrationsNotConnected')}
+          </p>
+        </div>
+        {linear?.connected && (
+          <button className="btn-secondary" onClick={disconnectLinear}>{t(lang, 'settings.integrationsDisconnect')}</button>
         )}
       </div>
     </div>

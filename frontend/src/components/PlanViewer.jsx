@@ -226,6 +226,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  const updateLinear = (nextLinear) => {
+    const nextPlan = { ...plan, linear: nextLinear }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const updateGithub = (nextGithub) => {
     const nextPlan = { ...plan, github: nextGithub }
     setPlan(nextPlan)
@@ -526,6 +532,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           captureRef={captureRef}
           onJiraExported={updateJira}
           onGithubExported={updateGithub}
+          onLinearExported={updateLinear}
         />
       )}
 
