@@ -3,7 +3,11 @@
 // (secret) et RESEND_FROM (var, ex: "VelocityLaunch <notifications@digitalblueskye.com>",
 // le domaine doit être vérifié dans Resend).
 export async function sendEmail(env, { to, subject, html }) {
-  if (!env.RESEND_API_KEY || !env.RESEND_FROM) return { skipped: true, reason: 'not_configured' }
+  if (!env.RESEND_API_KEY || !env.RESEND_FROM) {
+    console.log('[resend] skipped: not_configured (missing RESEND_API_KEY or RESEND_FROM)')
+    return { skipped: true, reason: 'not_configured' }
+  }
+  console.log(`[resend] sending to=${to} from=${env.RESEND_FROM} subject="${subject}"`)
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: {
@@ -12,8 +16,14 @@ export async function sendEmail(env, { to, subject, html }) {
     },
     body: JSON.stringify({ from: env.RESEND_FROM, to: [to], subject, html })
   })
-  if (!res.ok) throw new Error(`Resend send failed: ${res.status} ${await res.text()}`)
-  return res.json()
+  if (!res.ok) {
+    const body = await res.text()
+    console.log(`[resend] send failed: ${res.status} ${body}`)
+    throw new Error(`Resend send failed: ${res.status} ${body}`)
+  }
+  const data = await res.json()
+  console.log(`[resend] sent ok id=${data.id}`)
+  return data
 }
 
 const AGENT_TYPE_LABELS = {

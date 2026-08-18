@@ -22,16 +22,19 @@ import { sendEmail, agentDoneEmail } from '../lib/email/resendClient'
 // Email best-effort à la fin d'une génération IA (veille, benchmarks, calendriers, RGPD,
 // tableau IA, ou agent async) — n'échoue jamais la réponse HTTP, même si l'envoi rate.
 async function notifyGenerationDone(env, userId, plan, lang, taskType) {
-  if (!userId) return
+  if (!userId) { console.log(`[notify] skipped (${taskType}): no userId`); return }
   try {
     const prefs = await db.getNotificationPrefs(env, userId)
-    if (!prefs?.agent_done || !prefs.email) return
+    if (!prefs?.agent_done || !prefs.email) {
+      console.log(`[notify] skipped (${taskType}): agent_done=${prefs?.agent_done} email=${prefs?.email}`)
+      return
+    }
     const { subject, html } = agentDoneEmail(lang || plan?.language || 'fr', {
       productName: plan?.product?.name,
       taskType
     })
     await sendEmail(env, { to: prefs.email, subject, html })
-  } catch { /* best-effort, ne doit jamais faire échouer la génération */ }
+  } catch (e) { console.log(`[notify] error (${taskType}): ${e.message}`) }
 }
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
