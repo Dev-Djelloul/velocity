@@ -71,6 +71,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [showCoverPicker, setShowCoverPicker] = useState(false)
+  const [publicLinkCopied, setPublicLinkCopied] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
@@ -243,6 +244,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const nextPlan = { ...plan, isPublic: !plan.isPublic }
     setPlan(nextPlan)
     savePlan(nextPlan)
+  }
+
+  // URL "jolie" /p/:id — comme /s/:id pour un lien de partage classique, interceptée par
+  // une Cloudflare Pages Function pour que les aperçus LinkedIn/Twitter affichent la bonne
+  // image et le bon titre (voir frontend/functions/p/[id].js).
+  const copyPublicLink = async () => {
+    if (!plan.id) return
+    try {
+      await navigator.clipboard.writeText(`${window.location.origin}/p/${plan.id}`)
+      setPublicLinkCopied(true)
+      setTimeout(() => setPublicLinkCopied(false), 2000)
+    } catch { /* clipboard indisponible, on ignore silencieusement */ }
   }
 
   // Image de couverture : même circuit immédiat que la visibilité publique ci-dessus (pas
@@ -498,6 +511,11 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
               title={plan.isPublic ? t(lang, 'app.publicOnBody') : t(lang, 'app.publicOffBody')}
             >
               {plan.isPublic ? t(lang, 'app.publicOn') : t(lang, 'app.publicOff')}
+            </button>
+          )}
+          {plan.id && plan.isPublic && (
+            <button className="btn-secondary" onClick={copyPublicLink}>
+              {publicLinkCopied ? t(lang, 'plans.copied') : t(lang, 'app.copyPublicLink')}
             </button>
           )}
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>

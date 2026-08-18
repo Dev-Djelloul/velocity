@@ -70,6 +70,19 @@ const PATH_TO_PAGE = {
   '/parametres': 'settings'
 }
 
+// URLs "jolies" pour le partage (/s/:shareId, /p/:planId) — interceptées côté Cloudflare
+// Pages Functions (voir frontend/functions/) pour injecter des meta og:* correctes avant que
+// les robots des réseaux sociaux (qui n'exécutent jamais le JS) ne lisent le HTML. Le reste
+// de la logique de chargement (mêmes appels serveur que ?share=/?gallery=) est géré ici,
+// côté client, comme pour un utilisateur normal.
+function parsePrettyShareUrl(pathname) {
+  const shareMatch = pathname.match(/^\/s\/([^/]+)$/)
+  if (shareMatch) return { type: 'share', id: shareMatch[1] }
+  const galleryMatch = pathname.match(/^\/p\/([^/]+)$/)
+  if (galleryMatch) return { type: 'gallery', id: galleryMatch[1] }
+  return null
+}
+
 function pathForPage(page, authMode) {
   if (page === 'auth') return authMode === 'signup' ? '/inscription' : '/connexion'
   return PAGE_TO_PATH[page] || '/'
@@ -86,7 +99,9 @@ export default function App() {
   const [highContrast, setHighContrast] = useState(() => localStorage.getItem('plp_high_contrast') === '1')
   const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('plp_date_format') || 'auto')
   const [currency, setCurrency] = useState(() => localStorage.getItem('plp_currency') || 'EUR')
-  const [currentPage, setCurrentPage] = useState(() => PATH_TO_PAGE[window.location.pathname] || 'landing')
+  const [currentPage, setCurrentPage] = useState(() => (
+    parsePrettyShareUrl(window.location.pathname) ? 'result' : (PATH_TO_PAGE[window.location.pathname] || 'landing')
+  ))
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
   const [initialFormData, setInitialFormData] = useState(null)
@@ -191,8 +206,12 @@ export default function App() {
     localStorage.setItem('plp_currency', currency)
   }, [currency])
 
-  // Reflète currentPage/authMode dans l'URL (navigation interne -> barre d'adresse).
+  // Reflète currentPage/authMode dans l'URL (navigation interne -> barre d'adresse) — sauf
+  // si on est arrivé sur une URL "jolie" de partage (/s/:id, /p/:id) : on la laisse telle
+  // quelle dans la barre d'adresse (utile si l'utilisateur la recopie), plutôt que de la
+  // remplacer par /mon-plan dès que currentPage passe à 'result'.
   useEffect(() => {
+    if (parsePrettyShareUrl(location.pathname) && currentPage === 'result') return
     const target = pathForPage(currentPage, authMode)
     if (location.pathname !== target) {
       navigate({ pathname: target, search: location.search }, { replace: false })
@@ -202,7 +221,7 @@ export default function App() {
 
   // Reflète l'URL dans currentPage/authMode (bouton précédent/suivant, lien direct, refresh).
   useEffect(() => {
-    const page = PATH_TO_PAGE[location.pathname] || 'landing'
+    const page = parsePrettyShareUrl(location.pathname) ? 'result' : (PATH_TO_PAGE[location.pathname] || 'landing')
     if (page !== currentPage) setCurrentPage(page)
     if (page === 'auth') {
       const mode = location.pathname === '/connexion' ? 'signin' : 'signup'
@@ -227,7 +246,8 @@ export default function App() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
-    const shareId = params.get('share')
+    const pretty = parsePrettyShareUrl(window.location.pathname)
+    const shareId = params.get('share') || (pretty?.type === 'share' ? pretty.id : null)
     if (shareId) {
       (async () => {
         const shared = await getShareLink(shareId)
@@ -239,7 +259,7 @@ export default function App() {
         }
       })()
     }
-    const galleryId = params.get('gallery')
+    const galleryId = params.get('gallery') || (pretty?.type === 'gallery' ? pretty.id : null)
     if (galleryId) {
       (async () => {
         const res = await fetchGalleryPlan(galleryId)

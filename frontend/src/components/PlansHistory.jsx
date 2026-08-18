@@ -24,7 +24,10 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
 
   const handleShare = async (planId) => {
     const shareId = await createShareLink(planId)
-    const url = `${window.location.origin}${window.location.pathname}?share=${shareId}`
+    // URL "jolie" /s/:id (plutôt que ?share=) : interceptée par une Cloudflare Pages
+    // Function (voir frontend/functions/s/[id].js) qui injecte les meta og:image/og:title
+    // avant que les robots LinkedIn/Twitter (qui n'exécutent jamais le JS) ne lisent le HTML.
+    const url = `${window.location.origin}/s/${shareId}`
     setShareLink({ planId, shareId, url })
   }
 

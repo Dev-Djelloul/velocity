@@ -23,6 +23,7 @@ import * as github from '../lib/github/githubClient'
 import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
 import { triggerWebhooks, generateSecret } from '../lib/webhooks/webhookClient'
+import { generatePlanOgImage } from '../lib/og/ogImage'
 
 // Email + Slack best-effort à la fin d'une génération IA (veille, benchmarks, calendriers,
 // RGPD, tableau IA, ou agent async) — deux canaux indépendants (un utilisateur peut n'activer
@@ -242,6 +243,23 @@ export async function handleApi(request, env, url) {
     const plan = await db.getPublicPlan(env, galleryDetailMatch[1])
     if (!plan) return json({ error: 'not found' }, 404)
     return json({ plan })
+  }
+
+  // Image de partage (og:image) pour un plan partagé ou public — id accepté : soit un
+  // shareId (lien de partage classique, 30 jours), soit un id de plan public (galerie).
+  // Générée à la volée, jamais stockée (voir generatePlanOgImage).
+  const ogMatch = pathname.match(/^\/og\/([^/]+)\.png$/)
+  if (ogMatch && method === 'GET') {
+    const id = ogMatch[1]
+    const shared = await db.resolveShare(env, id).catch(() => null)
+    const plan = shared?.plan || await db.getPublicPlan(env, id).catch(() => null)
+    if (!plan) return json({ error: 'not found' }, 404)
+    try {
+      return await generatePlanOgImage(plan)
+    } catch (e) {
+      console.log(`[og] generation error: ${e.message}`)
+      return json({ error: 'og_generation_failed' }, 500)
+    }
   }
 
   if (pathname === '/generate-table' && method === 'POST') {
