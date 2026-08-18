@@ -95,7 +95,7 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection }) {
   // Repliée par défaut sous 900px (tablette/mobile) — en pleine largeur forcée par le CSS
   // responsive, la version dépliée (groupes + libellés) occupe toute la hauteur de l'écran
   // et masque le contenu du plan tant qu'on n'a pas scrollé plusieurs écrans plus bas.
@@ -147,6 +147,15 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
     itemRefs.current[activeId]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [activeId])
 
+  // La navigation par les flèches précédent/suivant (mode paginé mobile, voir
+  // PlanViewer.jsx) change la section affichée sans passer par goTo() ni déclencher
+  // l'IntersectionObserver ci-dessus (les sections inactives sont display:none, jamais
+  // "intersecting") — sans cette synchro, l'icône surlignée dans le sommaire restait
+  // bloquée sur la première section quel que soit l'endroit réellement affiché.
+  useEffect(() => {
+    if (activeSection) setActiveId(activeSection)
+  }, [activeSection])
+
   const startResize = (e) => {
     e.preventDefault()
     startRef.current = { x: e.clientX, width }
@@ -190,7 +199,29 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const readIds = getReadIds(currentUserId)
   const unreadComments = (comments || []).filter(c => !readIds.has(c.id)).length
 
+  // Repliée (grille d'icônes, mobile par défaut — voir plus haut), les panneaux Historique
+  // et Commentaires ne peuvent physiquement pas s'afficher : leur contenu n'est rendu que
+  // si !collapsed. Un simple toggle de l'état ouvert/fermé ne suffit donc pas depuis cet
+  // état — il faut d'abord déplier la sidebar, sinon le tap ne produit visiblement rien.
+  const openHistory = () => {
+    if (collapsed) {
+      setCollapsed(false)
+      setHistoryOpen(true)
+      return
+    }
+    setHistoryOpen(v => !v)
+  }
+
   const toggleComments = () => {
+    if (collapsed) {
+      setCollapsed(false)
+      setCommentsOpen(true)
+      if (comments?.length) {
+        markCommentsRead(currentUserId, comments.map(c => c.id))
+        setReadVersion(x => x + 1)
+      }
+      return
+    }
     setCommentsOpen(v => {
       const next = !v
       if (next && comments?.length) {
@@ -238,7 +269,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
         <div className="plan-sidebar-history">
           <button
             className={`plan-sidebar-item plan-sidebar-history-toggle ${historyOpen ? 'open' : ''}`}
-            onClick={() => setHistoryOpen(v => !v)}
+            onClick={openHistory}
             title={collapsed ? t(lang, 'outputs.historyPanelTitle') : t(lang, historyOpen ? 'outputs.historyCollapse' : 'outputs.historyExpand')}
           >
             <span className="plan-sidebar-icon"><IconHistory width={16} height={16} /></span>

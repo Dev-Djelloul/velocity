@@ -343,6 +343,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         onDeleteComment={deleteComment}
         currentUserId={userId}
         onSectionSelect={goToMobileSection}
+        activeSection={mobileSectionId}
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       <div className="mobile-section-nav">
