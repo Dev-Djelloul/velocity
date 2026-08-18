@@ -113,6 +113,14 @@ export function generateTable(prompt, plan, lang, userId) {
   })
 }
 
+export function notifyMentions(plan, comment, mentionedUserIds, lang, authorId) {
+  return safeFetch('/comments/notify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ plan, comment, mentionedUserIds, lang, authorId })
+  })
+}
+
 export function copilotChat(plan, message, history, lang, userId) {
   return safeFetch('/copilot/chat', {
     method: 'POST',
@@ -269,11 +277,11 @@ export function fetchNotificationPrefs(userId) {
   return safeFetch(`/notifications/prefs?userId=${encodeURIComponent(userId)}`)
 }
 
-export function saveNotificationPrefs(userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh }) {
+export function saveNotificationPrefs(userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions }) {
   return safeFetch('/notifications/prefs', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh })
+    body: JSON.stringify({ userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions })
   })
 }
 

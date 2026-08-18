@@ -63,6 +63,26 @@ export function veilleUpdateSlackMessage(lang, { productName, newItems, appUrl }
   return { text: title, blocks }
 }
 
+export function mentionSlackMessage(lang, { productName, authorName, commentText, appUrl }) {
+  const en = lang === 'en'
+  const who = authorName || (en ? 'Someone' : 'Quelqu\'un')
+  const title = en
+    ? `💬 ${who} mentioned you — ${productName || 'a plan'}`
+    : `💬 ${who} t'a mentionné(e) — ${productName || 'un plan'}`
+  const bodyLines = [`> ${commentText || ''}`]
+  const blocks = [
+    { type: 'header', text: { type: 'plain_text', text: title, emoji: true } },
+    { type: 'section', text: { type: 'mrkdwn', text: bodyLines.join('\n') } }
+  ]
+  if (appUrl) {
+    blocks.push({
+      type: 'actions',
+      elements: [{ type: 'button', text: { type: 'plain_text', text: en ? 'View the comment' : 'Voir le commentaire' }, url: appUrl }]
+    })
+  }
+  return { text: title, blocks }
+}
+
 export function inactivityReminderSlackMessage(lang, { productName, updatedAt, appUrl }) {
   const en = lang === 'en'
   const text = en

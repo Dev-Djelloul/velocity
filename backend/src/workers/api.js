@@ -18,8 +18,8 @@ import { runCopilotChat } from '../lib/ai/copilotClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as github from '../lib/github/githubClient'
-import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
-import { sendSlackMessage, agentDoneSlackMessage } from '../lib/slack/slackClient'
+import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail } from '../lib/email/resendClient'
+import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
 
 // Email + Slack best-effort à la fin d'une génération IA (veille, benchmarks, calendriers,
 // RGPD, tableau IA, ou agent async) — deux canaux indépendants (un utilisateur peut n'activer
@@ -190,6 +190,36 @@ export async function handleApi(request, env, url) {
     }
     await notifyGenerationDone(env, userId, plan, lang, 'table', result)
     return json(result)
+  }
+
+  // @mentions dans les commentaires : notification ciblée à chaque personne mentionnée
+  // (indépendant de notifyGenerationDone plus haut, qui notifie le propriétaire du plan —
+  // ici c'est la préférence du membre MENTIONNÉ qui compte, pas celle de l'auteur du plan).
+  // Best-effort, comme les autres notifications : n'échoue jamais la requête HTTP.
+  if (pathname === '/comments/notify' && method === 'POST') {
+    const { plan, comment, mentionedUserIds, lang, authorId } = await request.json()
+    if (!Array.isArray(mentionedUserIds) || !mentionedUserIds.length) return json({ ok: true })
+    const resolvedLang = lang || plan?.language || 'fr'
+    const productName = plan?.product?.name
+    const results = await Promise.allSettled(mentionedUserIds
+      .filter(uid => uid && uid !== authorId)
+      .map(async (uid) => {
+        const prefs = await db.getNotificationPrefs(env, uid).catch(() => null)
+        if (!prefs || !prefs.mentions) return
+        if (prefs.email) {
+          const { subject, html } = mentionEmail(resolvedLang, {
+            productName, authorName: comment?.authorName, commentText: comment?.text, appUrl: env.APP_URL
+          })
+          await sendEmail(env, { to: prefs.email, subject, html }).catch(e => console.log(`[notify] mention email error: ${e.message}`))
+        }
+        if (prefs.slack_enabled && prefs.slack_webhook_url) {
+          const msg = mentionSlackMessage(resolvedLang, {
+            productName, authorName: comment?.authorName, commentText: comment?.text, appUrl: env.APP_URL
+          })
+          await sendSlackMessage(prefs.slack_webhook_url, msg).catch(e => console.log(`[notify] mention slack error: ${e.message}`))
+        }
+      }))
+    return json({ ok: true, notified: results.length })
   }
 
   if (pathname === '/copilot/chat' && method === 'POST') {
@@ -506,14 +536,15 @@ export async function handleApi(request, env, url) {
       inactivityReminder: !!prefs?.inactivity_reminder,
       slackWebhookUrl: prefs?.slack_webhook_url || null,
       slackEnabled: !!prefs?.slack_enabled,
-      veilleAutoRefresh: !!prefs?.veille_auto_refresh
+      veilleAutoRefresh: !!prefs?.veille_auto_refresh,
+      mentions: prefs ? !!prefs.mentions : true
     })
   }
 
   if (pathname === '/notifications/prefs' && method === 'POST') {
-    const { userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh } = await request.json()
+    const { userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions } = await request.json()
     if (!userId) return json({ error: 'userId required' }, 400)
-    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh })
+    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions })
     return json({ ok: true })
   }
 

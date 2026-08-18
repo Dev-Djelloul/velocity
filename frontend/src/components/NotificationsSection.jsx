@@ -19,7 +19,7 @@ export default function NotificationsSection({ lang, userId }) {
   useEffect(() => {
     if (!userId) return
     fetchNotificationPrefs(userId).then(r => {
-      const next = r || { agentDone: false, inactivityReminder: false, slackWebhookUrl: null, slackEnabled: false, veilleAutoRefresh: false }
+      const next = r || { agentDone: false, inactivityReminder: false, slackWebhookUrl: null, slackEnabled: false, veilleAutoRefresh: false, mentions: true }
       setPrefs(next)
       setWebhookInput(next.slackWebhookUrl || '')
     })
@@ -35,7 +35,8 @@ export default function NotificationsSection({ lang, userId }) {
       inactivityReminder: next.inactivityReminder,
       slackWebhookUrl: next.slackWebhookUrl,
       slackEnabled: next.slackEnabled,
-      veilleAutoRefresh: next.veilleAutoRefresh
+      veilleAutoRefresh: next.veilleAutoRefresh,
+      mentions: next.mentions
     })
   }
 
@@ -98,6 +99,21 @@ export default function NotificationsSection({ lang, userId }) {
           role="switch"
           aria-checked={prefs.veilleAutoRefresh}
           onClick={() => toggle('veilleAutoRefresh')}
+        >
+          <span className="settings-switch-thumb" />
+        </button>
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <p className="settings-row-label">{t(lang, 'settings.notifMentionsLabel')}</p>
+          <p className="account-security-note">{t(lang, 'settings.notifMentionsBody')}</p>
+        </div>
+        <button
+          className={`settings-switch ${prefs.mentions ? 'is-on' : ''}`}
+          role="switch"
+          aria-checked={prefs.mentions}
+          onClick={() => toggle('mentions')}
         >
           <span className="settings-switch-thumb" />
         </button>

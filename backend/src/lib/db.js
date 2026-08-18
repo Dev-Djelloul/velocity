@@ -350,15 +350,17 @@ export async function setNotificationPrefs(env, userId, patch) {
     inactivityReminder: patch.inactivityReminder !== undefined ? patch.inactivityReminder : !!existing?.inactivity_reminder,
     slackWebhookUrl: patch.slackWebhookUrl !== undefined ? patch.slackWebhookUrl : existing?.slack_webhook_url,
     slackEnabled: patch.slackEnabled !== undefined ? patch.slackEnabled : !!existing?.slack_enabled,
-    veilleAutoRefresh: patch.veilleAutoRefresh !== undefined ? patch.veilleAutoRefresh : !!existing?.veille_auto_refresh
+    veilleAutoRefresh: patch.veilleAutoRefresh !== undefined ? patch.veilleAutoRefresh : !!existing?.veille_auto_refresh,
+    mentions: patch.mentions !== undefined ? patch.mentions : (existing ? !!existing.mentions : true)
   }
   await env.DB.prepare(
-    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, slack_webhook_url, slack_enabled, veille_auto_refresh, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, slack_webhook_url, slack_enabled, veille_auto_refresh, mentions, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
      ON CONFLICT(user_id) DO UPDATE SET email = excluded.email, agent_done = excluded.agent_done,
        inactivity_reminder = excluded.inactivity_reminder, slack_webhook_url = excluded.slack_webhook_url,
-       slack_enabled = excluded.slack_enabled, veille_auto_refresh = excluded.veille_auto_refresh, updated_at = datetime('now')`
-  ).bind(userId, next.email || null, next.agentDone ? 1 : 0, next.inactivityReminder ? 1 : 0, next.slackWebhookUrl || null, next.slackEnabled ? 1 : 0, next.veilleAutoRefresh ? 1 : 0).run()
+       slack_enabled = excluded.slack_enabled, veille_auto_refresh = excluded.veille_auto_refresh,
+       mentions = excluded.mentions, updated_at = datetime('now')`
+  ).bind(userId, next.email || null, next.agentDone ? 1 : 0, next.inactivityReminder ? 1 : 0, next.slackWebhookUrl || null, next.slackEnabled ? 1 : 0, next.veilleAutoRefresh ? 1 : 0, next.mentions ? 1 : 0).run()
 }
 
 // Plans dont le propriétaire a activé le rafraîchissement hebdomadaire de la veille —

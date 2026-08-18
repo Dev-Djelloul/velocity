@@ -25,6 +25,7 @@ import InfoModal from './InfoModal'
 import CopilotChat from './CopilotChat'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
+import { notifyMentions } from '../lib/serverStorage'
 import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
@@ -290,7 +291,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // Commentaires : postés/supprimés immédiatement (comme Jira/GitHub/Notion plus haut),
   // pas soumis au bouton "Enregistrer" — c'est une conversation, pas une édition de
   // contenu, ça n'a pas de sens de la faire attendre derrière les modifications en cours.
-  const addComment = (section, text) => {
+  const addComment = (section, text, mentionedIds) => {
     const trimmed = text.trim()
     if (!trimmed || !plan.id) return
     const comment = {
@@ -299,11 +300,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       text: trimmed,
       authorId: userId,
       authorName: user?.fullName || user?.firstName || (lang === 'fr' ? 'Anonyme' : 'Anonymous'),
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      mentions: mentionedIds?.length ? mentionedIds : undefined
     }
     const nextPlan = { ...plan, comments: [comment, ...(plan.comments || [])] }
     setPlan(nextPlan)
     savePlan(nextPlan)
+    // Best-effort, indépendant de la sauvegarde du plan : notifie chaque personne
+    // mentionnée selon SA propre préférence (pas celle du propriétaire du plan).
+    if (comment.mentions?.length) notifyMentions(plan, comment, comment.mentions, lang, userId)
   }
 
   const deleteComment = (id) => {
@@ -357,6 +362,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         comments={plan.comments}
         onAddComment={addComment}
         onDeleteComment={deleteComment}
+        teamMembers={team.members}
         currentUserId={userId}
         onSectionSelect={goToMobileSection}
         activeSection={mobileSectionId}

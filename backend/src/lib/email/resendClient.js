@@ -232,6 +232,29 @@ export function veilleUpdateEmail(lang, { productName, newItems, appUrl }) {
   return { subject, html }
 }
 
+export function mentionEmail(lang, { productName, authorName, commentText, appUrl }) {
+  const en = lang === 'en'
+  const who = authorName || (en ? 'Someone' : 'Quelqu\'un')
+  const subject = en
+    ? `${who} mentioned you — ${productName || 'a plan'}`
+    : `${who} t'a mentionné(e) — ${productName || 'un plan'}`
+  const ctaHtml = appUrl
+    ? `<p style="margin-top:28px"><a href="${esc(appUrl)}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600">${en ? 'View the comment' : 'Voir le commentaire'}</a></p>`
+    : ''
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1a1a1a">
+      <h2 style="color:#6366f1;margin-bottom:4px">${en ? 'You were mentioned' : 'Tu as été mentionné(e)'}</h2>
+      <p style="color:#6b7280;font-size:13px;margin-top:0">${esc(productName || (en ? 'A plan' : 'Un plan'))}</p>
+      <p>${en
+        ? `<strong>${esc(who)}</strong> mentioned you in a comment:`
+        : `<strong>${esc(who)}</strong> t'a mentionné(e) dans un commentaire :`}</p>
+      <blockquote style="margin:12px 0;padding:12px 16px;border-left:3px solid #6366f1;background:#f5f5ff;color:#1a1a1a;font-style:italic">${esc(commentText || '')}</blockquote>
+      ${ctaHtml}
+      ${brandSignature()}
+    </div>`
+  return { subject, html }
+}
+
 export function inactivityReminderEmail(lang, { productName, updatedAt }) {
   const en = lang === 'en'
   const subject = en

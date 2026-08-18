@@ -95,7 +95,7 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers }) {
   // Repliée par défaut sous 900px (tablette/mobile) — en pleine largeur forcée par le CSS
   // responsive, la version dépliée (groupes + libellés) occupe toute la hauteur de l'écran
   // et masque le contenu du plan tant qu'on n'a pas scrollé plusieurs écrans plus bas.
@@ -109,6 +109,8 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const [commentsOpen, setCommentsOpen] = useState(false)
   const [commentTopic, setCommentTopic] = useState('general')
   const [commentText, setCommentText] = useState('')
+  const [mentionedIds, setMentionedIds] = useState([])
+  const [mentionQuery, setMentionQuery] = useState(null)
   const [readVersion, setReadVersion] = useState(0)
   const startRef = useRef({ x: 0, width: DEFAULT_WIDTH })
   const itemRefs = useRef({})
@@ -190,8 +192,34 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
 
   const submitComment = () => {
     if (!commentText.trim()) return
-    onAddComment?.(commentTopic, commentText)
+    onAddComment?.(commentTopic, commentText, mentionedIds)
     setCommentText('')
+    setMentionedIds([])
+    setMentionQuery(null)
+  }
+
+  // @mentions : détecte un "@" en cours de frappe en fin de texte (pas de gestion fine de
+  // la position du curseur — suffisant pour une textarea courte comme celle-ci) et propose
+  // les membres de l'équipe active dont le nom correspond. Choisir un membre insère
+  // "@Nom " à la place du "@requête" en cours et l'ajoute à mentionedIds, qui accompagne le
+  // commentaire jusqu'à onAddComment (voir addComment dans PlanViewer.jsx) pour déclencher
+  // une notification ciblée (email/Slack) à cette personne, indépendante de la sauvegarde
+  // du plan.
+  const handleCommentTextChange = (e) => {
+    const value = e.target.value
+    setCommentText(value)
+    const match = value.match(/(?:^|\s)@(\w*)$/)
+    setMentionQuery(match ? match[1] : null)
+  }
+
+  const mentionMatches = mentionQuery !== null && teamMembers?.length
+    ? teamMembers.filter(m => m.id && m.name?.toLowerCase().includes(mentionQuery.toLowerCase()))
+    : []
+
+  const pickMention = (member) => {
+    setCommentText(prev => prev.replace(/(?:^|\s)@(\w*)$/, (m) => `${m.startsWith(' ') ? ' ' : ''}@${member.name} `))
+    setMentionedIds(prev => prev.includes(member.id) ? prev : [...prev, member.id])
+    setMentionQuery(null)
   }
 
   // Non-lus uniquement (pas le total) — sans ça le badge restait affiché même après avoir
@@ -342,12 +370,23 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
                     <option key={topic.key} value={topic.key}>{topic[lang]}</option>
                   ))}
                 </select>
-                <textarea
-                  value={commentText}
-                  onChange={e => setCommentText(e.target.value)}
-                  placeholder={lang === 'fr' ? 'Écrire un commentaire…' : 'Write a comment…'}
-                  rows={2}
-                />
+                <div className="plan-sidebar-comment-textarea-wrap">
+                  <textarea
+                    value={commentText}
+                    onChange={handleCommentTextChange}
+                    placeholder={lang === 'fr' ? 'Écrire un commentaire… (@ pour mentionner)' : 'Write a comment… (@ to mention)'}
+                    rows={2}
+                  />
+                  {!!mentionMatches.length && (
+                    <div className="plan-sidebar-mention-dropdown">
+                      {mentionMatches.map(m => (
+                        <button type="button" key={m.id} onClick={() => pickMention(m)}>
+                          {m.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
                 <button
                   className="plan-sidebar-comments-submit"
                   onClick={submitComment}

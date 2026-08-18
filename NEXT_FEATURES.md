@@ -4,6 +4,8 @@
 
 ## État au 18 août 2026 — déjà livré
 
+- **@mentions dans les commentaires** — la sélection @Nom dans le composeur de commentaire (`PlanSidebar.jsx`, dropdown déclenché par "@" + filtre sur `useTeam().members`) insère "@Nom" dans le texte et ajoute l'id du membre à `comment.mentions`. `PlanViewer.jsx` → `addComment` déclenche ensuite `POST /comments/notify` (fire-and-forget), qui pour chaque mentionné vérifie SA propre préférence (`notification_prefs.mentions`, colonne ajoutée par la migration `0009_mention_notifications.sql`, activée par défaut) et envoie l'email (`mentionEmail`) et/ou le Slack (`mentionSlackMessage`) correspondants — indépendant de la préférence du propriétaire du plan.
+- **Fil d'activité par plan** — déjà livré avant cette fiche, contrairement à ce que la fiche disait : `plan.changeLog` (rempli via `markChanged()`/`handleSave` dans `PlanViewer.jsx`, persisté avec le reste du plan en JSON dans `plans.data`) est affiché avec date/auteur/détail dans le panneau "Historique" de `PlanSidebar.jsx` (voir `plan-sidebar-history-panel`).
 - **Copilote IA conversationnel** — chat flottant dans PlanViewer (`frontend/src/components/CopilotChat.jsx`) pour itérer sur le plan en langage naturel. Backend : `POST /copilot/chat` (`backend/src/workers/api.js` → `backend/src/lib/ai/copilotClient.js`), function-calling OpenRouter qui renvoie une réponse conversationnelle + la valeur complète mise à jour de chaque section modifiée (sections éditables : product, persona, market, priorities, classification, roadmap, marketing, kpis, financials, strategyToolkit, executiveSummary, launchDate, planStartDate). Les changements passent par le circuit `markChanged()`/`pendingChanges` existant — rien n'est enregistré sans clic sur "Enregistrer".
 - Génération de plan IA complet (persona, roadmap, marketing, KPIs, finances, veille, benchmarks, calendriers éditorial/pub, RGPD, tableau/graphique IA)
 - Espaces d'équipe (Clerk Organizations) + offre Pro (Stripe)
@@ -17,24 +19,20 @@
 
 ## Fonctionnalités proposées, non commencées (par thème)
 
-### 🤝 Collaboration
-1. **Fil d'activité par plan** — historique détaillé des changements (qui, quoi, quand), distinct du changelog produit (`lib/i18n.js` → `changelog`). Existe déjà un système `markChanged()` dans PlanViewer.jsx qui décrit les changements (voir `describeDateChange`, etc.) — vérifier s'il est déjà stocké quelque part avant de tout reconstruire.
-2. **@mentions dans les commentaires** — notification ciblée à la personne mentionnée (email/Slack), en s'appuyant sur le système de commentaires déjà existant (`plan.comments`, voir `db.getRecentComments`).
-
 ### 🔌 Intégrations supplémentaires
-3. **Linear** — alternative à Jira, très populaire chez les startups. Copier intégralement le pattern Jira (`backend/src/lib/jira/jiraClient.js`, table `jira_tokens`, routes `/jira/*`) : Linear utilise une API GraphQL avec clé API personnelle (pas d'OAuth complexe nécessaire pour un MVP) — vérifier leur doc API actuelle.
-4. **Google Calendar** — sync du calendrier éditorial/pub et de la date de lancement. OAuth Google Calendar API, création d'événements pour chaque item du calendrier.
-5. **Webhooks sortants / Zapier** — permettre aux utilisateurs de brancher n'importe quel outil externe sur les événements du plan (génération terminée, story terminée, etc.). Nécessite : table `webhooks` (user_id, url, events[], secret pour signature HMAC), déclenchement depuis les mêmes points que les notifications Slack/email actuelles.
+1. **Linear** — alternative à Jira, très populaire chez les startups. Copier intégralement le pattern Jira (`backend/src/lib/jira/jiraClient.js`, table `jira_tokens`, routes `/jira/*`) : Linear utilise une API GraphQL avec clé API personnelle (pas d'OAuth complexe nécessaire pour un MVP) — vérifier leur doc API actuelle.
+2. **Google Calendar** — sync du calendrier éditorial/pub et de la date de lancement. OAuth Google Calendar API, création d'événements pour chaque item du calendrier.
+3. **Webhooks sortants / Zapier** — permettre aux utilisateurs de brancher n'importe quel outil externe sur les événements du plan (génération terminée, story terminée, etc.). Nécessite : table `webhooks` (user_id, url, events[], secret pour signature HMAC), déclenchement depuis les mêmes points que les notifications Slack/email actuelles.
 
 ### 📈 Rétention & scale
-6. **Templates de plans / duplication** — dupliquer un plan existant plutôt que de tout régénérer depuis le formulaire. Backend : `POST /plans/:id/duplicate`. Frontend : bouton dans PlansHistory.jsx / SpacePage.jsx.
-7. **Résumé hebdomadaire par email** — étend le rappel d'inactivité (`sendInactivityReminders` dans `generate.js`) à un digest actif pour les plans ACTIFS : "cette semaine : 3 stories terminées, budget à 60%, 2 commentaires". Réutilise le cron quotidien existant ou un nouveau cron hebdomadaire (attention : le cron `0 8 * * 1` du lundi est déjà pris par la veille auto — utiliser un autre horaire, ex. `0 9 * * 1`).
-8. **API publique (Entreprise)** — génération de plan programmatique via clé API. Nécessite : table `api_keys` (user_id, key_hash, scopes), middleware d'auth par clé API en plus de Clerk, doc API, rate limiting (KV).
-9. **Export marque blanche (Entreprise)** — PDF/PPTX sans branding VelocityLaunch, avec logo custom de l'utilisateur. Modifier `frontend/src/lib/pdfExport.js` pour accepter un thème custom quand `plan` appartient à un compte Entreprise.
+4. **Templates de plans / duplication** — dupliquer un plan existant plutôt que de tout régénérer depuis le formulaire. Backend : `POST /plans/:id/duplicate`. Frontend : bouton dans PlansHistory.jsx / SpacePage.jsx.
+5. **Résumé hebdomadaire par email** — étend le rappel d'inactivité (`sendInactivityReminders` dans `generate.js`) à un digest actif pour les plans ACTIFS : "cette semaine : 3 stories terminées, budget à 60%, 2 commentaires". Réutilise le cron quotidien existant ou un nouveau cron hebdomadaire (attention : le cron `0 8 * * 1` du lundi est déjà pris par la veille auto — utiliser un autre horaire, ex. `0 9 * * 1`).
+6. **API publique (Entreprise)** — génération de plan programmatique via clé API. Nécessite : table `api_keys` (user_id, key_hash, scopes), middleware d'auth par clé API en plus de Clerk, doc API, rate limiting (KV).
+7. **Export marque blanche (Entreprise)** — PDF/PPTX sans branding VelocityLaunch, avec logo custom de l'utilisateur. Modifier `frontend/src/lib/pdfExport.js` pour accepter un thème custom quand `plan` appartient à un compte Entreprise.
 
 ### 🚀 Distribution
-10. **Galerie publique de plans** (opt-in) — vitrine + acquisition organique façon Product Hunt. Nécessite : flag `plan.isPublic`, route publique `/gallery`, modération basique, page de détail publique (réutiliser le système de partage par lien existant `db.createShare`/`db.resolveShare`).
-11. **Image de partage (OG) par plan** — génération d'une image dynamique pour un partage LinkedIn/Twitter propre (titre du plan, classification, logo). Faisable via un Worker qui génère du SVG→PNG à la volée (Cloudflare a des exemples avec `@cloudflare/pages-plugin-vercel-og` ou équivalent), ou plus simple : template Canvas côté client au moment de l'export.
+8. **Galerie publique de plans** (opt-in) — vitrine + acquisition organique façon Product Hunt. Nécessite : flag `plan.isPublic`, route publique `/gallery`, modération basique, page de détail publique (réutiliser le système de partage par lien existant `db.createShare`/`db.resolveShare`).
+9. **Image de partage (OG) par plan** — génération d'une image dynamique pour un partage LinkedIn/Twitter propre (titre du plan, classification, logo). Faisable via un Worker qui génère du SVG→PNG à la volée (Cloudflare a des exemples avec `@cloudflare/pages-plugin-vercel-og` ou équivalent), ou plus simple : template Canvas côté client au moment de l'export.
 
 ## Notes techniques utiles pour la suite
 

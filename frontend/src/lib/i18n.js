@@ -1041,7 +1041,9 @@ export const translations = {
       notifSlackSave: 'Enregistrer',
       notifSlackSaved: 'Enregistré ✓',
       notifVeilleAutoLabel: 'Veille IA automatique',
-      notifVeilleAutoBody: "Régénère chaque lundi la veille des plans qui en ont déjà une, et te prévient uniquement si du contenu nouveau apparaît."
+      notifVeilleAutoBody: "Régénère chaque lundi la veille des plans qui en ont déjà une, et te prévient uniquement si du contenu nouveau apparaît.",
+      notifMentionsLabel: '@mentions dans les commentaires',
+      notifMentionsBody: "Te prévient quand un membre d'équipe te mentionne (@toi) dans un commentaire sur un plan partagé."
     }
   },
   en: {
@@ -2081,7 +2083,9 @@ export const translations = {
       notifSlackSave: 'Save',
       notifSlackSaved: 'Saved ✓',
       notifVeilleAutoLabel: 'Automatic AI market watch',
-      notifVeilleAutoBody: 'Refreshes every Monday for plans that already have a market watch, and only notifies you when something new shows up.'
+      notifVeilleAutoBody: 'Refreshes every Monday for plans that already have a market watch, and only notifies you when something new shows up.',
+      notifMentionsLabel: '@mentions in comments',
+      notifMentionsBody: 'Notifies you when a teammate mentions you (@you) in a comment on a shared plan.'
     }
   }
 }
