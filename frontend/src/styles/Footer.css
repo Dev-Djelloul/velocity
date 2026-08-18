@@ -141,19 +141,74 @@
   font-weight: var(--font-weight-semibold);
 }
 
-/* Responsive */
+/* Responsive : mobile/tablette — marque centrée en pleine largeur au-dessus,
+   les 3 colonnes de liens restent côte à côte (au lieu de s'empiler) mais centrées. */
 @media (max-width: 768px) {
   .footer {
-    padding: 3rem 1rem 1.5rem;
+    padding: 3rem 1.25rem 1.5rem;
     margin-top: 3rem;
+    text-align: center;
   }
 
   .footer-content {
-    gap: 2rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    column-gap: 1.25rem;
+    row-gap: 2rem;
+  }
+
+  /* La section marque (logo + tagline + réseaux sociaux) occupe toute la largeur,
+     au-dessus des 3 colonnes de liens. */
+  .footer-section:first-child {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .footer-section .brand-lockup {
+    justify-content: center;
+  }
+
+  .footer-section p {
+    max-width: 320px;
+  }
+
+  .footer-section h4 {
+    text-align: center;
+  }
+
+  .footer-section ul {
+    align-items: center;
+  }
+
+  .footer-section li {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .social-links {
+    justify-content: center;
   }
 
   /* Clears the floating scroll-to-top button so it doesn't cover the copyright lines */
   .footer-bottom {
     padding-bottom: 3.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-content {
+    column-gap: 0.75rem;
+  }
+
+  .footer-section h4 {
+    font-size: 0.7rem;
+  }
+
+  .footer-section a,
+  .footer-link {
+    font-size: 0.8rem;
+    text-align: center;
   }
 }
