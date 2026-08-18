@@ -55,14 +55,17 @@ async function processAgentTask(message, env) {
 async function notifyAgentDone(env, task) {
   try {
     const prefs = await db.getNotificationPrefs(env, task.user_id)
-    if (!prefs?.agent_done || !prefs.email) return
+    if (!prefs?.agent_done || !prefs.email) {
+      console.log(`[notify] skipped (agent:${task.type}): user_id=${task.user_id} agent_done=${prefs?.agent_done} email=${prefs?.email}`)
+      return
+    }
     const plan = await db.getPlan(env, task.plan_id)
     const { subject, html } = agentDoneEmail(plan?.language || 'fr', {
       productName: plan?.product?.name,
       taskType: task.type
     })
     await sendEmail(env, { to: prefs.email, subject, html })
-  } catch { /* email best-effort, ne bloque jamais le pipeline agent */ }
+  } catch (e) { console.log(`[notify] error (agent:${task.type}): ${e.message}`) }
 }
 
 // Cron quotidien (voir wrangler.toml [triggers]) — envoie un rappel pour chaque plan
