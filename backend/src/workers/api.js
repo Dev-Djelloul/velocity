@@ -232,6 +232,7 @@ export async function handleApi(request, env, url) {
       pitch: p.product?.pitch || null,
       classification: p.classification || null,
       executiveSummary: p.executiveSummary || null,
+      coverImage: p.coverImage || null,
       updatedAt: p.updatedAt
     })))
   }

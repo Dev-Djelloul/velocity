@@ -35,9 +35,14 @@ export default function GalleryPage({ lang, onOpenPlan }) {
         <div className="gallery-grid">
           {plans.map(p => (
             <button key={p.id} className="gallery-card" onClick={() => onOpenPlan(p.id)}>
-              <h3>{p.productName || t(lang, 'plans.untitled')}</h3>
-              {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
-              <p className="gallery-card-pitch">{p.pitch || p.executiveSummary || ''}</p>
+              {p.coverImage
+                ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
+                : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
+              <div className="gallery-card-body">
+                <h3>{p.productName || t(lang, 'plans.untitled')}</h3>
+                {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
+                <p className="gallery-card-pitch">{p.pitch || p.executiveSummary || ''}</p>
+              </div>
             </button>
           ))}
         </div>

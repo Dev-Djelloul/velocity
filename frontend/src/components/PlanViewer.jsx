@@ -23,14 +23,16 @@ import WhatIfScenarios from './WhatIfScenarios'
 import ExportModal from './ExportModal'
 import InfoModal from './InfoModal'
 import CopilotChat from './CopilotChat'
+import AvatarPicker from './AvatarPicker'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
+import { resizeImageToDataUrl } from '../lib/imageResize'
 import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -68,6 +70,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const team = useTeam()
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
+  const [showCoverPicker, setShowCoverPicker] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
@@ -240,6 +243,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const nextPlan = { ...plan, isPublic: !plan.isPublic }
     setPlan(nextPlan)
     savePlan(nextPlan)
+  }
+
+  // Image de couverture : même circuit immédiat que la visibilité publique ci-dessus (pas
+  // soumise au bouton "Enregistrer"). Redimensionnée avant stockage (voir imageResize.js)
+  // pour ne pas alourdir le JSON du plan ni, surtout, la liste /gallery qui agrège
+  // l'aperçu de dizaines de plans à la fois.
+  const updateCoverImage = async (blob) => {
+    const dataUrl = await resizeImageToDataUrl(blob)
+    const nextPlan = { ...plan, coverImage: dataUrl }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
   }
 
   const updateGoogleCalendar = (nextGoogleCalendar) => {
@@ -425,6 +439,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       )}
 
       <div className="plan-header card">
+        {plan.id && (
+          <button
+            className="plan-cover-btn"
+            onClick={() => setShowCoverPicker(true)}
+            title={t(lang, 'app.coverImageEdit')}
+          >
+            {plan.coverImage
+              ? <img src={plan.coverImage} alt="" className="plan-cover-img" />
+              : <span className="plan-cover-placeholder"><IconImage width={20} height={20} /></span>}
+          </button>
+        )}
         <div className="plan-header-main">
           <div className="plan-header-top">
             <h2>{plan.product?.name}</h2>
@@ -545,6 +570,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-tracking" className={`plan-section-anchor ${mobileSectionId === 'section-tracking' ? 'is-active' : ''}`}><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
         <div id="section-whatif" className={`plan-section-anchor ${mobileSectionId === 'section-whatif' ? 'is-active' : ''}`}><WhatIfScenarios plan={plan} lang={lang} /></div>
       </div>
+
+      {showCoverPicker && (
+        <AvatarPicker
+          lang={lang}
+          title={t(lang, 'app.coverImageTitle')}
+          onSave={updateCoverImage}
+          onClose={() => setShowCoverPicker(false)}
+        />
+      )}
 
       {showExport && (
         <ExportModal
