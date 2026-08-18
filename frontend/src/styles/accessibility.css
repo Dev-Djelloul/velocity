@@ -124,3 +124,25 @@ h1, h2, h3, h4, h5, h6 {
   transition-duration: 0.001ms !important;
   scroll-behavior: auto !important;
 }
+
+/* Préférence utilisateur "Taille de police" (Paramètres) — échelle le rem racine,
+   donc tout ce qui est dimensionné en rem/em suit proportionnellement. */
+html[data-font-size="large"] {
+  font-size: 18px;
+}
+
+html[data-font-size="xlarge"] {
+  font-size: 20px;
+}
+
+/* Préférence utilisateur "Contraste renforcé" (Paramètres) — réutilise les tokens
+   plus contrastés déjà définis ci-dessus pour le texte secondaire/atténué. */
+html[data-high-contrast="true"] {
+  --color-text-muted: var(--color-text-muted-accessible);
+  --color-text-secondary: var(--color-text-secondary-accessible);
+}
+
+html[data-high-contrast="true"] .card,
+html[data-high-contrast="true"] button:not(.settings-switch) {
+  border-color: rgba(255, 255, 255, 0.28) !important;
+}

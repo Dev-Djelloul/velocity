@@ -80,6 +80,10 @@ export default function App() {
   const [theme, setTheme] = useState(() => localStorage.getItem('plp_theme') || 'dark')
   const [timezone, setTimezone] = useState(() => getTimezone())
   const [reduceMotion, setReduceMotion] = useState(() => localStorage.getItem('plp_reduce_motion') === '1')
+  const [fontSize, setFontSize] = useState(() => localStorage.getItem('plp_font_size') || 'normal')
+  const [highContrast, setHighContrast] = useState(() => localStorage.getItem('plp_high_contrast') === '1')
+  const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('plp_date_format') || 'auto')
+  const [currency, setCurrency] = useState(() => localStorage.getItem('plp_currency') || 'EUR')
   const [currentPage, setCurrentPage] = useState(() => PATH_TO_PAGE[window.location.pathname] || 'landing')
   const [plan, setPlan] = useState(null)
   const [justGenerated, setJustGenerated] = useState(false)
@@ -166,6 +170,24 @@ export default function App() {
     document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false'
     localStorage.setItem('plp_reduce_motion', reduceMotion ? '1' : '0')
   }, [reduceMotion])
+
+  useEffect(() => {
+    document.documentElement.dataset.fontSize = fontSize
+    localStorage.setItem('plp_font_size', fontSize)
+  }, [fontSize])
+
+  useEffect(() => {
+    document.documentElement.dataset.highContrast = highContrast ? 'true' : 'false'
+    localStorage.setItem('plp_high_contrast', highContrast ? '1' : '0')
+  }, [highContrast])
+
+  useEffect(() => {
+    localStorage.setItem('plp_date_format', dateFormat)
+  }, [dateFormat])
+
+  useEffect(() => {
+    localStorage.setItem('plp_currency', currency)
+  }, [currency])
 
   // Reflète currentPage/authMode dans l'URL (navigation interne -> barre d'adresse).
   useEffect(() => {
@@ -874,6 +896,15 @@ export default function App() {
             onChangeTimezone={setTimezone}
             reduceMotion={reduceMotion}
             onToggleReduceMotion={() => setReduceMotion(r => !r)}
+            fontSize={fontSize}
+            onChangeFontSize={setFontSize}
+            highContrast={highContrast}
+            onToggleHighContrast={() => setHighContrast(h => !h)}
+            dateFormat={dateFormat}
+            onChangeDateFormat={setDateFormat}
+            currency={currency}
+            onChangeCurrency={setCurrency}
+            userId={userId}
             onBack={() => setCurrentPage('landing')}
           />
         )}

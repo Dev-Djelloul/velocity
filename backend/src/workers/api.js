@@ -434,6 +434,26 @@ export async function handleApi(request, env, url) {
     }
   }
 
+  // --- Préférences de notification par email ---
+
+  if (pathname === '/notifications/prefs' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const prefs = await db.getNotificationPrefs(env, userId)
+    return json({
+      email: prefs?.email || null,
+      agentDone: !!prefs?.agent_done,
+      inactivityReminder: !!prefs?.inactivity_reminder
+    })
+  }
+
+  if (pathname === '/notifications/prefs' && method === 'POST') {
+    const { userId, email, agentDone, inactivityReminder } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder })
+    return json({ ok: true })
+  }
+
   // Agents IA asynchrones — la requête ne fait qu'empiler le message sur la queue
   // et retourne immédiatement ; le traitement réel se fait dans le consumer (queue()
   // dans generate.js), potentiellement bien après la fin de cette requête HTTP.

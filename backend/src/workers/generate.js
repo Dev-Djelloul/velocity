@@ -8,6 +8,7 @@ import { recordUsage } from '../lib/ai/usageTracker'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import * as db from '../lib/db'
 import { handleApi, CORS_HEADERS } from './api'
+import { sendEmail, agentDoneEmail, inactivityReminderEmail } from '../lib/email/resendClient'
 
 function generateWithRules(data, lang) {
   const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
@@ -42,13 +43,51 @@ async function processAgentTask(message, env) {
   try {
     const output = await runner(env, task.input)
     await db.updateAgentTask(env, taskId, { status: 'done', output, attempts: message.attempts })
+    await notifyAgentDone(env, task)
   } catch (error) {
     await db.updateAgentTask(env, taskId, { status: 'error', error: error.message, attempts: message.attempts })
     throw error // laisse Cloudflare Queues retenter selon max_retries
   }
 }
 
+// Email best-effort à la fin d'une tâche agent — ne doit jamais faire échouer la tâche
+// elle-même (déjà marquée "done" en base à ce stade).
+async function notifyAgentDone(env, task) {
+  try {
+    const prefs = await db.getNotificationPrefs(env, task.user_id)
+    if (!prefs?.agent_done || !prefs.email) return
+    const plan = await db.getPlan(env, task.plan_id)
+    const { subject, html } = agentDoneEmail(plan?.language || 'fr', {
+      productName: plan?.product?.name,
+      taskType: task.type
+    })
+    await sendEmail(env, { to: prefs.email, subject, html })
+  } catch { /* email best-effort, ne bloque jamais le pipeline agent */ }
+}
+
+// Cron quotidien (voir wrangler.toml [triggers]) — envoie un rappel pour chaque plan
+// inactif depuis 14 jours dont le propriétaire a activé ce rappel, puis marque l'envoi
+// pour ne pas relancer tant que le plan reste inchangé.
+async function sendInactivityReminders(env) {
+  const plans = await db.getPlansNeedingInactivityReminder(env)
+  for (const row of plans) {
+    try {
+      const plan = await db.getPlan(env, row.id)
+      const { subject, html } = inactivityReminderEmail(plan?.language || 'fr', {
+        productName: row.product_name,
+        updatedAt: new Date(row.updated_at).toLocaleDateString('fr-FR')
+      })
+      await sendEmail(env, { to: row.email, subject, html })
+      await db.markReminderSent(env, row.id)
+    } catch { /* on continue avec les plans suivants même si un envoi échoue */ }
+  }
+}
+
 export default {
+  async scheduled(event, env) {
+    await sendInactivityReminders(env)
+  },
+
   async queue(batch, env) {
     for (const message of batch.messages) {
       try {

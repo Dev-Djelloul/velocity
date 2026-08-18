@@ -332,3 +332,38 @@ export async function getGithubToken(env, userId) {
 export async function deleteGithubToken(env, userId) {
   await env.DB.prepare('DELETE FROM github_tokens WHERE user_id = ?').bind(userId).run()
 }
+
+// --- Préférences de notification par email ---
+
+export async function getNotificationPrefs(env, userId) {
+  return env.DB.prepare('SELECT * FROM notification_prefs WHERE user_id = ?').bind(userId).first()
+}
+
+export async function setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder }) {
+  await env.DB.prepare(
+    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, updated_at)
+     VALUES (?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(user_id) DO UPDATE SET email = excluded.email, agent_done = excluded.agent_done,
+       inactivity_reminder = excluded.inactivity_reminder, updated_at = datetime('now')`
+  ).bind(userId, email || null, agentDone ? 1 : 0, inactivityReminder ? 1 : 0).run()
+}
+
+// Plans inactifs depuis >= 14 jours, dont le propriétaire a activé le rappel et dont on
+// n'a pas déjà envoyé un rappel pour cette période d'inactivité (reminder_sent_at plus
+// récent que updated_at => déjà notifié depuis la dernière modification).
+export async function getPlansNeedingInactivityReminder(env) {
+  const res = await env.DB.prepare(
+    `SELECT p.id, p.user_id, p.product_name, p.updated_at, n.email
+     FROM plans p
+     JOIN notification_prefs n ON n.user_id = p.user_id
+     WHERE n.inactivity_reminder = 1
+       AND n.email IS NOT NULL
+       AND p.updated_at <= datetime('now', '-14 days')
+       AND (p.reminder_sent_at IS NULL OR p.reminder_sent_at < p.updated_at)`
+  ).all()
+  return res.results || []
+}
+
+export async function markReminderSent(env, planId) {
+  await env.DB.prepare("UPDATE plans SET reminder_sent_at = datetime('now') WHERE id = ?").bind(planId).run()
+}

@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
+import { formatMoney } from '../lib/currency'
 import { validateRoadmap } from '../lib/roadmapValidator'
 import { nextStoryStatus } from '../lib/storyStatus'
 import { IconAlertTriangle, IconTarget, IconUser, IconCoin, IconCircleDot, IconCheckCircle, IconClock, IconChevronRight, IconPencil } from './Icons'
@@ -131,7 +132,7 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
         <div className="gauge">
           <div className="gauge-header">
             <span className="gauge-title">{t(lang, 'outputs.estimatedCost')}</span>
-            <span className="gauge-value">{estimatedCost.toLocaleString()} €</span>
+            <span className="gauge-value">{formatMoney(estimatedCost)}</span>
           </div>
           <div className="gauge-bar">
             <div className="gauge-fill" style={{ width: `${Math.min((estimatedCost / 50000) * 100, 100)}%` }} />

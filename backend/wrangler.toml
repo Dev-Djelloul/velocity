@@ -12,9 +12,15 @@ JIRA_REDIRECT_URI = "https://velocity-launch.djelloulabid75.workers.dev/jira/cal
 JIRA_CLIENT_ID = "dNq58ioA9irxzv6Xj8oxKOZ5VHlk0zvE"
 GITHUB_REDIRECT_URI = "https://velocity-launch.djelloulabid75.workers.dev/github/callback"
 GITHUB_CLIENT_ID = "Ov23li93Iig7GBy9fpt2"
+RESEND_FROM = "VelocityLaunch <notifications@digitalblueskye.com>"
 # JIRA_CLIENT_SECRET : secret via `wrangler secret put JIRA_CLIENT_SECRET --name velocity-launch`
 # NOTION_CLIENT_SECRET : secret via `wrangler secret put NOTION_CLIENT_SECRET --name velocity-launch`
 # GITHUB_CLIENT_SECRET : secret via `wrangler secret put GITHUB_CLIENT_SECRET --name velocity-launch`
+# RESEND_API_KEY : secret via `wrangler secret put RESEND_API_KEY --name velocity-launch`
+# Nécessite un domaine vérifié dans Resend (l'adresse RESEND_FROM ci-dessus doit en dépendre).
+
+[triggers]
+crons = ["0 9 * * *"] # rappel d'inactivité — une fois par jour à 9h UTC
 
 [[kv_namespaces]]
 binding = "AI_USAGE"

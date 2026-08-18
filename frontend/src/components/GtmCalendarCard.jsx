@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
+import { formatMoney } from '../lib/currency'
 import { generateEditorial, generateAdvertising } from '../lib/serverStorage'
 import { generateEditorialFallback } from '../lib/editorialFallback'
 import { generateAdvertisingFallback } from '../lib/advertisingFallback'
@@ -171,7 +172,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
         <div className="gtm-body">
           {advertising?.totalBudget != null && (
             <div className="gtm-total-budget">
-              {t(lang, 'gtm.totalPaidBudget')} : <strong>{Number(advertising.totalBudget).toLocaleString()} €</strong>
+              {t(lang, 'gtm.totalPaidBudget')} : <strong>{formatMoney(advertising.totalBudget)}</strong>
               {budgetDrifted && <span className="gtm-budget-drift">{t(lang, 'gtm.budgetDrift')(liveBudget)}</span>}
             </div>
           )}
@@ -216,7 +217,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
                       <div className="gtm-item-format">{c.format}</div>
                       <div className="gtm-item-audience">{c.audience}</div>
                       <div className="gtm-item-foot">
-                        <span className="gtm-item-budget">{Number(c.budget).toLocaleString()} €</span>
+                        <span className="gtm-item-budget">{formatMoney(c.budget)}</span>
                         <span className="gtm-item-kpi">{c.kpi}</span>
                       </div>
                     </div>

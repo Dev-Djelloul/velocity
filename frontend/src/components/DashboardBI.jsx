@@ -1,4 +1,5 @@
 import { t } from '../lib/i18n'
+import { formatMoney } from '../lib/currency'
 import CircularGauge from './CircularGauge'
 import GaugeProgress from './GaugeProgress'
 import { IconBarChart } from './Icons'
@@ -53,7 +54,7 @@ export default function DashboardBI({ plan, lang }) {
   const budgetSegments = (marketing?.channels || []).map(ch => ({
     name: ch.name,
     value: ch.budget,
-    display: `${ch.budget.toLocaleString()} €`
+    display: formatMoney(ch.budget)
   }))
 
   const workloadMap = {}
@@ -87,7 +88,7 @@ export default function DashboardBI({ plan, lang }) {
             <h4>{t(lang, 'dashboardBi.budgetByChannel')}</h4>
             <Donut
               segments={budgetSegments}
-              centerValue={`${marketing.totalBudget.toLocaleString()} €`}
+              centerValue={formatMoney(marketing.totalBudget)}
               centerLabel={t(lang, 'dashboardBi.total')}
             />
           </div>
@@ -109,7 +110,7 @@ export default function DashboardBI({ plan, lang }) {
             <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
             <Donut
               segments={financials.costBreakdown.map(c => ({ name: c.category, value: c.amount, display: `${c.pct}%` }))}
-              centerValue={`${(financials.monthlyBurn).toLocaleString()} €`}
+              centerValue={formatMoney(financials.monthlyBurn)}
               centerLabel={t(lang, 'dashboardBi.monthlyBurn')}
             />
           </div>

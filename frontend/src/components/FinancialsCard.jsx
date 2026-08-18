@@ -1,4 +1,5 @@
 import { t } from '../lib/i18n'
+import { formatMoney } from '../lib/currency'
 import { IconCoin, IconTrendingUp, IconTarget } from './Icons'
 import '../styles/FinancialsCard.css'
 
@@ -24,7 +25,7 @@ export default function FinancialsCard({ financials, lang }) {
         <div className="fin-tile" style={{ '--fin-color': '#9184d9' }}>
           <div className="fin-icon"><IconCoin width={16} height={16} /></div>
           <div className="fin-label">{t(lang, 'outputs.financials.monthlyBurn')}</div>
-          <div className="fin-value">{monthlyBurn.toLocaleString()} €</div>
+          <div className="fin-value">{formatMoney(monthlyBurn)}</div>
         </div>
         <div className="fin-tile" style={{ '--fin-color': '#06b6d4' }}>
           <div className="fin-icon"><IconTrendingUp width={16} height={16} /></div>
@@ -47,7 +48,7 @@ export default function FinancialsCard({ financials, lang }) {
             const pct = Math.round((remaining / budget) * 100)
             const isDepleted = remaining === 0
             return (
-              <div key={i} className="runway-bar-col" title={`M${i} — ${remaining.toLocaleString()} €`}>
+              <div key={i} className="runway-bar-col" title={`M${i} — ${formatMoney(remaining)}`}>
                 <div className="runway-bar-track">
                   <div className={`runway-bar-fill ${isDepleted ? 'depleted' : ''}`} style={{ height: `${pct}%` }} />
                 </div>
@@ -71,14 +72,14 @@ export default function FinancialsCard({ financials, lang }) {
             <div className="bridge-bar-track">
               <div className="bridge-bar-fill bridge-cost" style={{ width: `${(monthlyBurn / bridgeMax) * 100}%` }} />
             </div>
-            <span className="bridge-row-value">{monthlyBurn.toLocaleString()} €</span>
+            <span className="bridge-row-value">{formatMoney(monthlyBurn)}</span>
           </div>
           <div className="bridge-row">
             <span className="bridge-row-label">{t(lang, 'outputs.financials.bridgeRevenue')}</span>
             <div className="bridge-bar-track">
               <div className="bridge-bar-fill bridge-revenue" style={{ width: `${(breakEvenMonthlyRevenue / bridgeMax) * 100}%` }} />
             </div>
-            <span className="bridge-row-value">{breakEvenMonthlyRevenue.toLocaleString()} €</span>
+            <span className="bridge-row-value">{formatMoney(breakEvenMonthlyRevenue)}</span>
           </div>
         </div>
       </div>
@@ -97,7 +98,7 @@ export default function FinancialsCard({ financials, lang }) {
             <div key={i} className="cost-line" style={{ '--cost-color': color }}>
               <div className="cost-line-header">
                 <span>{line.category}</span>
-                <span>{line.amount.toLocaleString()} € · {line.pct}%</span>
+                <span>{formatMoney(line.amount)} · {line.pct}%</span>
               </div>
               <div className="cost-bar"><div className="cost-bar-fill" style={{ width: `${line.pct}%` }} /></div>
             </div>

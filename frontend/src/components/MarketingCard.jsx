@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
+import { formatMoney } from '../lib/currency'
 import { IconChevronDown } from './Icons'
 import '../styles/MarketingCard.css'
 
@@ -26,7 +27,7 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
       {onBudgetChange && (
         <div className="marketing-budget-control">
           <label>
-            {t(lang, 'outputs.marketingBudgetLabel')}: <strong>{budget.toLocaleString()} €</strong>
+            {t(lang, 'outputs.marketingBudgetLabel')}: <strong>{formatMoney(budget)}</strong>
           </label>
           <input type="range" min="2000" max="50000" step="500" value={budget}
             onChange={e => onBudgetChange(Number(e.target.value))} />
@@ -40,7 +41,7 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
               key={channel.name}
               className="budget-allocation-segment"
               style={{ width: `${(channel.budget / totalBudget) * 100}%`, background: CHANNEL_PALETTE[idx % CHANNEL_PALETTE.length] }}
-              title={`${channel.name} — ${channel.budget.toLocaleString()} € (${channel.pct}%)`}
+              title={`${channel.name} — ${formatMoney(channel.budget)} (${channel.pct}%)`}
             />
           ))}
           {remaining > 0 && (
@@ -48,8 +49,8 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
           )}
         </div>
         <div className="budget-summary-row">
-          <span className="budget-summary-allocated">{t(lang, 'outputs.allocatedLabel')} : <strong>{totalAllocated.toLocaleString()} €</strong></span>
-          <span className="budget-summary-total">{t(lang, 'outputs.budgetAvailable')(`${totalBudget.toLocaleString()} €`)}</span>
+          <span className="budget-summary-allocated">{t(lang, 'outputs.allocatedLabel')} : <strong>{formatMoney(totalAllocated)}</strong></span>
+          <span className="budget-summary-total">{t(lang, 'outputs.budgetAvailable')(formatMoney(totalBudget))}</span>
         </div>
       </div>
 
@@ -82,7 +83,7 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
                   </div>
                   {!isDisabled && (
                     <div className="channel-amount-block">
-                      <span className="budget-amount">{channel.budget.toLocaleString()} €</span>
+                      <span className="budget-amount">{formatMoney(channel.budget)}</span>
                       <span className="budget-pct" style={{ color, background: `${color}26` }}>{channel.pct}%</span>
                     </div>
                   )}

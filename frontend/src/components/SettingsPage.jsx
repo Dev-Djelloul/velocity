@@ -1,5 +1,8 @@
 import { t } from '../lib/i18n'
 import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings } from './Icons'
+import IntegrationsPanel from './IntegrationsPanel'
+import NotificationsSection from './NotificationsSection'
+import PrivacySection from './PrivacySection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 
@@ -14,7 +17,12 @@ const COMMON_TIMEZONES = [
   'Australia/Sydney', 'Pacific/Auckland', 'UTC'
 ]
 
-export default function SettingsPage({ lang, theme, onToggleTheme, onChangeLang, timezone, onChangeTimezone, reduceMotion, onToggleReduceMotion, onBack }) {
+export default function SettingsPage({
+  lang, theme, onToggleTheme, onChangeLang, timezone, onChangeTimezone,
+  reduceMotion, onToggleReduceMotion, fontSize, onChangeFontSize,
+  highContrast, onToggleHighContrast, dateFormat, onChangeDateFormat,
+  currency, onChangeCurrency, userId, onBack
+}) {
   return (
     <div className="account-page">
       <button className="account-back-btn" onClick={onBack}>
@@ -66,6 +74,34 @@ export default function SettingsPage({ lang, theme, onToggleTheme, onChangeLang,
 
       <div className="account-section card">
         <h3>{t(lang, 'settings.accessibilityTitle')}</h3>
+
+        <div className="settings-row">
+          <div>
+            <p className="settings-row-label">{t(lang, 'settings.fontSizeLabel')}</p>
+            <p className="account-security-note">{t(lang, 'settings.fontSizeBody')}</p>
+          </div>
+          <div className="settings-toggle-group">
+            <button className={fontSize === 'normal' ? 'active' : ''} onClick={() => onChangeFontSize('normal')}>{t(lang, 'settings.fontSizeNormal')}</button>
+            <button className={fontSize === 'large' ? 'active' : ''} onClick={() => onChangeFontSize('large')}>{t(lang, 'settings.fontSizeLarge')}</button>
+            <button className={fontSize === 'xlarge' ? 'active' : ''} onClick={() => onChangeFontSize('xlarge')}>{t(lang, 'settings.fontSizeXLarge')}</button>
+          </div>
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <p className="settings-row-label">{t(lang, 'settings.highContrastLabel')}</p>
+            <p className="account-security-note">{t(lang, 'settings.highContrastBody')}</p>
+          </div>
+          <button
+            className={`settings-switch ${highContrast ? 'is-on' : ''}`}
+            role="switch"
+            aria-checked={highContrast}
+            onClick={onToggleHighContrast}
+          >
+            <span className="settings-switch-thumb" />
+          </button>
+        </div>
+
         <div className="settings-row">
           <div>
             <p className="settings-row-label">{t(lang, 'settings.reduceMotionLabel')}</p>
@@ -81,6 +117,38 @@ export default function SettingsPage({ lang, theme, onToggleTheme, onChangeLang,
           </button>
         </div>
       </div>
+
+      <div className="account-section card">
+        <h3>{t(lang, 'settings.formatsTitle')}</h3>
+
+        <div className="settings-row">
+          <div>
+            <p className="settings-row-label">{t(lang, 'settings.dateFormatLabel')}</p>
+            <p className="account-security-note">{t(lang, 'settings.dateFormatBody')}</p>
+          </div>
+          <select className="settings-select" value={dateFormat} onChange={(e) => onChangeDateFormat(e.target.value)}>
+            <option value="auto">{t(lang, 'settings.dateFormatAuto')}</option>
+            <option value="dmy">{t(lang, 'settings.dateFormatDMY')}</option>
+            <option value="mdy">{t(lang, 'settings.dateFormatMDY')}</option>
+          </select>
+        </div>
+
+        <div className="settings-row">
+          <div>
+            <p className="settings-row-label">{t(lang, 'settings.currencyLabel')}</p>
+            <p className="account-security-note">{t(lang, 'settings.currencyBody')}</p>
+          </div>
+          <select className="settings-select" value={currency} onChange={(e) => onChangeCurrency(e.target.value)}>
+            <option value="EUR">EUR (€)</option>
+            <option value="USD">USD ($)</option>
+            <option value="GBP">GBP (£)</option>
+          </select>
+        </div>
+      </div>
+
+      <NotificationsSection lang={lang} userId={userId} />
+      <IntegrationsPanel lang={lang} userId={userId} />
+      <PrivacySection lang={lang} userId={userId} />
     </div>
   )
 }

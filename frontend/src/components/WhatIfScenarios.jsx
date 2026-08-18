@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import { t } from '../lib/i18n'
+import { formatMoney } from '../lib/currency'
 import { generateFinancials } from '../lib/extendedGenerator'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { sprintCount } from '../lib/engine'
@@ -137,7 +138,7 @@ export default function WhatIfScenarios({ plan, lang }) {
                   style={{ width: `${(c.budget / maxChannelBudget) * 100}%`, background: CHANNEL_PALETTE[i % CHANNEL_PALETTE.length] }}
                 />
               </div>
-              <span className="sim-channel-value">{c.budget.toLocaleString()} €</span>
+              <span className="sim-channel-value">{formatMoney(c.budget)}</span>
             </div>
           ))}
         </div>

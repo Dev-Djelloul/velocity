@@ -161,6 +161,14 @@ export function notionAuthorizeUrl(userId) {
   return safeFetch(`/notion/authorize-url?userId=${encodeURIComponent(userId)}`)
 }
 
+export function notionDisconnect(userId) {
+  return safeFetch('/notion/disconnect', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
 export function notionExport(userId, plan, lang) {
   return safeFetch('/notion/export', {
     method: 'POST',
@@ -246,6 +254,18 @@ export function githubExport(userId, plan, lang) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ userId, plan, lang })
+  })
+}
+
+export function fetchNotificationPrefs(userId) {
+  return safeFetch(`/notifications/prefs?userId=${encodeURIComponent(userId)}`)
+}
+
+export function saveNotificationPrefs(userId, { email, agentDone, inactivityReminder }) {
+  return safeFetch('/notifications/prefs', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, email, agentDone, inactivityReminder })
   })
 }
 
