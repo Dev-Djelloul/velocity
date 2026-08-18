@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { getAllPlans, deletePlan, createShareLink, getPlanById } from '../lib/planStorage'
+import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan } from '../lib/planStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
-import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle } from './Icons'
+import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy } from './Icons'
 import '../styles/PlansHistory.css'
 
 export default function PlansHistory({ lang, onLoadPlan, onClose }) {
@@ -39,6 +39,13 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
     onClose()
   }
 
+  const handleDuplicate = (plan) => {
+    const copy = duplicatePlan(plan, lang)
+    setPlans(getAllPlans())
+    if (onLoadPlan) onLoadPlan(copy)
+    onClose()
+  }
+
   if (plans.length === 0) {
     return (
       <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.emptyTitle')} onClose={onClose}>
@@ -71,6 +78,9 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
               </button>
               <button className="btn-secondary" onClick={() => handleShare(plan.id)}>
                 {t(lang, 'plans.share')}
+              </button>
+              <button className="btn-secondary" onClick={() => handleDuplicate(plan)}>
+                <IconCopy width={13} height={13} /> {t(lang, 'plans.duplicate')}
               </button>
               <button className="btn-plan-danger" onClick={() => setDeleteTarget(plan)}>
                 {t(lang, 'plans.delete')}

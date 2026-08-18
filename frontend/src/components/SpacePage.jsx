@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useTeam, useUser, useAuth } from '../lib/auth'
-import { getAllPlans, deletePlan } from '../lib/planStorage'
+import { getAllPlans, deletePlan, duplicatePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
-import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil } from './Icons'
+import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy } from './Icons'
 import { teamColor } from './TeamAvatar'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
@@ -83,6 +83,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     deletePlan(deleteTarget.id)
     setPlans(getAllPlans())
     setDeleteTarget(null)
+  }
+
+  const handleDuplicate = (plan) => {
+    const copy = duplicatePlan(plan, lang)
+    setPlans(getAllPlans())
+    onLoadPlan(copy)
   }
 
   const confirmDeleteDraft = () => {
@@ -183,6 +189,9 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                     {p.createdByName && ` · ${p.createdByName}`}
                     {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
                   </span>
+                </button>
+                <button className="account-list-item-move" onClick={() => handleDuplicate(p)} title={t(lang, 'plans.duplicate')}>
+                  <IconCopy width={14} height={14} />
                 </button>
                 <button className="account-list-item-delete" onClick={() => setDeleteTarget(p)} title="Delete">
                   <IconTrash width={14} height={14} />
