@@ -4,7 +4,9 @@
   /* Empile au-dessus du bouton rond "scroll-to-top" (bottom 1.5rem/24px, 36px de haut,
      voir ScrollToTop.css) au lieu de le chevaucher — même position que lui sinon. */
   bottom: 80px;
-  z-index: 60;
+  /* Au-dessus du header sticky (z-index: 100, voir design-system.css) : filet de sécurité
+     si le contenu du panneau dépassait malgré tout le max-height calculé plus bas. */
+  z-index: 150;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -25,12 +27,14 @@
   position: fixed;
   right: 24px;
   bottom: 144px;
-  z-index: 61;
+  z-index: 151;
   width: min(380px, calc(100vw - 32px));
-  /* Plafonné à la fois en valeur absolue et par rapport au viewport, pour ne jamais
-     dépasser le haut de l'écran ni chevaucher le header quelle que soit la hauteur du
-     contenu (voir .copilot-messages plus bas, qui ne force plus le panneau à grandir). */
-  max-height: min(70vh, 520px);
+  /* Le header applicatif est sticky (top: 0, z-index: 100 — voir design-system.css), donc
+     au-dessus du panneau (z-index: 61) : s'il déborde en haut de l'écran, il passe derrière
+     le header au lieu de simplement le chevaucher. On réserve donc explicitement sa hauteur
+     (~100px, marge incluse) en plus de la position basse du panneau (144px), et pas
+     seulement un pourcentage de la fenêtre qui ne tient pas compte du header. */
+  max-height: min(480px, calc(100vh - 244px));
   display: flex;
   flex-direction: column;
   background: var(--card-bg, #fff);
@@ -167,5 +171,5 @@
 @media (max-width: 640px) {
   .copilot-fab span { display: none; }
   .copilot-fab { padding: 14px; bottom: 70px; }
-  .copilot-panel { right: 12px; left: 12px; width: auto; bottom: 122px; max-height: min(65vh, 460px); }
+  .copilot-panel { right: 12px; left: 12px; width: auto; bottom: 122px; max-height: min(440px, calc(100vh - 212px)); }
 }
