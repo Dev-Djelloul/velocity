@@ -723,14 +723,15 @@ export async function handleApi(request, env, url) {
       slackWebhookUrl: prefs?.slack_webhook_url || null,
       slackEnabled: !!prefs?.slack_enabled,
       veilleAutoRefresh: !!prefs?.veille_auto_refresh,
-      mentions: prefs ? !!prefs.mentions : true
+      mentions: prefs ? !!prefs.mentions : true,
+      weeklyDigest: !!prefs?.weekly_digest
     })
   }
 
   if (pathname === '/notifications/prefs' && method === 'POST') {
-    const { userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions } = await request.json()
+    const { userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions, weeklyDigest } = await request.json()
     if (!userId) return json({ error: 'userId required' }, 400)
-    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions })
+    await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions, weeklyDigest })
     return json({ ok: true })
   }
 

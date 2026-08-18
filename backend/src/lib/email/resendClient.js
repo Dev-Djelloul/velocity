@@ -255,6 +255,34 @@ export function mentionEmail(lang, { productName, authorName, commentText, appUr
   return { subject, html }
 }
 
+export function weeklyDigestEmail(lang, { productName, doneStories, totalStories, storiesCompletedThisWeek, budgetPct, commentsThisWeek, appUrl }) {
+  const en = lang === 'en'
+  const subject = en
+    ? `Weekly digest — ${productName || 'your plan'}`
+    : `Résumé de la semaine — ${productName || 'ton plan'}`
+  const lines = [
+    storiesCompletedThisWeek > 0
+      ? (en ? `${storiesCompletedThisWeek} stor${storiesCompletedThisWeek === 1 ? 'y' : 'ies'} completed this week` : `${storiesCompletedThisWeek} story(ies) terminée(s) cette semaine`)
+      : null,
+    en ? `${doneStories}/${totalStories} stories done overall (${Math.round((doneStories / (totalStories || 1)) * 100)}%)` : `${doneStories}/${totalStories} stories terminées au total (${Math.round((doneStories / (totalStories || 1)) * 100)}%)`,
+    budgetPct !== null ? (en ? `~${budgetPct}% of estimated budget committed` : `~${budgetPct}% du budget estimé engagé`) : null,
+    commentsThisWeek > 0 ? (en ? `${commentsThisWeek} new comment${commentsThisWeek === 1 ? '' : 's'} this week` : `${commentsThisWeek} nouveau(x) commentaire(s) cette semaine`) : null
+  ].filter(Boolean)
+  const listHtml = `<ul style="margin:16px 0;padding-left:20px;color:#1a1a1a;line-height:1.7">${lines.map(l => `<li>${esc(l)}</li>`).join('')}</ul>`
+  const ctaHtml = appUrl
+    ? `<p style="margin-top:28px"><a href="${esc(appUrl)}" style="display:inline-block;background:#6366f1;color:#fff;text-decoration:none;padding:10px 20px;border-radius:8px;font-weight:600">${en ? 'Open the plan' : 'Ouvrir le plan'}</a></p>`
+    : ''
+  const html = `
+    <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:24px;color:#1a1a1a">
+      <h2 style="color:#6366f1;margin-bottom:4px">${en ? 'This week on your plan' : 'Cette semaine sur ton plan'}</h2>
+      <p style="color:#6b7280;font-size:13px;margin-top:0">${esc(productName || (en ? 'Your plan' : 'Ton plan'))}</p>
+      ${listHtml}
+      ${ctaHtml}
+      ${brandSignature()}
+    </div>`
+  return { subject, html }
+}
+
 export function inactivityReminderEmail(lang, { productName, updatedAt }) {
   const en = lang === 'en'
   const subject = en

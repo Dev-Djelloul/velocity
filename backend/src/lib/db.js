@@ -439,16 +439,17 @@ export async function setNotificationPrefs(env, userId, patch) {
     slackWebhookUrl: patch.slackWebhookUrl !== undefined ? patch.slackWebhookUrl : existing?.slack_webhook_url,
     slackEnabled: patch.slackEnabled !== undefined ? patch.slackEnabled : !!existing?.slack_enabled,
     veilleAutoRefresh: patch.veilleAutoRefresh !== undefined ? patch.veilleAutoRefresh : !!existing?.veille_auto_refresh,
-    mentions: patch.mentions !== undefined ? patch.mentions : (existing ? !!existing.mentions : true)
+    mentions: patch.mentions !== undefined ? patch.mentions : (existing ? !!existing.mentions : true),
+    weeklyDigest: patch.weeklyDigest !== undefined ? patch.weeklyDigest : !!existing?.weekly_digest
   }
   await env.DB.prepare(
-    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, slack_webhook_url, slack_enabled, veille_auto_refresh, mentions, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
+    `INSERT INTO notification_prefs (user_id, email, agent_done, inactivity_reminder, slack_webhook_url, slack_enabled, veille_auto_refresh, mentions, weekly_digest, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, datetime('now'))
      ON CONFLICT(user_id) DO UPDATE SET email = excluded.email, agent_done = excluded.agent_done,
        inactivity_reminder = excluded.inactivity_reminder, slack_webhook_url = excluded.slack_webhook_url,
        slack_enabled = excluded.slack_enabled, veille_auto_refresh = excluded.veille_auto_refresh,
-       mentions = excluded.mentions, updated_at = datetime('now')`
-  ).bind(userId, next.email || null, next.agentDone ? 1 : 0, next.inactivityReminder ? 1 : 0, next.slackWebhookUrl || null, next.slackEnabled ? 1 : 0, next.veilleAutoRefresh ? 1 : 0, next.mentions ? 1 : 0).run()
+       mentions = excluded.mentions, weekly_digest = excluded.weekly_digest, updated_at = datetime('now')`
+  ).bind(userId, next.email || null, next.agentDone ? 1 : 0, next.inactivityReminder ? 1 : 0, next.slackWebhookUrl || null, next.slackEnabled ? 1 : 0, next.veilleAutoRefresh ? 1 : 0, next.mentions ? 1 : 0, next.weeklyDigest ? 1 : 0).run()
 }
 
 // Plans dont le propriétaire a activé le rafraîchissement hebdomadaire de la veille —
@@ -495,4 +496,20 @@ export async function getPlansNeedingInactivityReminder(env) {
 
 export async function markReminderSent(env, planId) {
   await env.DB.prepare("UPDATE plans SET reminder_sent_at = datetime('now') WHERE id = ?").bind(planId).run()
+}
+
+// Plans "ACTIFS" (par opposition aux plans inactifs ciblés par le rappel ci-dessus) dont le
+// propriétaire a activé le résumé hebdomadaire — actif = modifié dans les 14 derniers jours,
+// même seuil que le rappel d'inactivité pour que les deux se complètent sans zone morte ni
+// chevauchement (un plan est soit inactif, soit éligible au digest, jamais les deux).
+export async function getPlansForWeeklyDigest(env) {
+  const res = await env.DB.prepare(
+    `SELECT p.id, p.data, n.email, n.slack_webhook_url, n.slack_enabled
+     FROM plans p
+     JOIN notification_prefs n ON n.user_id = p.user_id
+     WHERE n.weekly_digest = 1
+       AND (n.email IS NOT NULL OR (n.slack_enabled = 1 AND n.slack_webhook_url IS NOT NULL))
+       AND p.updated_at > datetime('now', '-14 days')`
+  ).all()
+  return (res.results || []).map(r => ({ ...r, data: JSON.parse(r.data) }))
 }

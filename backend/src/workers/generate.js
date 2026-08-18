@@ -9,8 +9,8 @@ import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { generateVeilleWithAI } from '../lib/ai/veilleClient'
 import * as db from '../lib/db'
 import { handleApi, CORS_HEADERS } from './api'
-import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
-import { sendSlackMessage, agentDoneSlackMessage, inactivityReminderSlackMessage, veilleUpdateSlackMessage } from '../lib/slack/slackClient'
+import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, weeklyDigestEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
+import { sendSlackMessage, agentDoneSlackMessage, inactivityReminderSlackMessage, veilleUpdateSlackMessage, weeklyDigestSlackMessage } from '../lib/slack/slackClient'
 import { triggerWebhooks } from '../lib/webhooks/webhookClient'
 
 function generateWithRules(data, lang) {
@@ -169,12 +169,83 @@ async function refreshVeilleForSubscribedPlans(env) {
   }
 }
 
+function flattenStories(roadmap) {
+  return (roadmap?.sprints || []).flatMap(sp => sp.stories || [])
+}
+
+// Heuristique volontairement simple pour compter les stories terminées CETTE semaine :
+// scanne le changeLog (rempli côté client par markChanged() dans PlanViewer.jsx) sur les 7
+// derniers jours, à la recherche d'entrées "story:ID" dont le détail contient un passage de
+// statut vers Terminé/Done. Peut compter deux fois une même story si son statut a été
+// modifié plusieurs fois dans la semaine (ex: Done → À faire → Done) — acceptable pour un
+// digest indicatif, pas une source de vérité comptable.
+function countStoriesCompletedThisWeek(changeLog, sevenDaysAgo) {
+  let count = 0
+  for (const entry of changeLog || []) {
+    if (!entry.date || new Date(entry.date) < sevenDaysAgo) continue
+    for (const change of entry.changes || entry.sections || []) {
+      if (typeof change === 'string') continue
+      if (change.section?.startsWith('story:') && /→\s*(Terminé|Done)/i.test(change.detail || '')) count++
+    }
+  }
+  return count
+}
+
+// Cron hebdomadaire (voir wrangler.toml [triggers]) — digest actif pour les plans modifiés
+// récemment (par opposition au rappel d'inactivité, qui cible l'inverse). Purement
+// informatif : ne touche jamais updated_at ni reminder_sent_at.
+async function sendWeeklyDigests(env) {
+  const plans = await db.getPlansForWeeklyDigest(env)
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
+
+  for (const row of plans) {
+    try {
+      const plan = row.data
+      const lang = plan.language || 'fr'
+      const stories = flattenStories(plan.roadmap)
+      const doneStories = stories.filter(s => s.status === 'done')
+      const totalCost = stories.reduce((sum, s) => sum + (s.cost || 0), 0)
+      const doneCost = doneStories.reduce((sum, s) => sum + (s.cost || 0), 0)
+      const budgetPct = totalCost > 0 ? Math.round((doneCost / totalCost) * 100) : null
+      const storiesCompletedThisWeek = countStoriesCompletedThisWeek(plan.changeLog, sevenDaysAgo)
+      const commentsThisWeek = (plan.comments || []).filter(c => c.createdAt && new Date(c.createdAt) >= sevenDaysAgo).length
+
+      // Rien à raconter cette semaine (plan "actif" au sens updated_at mais sans mouvement
+      // concret sur roadmap/commentaires) : un digest vide serait juste du bruit.
+      if (!stories.length && !commentsThisWeek) continue
+
+      const payload = {
+        productName: plan.product?.name,
+        doneStories: doneStories.length,
+        totalStories: stories.length,
+        storiesCompletedThisWeek,
+        budgetPct,
+        commentsThisWeek,
+        appUrl: env.APP_URL
+      }
+
+      if (row.email) {
+        const { subject, html } = weeklyDigestEmail(lang, payload)
+        await sendEmail(env, { to: row.email, subject, html }).catch(e => console.log(`[notify] digest email error: ${e.message}`))
+      }
+      if (row.slack_enabled && row.slack_webhook_url) {
+        const msg = weeklyDigestSlackMessage(lang, payload)
+        await sendSlackMessage(row.slack_webhook_url, msg).catch(e => console.log(`[notify] digest slack error: ${e.message}`))
+      }
+    } catch (e) { console.log(`[notify] digest error (plan ${row.id}): ${e.message}`) }
+  }
+}
+
 export default {
   async scheduled(event, env) {
-    // Deux crons distincts (voir wrangler.toml [triggers]) partagent ce handler ;
+    // Trois crons distincts (voir wrangler.toml [triggers]) partagent ce handler ;
     // event.cron correspond exactement à l'expression qui a déclenché l'appel.
     if (event.cron === '0 8 * * 1') {
       await refreshVeilleForSubscribedPlans(env)
+      return
+    }
+    if (event.cron === '0 9 * * 1') {
+      await sendWeeklyDigests(env)
       return
     }
     await sendInactivityReminders(env)

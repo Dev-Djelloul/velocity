@@ -19,7 +19,7 @@ export default function NotificationsSection({ lang, userId }) {
   useEffect(() => {
     if (!userId) return
     fetchNotificationPrefs(userId).then(r => {
-      const next = r || { agentDone: false, inactivityReminder: false, slackWebhookUrl: null, slackEnabled: false, veilleAutoRefresh: false, mentions: true }
+      const next = r || { agentDone: false, inactivityReminder: false, slackWebhookUrl: null, slackEnabled: false, veilleAutoRefresh: false, mentions: true, weeklyDigest: false }
       setPrefs(next)
       setWebhookInput(next.slackWebhookUrl || '')
     })
@@ -36,7 +36,8 @@ export default function NotificationsSection({ lang, userId }) {
       slackWebhookUrl: next.slackWebhookUrl,
       slackEnabled: next.slackEnabled,
       veilleAutoRefresh: next.veilleAutoRefresh,
-      mentions: next.mentions
+      mentions: next.mentions,
+      weeklyDigest: next.weeklyDigest
     })
   }
 
@@ -114,6 +115,21 @@ export default function NotificationsSection({ lang, userId }) {
           role="switch"
           aria-checked={prefs.mentions}
           onClick={() => toggle('mentions')}
+        >
+          <span className="settings-switch-thumb" />
+        </button>
+      </div>
+
+      <div className="settings-row">
+        <div>
+          <p className="settings-row-label">{t(lang, 'settings.notifWeeklyDigestLabel')}</p>
+          <p className="account-security-note">{t(lang, 'settings.notifWeeklyDigestBody')}</p>
+        </div>
+        <button
+          className={`settings-switch ${prefs.weeklyDigest ? 'is-on' : ''}`}
+          role="switch"
+          aria-checked={prefs.weeklyDigest}
+          onClick={() => toggle('weeklyDigest')}
         >
           <span className="settings-switch-thumb" />
         </button>

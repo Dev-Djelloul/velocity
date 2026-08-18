@@ -21,7 +21,7 @@ RESEND_FROM = "VelocityLaunch <notifications@networkee.digitalblueskye.com>"
 # autre projet — un domaine vérifié peut servir d'adresse d'envoi à plusieurs apps).
 
 [triggers]
-crons = ["0 9 * * *", "0 8 * * 1"] # rappel d'inactivité (quotidien 9h UTC), veille IA auto (lundi 8h UTC)
+crons = ["0 9 * * *", "0 8 * * 1", "0 9 * * 1"] # rappel d'inactivité (quotidien 9h UTC), veille IA auto (lundi 8h UTC), résumé hebdomadaire (lundi 9h UTC)
 
 [[kv_namespaces]]
 binding = "AI_USAGE"

@@ -83,6 +83,32 @@ export function mentionSlackMessage(lang, { productName, authorName, commentText
   return { text: title, blocks }
 }
 
+export function weeklyDigestSlackMessage(lang, { productName, doneStories, totalStories, storiesCompletedThisWeek, budgetPct, commentsThisWeek, appUrl }) {
+  const en = lang === 'en'
+  const title = en
+    ? `📊 Weekly digest — ${productName || 'your plan'}`
+    : `📊 Résumé de la semaine — ${productName || 'ton plan'}`
+  const bodyLines = [
+    storiesCompletedThisWeek > 0
+      ? (en ? `• ${storiesCompletedThisWeek} stor${storiesCompletedThisWeek === 1 ? 'y' : 'ies'} completed this week` : `• ${storiesCompletedThisWeek} story(ies) terminée(s) cette semaine`)
+      : null,
+    en ? `• ${doneStories}/${totalStories} stories done overall (${Math.round((doneStories / (totalStories || 1)) * 100)}%)` : `• ${doneStories}/${totalStories} stories terminées au total (${Math.round((doneStories / (totalStories || 1)) * 100)}%)`,
+    budgetPct !== null ? (en ? `• ~${budgetPct}% of estimated budget committed` : `• ~${budgetPct}% du budget estimé engagé`) : null,
+    commentsThisWeek > 0 ? (en ? `• ${commentsThisWeek} new comment${commentsThisWeek === 1 ? '' : 's'} this week` : `• ${commentsThisWeek} nouveau(x) commentaire(s) cette semaine`) : null
+  ].filter(Boolean)
+  const blocks = [
+    { type: 'header', text: { type: 'plain_text', text: title, emoji: true } },
+    { type: 'section', text: { type: 'mrkdwn', text: bodyLines.join('\n') } }
+  ]
+  if (appUrl) {
+    blocks.push({
+      type: 'actions',
+      elements: [{ type: 'button', text: { type: 'plain_text', text: en ? 'Open the plan' : 'Ouvrir le plan' }, url: appUrl }]
+    })
+  }
+  return { text: title, blocks }
+}
+
 export function inactivityReminderSlackMessage(lang, { productName, updatedAt, appUrl }) {
   const en = lang === 'en'
   const text = en
