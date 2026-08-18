@@ -11,6 +11,7 @@ import * as db from '../lib/db'
 import { handleApi, CORS_HEADERS } from './api'
 import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, inactivityReminderSlackMessage, veilleUpdateSlackMessage } from '../lib/slack/slackClient'
+import { triggerWebhooks } from '../lib/webhooks/webhookClient'
 
 function generateWithRules(data, lang) {
   const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
@@ -56,10 +57,21 @@ async function processAgentTask(message, env) {
 // elle-même (déjà marquée "done" en base à ce stade).
 async function notifyAgentDone(env, task, output) {
   // getAgentTask() renvoie des clés camelCase (userId/planId), pas les colonnes SQL brutes.
-  const prefs = await db.getNotificationPrefs(env, task.userId).catch(() => null)
-  if (!prefs) { console.log(`[notify] skipped (agent:${task.type}): no prefs for userId=${task.userId}`); return }
   const plan = await db.getPlan(env, task.planId)
   const lang = plan?.language || 'fr'
+
+  // Les webhooks sont un canal indépendant des préférences email/Slack (pas de ligne
+  // notification_prefs nécessaire pour en profiter) — déclenchés avant le early-return
+  // ci-dessous, sinon un utilisateur sans préférence email/Slack configurée ne recevrait
+  // jamais ses webhooks non plus.
+  await triggerWebhooks(env, task.userId, 'generation.completed', {
+    taskType: task.type,
+    planId: task.planId,
+    productName: plan?.product?.name || null
+  })
+
+  const prefs = await db.getNotificationPrefs(env, task.userId).catch(() => null)
+  if (!prefs) { console.log(`[notify] skipped (agent:${task.type}): no prefs for userId=${task.userId}`); return }
 
   if (prefs.agent_done && prefs.email) {
     try {

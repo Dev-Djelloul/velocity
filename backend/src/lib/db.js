@@ -390,6 +390,37 @@ export async function deleteGoogleCalendarToken(env, userId) {
   await env.DB.prepare('DELETE FROM google_calendar_tokens WHERE user_id = ?').bind(userId).run()
 }
 
+// --- Webhooks sortants ---
+
+export async function listWebhooks(env, userId) {
+  const { results } = await env.DB.prepare('SELECT * FROM webhooks WHERE user_id = ? ORDER BY created_at DESC').bind(userId).all()
+  return results.map(r => ({ ...r, events: JSON.parse(r.events || '[]'), enabled: !!r.enabled }))
+}
+
+export async function createWebhook(env, userId, { url, events, secret }) {
+  const id = genId()
+  await env.DB.prepare(
+    `INSERT INTO webhooks (id, user_id, url, events, secret, enabled, created_at)
+     VALUES (?, ?, ?, ?, ?, 1, datetime('now'))`
+  ).bind(id, userId, url, JSON.stringify(events || []), secret).run()
+  return { id, userId, url, events: events || [], enabled: true }
+}
+
+export async function updateWebhookEnabled(env, userId, id, enabled) {
+  await env.DB.prepare('UPDATE webhooks SET enabled = ? WHERE id = ? AND user_id = ?').bind(enabled ? 1 : 0, id, userId).run()
+}
+
+export async function deleteWebhook(env, userId, id) {
+  await env.DB.prepare('DELETE FROM webhooks WHERE id = ? AND user_id = ?').bind(id, userId).run()
+}
+
+// Webhooks actifs d'un utilisateur souscrits à un événement donné — filtré en JS après
+// lecture (peu de lignes par utilisateur, pas besoin d'indexer le JSON events en SQL).
+export async function getWebhooksForEvent(env, userId, eventType) {
+  const all = await listWebhooks(env, userId)
+  return all.filter(w => w.enabled && w.events.includes(eventType))
+}
+
 // --- Préférences de notification par email ---
 
 export async function getNotificationPrefs(env, userId) {

@@ -2,6 +2,7 @@ import { t } from '../lib/i18n'
 import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings } from './Icons'
 import IntegrationsPanel from './IntegrationsPanel'
 import NotificationsSection from './NotificationsSection'
+import WebhooksSection from './WebhooksSection'
 import PrivacySection from './PrivacySection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
@@ -148,6 +149,7 @@ export default function SettingsPage({
 
       <NotificationsSection lang={lang} userId={userId} />
       <IntegrationsPanel lang={lang} userId={userId} />
+      <WebhooksSection lang={lang} userId={userId} />
       <PrivacySection lang={lang} userId={userId} />
     </div>
   )

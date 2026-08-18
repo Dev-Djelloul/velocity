@@ -22,15 +22,25 @@ import * as googleCalendar from '../lib/google/googleCalendarClient'
 import * as github from '../lib/github/githubClient'
 import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
+import { triggerWebhooks, generateSecret } from '../lib/webhooks/webhookClient'
 
 // Email + Slack best-effort à la fin d'une génération IA (veille, benchmarks, calendriers,
 // RGPD, tableau IA, ou agent async) — deux canaux indépendants (un utilisateur peut n'activer
 // que l'un des deux) ; n'échoue jamais la réponse HTTP, même si un envoi rate.
 async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
   if (!userId) { console.log(`[notify] skipped (${taskType}): no userId`); return }
+  const resolvedLang = lang || plan?.language || 'fr'
+
+  // Canal indépendant des préférences email/Slack ci-dessous (pas de ligne notification_prefs
+  // nécessaire) — déclenché avant le early-return sur prefs manquantes.
+  await triggerWebhooks(env, userId, 'generation.completed', {
+    taskType,
+    planId: plan?.id || null,
+    productName: plan?.product?.name || null
+  })
+
   const prefs = await db.getNotificationPrefs(env, userId).catch(() => null)
   if (!prefs) { console.log(`[notify] skipped (${taskType}): no prefs`); return }
-  const resolvedLang = lang || plan?.language || 'fr'
 
   if (prefs.agent_done && prefs.email) {
     try {
@@ -54,6 +64,14 @@ async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
       await sendSlackMessage(prefs.slack_webhook_url, msg)
     } catch (e) { console.log(`[notify] slack error (${taskType}): ${e.message}`) }
   }
+}
+
+function flattenStories(roadmap) {
+  return (roadmap?.sprints || []).flatMap(sp => sp.stories || [])
+}
+
+function flattenDoneStoryIds(roadmap) {
+  return flattenStories(roadmap).filter(s => s.status === 'done').map(s => s.id)
 }
 
 const AGENT_TASK_TYPES = Object.keys(AGENT_RUNNERS)
@@ -91,6 +109,26 @@ export async function handleApi(request, env, url) {
   if (pathname === '/plans' && method === 'POST') {
     const { userId, plan, teamId } = await request.json()
     if (!userId || !plan) return json({ error: 'userId and plan required' }, 400)
+    // Diff roadmap avant/après pour l'événement webhook story.completed — coût d'une lecture
+    // supplémentaire seulement si l'utilisateur a effectivement un webhook sur cet événement,
+    // pour ne pas ralentir l'enregistrement (le chemin chaud) dans le cas commun sans webhook.
+    if (plan.id) {
+      const storyHooks = await db.getWebhooksForEvent(env, userId, 'story.completed').catch(() => [])
+      if (storyHooks.length) {
+        const previous = await db.getPlan(env, plan.id).catch(() => null)
+        const doneBefore = new Set(flattenDoneStoryIds(previous?.roadmap))
+        for (const story of flattenStories(plan.roadmap)) {
+          if (story.status === 'done' && !doneBefore.has(story.id)) {
+            await triggerWebhooks(env, userId, 'story.completed', {
+              planId: plan.id,
+              productName: plan.product?.name || null,
+              storyId: story.id,
+              storyTitle: story.title
+            })
+          }
+        }
+      }
+    }
     return json(await db.upsertPlan(env, userId, plan, teamId || null))
   }
 
@@ -693,6 +731,48 @@ export async function handleApi(request, env, url) {
     const { userId, email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions } = await request.json()
     if (!userId) return json({ error: 'userId required' }, 400)
     await db.setNotificationPrefs(env, userId, { email, agentDone, inactivityReminder, slackWebhookUrl, slackEnabled, veilleAutoRefresh, mentions })
+    return json({ ok: true })
+  }
+
+  // --- Webhooks sortants (Zapier, Make, backend perso...) ---
+
+  const VALID_WEBHOOK_EVENTS = ['generation.completed', 'story.completed']
+
+  if (pathname === '/webhooks' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const hooks = await db.listWebhooks(env, userId)
+    // Le secret n'est renvoyé qu'à la création (voir POST ci-dessous) — jamais relu ensuite,
+    // même par son propriétaire, pour limiter la fenêtre d'exposition si le compte est compromis.
+    return json(hooks.map(({ secret, ...rest }) => rest))
+  }
+
+  if (pathname === '/webhooks' && method === 'POST') {
+    const { userId, url, events } = await request.json()
+    if (!userId || !url) return json({ error: 'userId and url required' }, 400)
+    let parsedUrl
+    try { parsedUrl = new URL(url) } catch { return json({ error: 'invalid_url' }, 400) }
+    if (parsedUrl.protocol !== 'https:') return json({ error: 'https_required' }, 400)
+    const validEvents = (Array.isArray(events) ? events : []).filter(e => VALID_WEBHOOK_EVENTS.includes(e))
+    if (!validEvents.length) return json({ error: 'at_least_one_event_required' }, 400)
+    const secret = generateSecret()
+    const hook = await db.createWebhook(env, userId, { url, events: validEvents, secret })
+    return json({ ...hook, secret }) // seule occasion où le secret est renvoyé en clair
+  }
+
+  const webhookToggleMatch = pathname.match(/^\/webhooks\/([^/]+)\/toggle$/)
+  if (webhookToggleMatch && method === 'POST') {
+    const { userId, enabled } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.updateWebhookEnabled(env, userId, webhookToggleMatch[1], !!enabled)
+    return json({ ok: true })
+  }
+
+  const webhookMatch = pathname.match(/^\/webhooks\/([^/]+)$/)
+  if (webhookMatch && method === 'DELETE') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteWebhook(env, userId, webhookMatch[1])
     return json({ ok: true })
   }
 

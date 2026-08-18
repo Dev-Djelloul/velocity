@@ -121,6 +121,30 @@ export function notifyMentions(plan, comment, mentionedUserIds, lang, authorId) 
   })
 }
 
+export function listWebhooks(userId) {
+  return safeFetch(`/webhooks?userId=${encodeURIComponent(userId)}`)
+}
+
+export function createWebhook(userId, url, events) {
+  return safeFetch('/webhooks', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, url, events })
+  })
+}
+
+export function toggleWebhook(userId, id, enabled) {
+  return safeFetch(`/webhooks/${encodeURIComponent(id)}/toggle`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, enabled })
+  })
+}
+
+export function deleteWebhookRequest(userId, id) {
+  return safeFetch(`/webhooks/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+}
+
 export function copilotChat(plan, message, history, lang, userId) {
   return safeFetch('/copilot/chat', {
     method: 'POST',

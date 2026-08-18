@@ -1070,7 +1070,17 @@ export const translations = {
       notifVeilleAutoLabel: 'Veille IA automatique',
       notifVeilleAutoBody: "Régénère chaque lundi la veille des plans qui en ont déjà une, et te prévient uniquement si du contenu nouveau apparaît.",
       notifMentionsLabel: '@mentions dans les commentaires',
-      notifMentionsBody: "Te prévient quand un membre d'équipe te mentionne (@toi) dans un commentaire sur un plan partagé."
+      notifMentionsBody: "Te prévient quand un membre d'équipe te mentionne (@toi) dans un commentaire sur un plan partagé.",
+      webhooksTitle: 'Webhooks sortants',
+      webhooksBody: "Branche n'importe quel outil externe (Zapier, Make, ton propre backend...) sur les événements de tes plans. Chaque livraison est signée en HMAC-SHA256 (header X-VelocityLaunch-Signature) pour que tu puisses vérifier son authenticité.",
+      webhookEventGeneration: 'Génération IA terminée',
+      webhookEventStory: 'Story marquée terminée',
+      webhookAdd: 'Ajouter le webhook',
+      webhookDelete: 'Supprimer',
+      webhookError: "Impossible de créer le webhook. Vérifie l'URL (doit être en https) et qu'au moins un événement est coché.",
+      webhookSecretTitle: 'Secret de signature — à copier maintenant',
+      webhookSecretBody: 'Ce secret ne sera plus jamais affiché. Utilise-le pour vérifier la signature HMAC-SHA256 de chaque livraison.',
+      webhookSecretDismiss: "J'ai copié le secret"
     }
   },
   en: {
@@ -2139,7 +2149,17 @@ export const translations = {
       notifVeilleAutoLabel: 'Automatic AI market watch',
       notifVeilleAutoBody: 'Refreshes every Monday for plans that already have a market watch, and only notifies you when something new shows up.',
       notifMentionsLabel: '@mentions in comments',
-      notifMentionsBody: 'Notifies you when a teammate mentions you (@you) in a comment on a shared plan.'
+      notifMentionsBody: 'Notifies you when a teammate mentions you (@you) in a comment on a shared plan.',
+      webhooksTitle: 'Outgoing webhooks',
+      webhooksBody: 'Connect any external tool (Zapier, Make, your own backend...) to your plan events. Every delivery is signed with HMAC-SHA256 (X-VelocityLaunch-Signature header) so you can verify its authenticity.',
+      webhookEventGeneration: 'AI generation completed',
+      webhookEventStory: 'Story marked done',
+      webhookAdd: 'Add webhook',
+      webhookDelete: 'Delete',
+      webhookError: 'Could not create the webhook. Check the URL (must be https) and that at least one event is checked.',
+      webhookSecretTitle: 'Signing secret — copy it now',
+      webhookSecretBody: "This secret will never be shown again. Use it to verify each delivery's HMAC-SHA256 signature.",
+      webhookSecretDismiss: "I've copied the secret"
     }
   }
 }
