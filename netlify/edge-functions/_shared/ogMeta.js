@@ -3,7 +3,8 @@
 // JavaScript de la SPA, donc les valeurs par défaut du <head> (celles de la page d'accueil)
 // sont tout ce qu'ils voient sans cette étape. Un utilisateur humain reçoit exactement le
 // même HTML : React démarre normalement et charge le plan côté client comme d'habitude
-// (voir parsePrettyShareUrl dans App.jsx).
+// (voir parsePrettyShareUrl dans frontend/src/App.jsx). context.next() renvoie le HTML déjà
+// servi par la règle SPA fallback de _redirects (/* -> /index.html 200).
 const BACKEND_URL = 'https://velocity-launch.djelloulabid75.workers.dev'
 
 function escapeHtml(s) {
@@ -18,7 +19,7 @@ function replaceMeta(html, selectorRegex, attr, value) {
   return html.replace(selectorRegex, (full) => full.replace(new RegExp(`(${attr}=")[^"]*(")`), `$1${value}$2`))
 }
 
-export function injectPlanMeta(html, { title, description, image, url }) {
+function injectPlanMeta(html, { title, description, image, url }) {
   const safeTitle = escapeHtml(title)
   const safeDesc = escapeHtml(description)
   let out = html
@@ -34,7 +35,7 @@ export function injectPlanMeta(html, { title, description, image, url }) {
 }
 
 // fetchPath : "/shares/:id" ou "/gallery/:id" — les deux renvoient { plan } (voir api.js).
-export async function fetchPlanMeta(fetchPath) {
+async function fetchPlanMeta(fetchPath) {
   try {
     const res = await fetch(`${BACKEND_URL}${fetchPath}`)
     if (!res.ok) return null
@@ -45,15 +46,11 @@ export async function fetchPlanMeta(fetchPath) {
   }
 }
 
-export async function servePlanMeta(context, { fetchPath, ogId }) {
-  const { request, env } = context
-  const plan = await fetchPlanMeta(fetchPath)
+export async function servePlanMeta(request, context, { fetchPath, ogId }) {
+  const [originRes, plan] = await Promise.all([context.next(), fetchPlanMeta(fetchPath)])
+  if (!plan) return originRes
 
-  const assetRes = await env.ASSETS.fetch(request)
-  const html = await assetRes.text()
-
-  if (!plan) return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8' } })
-
+  const html = await originRes.text()
   const title = plan.product?.name ? `${plan.product.name} — VelocityLaunch` : 'VelocityLaunch'
   const description = plan.product?.pitch || plan.executiveSummary || 'Plan de lancement produit généré par IA avec VelocityLaunch.'
   const image = `${BACKEND_URL}/og/${ogId}.png`

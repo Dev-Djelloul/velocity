@@ -2,3 +2,15 @@
 base = "frontend"
 command = "npm run build"
 publish = "dist"
+
+# Injecte les meta og:image/og:title spécifiques à un plan pour les liens de partage
+# (/s/:id) et les plans publics de la galerie (/p/:id) — voir netlify/edge-functions/.
+# edge_functions se déclare toujours à la racine du repo (pas sous [build], même avec
+# base = "frontend") : le chemin function pointe vers netlify/edge-functions/<nom>.js.
+[[edge_functions]]
+path = "/s/*"
+function = "og-share"
+
+[[edge_functions]]
+path = "/p/*"
+function = "og-gallery"
