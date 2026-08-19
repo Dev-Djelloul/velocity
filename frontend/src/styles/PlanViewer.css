@@ -112,10 +112,23 @@
   display: block;
 }
 
-.plan-cover-banner-btn {
+.plan-cover-banner-actions {
   position: absolute;
   right: 0.85rem;
   bottom: 0.85rem;
+  display: flex;
+  gap: 0.5rem;
+  /* Visible en permanence tant qu'il n'y a pas de couverture (rien d'autre à survoler pour
+     la découvrir) ; masqué et révélé au survol une fois une couverture posée, comme Notion. */
+  opacity: 1;
+  transition: opacity 0.15s ease;
+}
+
+.plan-cover-banner.has-image .plan-cover-banner-actions { opacity: 0; }
+.plan-cover-banner.has-image:hover .plan-cover-banner-actions,
+.plan-cover-banner.has-image:focus-within .plan-cover-banner-actions { opacity: 1; }
+
+.plan-cover-banner-btn {
   display: flex;
   align-items: center;
   gap: 0.4rem;
@@ -133,6 +146,7 @@
 .plan-cover-banner-btn:hover { background: rgba(15, 15, 20, 0.75); }
 
 @media (max-width: 640px) {
+  .plan-cover-banner.has-image .plan-cover-banner-actions { opacity: 1; }
   .plan-cover-banner { height: 140px; }
 }
 

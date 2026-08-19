@@ -23,11 +23,10 @@ import WhatIfScenarios from './WhatIfScenarios'
 import ExportModal from './ExportModal'
 import InfoModal from './InfoModal'
 import CopilotChat from './CopilotChat'
-import AvatarPicker from './AvatarPicker'
+import CoverPicker from './CoverPicker'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { savePlan } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
-import { resizeImageToDataUrl } from '../lib/imageResize'
 import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
@@ -259,12 +258,20 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   }
 
   // Image de couverture : même circuit immédiat que la visibilité publique ci-dessus (pas
-  // soumise au bouton "Enregistrer"). Redimensionnée avant stockage (voir imageResize.js)
-  // pour ne pas alourdir le JSON du plan ni, surtout, la liste /gallery qui agrège
-  // l'aperçu de dizaines de plans à la fois.
-  const updateCoverImage = async (blob) => {
-    const dataUrl = await resizeImageToDataUrl(blob)
-    const nextPlan = { ...plan, coverImage: dataUrl }
+  // soumise au bouton "Enregistrer"). CoverPicker résout déjà la valeur finale (data URL
+  // redimensionnée pour un upload, data URL générée pour un dégradé/couleur de la galerie,
+  // ou URL externe telle quelle pour l'onglet Lien) — value est directement stockable, ou
+  // null pour supprimer la couverture.
+  const updateCoverImage = (value) => {
+    const nextPlan = { ...plan, coverImage: value }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
+  const cyclePosition = { top: 'center', center: 'bottom', bottom: 'top' }
+  const cycleCoverPosition = () => {
+    const next = cyclePosition[plan.coverPosition || 'center']
+    const nextPlan = { ...plan, coverPosition: next }
     setPlan(nextPlan)
     if (plan.id) savePlan(nextPlan)
   }
@@ -453,14 +460,25 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
       {plan.id && (
         <div className={`plan-cover-banner ${plan.coverImage ? 'has-image' : ''}`}>
-          {plan.coverImage && <img src={plan.coverImage} alt="" className="plan-cover-banner-img" />}
-          <button
-            className="plan-cover-banner-btn"
-            onClick={() => setShowCoverPicker(true)}
-          >
-            <IconImage width={14} height={14} />
-            {plan.coverImage ? t(lang, 'app.coverImageChange') : t(lang, 'app.coverImageAdd')}
-          </button>
+          {plan.coverImage && (
+            <img
+              src={plan.coverImage}
+              alt=""
+              className="plan-cover-banner-img"
+              style={{ objectPosition: `center ${plan.coverPosition || 'center'}` }}
+            />
+          )}
+          <div className="plan-cover-banner-actions">
+            <button className="plan-cover-banner-btn" onClick={() => setShowCoverPicker(true)}>
+              <IconImage width={14} height={14} />
+              {plan.coverImage ? t(lang, 'app.coverImageChange') : t(lang, 'app.coverImageAdd')}
+            </button>
+            {plan.coverImage && (
+              <button className="plan-cover-banner-btn" onClick={cycleCoverPosition}>
+                {t(lang, 'app.coverReposition')}
+              </button>
+            )}
+          </div>
         </div>
       )}
 
@@ -592,10 +610,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       </div>
 
       {showCoverPicker && (
-        <AvatarPicker
+        <CoverPicker
           lang={lang}
-          title={t(lang, 'app.coverImageTitle')}
-          onSave={updateCoverImage}
+          hasCover={!!plan.coverImage}
+          onChange={updateCoverImage}
           onClose={() => setShowCoverPicker(false)}
         />
       )}
