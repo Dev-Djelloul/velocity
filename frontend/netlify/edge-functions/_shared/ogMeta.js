@@ -53,7 +53,9 @@ export async function servePlanMeta(request, context, { fetchPath, ogId }) {
   const html = await originRes.text()
   const title = plan.product?.name ? `${plan.product.name} — VelocityLaunch` : 'VelocityLaunch'
   const description = plan.product?.pitch || plan.executiveSummary || 'Plan de lancement produit généré par IA avec VelocityLaunch.'
-  const image = `${BACKEND_URL}/og/${ogId}.png`
+  // Domaine principal (proxié vers le Worker via le redirect /og/* de netlify.toml), pas
+  // l'URL *.workers.dev brute — voir le commentaire dans netlify.toml pour le pourquoi.
+  const image = `${new URL(request.url).origin}/og/${ogId}.png`
 
   const out = injectPlanMeta(html, { title, description, image, url: request.url })
   return new Response(out, { headers: { 'content-type': 'text/html; charset=utf-8' } })

@@ -18,3 +18,14 @@ function = "og-share"
 [[edge_functions]]
 path = "/p/*"
 function = "og-gallery"
+
+# Fait passer l'image OG par le domaine principal plutôt que d'exposer l'URL brute
+# *.workers.dev aux robots des réseaux sociaux : ce domaine générique très utilisé pour le
+# spam/phishing est traité avec méfiance par certains crawlers (LinkedIn en particulier),
+# qui ignorent silencieusement l'image au lieu de la refuser explicitement (constaté via
+# Post Inspector : "No image found" malgré une image tout à fait valide en accès direct).
+[[redirects]]
+from = "/og/*"
+to = "https://velocity-launch.djelloulabid75.workers.dev/og/:splat"
+status = 200
+force = true
