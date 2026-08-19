@@ -218,18 +218,23 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
           <div className="account-list">
             {plans.map(p => (
               <div key={p.id} className="account-list-item">
-                <button className="account-list-item-main" onClick={() => onLoadPlan(p)}>
-                  <span className="account-list-item-name">
-                    {p.product?.name}
-                    {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
-                  </span>
-                  <span className="account-list-item-meta">{p.classification}</span>
-                  <span className="plan-origin-tag">
-                    <span className={`plan-origin-dot ${p.team_id ? 'is-team' : 'is-personal'}`} />
-                    {spaceNameFor(p.team_id)}
-                    {p.createdByName && ` · ${lang === 'fr' ? 'créé par' : 'created by'} ${p.createdByName}`}
-                    {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
-                  </span>
+                <button className="account-list-item-main has-thumb" onClick={() => onLoadPlan(p)}>
+                  {p.coverImage
+                    ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
+                    : <div className="account-list-item-thumb account-list-item-thumb-placeholder" aria-hidden="true" />}
+                  <div className="account-list-item-text">
+                    <span className="account-list-item-name">
+                      {p.product?.name}
+                      {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                    </span>
+                    <span className="account-list-item-meta">{p.classification}</span>
+                    <span className="plan-origin-tag">
+                      <span className={`plan-origin-dot ${p.team_id ? 'is-team' : 'is-personal'}`} />
+                      {spaceNameFor(p.team_id)}
+                      {p.createdByName && ` · ${lang === 'fr' ? 'créé par' : 'created by'} ${p.createdByName}`}
+                      {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
+                    </span>
+                  </div>
                 </button>
                 <button
                   className={`account-list-item-favorite ${p.isFavorite ? 'is-favorite' : ''}`}

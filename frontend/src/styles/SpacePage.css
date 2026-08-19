@@ -159,7 +159,10 @@
 .space-page-section-head h3 {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  /* 0.85rem : même écart icône-texte que .space-page-gallery-link ("Mes plans"/"Ma
+     galerie"), pour que le mot qui suit l'icône démarre exactement à la même position
+     horizontale d'une carte à l'autre. */
+  gap: 0.85rem;
   /* Un <h3> dans un <button> (voir .space-page-gallery-link, "Mes plans"/"Ma galerie") ne
      hérite pas du font-size ambiant — les boutons ont leur propre taille par défaut côté
      navigateur — d'où un texte visiblement plus grand ici (h3 dans une simple <div>) sans
