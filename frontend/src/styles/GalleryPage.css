@@ -116,65 +116,21 @@
   font-size: 1.02rem;
 }
 
-.gallery-card-name-row {
-  display: flex;
-  align-items: center;
-  gap: 0.3rem;
-}
-
-.gallery-card-name-text {
-  flex: 1;
-  min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* Crayon caché par défaut pour économiser la place — visible seulement au survol de la
-   carte (desktop) ou toujours affiché en tactile, faute de hover fiable (voir media query
-   plus bas). */
-.gallery-card-rename-btn {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  color: var(--color-text-secondary);
-  opacity: 0;
-  cursor: pointer;
-  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
-}
-
-.gallery-card:hover .gallery-card-rename-btn {
-  opacity: 0.7;
-}
-
-.gallery-card-rename-btn:hover {
-  opacity: 1 !important;
-  background: rgba(145, 132, 217, 0.15);
-  color: var(--color-accent);
-}
-
-@media (hover: none) {
-  .gallery-card-rename-btn { opacity: 0.6; }
-}
-
-.gallery-card-name-input {
+.gallery-rename-input {
   width: 100%;
   background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.06));
-  border: 1px solid var(--color-accent);
-  border-radius: 6px;
-  padding: 0.15rem 0.4rem;
-  font-size: 1.02rem;
-  font-weight: 600;
+  border: 1px solid rgba(145, 132, 217, 0.3);
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
   font-family: inherit;
   color: var(--color-text-primary);
+  margin: 0.75rem 0 1rem;
 }
 
-.gallery-card-name-input:focus {
+.gallery-rename-input:focus {
   outline: none;
+  border-color: var(--color-accent);
 }
 
 .gallery-card-tag {

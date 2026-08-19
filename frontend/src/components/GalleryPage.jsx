@@ -14,7 +14,7 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const [contextMenu, setContextMenu] = useState(null) // { plan, x, y }
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [toast, setToast] = useState(null)
-  const [editingId, setEditingId] = useState(null)
+  const [renameTarget, setRenameTarget] = useState(null)
   const [editValue, setEditValue] = useState('')
   const menuRef = useRef(null)
 
@@ -121,19 +121,24 @@ export default function GalleryPage({ lang, onOpenPlan }) {
     setDeleteTarget(null)
   }
 
-  const startRename = (e, plan) => {
-    e.stopPropagation()
-    setEditingId(plan.id)
+  // Renommer passe par une modale dédiée (déclenchée depuis le menu contextuel) plutôt
+  // qu'une édition inline directement dans la carte : la carte entière est un <button>
+  // (pour le clic = ouvrir le plan), et un <input> imbriqué dans un <button> se comporte de
+  // façon peu fiable selon les navigateurs — le clic pour lancer l'édition finissait par
+  // aussi déclencher l'ouverture du plan. Un menu contextuel externe n'a pas ce problème.
+  const openRenameModal = (plan) => {
+    closeMenu()
+    setRenameTarget(plan)
     setEditValue(plan.product?.name || '')
   }
 
-  const commitRename = (plan) => {
+  const commitRename = () => {
     const trimmed = editValue.trim()
-    if (trimmed && trimmed !== plan.product?.name) {
-      savePlan({ ...plan, product: { ...plan.product, name: trimmed } })
+    if (trimmed && trimmed !== renameTarget.product?.name) {
+      savePlan({ ...renameTarget, product: { ...renameTarget.product, name: trimmed } })
       setPlans(getAllPlans())
     }
-    setEditingId(null)
+    setRenameTarget(null)
   }
 
   return (
@@ -173,36 +178,10 @@ export default function GalleryPage({ lang, onOpenPlan }) {
                 ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
                 : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
               <div className="gallery-card-body">
-                {editingId === p.id ? (
-                  <input
-                    type="text"
-                    className="gallery-card-name-input"
-                    value={editValue}
-                    autoFocus
-                    onClick={(e) => e.stopPropagation()}
-                    onChange={(e) => setEditValue(e.target.value)}
-                    onBlur={() => commitRename(p)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') { e.preventDefault(); commitRename(p) }
-                      if (e.key === 'Escape') { e.preventDefault(); setEditingId(null) }
-                    }}
-                  />
-                ) : (
-                  <h3 className="gallery-card-name-row">
-                    <span className="gallery-card-name-text">{p.product?.name || t(lang, 'plans.untitled')}</span>
-                    <span
-                      className="gallery-card-rename-btn"
-                      role="button"
-                      tabIndex={0}
-                      title={lang === 'fr' ? 'Renommer' : 'Rename'}
-                      onClick={(e) => startRename(e, p)}
-                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startRename(e, p) }}
-                    >
-                      <IconPencil width={12} height={12} />
-                    </span>
-                    {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
-                  </h3>
-                )}
+                <h3>
+                  {p.product?.name || t(lang, 'plans.untitled')}
+                  {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                </h3>
                 {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
                 <p className="gallery-card-pitch">{p.product?.pitch || p.executiveSummary || ''}</p>
               </div>
@@ -225,6 +204,9 @@ export default function GalleryPage({ lang, onOpenPlan }) {
             <span className="gallery-context-star">{contextMenu.plan.isFavorite ? '⭐' : '☆'}</span>
             {contextMenu.plan.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
           </button>
+          <button className="gallery-context-item" onClick={() => openRenameModal(contextMenu.plan)}>
+            <IconPencil width={14} height={14} /> {lang === 'fr' ? 'Renommer' : 'Rename'}
+          </button>
           <button className="gallery-context-item" onClick={() => handleShare(contextMenu.plan)}>
             <IconLink width={14} height={14} /> {t(lang, 'plans.share')}
           </button>
@@ -245,6 +227,30 @@ export default function GalleryPage({ lang, onOpenPlan }) {
       )}
 
       {toast && <div className="gallery-toast">{toast}</div>}
+
+      {renameTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setRenameTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconPencil width={22} height={22} /></div>
+            <h3>{lang === 'fr' ? 'Renommer le plan' : 'Rename plan'}</h3>
+            <input
+              type="text"
+              className="gallery-rename-input"
+              value={editValue}
+              autoFocus
+              onChange={(e) => setEditValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') { e.preventDefault(); commitRename() }
+                if (e.key === 'Escape') { e.preventDefault(); setRenameTarget(null) }
+              }}
+            />
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setRenameTarget(null)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-primary" onClick={commitRename} disabled={!editValue.trim()}>{t(lang, 'app.save')}</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {deleteTarget && (
         <div className="confirm-modal-backdrop" onClick={() => setDeleteTarget(null)}>
