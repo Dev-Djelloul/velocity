@@ -3,15 +3,14 @@ import { t } from '../lib/i18n'
 import { getAllPlans } from '../lib/planStorage'
 import { getAllDrafts } from '../lib/draftStorage'
 import { downloadBlob } from '../lib/pdfExport'
-import { useUser, useOpenSecurity, isMockAuth, useAuth } from '../lib/auth'
+import { useUser, isMockAuth, useAuth } from '../lib/auth'
 
-// Export RGPD (toutes les données locales à ce compte : plans, brouillons, préférences)
-// et suppression de compte. En mode réel, la suppression passe par le panneau natif
-// Clerk (seul endroit habilité à supprimer un compte + ses données d'auth) ; en mode
-// démo (pas de backend Clerk), on efface simplement la session simulée en local.
+// Export RGPD (toutes les données locales à ce compte : plans, brouillons, préférences).
+// La suppression de compte n'est proposée ici qu'en mode démo (pas de backend Clerk) —
+// en mode réel, elle vit uniquement dans la carte "Sécurité & connexion" juste au-dessus
+// (même panneau Clerk), pour éviter deux boutons qui mènent au même endroit.
 export default function PrivacySection({ lang, userId }) {
   const { user } = useUser()
-  const openSecurity = useOpenSecurity()
   const { signOut } = useAuth()
   const [confirmDelete, setConfirmDelete] = useState(false)
 
@@ -58,24 +57,26 @@ export default function PrivacySection({ lang, userId }) {
         <button className="btn-secondary" onClick={exportAllData}>{t(lang, 'settings.exportDataCta')}</button>
       </div>
 
-      <div className="settings-row">
-        <div>
-          <p className="settings-row-label">{t(lang, 'settings.deleteAccountLabel')}</p>
-          <p className="account-security-note">{t(lang, 'settings.deleteAccountBody')}</p>
-        </div>
-        {isMockAuth ? (
-          confirmDelete ? (
+      {/* En mode Clerk réel, la suppression de compte vit uniquement dans le panneau
+          "Gérer la sécurité" au-dessus (openSecurity ouvre le même panneau Clerk) — la
+          dupliquer ici renverrait vers exactement le même endroit sous un bouton différent.
+          En mode démo (pas de Clerk), c'est la seule suppression réelle disponible. */}
+      {isMockAuth && (
+        <div className="settings-row">
+          <div>
+            <p className="settings-row-label">{t(lang, 'settings.deleteAccountLabel')}</p>
+            <p className="account-security-note">{t(lang, 'settings.deleteAccountBody')}</p>
+          </div>
+          {confirmDelete ? (
             <div className="settings-toggle-group">
               <button className="btn-danger" onClick={deleteAccountMock}>{t(lang, 'settings.deleteAccountConfirm')}</button>
               <button className="btn-secondary" onClick={() => setConfirmDelete(false)}>{t(lang, 'settings.deleteAccountCancel')}</button>
             </div>
           ) : (
             <button className="btn-danger" onClick={() => setConfirmDelete(true)}>{t(lang, 'settings.deleteAccountCta')}</button>
-          )
-        ) : (
-          <button className="btn-danger" onClick={openSecurity}>{t(lang, 'settings.deleteAccountCta')}</button>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </div>
   )
 }
