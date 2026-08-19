@@ -44,8 +44,14 @@
   width: 88px;
   height: 88px;
   border-radius: 50%;
-  background: var(--color-bg-tertiary);
-  border: 1px solid rgba(145, 132, 217, 0.3);
+  /* Anneau en dégradé (même technique que .demo-card/.copilot-panel : fond opaque en
+     padding-box par-dessus le dégradé en border-box) plutôt qu'un simple liseré violet —
+     encercle la photo de profil comme demandé, cohérent avec le reste de l'identité
+     visuelle (wordmark, bordure de Nova). */
+  border: 2.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-tertiary), var(--color-bg-tertiary)) padding-box,
+    var(--wordmark-gradient) border-box;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -85,9 +91,9 @@
 .account-avatar-btn {
   cursor: pointer;
   padding: 0;
-  transition: border-color 0.15s ease, transform 0.15s ease;
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
-.account-avatar-btn:hover { border-color: var(--color-accent); transform: scale(1.04); }
+.account-avatar-btn:hover { transform: scale(1.04); filter: brightness(1.1); }
 
 .account-avatar-wrap {
   position: relative;

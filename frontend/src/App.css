@@ -145,6 +145,12 @@
   height: 24px;
   border-radius: 50%;
   object-fit: cover;
+  /* Anneau en dégradé : sur un <img> simple (pas de conteneur séparé ici), le padding crée
+     l'espace où le fond en dégradé apparaît autour de la photo — même identité visuelle
+     (--wordmark-gradient) que l'avatar de "Mon compte" et la bordure du panneau de Nova. */
+  padding: 1.5px;
+  box-sizing: border-box;
+  background: var(--wordmark-gradient);
 }
 
 .header-space-btn {
@@ -401,6 +407,15 @@
   font-size: 0.68rem;
   font-weight: 700;
   object-fit: cover;
+}
+
+/* Anneau en dégradé réservé aux vraies photos (balise <img>, personal/team) — pas aux
+   pastilles de repli à initiale/icône (.header-space-avatar-personal ou couleur d'équipe),
+   déjà pleines d'une couleur unie où un anneau n'apporterait rien. */
+img.header-space-avatar {
+  padding: 1.5px;
+  box-sizing: border-box;
+  background: var(--wordmark-gradient);
 }
 
 .header-space-avatar-personal {

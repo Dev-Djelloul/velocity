@@ -37,6 +37,14 @@
   object-fit: cover;
 }
 
+/* Anneau en dégradé réservé aux vraies photos (<img>) — les pastilles de repli (couleur
+   d'équipe ou icône personnelle, déjà en fond dégradé/uni) n'en ont pas besoin. */
+img.space-page-avatar {
+  padding: 2px;
+  box-sizing: border-box;
+  background: var(--wordmark-gradient);
+}
+
 .space-page-avatar-personal {
   background: rgba(145, 132, 217, 0.14);
   color: var(--color-primary);
