@@ -218,6 +218,15 @@
   margin: 0;
 }
 
+/* Même style que la description non-italique de "Mes plans"/"Ma galerie" — pour l'état vide
+   de "Mes brouillons", qui utilisait jusque-là .account-empty (italique), seule différence
+   visuelle qui le distinguait des deux autres cartes. */
+.space-page-plain-note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
 .space-page-upsell h3 {
   color: var(--color-text-primary);
   margin-bottom: 0.25rem;
