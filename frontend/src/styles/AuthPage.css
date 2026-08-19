@@ -147,12 +147,18 @@
 }
 
 /* Filet de sécurité pour le badge "Last used" (rempli, cyan de la charte) au cas où la
-   classe stable cl-badge diffère de celle stylée via appearance.elements.badge côté JS. */
-.auth-clerk-widget .cl-badge {
+   classe stable cl-badge diffère de celle stylée via appearance.elements.badge côté JS.
+   Sélecteur élargi par attribut (en plus de la classe exacte) au cas où Clerk préfixe ou
+   suffixe cl-badge différemment selon la version — et opacity/backdrop-filter réinitialisés
+   explicitement, la translucidité observée pouvant venir de là plutôt que du background. */
+.auth-clerk-widget .cl-badge,
+.auth-clerk-widget [class*="cl-badge" i] {
   background: #06b6d4 !important;
   color: #04141a !important;
   border: none !important;
   font-weight: 600 !important;
+  opacity: 1 !important;
+  backdrop-filter: none !important;
 }
 
 .auth-clerk-widget .cl-socialButtonsRoot {
