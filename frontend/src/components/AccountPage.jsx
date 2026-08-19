@@ -19,6 +19,7 @@ import AvatarPicker from './AvatarPicker'
 import PricingCards from './PricingCards'
 import { ContactModal } from './CompanyModals'
 import '../styles/AccountPage.css'
+import '../styles/SettingsPage.css'
 
 export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotification, pendingAction, onConsumeAction }) {
   const { user } = useUser()
@@ -175,6 +176,8 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       <button className="account-back-btn" onClick={onBack}>
         <IconArrowLeft width={16} height={16} /> {t(lang, 'account.backToApp')}
       </button>
+
+      <h2 className="settings-page-title"><IconUser width={20} height={20} /> {t(lang, 'auth.myAccount')}</h2>
 
       <div className="account-header card">
         <div className="account-avatar-wrap">
