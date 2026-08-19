@@ -207,6 +207,15 @@ export async function getShareLink(shareId) {
   return { share, plan }
 }
 
+// Classement personnel (galerie privée) : bascule plan.isFavorite et resauvegarde tel
+// quel — même circuit que n'importe quelle autre modification de plan, pas de champ ni de
+// table dédiés côté serveur (le JSON complet du plan est déjà synchronisé).
+export function toggleFavorite(id) {
+  const plan = getPlanById(id)
+  if (!plan) return null
+  return savePlan({ ...plan, isFavorite: !plan.isFavorite })
+}
+
 export function generateId() {
   return Math.random().toString(36).substr(2, 9)
 }

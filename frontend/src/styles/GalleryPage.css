@@ -101,17 +101,25 @@
   box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.25);
 }
 
-.gallery-card-featured-badge {
+.gallery-card-favorite-toggle {
   position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
+  top: 0.5rem;
+  right: 0.5rem;
   z-index: 1;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  background: #eab308;
-  color: #1a1a1a;
+  width: 1.9rem;
+  height: 1.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.05rem;
+  border-radius: 50%;
+  background: rgba(20, 18, 32, 0.55);
+  cursor: pointer;
+  line-height: 1;
+}
+
+.gallery-card-favorite-toggle:hover {
+  background: rgba(20, 18, 32, 0.8);
 }
 
 .gallery-card-cover {

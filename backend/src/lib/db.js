@@ -28,13 +28,12 @@ export async function upsertPlan(env, userId, plan, teamId) {
   const isNew = !plan.id
   const now = new Date().toISOString()
   const effectiveTeamId = isNew ? (teamId || null) : (plan.team_id ?? null)
-  const isPublic = plan.isPublic ? 1 : 0
   await env.DB.prepare(
-    `INSERT INTO plans (id, user_id, team_id, data, product_name, is_public, created_at, updated_at)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `INSERT INTO plans (id, user_id, team_id, data, product_name, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
      ON CONFLICT(id) DO UPDATE SET data = excluded.data, product_name = excluded.product_name,
-       is_public = excluded.is_public, updated_at = excluded.updated_at`
-  ).bind(id, userId, effectiveTeamId, JSON.stringify({ ...plan, id, team_id: effectiveTeamId }), plan.product?.name || null, isPublic, now, now).run()
+       updated_at = excluded.updated_at`
+  ).bind(id, userId, effectiveTeamId, JSON.stringify({ ...plan, id, team_id: effectiveTeamId }), plan.product?.name || null, now, now).run()
   return { ...plan, id, team_id: effectiveTeamId, savedAt: now, updatedAt: now }
 }
 
@@ -166,28 +165,6 @@ export async function resolveShare(env, shareId) {
   await env.DB.prepare('UPDATE shares SET access_count = access_count + 1 WHERE id = ?').bind(shareId).run()
   const plan = await getPlan(env, share.plan_id)
   return plan ? { plan, share } : null
-}
-
-// --- Galerie publique ---
-
-// Liste paginée, la plus récente d'abord — aucune donnée sensible au-delà de ce que
-// l'auteur a explicitement choisi de rendre public en activant plan.isPublic (le JSON
-// complet, y compris financials/persona, est déjà ce que l'auteur voit lui-même : rien de
-// spécifique à l'utilisateur type user_id n'est exposé ici).
-export async function listPublicPlans(env, { limit = 24, offset = 0 } = {}) {
-  const { results } = await env.DB.prepare(
-    'SELECT id, data, updated_at, is_featured FROM plans WHERE is_public = 1 ORDER BY is_featured DESC, updated_at DESC LIMIT ? OFFSET ?'
-  ).bind(limit, offset).all()
-  return results.map(row => ({ ...JSON.parse(row.data), id: row.id, updatedAt: row.updated_at, isFeatured: !!row.is_featured }))
-}
-
-// Contrairement à resolveShare (lien temporaire, 30 jours), un plan public reste
-// accessible tant que isPublic est activé — pas d'expiration, l'auteur contrôle la
-// visibilité en repassant le toggle à tout moment (voir upsertPlan, is_public y est
-// remis à jour à chaque sauvegarde).
-export async function getPublicPlan(env, id) {
-  const row = await env.DB.prepare('SELECT data FROM plans WHERE id = ? AND is_public = 1').bind(id).first()
-  return row ? JSON.parse(row.data) : null
 }
 
 export async function getCredits(env, userId) {

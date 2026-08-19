@@ -10,14 +10,10 @@ publish = "dist"
 edge_functions = "netlify/edge-functions"
 
 # Injecte les meta og:image/og:title spécifiques à un plan pour les liens de partage
-# (/s/:id) et les plans publics de la galerie (/p/:id) — voir frontend/netlify/edge-functions/.
+# (/s/:id) — voir frontend/netlify/edge-functions/.
 [[edge_functions]]
 path = "/s/*"
 function = "og-share"
-
-[[edge_functions]]
-path = "/p/*"
-function = "og-gallery"
 
 # Le proxy /og/* -> le Worker (pour éviter d'exposer l'URL *.workers.dev brute aux robots
 # des réseaux sociaux, voir plus haut) vit dans frontend/public/_redirects, PAS ici : dans

@@ -64,7 +64,7 @@ const SECTION_LIST = [
 ]
 
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly }) {
-  // Choke point unique : un plan public/partagé (lien ou galerie) ouvert par un visiteur
+  // Choke point unique : un plan partagé (lien /s/:id) ouvert par un visiteur
   // connecté avec SON PROPRE compte ne doit jamais pouvoir écraser le plan d'un autre —
   // avant ce garde-fou, n'importe quel visiteur connecté pouvait modifier la roadmap, le
   // budget, activer le Copilote IA, etc. sur le plan de quelqu'un d'autre et voir ça
@@ -79,8 +79,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [showCoverPicker, setShowCoverPicker] = useState(false)
-  const [publicLinkCopied, setPublicLinkCopied] = useState(false)
-  const [publicGateMsg, setPublicGateMsg] = useState(null)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
@@ -243,43 +241,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const nextPlan = { ...plan, linear: nextLinear }
     setPlan(nextPlan)
     if (plan.id) savePlan(nextPlan)
-  }
-
-  // Visibilité dans la galerie publique : pas soumis au bouton "Enregistrer" (comme les
-  // liens Jira/GitHub/Notion plus haut) — un toggle de visibilité doit s'appliquer
-  // immédiatement, pas rester en attente derrière d'éventuelles autres modifications non liées.
-  // Garde-fou de contenu minimal à l'activation (jamais à la désactivation) : sans ça,
-  // n'importe quel plan de test à peine rempli ("test" / "test" / roadmap vide) atterrit
-  // dans la vitrine publique, ce qui la vide de tout intérêt pour qui la parcourt.
-  const isPublishable = () => {
-    const pitchLong = (plan.product?.pitch || '').trim().length >= 30
-    const hasRoadmap = (plan.roadmap?.sprints || []).some(sp => (sp.stories || []).length > 0)
-    const hasSummary = !!(plan.executiveSummary || '').trim()
-    return pitchLong && hasRoadmap && hasSummary
-  }
-
-  const toggleIsPublic = () => {
-    if (!plan.id) return
-    if (!plan.isPublic && !isPublishable()) {
-      setPublicGateMsg(t(lang, 'app.publicGateBlocked'))
-      setTimeout(() => setPublicGateMsg(null), 4000)
-      return
-    }
-    const nextPlan = { ...plan, isPublic: !plan.isPublic }
-    setPlan(nextPlan)
-    savePlan(nextPlan)
-  }
-
-  // URL "jolie" /p/:id — comme /s/:id pour un lien de partage classique, interceptée par
-  // une Cloudflare Pages Function pour que les aperçus LinkedIn/Twitter affichent la bonne
-  // image et le bon titre (voir frontend/functions/p/[id].js).
-  const copyPublicLink = async () => {
-    if (!plan.id) return
-    try {
-      await navigator.clipboard.writeText(`${window.location.origin}/p/${plan.id}`)
-      setPublicLinkCopied(true)
-      setTimeout(() => setPublicLinkCopied(false), 2000)
-    } catch { /* clipboard indisponible, on ignore silencieusement */ }
   }
 
   // Image de couverture : même circuit immédiat que la visibilité publique ci-dessus (pas
@@ -557,21 +518,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </div>
         </div>
         <div className="plan-actions">
-          {plan.id && !readOnly && (
-            <button
-              className={`btn-secondary plan-public-toggle ${plan.isPublic ? 'is-public' : ''}`}
-              onClick={toggleIsPublic}
-              title={plan.isPublic ? t(lang, 'app.publicOnBody') : t(lang, 'app.publicOffBody')}
-            >
-              {plan.isPublic ? t(lang, 'app.publicOn') : t(lang, 'app.publicOff')}
-            </button>
-          )}
-          {plan.id && plan.isPublic && (
-            <button className="btn-secondary" onClick={copyPublicLink}>
-              {publicLinkCopied ? t(lang, 'plans.copied') : t(lang, 'app.copyPublicLink')}
-            </button>
-          )}
-          {publicGateMsg && <span className="public-gate-msg">{publicGateMsg}</span>}
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
           {!readOnly && (
             <button

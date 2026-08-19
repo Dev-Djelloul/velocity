@@ -1,36 +1,41 @@
 import { useEffect, useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
-import { fetchGallery } from '../lib/serverStorage'
+import { getAllPlans, toggleFavorite } from '../lib/planStorage'
 import { IconClipboard, IconSparkle } from './Icons'
 import '../styles/GalleryPage.css'
 
-// Vitrine publique des plans que leurs auteurs ont choisi de rendre visibles
-// (plan.isPublic, activé depuis PlanViewer) — accessible sans compte, comme les liens de
-// partage. Pas de modération a priori : c'est l'auteur qui contrôle la visibilité de son
-// propre plan (toggle réversible à tout moment), pas de file de revue côté équipe pour ce MVP.
+// Galerie privée : vue en grille des propres plans de l'utilisateur connecté (espace
+// actif), pour les retrouver et les classer d'un coup d'œil — aucune donnée n'est exposée
+// publiquement, tout passe par getAllPlans() (même source que PlansHistory), scopée par
+// utilisateur+espace côté planStorage.
 export default function GalleryPage({ lang, onOpenPlan }) {
-  const [plans, setPlans] = useState(null) // null = chargement
+  const [plans, setPlans] = useState(() => getAllPlans())
   const [category, setCategory] = useState('all')
 
   useEffect(() => {
-    fetchGallery(48, 0).then(r => setPlans(r || []))
+    setPlans(getAllPlans())
   }, [])
 
-  // Filtrage côté client : volume actuel de la galerie ne justifie pas un paramètre
-  // de requête côté GET /gallery (à revoir si le catalogue grossit beaucoup).
   const categories = useMemo(() => {
-    if (!plans) return []
-    const set = new Set(plans.map(p => p.category).filter(Boolean))
+    const set = new Set(plans.map(p => p.product?.category).filter(Boolean))
     return [...set]
   }, [plans])
 
   const categoryLabels = t(lang, 'product.categoryOptions')
 
-  const filteredPlans = useMemo(() => {
-    if (!plans) return null
-    if (category === 'all') return plans
-    return plans.filter(p => p.category === category)
+  const sortedPlans = useMemo(() => {
+    const filtered = category === 'all' ? plans : plans.filter(p => p.product?.category === category)
+    return [...filtered].sort((a, b) => {
+      if (!!b.isFavorite !== !!a.isFavorite) return (b.isFavorite ? 1 : 0) - (a.isFavorite ? 1 : 0)
+      return (b.updatedAt || b.savedAt || '').localeCompare(a.updatedAt || a.savedAt || '')
+    })
   }, [plans, category])
+
+  const handleToggleFavorite = (e, id) => {
+    e.stopPropagation()
+    toggleFavorite(id)
+    setPlans(getAllPlans())
+  }
 
   return (
     <div className="gallery-page">
@@ -39,16 +44,14 @@ export default function GalleryPage({ lang, onOpenPlan }) {
         <p className="gallery-page-subtitle">{t(lang, 'gallery.subtitle')}</p>
       </div>
 
-      {plans === null && <p className="gallery-empty">{t(lang, 'gallery.loading')}</p>}
-
-      {plans?.length === 0 && (
+      {plans.length === 0 && (
         <div className="gallery-empty-state">
           <IconClipboard width={28} height={28} />
           <p>{t(lang, 'gallery.empty')}</p>
         </div>
       )}
 
-      {!!plans?.length && !!categories.length && (
+      {!!plans.length && !!categories.length && (
         <div className="gallery-filters">
           <button
             className={`gallery-filter-chip${category === 'all' ? ' active' : ''}`}
@@ -68,22 +71,31 @@ export default function GalleryPage({ lang, onOpenPlan }) {
         </div>
       )}
 
-      {!!plans?.length && filteredPlans?.length === 0 && (
+      {!!plans.length && sortedPlans.length === 0 && (
         <p className="gallery-empty">{t(lang, 'gallery.filterNoMatch')}</p>
       )}
 
-      {!!filteredPlans?.length && (
+      {!!sortedPlans.length && (
         <div className="gallery-grid">
-          {filteredPlans.map(p => (
-            <button key={p.id} className={`gallery-card${p.isFeatured ? ' gallery-card-featured' : ''}`} onClick={() => onOpenPlan(p.id)}>
-              {p.isFeatured && <span className="gallery-card-featured-badge">⭐ {t(lang, 'gallery.featured')}</span>}
+          {sortedPlans.map(p => (
+            <button key={p.id} className={`gallery-card${p.isFavorite ? ' gallery-card-featured' : ''}`} onClick={() => onOpenPlan(p)}>
+              <span
+                className="gallery-card-favorite-toggle"
+                role="button"
+                tabIndex={0}
+                title={p.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
+                onClick={(e) => handleToggleFavorite(e, p.id)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleToggleFavorite(e, p.id) }}
+              >
+                {p.isFavorite ? '⭐' : '☆'}
+              </span>
               {p.coverImage
                 ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
                 : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
               <div className="gallery-card-body">
-                <h3>{p.productName || t(lang, 'plans.untitled')}</h3>
+                <h3>{p.product?.name || t(lang, 'plans.untitled')}</h3>
                 {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
-                <p className="gallery-card-pitch">{p.pitch || p.executiveSummary || ''}</p>
+                <p className="gallery-card-pitch">{p.product?.pitch || p.executiveSummary || ''}</p>
               </div>
             </button>
           ))}

@@ -220,42 +220,13 @@ export async function handleApi(request, env, url) {
     return json(resolved)
   }
 
-  // --- Galerie publique (opt-in, plan.isPublic) — routes publiques, sans userId ---
-
-  if (pathname === '/gallery' && method === 'GET') {
-    const limit = Math.min(Number(searchParams.get('limit')) || 24, 50)
-    const offset = Number(searchParams.get('offset')) || 0
-    const plans = await db.listPublicPlans(env, { limit, offset })
-    // Aperçu léger pour la grille — le détail complet n'est chargé qu'au clic (GET /gallery/:id).
-    return json(plans.map(p => ({
-      id: p.id,
-      productName: p.product?.name || null,
-      pitch: p.product?.pitch || null,
-      classification: p.classification || null,
-      executiveSummary: p.executiveSummary || null,
-      coverImage: p.coverImage || null,
-      category: p.product?.category || null,
-      b2bVsB2c: p.market?.b2bVsB2c || null,
-      isFeatured: !!p.isFeatured,
-      updatedAt: p.updatedAt
-    })))
-  }
-
-  const galleryDetailMatch = pathname.match(/^\/gallery\/([^/]+)$/)
-  if (galleryDetailMatch && method === 'GET') {
-    const plan = await db.getPublicPlan(env, galleryDetailMatch[1])
-    if (!plan) return json({ error: 'not found' }, 404)
-    return json({ plan })
-  }
-
-  // Image de partage (og:image) pour un plan partagé ou public — id accepté : soit un
-  // shareId (lien de partage classique, 30 jours), soit un id de plan public (galerie).
-  // Générée à la volée, jamais stockée (voir generatePlanOgImage).
+  // Image de partage (og:image) pour un plan partagé — id d'un shareId (lien de partage
+  // classique, 30 jours). Générée à la volée, jamais stockée (voir generatePlanOgImage).
   const ogMatch = pathname.match(/^\/og\/([^/]+)\.png$/)
   if (ogMatch && (method === 'GET' || method === 'HEAD')) {
     const id = ogMatch[1]
     const shared = await db.resolveShare(env, id).catch(() => null)
-    const plan = shared?.plan || await db.getPublicPlan(env, id).catch(() => null)
+    const plan = shared?.plan
     if (!plan) return json({ error: 'not found' }, 404)
     // LinkedIn/Facebook/Slack envoient d'abord un HEAD sur og:image pour vérifier son
     // type avant de faire le GET réel — un 405 sur ce HEAD (avant ce correctif, seul GET

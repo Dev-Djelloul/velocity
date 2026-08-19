@@ -1,8 +1,8 @@
 // Redimensionne une image uploadée avant de la stocker en data URL dans le plan (comme les
 // avatars, voir personalSpace.js) — sans ça, une photo de plusieurs Mo alourdirait le JSON
-// du plan et, plus grave, la liste /gallery qui agrège l'aperçu de dizaines de plans d'un
-// coup. maxWidth 640 + JPEG qualité 0.82 : largement suffisant pour une carte de galerie ou
-// un bandeau de plan, jamais plus de ~150 Ko en pratique.
+// du plan, et par ricochet la liste de tous les plans de l'utilisateur (galerie, historique)
+// qui charge l'aperçu de chacun d'un coup. maxWidth 640 + JPEG qualité 0.82 : largement
+// suffisant pour une carte de galerie ou un bandeau de plan, jamais plus de ~150 Ko en pratique.
 export function resizeImageToDataUrl(file, maxWidth = 640) {
   return new Promise((resolve, reject) => {
     const reader = new FileReader()
