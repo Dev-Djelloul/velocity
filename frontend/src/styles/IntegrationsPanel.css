@@ -1,0 +1,74 @@
+.integration-row {
+  align-items: center;
+}
+
+.integration-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.integration-icon {
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  object-fit: contain;
+  background: rgba(255, 255, 255, 0.06);
+  padding: 5px;
+}
+
+/* Le logo Linear "dark" (blanc/clair) a été pensé pour un bouton plein-couleur, pas un fond
+   quasi transparent comme les autres icônes ici — sans un fond propre il se fond dans le
+   thème sombre de la page. */
+.integration-icon-linear {
+  background: #1a1a1a;
+}
+
+.integration-icon-gcal {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4285f4;
+  background: rgba(66, 133, 244, 0.12);
+}
+
+.integration-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.integration-badge.is-disconnected {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--color-text-muted);
+}
+
+/* Une couleur de marque par service plutôt qu'un vert générique "connecté" — repère plus
+   vite quel service est actif dans une liste de quatre lignes très proches visuellement. */
+.integration-badge.is-connected.brand-notion {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.integration-badge.is-connected.brand-jira {
+  background: rgba(38, 132, 255, 0.18);
+  color: #5b9fff;
+}
+
+.integration-badge.is-connected.brand-linear {
+  background: rgba(94, 106, 210, 0.2);
+  color: #9ba4f0;
+}
+
+.integration-badge.is-connected.brand-gcal {
+  background: rgba(66, 133, 244, 0.18);
+  color: #669df6;
+}
