@@ -214,7 +214,13 @@
 
 .plan-stat svg { color: var(--color-accent); flex-shrink: 0; }
 
-.plan-actions { display: flex; gap: 0.5rem; }
+.plan-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+
+.public-gate-msg {
+  font-size: 0.76rem;
+  color: #f59e0b;
+  max-width: 260px;
+}
 
 .plan-public-toggle.is-public {
   background: rgba(52, 211, 153, 0.15);
@@ -326,6 +332,32 @@
    changements non enregistrés impossible à manquer, même quand on a édité une section
    loin en bas de page. Boîte (pas une bulle tronquée) pour que le texte complet de chaque
    modification reste lisible. */
+/* Bannière lecture seule : plan public/partagé ouvert par quelqu'un d'autre que son
+   propriétaire (voir readOnly dans PlanViewer.jsx) — inline en haut du contenu, pas
+   flottante comme .unsaved-banner, puisqu'elle reste affichée toute la visite plutôt que le
+   temps d'une seule action. */
+.readonly-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border-radius: 10px;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--color-text-primary);
+  font-size: 0.86rem;
+}
+
+.readonly-banner .btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
 .unsaved-banner {
   position: fixed;
   top: 88px;

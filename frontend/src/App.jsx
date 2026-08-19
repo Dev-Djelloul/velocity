@@ -25,7 +25,7 @@ import { PricingModal, ChangelogModal, RoadmapModal } from './components/Product
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
-import { savePlan, getAllPlans, getShareLink, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
+import { savePlan, getAllPlans, getShareLink, duplicatePlan, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
 import { fetchGalleryPlan } from './lib/serverStorage'
 import { collectRecentComments } from './lib/notifications'
 import { getReadIds } from './lib/commentReads'
@@ -117,6 +117,7 @@ export default function App() {
   const [authMode, setAuthMode] = useState(() => window.location.pathname === '/connexion' ? 'signin' : 'signup')
   const [authIntent, setAuthIntent] = useState(null)
   const [pendingDemoData, setPendingDemoData] = useState(null)
+  const [pendingDuplicatePlan, setPendingDuplicatePlan] = useState(null)
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [pendingAccountAction, setPendingAccountAction] = useState(null) // 'plans' | 'upgrade' | null
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
@@ -304,6 +305,12 @@ export default function App() {
       if (pendingDemoData) {
         loadDemoPlan(pendingDemoData)
         setPendingDemoData(null)
+      } else if (pendingDuplicatePlan) {
+        // Repris après inscription : voir handleDuplicateReadOnlyPlan ci-dessous —
+        // dupliquer un plan public/partagé en lecture seule nécessite un compte.
+        const copy = duplicatePlan(pendingDuplicatePlan, lang)
+        handleLoadFromHistory(copy)
+        setPendingDuplicatePlan(null)
       } else {
         setCurrentPage(authIntent || 'account')
       }
@@ -455,6 +462,21 @@ export default function App() {
     setShowHistory(false)
     setCurrentPage('result')
     window.scrollTo(0, 0)
+  }
+
+  // "Dupliquer pour modifier" depuis un plan public/partagé en lecture seule (voir
+  // PlanViewer readOnly) : la galerie devient une bibliothèque d'inspiration plutôt qu'un
+  // éditeur partagé — copier dans son propre compte est la seule façon d'en repartir, pas
+  // d'édition en place sur le plan de quelqu'un d'autre. Sans compte, on redirige vers
+  // l'inscription et on reprend l'action juste après (voir pendingDuplicatePlan plus haut).
+  const handleDuplicateReadOnlyPlan = (sourcePlan) => {
+    if (!isSignedIn) {
+      setPendingDuplicatePlan(sourcePlan)
+      goToAuth('signup', 'result')
+      return
+    }
+    const copy = duplicatePlan(sourcePlan, lang)
+    handleLoadFromHistory(copy)
   }
 
   // Ouvrir une notification peut demander de changer d'espace actif au préalable (le
@@ -913,7 +935,17 @@ export default function App() {
           <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
         {currentPage === 'result' && plan && (isSignedIn || isSharedView) && (
-          <PlanViewer key={plan.id || plan.generatedAt} plan={plan} justGenerated={justGenerated} onReset={handleReset} lang={lang} isPro={pro} onRequestUpgrade={goToUpgrade} />
+          <PlanViewer
+            key={plan.id || plan.generatedAt}
+            plan={plan}
+            justGenerated={justGenerated}
+            onReset={handleReset}
+            lang={lang}
+            isPro={pro}
+            onRequestUpgrade={goToUpgrade}
+            readOnly={isSharedView}
+            onDuplicateReadOnly={handleDuplicateReadOnlyPlan}
+          />
         )}
         {currentPage === 'account' && isSignedIn && (
           <AccountPage

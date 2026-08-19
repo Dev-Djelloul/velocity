@@ -25,7 +25,7 @@ import InfoModal from './InfoModal'
 import CopilotChat from './CopilotChat'
 import CoverPicker from './CoverPicker'
 import { generateMarketingStrategy } from '../lib/planGenerator'
-import { savePlan } from '../lib/planStorage'
+import { savePlan as savePlanToStorage } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
 import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
@@ -63,7 +63,16 @@ const SECTION_LIST = [
   { id: 'section-whatif', labelKey: 'whatif.title' }
 ]
 
-export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade }) {
+export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly }) {
+  // Choke point unique : un plan public/partagé (lien ou galerie) ouvert par un visiteur
+  // connecté avec SON PROPRE compte ne doit jamais pouvoir écraser le plan d'un autre —
+  // avant ce garde-fou, n'importe quel visiteur connecté pouvait modifier la roadmap, le
+  // budget, activer le Copilote IA, etc. sur le plan de quelqu'un d'autre et voir ça
+  // silencieusement persisté côté serveur (le user_id du propriétaire n'était jamais
+  // touché, mais le contenu "data" du plan l'était). En "masquant" savePlan ici, tous les
+  // appels existants (une quinzaine, un par section éditable) sont neutralisés d'un coup
+  // sans avoir à toucher chacun individuellement.
+  const savePlan = (p) => (readOnly ? p : savePlanToStorage(p))
   const { userId } = useAuth()
   const { user } = useUser()
   const team = useTeam()
@@ -71,6 +80,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [showExport, setShowExport] = useState(false)
   const [showCoverPicker, setShowCoverPicker] = useState(false)
   const [publicLinkCopied, setPublicLinkCopied] = useState(false)
+  const [publicGateMsg, setPublicGateMsg] = useState(null)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
@@ -238,8 +248,23 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // Visibilité dans la galerie publique : pas soumis au bouton "Enregistrer" (comme les
   // liens Jira/GitHub/Notion plus haut) — un toggle de visibilité doit s'appliquer
   // immédiatement, pas rester en attente derrière d'éventuelles autres modifications non liées.
+  // Garde-fou de contenu minimal à l'activation (jamais à la désactivation) : sans ça,
+  // n'importe quel plan de test à peine rempli ("test" / "test" / roadmap vide) atterrit
+  // dans la vitrine publique, ce qui la vide de tout intérêt pour qui la parcourt.
+  const isPublishable = () => {
+    const pitchLong = (plan.product?.pitch || '').trim().length >= 30
+    const hasRoadmap = (plan.roadmap?.sprints || []).some(sp => (sp.stories || []).length > 0)
+    const hasSummary = !!(plan.executiveSummary || '').trim()
+    return pitchLong && hasRoadmap && hasSummary
+  }
+
   const toggleIsPublic = () => {
     if (!plan.id) return
+    if (!plan.isPublic && !isPublishable()) {
+      setPublicGateMsg(t(lang, 'app.publicGateBlocked'))
+      setTimeout(() => setPublicGateMsg(null), 4000)
+      return
+    }
     const nextPlan = { ...plan, isPublic: !plan.isPublic }
     setPlan(nextPlan)
     savePlan(nextPlan)
@@ -398,7 +423,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   return (
     <div className="plan-viewer-layout">
-      {isDirty && (
+      {readOnly && (
+        <div className="readonly-banner" role="status">
+          <span>{t(lang, 'app.readOnlyBanner')}</span>
+          <button className="btn-primary" onClick={() => onDuplicateReadOnly?.(plan)}>
+            <IconCopy width={14} height={14} /> {t(lang, 'app.readOnlyDuplicate')}
+          </button>
+        </div>
+      )}
+      {!readOnly && isDirty && (
         <div className="unsaved-banner" role="status">
           <div className="unsaved-banner-head">
             <IconSave width={15} height={15} className="unsaved-banner-icon" />
@@ -416,7 +449,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         changeLog={plan.changeLog}
         onClearHistory={handleClearHistory}
         comments={plan.comments}
-        onAddComment={addComment}
+        onAddComment={readOnly ? undefined : addComment}
         onDeleteComment={deleteComment}
         teamMembers={team.members}
         currentUserId={userId}
@@ -468,17 +501,19 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
               style={{ objectPosition: `center ${plan.coverPosition || 'center'}` }}
             />
           )}
-          <div className="plan-cover-banner-actions">
-            <button className="plan-cover-banner-btn" onClick={() => setShowCoverPicker(true)}>
-              <IconImage width={14} height={14} />
-              {plan.coverImage ? t(lang, 'app.coverImageChange') : t(lang, 'app.coverImageAdd')}
-            </button>
-            {plan.coverImage && (
-              <button className="plan-cover-banner-btn" onClick={cycleCoverPosition}>
-                {t(lang, 'app.coverReposition')}
+          {!readOnly && (
+            <div className="plan-cover-banner-actions">
+              <button className="plan-cover-banner-btn" onClick={() => setShowCoverPicker(true)}>
+                <IconImage width={14} height={14} />
+                {plan.coverImage ? t(lang, 'app.coverImageChange') : t(lang, 'app.coverImageAdd')}
               </button>
-            )}
-          </div>
+              {plan.coverImage && (
+                <button className="plan-cover-banner-btn" onClick={cycleCoverPosition}>
+                  {t(lang, 'app.coverReposition')}
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -522,7 +557,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </div>
         </div>
         <div className="plan-actions">
-          {plan.id && (
+          {plan.id && !readOnly && (
             <button
               className={`btn-secondary plan-public-toggle ${plan.isPublic ? 'is-public' : ''}`}
               onClick={toggleIsPublic}
@@ -536,20 +571,23 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
               {publicLinkCopied ? t(lang, 'plans.copied') : t(lang, 'app.copyPublicLink')}
             </button>
           )}
+          {publicGateMsg && <span className="public-gate-msg">{publicGateMsg}</span>}
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
-          <button
-            className={`plan-save-btn ${isDirty ? 'is-dirty' : ''} ${justSaved ? 'just-saved' : ''}`}
-            onClick={handleSave}
-            disabled={!isDirty}
-            title={isDirty ? t(lang, 'app.save') : t(lang, 'app.saved')}
-          >
-            {justSaved
-              ? <IconCheckCircle width={14} height={14} className="plan-save-btn-icon" />
-              : <IconSave width={14} height={14} className="plan-save-btn-icon" />}
-            <span className="plan-save-btn-label">
-              {justSaved ? t(lang, 'app.saved') : (isDirty ? t(lang, 'app.save') : t(lang, 'app.saved'))}
-            </span>
-          </button>
+          {!readOnly && (
+            <button
+              className={`plan-save-btn ${isDirty ? 'is-dirty' : ''} ${justSaved ? 'just-saved' : ''}`}
+              onClick={handleSave}
+              disabled={!isDirty}
+              title={isDirty ? t(lang, 'app.save') : t(lang, 'app.saved')}
+            >
+              {justSaved
+                ? <IconCheckCircle width={14} height={14} className="plan-save-btn-icon" />
+                : <IconSave width={14} height={14} className="plan-save-btn-icon" />}
+              <span className="plan-save-btn-label">
+                {justSaved ? t(lang, 'app.saved') : (isDirty ? t(lang, 'app.save') : t(lang, 'app.saved'))}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -652,7 +690,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         </InfoModal>
       )}
 
-      <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} />
+      {!readOnly && <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} />}
       </div>
     </div>
   )
