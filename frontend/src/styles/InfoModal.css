@@ -50,6 +50,25 @@
   background: rgba(145, 132, 217, 0.1);
 }
 
+.info-modal.has-banner .info-modal-close {
+  color: #fff;
+  background: rgba(15, 15, 20, 0.45);
+}
+
+.info-modal.has-banner .info-modal-close:hover {
+  background: rgba(15, 15, 20, 0.7);
+}
+
+.info-modal-banner {
+  display: block;
+  width: calc(100% + 80px);
+  height: 180px;
+  object-fit: cover;
+  object-position: center 30%;
+  margin: -40px -40px 24px -40px;
+  border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
 .info-modal-content h1 {
   display: flex;
   align-items: center;
@@ -311,5 +330,12 @@
   .info-modal-close {
     top: 12px;
     right: 12px;
+  }
+
+  .info-modal-banner {
+    width: calc(100% + 48px);
+    height: 130px;
+    margin: -24px -24px 20px -24px;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
 }

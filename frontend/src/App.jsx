@@ -5,6 +5,7 @@ import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
 import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart, IconMessageCircle, IconMenu, IconX, IconLink } from './components/Icons'
 import InfoModal from './components/InfoModal'
+import createTeamBanner from '../assets/img/hiw-hero-tablets-purple.webp'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
 import Footer from './components/Footer'
@@ -888,6 +889,7 @@ export default function App() {
             icon={<IconUsers width={22} height={22} />}
             title={t(lang, 'team.createTeamTitle')}
             onClose={() => setShowCreateTeam(false)}
+            banner={createTeamBanner}
           >
             {teamLimitReached ? (
               <>
