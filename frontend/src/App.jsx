@@ -893,7 +893,7 @@ export default function App() {
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
         )}
         {currentPage === 'gallery' && isSignedIn && (
-          <GalleryPage lang={lang} onOpenPlan={handleLoadFromHistory} />
+          <GalleryPage key={dataVersion} lang={lang} onOpenPlan={handleLoadFromHistory} />
         )}
         {currentPage === 'auth' && !isSignedIn && (
           <AuthPage
