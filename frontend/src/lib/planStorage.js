@@ -95,6 +95,18 @@ export function getAllPlans() {
   }
 }
 
+// Hook de diagnostic temporaire (voir bug "galerie vide malgré données correctes" — à
+// retirer une fois le problème confirmé/résolu) : expose l'état interne autrement invisible
+// depuis la console (activeUserId/activeTeamId sont des variables privées du module).
+if (typeof window !== 'undefined') {
+  window.__vlDebug = () => ({
+    activeUserId,
+    activeTeamId,
+    plansKey: activeUserId ? plansKey(activeUserId, activeTeamId) : null,
+    plans: getAllPlans().map(p => ({ id: p.id, name: p.product?.name, inGallery: p.inGallery }))
+  })
+}
+
 // Tous les plans de l'utilisateur, tous espaces confondus (personnel + chaque équipe listée
 // dans teamIds) — pour "Historique de tous les plans" dans Mon compte, qui doit tout
 // regrouper au même endroit (contrairement aux tableaux de bord d'espace, eux scopés à un
