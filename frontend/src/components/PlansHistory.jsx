@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan, savePlan } from '../lib/planStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
+import PlanTags from './PlanTags'
 import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy, IconPencil, IconSearch, IconX } from './Icons'
 import '../styles/PlansHistory.css'
 
@@ -14,19 +15,32 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
   const [editingId, setEditingId] = useState(null)
   const [editValue, setEditValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeTag, setActiveTag] = useState(null)
 
   useEffect(() => {
     setPlans(getAllPlans())
   }, [])
 
+  const allTags = useMemo(() => {
+    const set = new Set()
+    plans.forEach(p => (p.tags || []).forEach(tag => set.add(tag)))
+    return [...set].sort((a, b) => a.localeCompare(b))
+  }, [plans])
+
   const normalizedQuery = searchQuery.trim().toLowerCase()
-  const visiblePlans = normalizedQuery
-    ? plans.filter(plan => {
-        const name = plan.product?.name || t(lang, 'plans.untitled')
-        return name.toLowerCase().includes(normalizedQuery)
-          || plan.classification?.toLowerCase().includes(normalizedQuery)
-      })
-    : plans
+  const visiblePlans = plans.filter(plan => {
+    if (activeTag && !(plan.tags || []).includes(activeTag)) return false
+    if (!normalizedQuery) return true
+    const name = plan.product?.name || t(lang, 'plans.untitled')
+    return name.toLowerCase().includes(normalizedQuery)
+      || plan.classification?.toLowerCase().includes(normalizedQuery)
+      || (plan.tags || []).some(tag => tag.toLowerCase().includes(normalizedQuery))
+  })
+
+  const handleTagsChange = (updatedPlan) => {
+    if (!updatedPlan) return
+    setPlans(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p))
+  }
 
   const confirmDelete = () => {
     deletePlan(deleteTarget.id)
@@ -106,6 +120,28 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
         </div>
       )}
 
+      {allTags.length > 0 && (
+        <div className="tag-filter-row">
+          <button
+            type="button"
+            className={`tag-filter-chip${!activeTag ? ' active' : ''}`}
+            onClick={() => setActiveTag(null)}
+          >
+            {t(lang, 'tags.filterAll')}
+          </button>
+          {allTags.map(tag => (
+            <button
+              type="button"
+              key={tag}
+              className={`tag-filter-chip${activeTag === tag ? ' active' : ''}`}
+              onClick={() => setActiveTag(prev => prev === tag ? null : tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
+
       {visiblePlans.length === 0 && (
         <p className="plans-empty-state">{t(lang, 'plans.noSearchResults')}</p>
       )}
@@ -146,6 +182,7 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
               {plan.classification && (
                 <p className="plan-type">{plan.classification}</p>
               )}
+              <PlanTags plan={plan} lang={lang} onChange={handleTagsChange} compact />
             </div>
             </div>
 

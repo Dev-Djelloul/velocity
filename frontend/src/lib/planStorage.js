@@ -219,6 +219,23 @@ export function toggleFavorite(plan) {
   return savePlan({ ...plan, isFavorite: !plan.isFavorite })
 }
 
+// Tags transversaux : libres, définis par l'utilisateur, réutilisables dans "Mes plans"
+// comme dans "Ma galerie" — même circuit savePlan() que isFavorite/inGallery ci-dessus,
+// pas de table ni de taxonomie dédiée côté serveur.
+export function addTag(plan, tag) {
+  if (!plan) return null
+  const trimmed = tag.trim()
+  if (!trimmed) return plan
+  const existing = plan.tags || []
+  if (existing.some(t => t.toLowerCase() === trimmed.toLowerCase())) return plan
+  return savePlan({ ...plan, tags: [...existing, trimmed].slice(0, 10) })
+}
+
+export function removeTag(plan, tag) {
+  if (!plan) return null
+  return savePlan({ ...plan, tags: (plan.tags || []).filter(t => t !== tag) })
+}
+
 export function generateId() {
   return Math.random().toString(36).substr(2, 9)
 }

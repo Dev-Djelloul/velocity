@@ -20,10 +20,49 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
   const [copiedIndex, setCopiedIndex] = useState(null)
   const listRef = useRef(null)
   const textareaRef = useRef(null)
+  const suggestionRefs = useRef([])
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, open, busy])
+
+  // Raccourcis globaux : ⌘K/Ctrl+K bascule le panneau depuis n'importe où dans l'app
+  // (comme un command palette), Échap le referme. On ne les enregistre qu'une fois —
+  // pas de dépendance sur `open`, l'état est lu via un toggle fonctionnel pour rester à jour.
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        setOpen(o => !o)
+        return
+      }
+      if (e.key === 'Escape') {
+        setOpen(o => o ? false : o)
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [])
+
+  // Focus le champ de saisie à l'ouverture, pour pouvoir taper immédiatement après ⌘K.
+  useEffect(() => {
+    if (open && textareaRef.current) textareaRef.current.focus()
+  }, [open])
+
+  const focusSuggestion = (index, total) => {
+    const wrapped = (index + total) % total
+    suggestionRefs.current[wrapped]?.focus()
+  }
+
+  const handleSuggestionKeyDown = (e, index, total) => {
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+      e.preventDefault()
+      focusSuggestion(index + 1, total)
+    } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+      e.preventDefault()
+      focusSuggestion(index - 1, total)
+    }
+  }
 
   // Auto-grandit avec le contenu jusqu'à une limite (voir max-height en CSS) plutôt qu'un
   // nombre de lignes fixe — plus confortable pour taper une demande un peu détaillée sans
@@ -62,7 +101,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
   }
 
   const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === 'Enter' && (!e.shiftKey || e.metaKey || e.ctrlKey)) {
       e.preventDefault()
       send()
     }
@@ -79,7 +118,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
 
   return (
     <>
-      <button type="button" className="copilot-fab" onClick={() => setOpen(o => !o)}>
+      <button type="button" className="copilot-fab" onClick={() => setOpen(o => !o)} title={t(lang, 'copilot.openTooltip')}>
         <img className="copilot-avatar" src={NOVA_AVATAR} alt="" />
         <span>{t(lang, 'copilot.openButton')}</span>
       </button>
@@ -109,7 +148,14 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
                 <p className="copilot-empty">{t(lang, 'copilot.empty')}</p>
                 <div className="copilot-suggestions">
                   {Array.isArray(suggestions) && suggestions.map((s, i) => (
-                    <button key={i} type="button" className="copilot-suggestion-chip" onClick={() => send(s)}>
+                    <button
+                      key={i}
+                      type="button"
+                      ref={el => { suggestionRefs.current[i] = el }}
+                      className="copilot-suggestion-chip"
+                      onClick={() => send(s)}
+                      onKeyDown={(e) => handleSuggestionKeyDown(e, i, suggestions.length)}
+                    >
                       {s}
                     </button>
                   ))}

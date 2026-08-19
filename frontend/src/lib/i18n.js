@@ -431,7 +431,8 @@ export const translations = {
       newConversation: 'Nouvelle conversation',
       copyReply: 'Copier la réponse',
       copied: 'Copié !',
-      inputHint: '↵ Envoyer · Maj+↵ Nouvelle ligne',
+      inputHint: '↵ Envoyer · Maj+↵ Nouvelle ligne · ⌘K Ouvrir/fermer · Échap Fermer',
+      openTooltip: 'Ouvrir Nova (⌘K)',
       suggestions: [
         'Réduis le budget marketing de 20%',
         'Ajoute un persona B2C',
@@ -1024,6 +1025,12 @@ export const translations = {
       rename: 'Renommer',
       delete: 'Supprimer',
       confirmDelete: 'Confirmer ?'
+    },
+    tags: {
+      add: 'tag',
+      addPlaceholder: 'Nouveau tag...',
+      remove: 'Retirer ce tag',
+      filterAll: 'Tous'
     },
     gallery: {
       title: 'Ma galerie',
@@ -1693,7 +1700,8 @@ export const translations = {
       newConversation: 'New conversation',
       copyReply: 'Copy reply',
       copied: 'Copied!',
-      inputHint: '↵ Send · Shift+↵ New line',
+      inputHint: '↵ Send · Shift+↵ New line · ⌘K Open/close · Esc Close',
+      openTooltip: 'Open Nova (⌘K)',
       suggestions: [
         'Cut marketing budget by 20%',
         'Add a B2C persona',
@@ -2281,6 +2289,12 @@ export const translations = {
       rename: 'Rename',
       delete: 'Delete',
       confirmDelete: 'Confirm?'
+    },
+    tags: {
+      add: 'tag',
+      addPlaceholder: 'New tag...',
+      remove: 'Remove this tag',
+      filterAll: 'All'
     },
     gallery: {
       title: 'My gallery',

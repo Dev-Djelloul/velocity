@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
 import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil, IconSearch } from './Icons'
+import PlanTags from './PlanTags'
 import '../styles/GalleryPage.css'
 import '../styles/PlansHistory.css'
 
@@ -18,6 +19,7 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const [renameTarget, setRenameTarget] = useState(null)
   const [editValue, setEditValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
+  const [activeTag, setActiveTag] = useState(null)
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -31,15 +33,28 @@ export default function GalleryPage({ lang, onOpenPlan }) {
     })
   }, [plans])
 
+  const allTags = useMemo(() => {
+    const set = new Set()
+    galleryPlans.forEach(p => (p.tags || []).forEach(tag => set.add(tag)))
+    return [...set].sort((a, b) => a.localeCompare(b))
+  }, [galleryPlans])
+
   const normalizedQuery = searchQuery.trim().toLowerCase()
   const visibleGalleryPlans = useMemo(() => {
-    if (!normalizedQuery) return galleryPlans
     return galleryPlans.filter(p => {
+      if (activeTag && !(p.tags || []).includes(activeTag)) return false
+      if (!normalizedQuery) return true
       const name = p.product?.name || t(lang, 'plans.untitled')
       return name.toLowerCase().includes(normalizedQuery)
         || p.classification?.toLowerCase().includes(normalizedQuery)
+        || (p.tags || []).some(tag => tag.toLowerCase().includes(normalizedQuery))
     })
-  }, [galleryPlans, normalizedQuery, lang])
+  }, [galleryPlans, normalizedQuery, activeTag, lang])
+
+  const handleTagsChange = (updatedPlan) => {
+    if (!updatedPlan) return
+    setPlans(prev => prev.map(p => p.id === updatedPlan.id ? updatedPlan : p))
+  }
 
   // Ferme le menu contextuel au premier clic ailleurs, à l'échappement, ou si la fenêtre
   // défile/redimensionne — sans ça il resterait affiché à des coordonnées qui ne
@@ -185,6 +200,28 @@ export default function GalleryPage({ lang, onOpenPlan }) {
         </div>
       )}
 
+      {allTags.length > 0 && (
+        <div className="tag-filter-row gallery-search">
+          <button
+            type="button"
+            className={`tag-filter-chip${!activeTag ? ' active' : ''}`}
+            onClick={() => setActiveTag(null)}
+          >
+            {t(lang, 'tags.filterAll')}
+          </button>
+          {allTags.map(tag => (
+            <button
+              type="button"
+              key={tag}
+              className={`tag-filter-chip${activeTag === tag ? ' active' : ''}`}
+              onClick={() => setActiveTag(prev => prev === tag ? null : tag)}
+            >
+              {tag}
+            </button>
+          ))}
+        </div>
+      )}
+
       {!!galleryPlans.length && visibleGalleryPlans.length === 0 && (
         <p className="plans-empty-state">{t(lang, 'plans.noSearchResults')}</p>
       )}
@@ -192,34 +229,36 @@ export default function GalleryPage({ lang, onOpenPlan }) {
       {!!visibleGalleryPlans.length && (
         <div className="gallery-grid">
           {visibleGalleryPlans.map(p => (
-            <button
-              key={p.id}
-              className={`gallery-card${p.isFavorite ? ' gallery-card-featured' : ''}`}
-              onClick={() => onOpenPlan(p)}
-              onContextMenu={(e) => openContextMenu(e, p)}
-            >
-              <span
-                className="gallery-card-favorite-toggle"
-                role="button"
-                tabIndex={0}
-                title={p.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
-                onClick={(e) => handleToggleFavorite(e, p)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleToggleFavorite(e, p) }}
+            <div key={p.id} className="gallery-card-wrap">
+              <button
+                className={`gallery-card${p.isFavorite ? ' gallery-card-featured' : ''}`}
+                onClick={() => onOpenPlan(p)}
+                onContextMenu={(e) => openContextMenu(e, p)}
               >
-                {p.isFavorite ? '⭐' : '☆'}
-              </span>
-              {p.coverImage
-                ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
-                : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
-              <div className="gallery-card-body">
-                <h3>
-                  {p.product?.name || t(lang, 'plans.untitled')}
-                  {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
-                </h3>
-                {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
-                <p className="gallery-card-pitch">{p.product?.pitch || p.executiveSummary || ''}</p>
-              </div>
-            </button>
+                <span
+                  className="gallery-card-favorite-toggle"
+                  role="button"
+                  tabIndex={0}
+                  title={p.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
+                  onClick={(e) => handleToggleFavorite(e, p)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleToggleFavorite(e, p) }}
+                >
+                  {p.isFavorite ? '⭐' : '☆'}
+                </span>
+                {p.coverImage
+                  ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
+                  : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
+                <div className="gallery-card-body">
+                  <h3>
+                    {p.product?.name || t(lang, 'plans.untitled')}
+                    {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                  </h3>
+                  {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
+                  <p className="gallery-card-pitch">{p.product?.pitch || p.executiveSummary || ''}</p>
+                </div>
+              </button>
+              <PlanTags plan={p} lang={lang} onChange={handleTagsChange} compact />
+            </div>
           ))}
         </div>
       )}

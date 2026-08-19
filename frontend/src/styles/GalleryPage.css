@@ -49,6 +49,16 @@
   gap: 1rem;
 }
 
+.gallery-card-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gallery-card-wrap .plan-tags {
+  padding: 0 0.2rem;
+}
+
 .gallery-card {
   position: relative;
   text-align: left;
