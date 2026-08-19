@@ -114,9 +114,28 @@ export default function App() {
   const [isSharedView, setIsSharedView] = useState(false)
   const [dataVersion, setDataVersion] = useState(0)
   const [authMode, setAuthMode] = useState(() => window.location.pathname === '/connexion' ? 'signin' : 'signup')
-  const [authIntent, setAuthIntent] = useState(null)
-  const [pendingDemoData, setPendingDemoData] = useState(null)
-  const [pendingDuplicatePlan, setPendingDuplicatePlan] = useState(null)
+  const [authIntent, setAuthIntent] = useState(() => sessionStorage.getItem('plp_auth_intent') || null)
+  // Persistés en sessionStorage (pas juste en state React) car les boutons OAuth (Google/
+  // Apple/Slack) de <SignIn/> font une vraie redirection de page — le navigateur quitte
+  // complètement l'app le temps de l'auth chez le provider, ce qui remettrait sinon ces
+  // states à zéro au retour et ferait atterrir l'utilisateur sur "Mon compte" au lieu du
+  // plan démo/dupliqué qu'il avait demandé avant de se connecter.
+  const [pendingDemoData, setPendingDemoDataState] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('plp_pending_demo') || 'null') } catch { return null }
+  })
+  const setPendingDemoData = (data) => {
+    setPendingDemoDataState(data)
+    if (data) sessionStorage.setItem('plp_pending_demo', JSON.stringify(data))
+    else sessionStorage.removeItem('plp_pending_demo')
+  }
+  const [pendingDuplicatePlan, setPendingDuplicatePlanState] = useState(() => {
+    try { return JSON.parse(sessionStorage.getItem('plp_pending_duplicate') || 'null') } catch { return null }
+  })
+  const setPendingDuplicatePlan = (plan) => {
+    setPendingDuplicatePlanState(plan)
+    if (plan) sessionStorage.setItem('plp_pending_duplicate', JSON.stringify(plan))
+    else sessionStorage.removeItem('plp_pending_duplicate')
+  }
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [pendingAccountAction, setPendingAccountAction] = useState(null) // 'plans' | 'upgrade' | null
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
@@ -151,6 +170,8 @@ export default function App() {
   const goToAuth = (mode, intent = null) => {
     setAuthMode(mode)
     setAuthIntent(intent)
+    if (intent) sessionStorage.setItem('plp_auth_intent', intent)
+    else sessionStorage.removeItem('plp_auth_intent')
     setCurrentPage('auth')
     window.scrollTo(0, 0)
   }
@@ -289,6 +310,7 @@ export default function App() {
         setCurrentPage(authIntent || 'account')
       }
       setAuthIntent(null)
+      sessionStorage.removeItem('plp_auth_intent')
       window.scrollTo(0, 0)
     }
     if (wasSignedIn.current && !isSignedIn) {
