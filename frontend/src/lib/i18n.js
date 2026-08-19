@@ -899,7 +899,9 @@ export const translations = {
       filterNoMatch: 'Aucun plan ne correspond à ce filtre.',
       favorite: 'Favori',
       favoriteAdd: 'Ajouter aux favoris',
-      favoriteRemove: 'Retirer des favoris'
+      favoriteRemove: 'Retirer des favoris',
+      editCategory: 'Changer la catégorie',
+      setCategory: 'Définir une catégorie'
     },
     plans: {
       title: 'Mes plans',
@@ -2013,7 +2015,9 @@ export const translations = {
       filterNoMatch: 'No plans match this filter.',
       favorite: 'Favorite',
       favoriteAdd: 'Add to favorites',
-      favoriteRemove: 'Remove from favorites'
+      favoriteRemove: 'Remove from favorites',
+      editCategory: 'Change category',
+      setCategory: 'Set a category'
     },
     plans: {
       title: 'My plans',

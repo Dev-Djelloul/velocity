@@ -86,6 +86,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
+  const [editingCategory, setEditingCategory] = useState(false)
   const captureRef = useRef(null)
 
   const isDirty = pendingChanges.length > 0
@@ -258,6 +259,16 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const cycleCoverPosition = () => {
     const next = cyclePosition[plan.coverPosition || 'center']
     const nextPlan = { ...plan, coverPosition: next }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
+  // Catégorie produit : fixée au questionnaire de création, mais reclassable ensuite —
+  // même circuit immédiat que la couverture ci-dessus (pas soumis au bouton "Enregistrer"),
+  // pour que le classement dans la galerie privée reste indépendant d'éventuelles autres
+  // modifications de contenu en attente.
+  const updateCategory = (value) => {
+    const nextPlan = { ...plan, product: { ...plan.product, category: value } }
     setPlan(nextPlan)
     if (plan.id) savePlan(nextPlan)
   }
@@ -485,7 +496,31 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             <div className="plan-badges">
               {plan.classification && <span className="plan-badge plan-badge-accent">{plan.classification}</span>}
               {plan.product?.stage && <span className="plan-badge plan-badge-stage">{t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}</span>}
-              {plan.product?.category && <span className="plan-badge plan-badge-category">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
+              {!readOnly && editingCategory ? (
+                <select
+                  className="plan-badge-category-select"
+                  autoFocus
+                  value={plan.product?.category || ''}
+                  onChange={(e) => { updateCategory(e.target.value); setEditingCategory(false) }}
+                  onBlur={() => setEditingCategory(false)}
+                >
+                  {Object.entries(t(lang, 'product.categoryOptions')).map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </select>
+              ) : (
+                (plan.product?.category || !readOnly) && (
+                  <span
+                    className={`plan-badge plan-badge-category${!readOnly ? ' plan-badge-editable' : ''}`}
+                    onClick={() => !readOnly && setEditingCategory(true)}
+                    title={!readOnly ? t(lang, 'gallery.editCategory') : undefined}
+                  >
+                    {plan.product?.category
+                      ? (t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category)
+                      : t(lang, 'gallery.setCategory')}
+                  </span>
+                )
+              )}
             </div>
           </div>
 

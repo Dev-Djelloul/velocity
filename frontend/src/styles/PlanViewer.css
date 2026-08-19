@@ -197,6 +197,25 @@
   color: var(--color-success);
 }
 
+.plan-badge-editable {
+  cursor: pointer;
+}
+
+.plan-badge-editable:hover {
+  border-color: rgba(74, 222, 128, 0.6);
+}
+
+.plan-badge-category-select {
+  background: var(--color-bg-tertiary);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  border-radius: 999px;
+  padding: 0.2rem 0.5rem;
+  font-size: 0.72rem;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-success);
+  font-family: inherit;
+}
+
 .plan-header-stats {
   display: flex;
   align-items: center;
