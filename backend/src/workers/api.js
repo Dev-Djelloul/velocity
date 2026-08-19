@@ -249,11 +249,19 @@ export async function handleApi(request, env, url) {
   // shareId (lien de partage classique, 30 jours), soit un id de plan public (galerie).
   // Générée à la volée, jamais stockée (voir generatePlanOgImage).
   const ogMatch = pathname.match(/^\/og\/([^/]+)\.png$/)
-  if (ogMatch && method === 'GET') {
+  if (ogMatch && (method === 'GET' || method === 'HEAD')) {
     const id = ogMatch[1]
     const shared = await db.resolveShare(env, id).catch(() => null)
     const plan = shared?.plan || await db.getPublicPlan(env, id).catch(() => null)
     if (!plan) return json({ error: 'not found' }, 404)
+    // LinkedIn/Facebook/Slack envoient d'abord un HEAD sur og:image pour vérifier son
+    // type avant de faire le GET réel — un 405 sur ce HEAD (avant ce correctif, seul GET
+    // était géré) leur faisait abandonner sans jamais récupérer l'image ("No image found"
+    // dans LinkedIn Post Inspector alors que l'image répondait très bien en GET direct).
+    // Réponse légère sans regénérer l'image pour un simple HEAD.
+    if (method === 'HEAD') {
+      return new Response(null, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=3600' } })
+    }
     try {
       return await generatePlanOgImage(plan)
     } catch (e) {
