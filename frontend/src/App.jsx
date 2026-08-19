@@ -15,6 +15,7 @@ import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
 import GalleryPage from './components/GalleryPage'
 import AccountPage from './components/AccountPage'
+import NotificationsPage from './components/NotificationsPage'
 import TeamPage from './components/TeamPage'
 import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
@@ -38,7 +39,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings']
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -55,7 +56,8 @@ const PAGE_TO_PATH = {
   team: '/mon-equipe',
   space: '/mon-espace',
   gallery: '/ma-galerie',
-  settings: '/parametres'
+  settings: '/parametres',
+  notifications: '/notifications'
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
@@ -68,6 +70,7 @@ const PATH_TO_PAGE = {
   '/mon-equipe': 'team',
   '/mon-espace': 'space',
   '/ma-galerie': 'gallery',
+  '/notifications': 'notifications',
   '/parametres': 'settings'
 }
 
@@ -613,11 +616,8 @@ export default function App() {
   const personalSpaceName = isSignedIn ? getPersonalSpace(userId, lang).name : t(lang, 'team.personalSpace')
 
   const goToNotifications = () => {
-    setCurrentPage('account')
+    setCurrentPage('notifications')
     window.scrollTo(0, 0)
-    setTimeout(() => {
-      document.getElementById('account-notifications')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }, 80)
   }
 
   // Invitation d'équipe ouverte alors qu'une session est déjà active dans ce navigateur
@@ -951,9 +951,17 @@ export default function App() {
             lang={lang}
             onBack={() => setCurrentPage('landing')}
             onLoadPlan={handleOpenPlanFromHistory}
-            onOpenNotification={handleOpenNotification}
+            onCreateTeam={() => setShowCreateTeam(true)}
             pendingAction={pendingAccountAction}
             onConsumeAction={() => setPendingAccountAction(null)}
+          />
+        )}
+        {currentPage === 'notifications' && isSignedIn && (
+          <NotificationsPage
+            key={dataVersion}
+            lang={lang}
+            onBack={() => setCurrentPage('landing')}
+            onOpenNotification={handleOpenNotification}
           />
         )}
         {currentPage === 'team' && isSignedIn && (

@@ -5,10 +5,8 @@ import { deletePlan, movePlanToTeam, fetchAllPlansAggregated, getAllPlans, toggl
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
-import { getReadIds, markCommentsRead, getDismissedIds, dismissComments } from '../lib/commentReads'
 import { getPersonalSpace } from '../lib/personalSpace'
-import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconMessageCircle, IconCrown } from './Icons'
+import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconBarChart, IconCrown } from './Icons'
 
 const PROVIDER_ICONS = {
   google: IconProviderGoogle,
@@ -20,8 +18,9 @@ import PricingCards from './PricingCards'
 import { ContactModal } from './CompanyModals'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
+import '../styles/SpacePage.css'
 
-export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotification, pendingAction, onConsumeAction }) {
+export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pendingAction, onConsumeAction }) {
   const { user } = useUser()
   const { userId, signOut } = useAuth()
   const openSecurity = useOpenSecurity()
@@ -29,8 +28,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   const team = useTeam()
   const ProviderIcon = authProvider ? PROVIDER_ICONS[authProvider] : null
   const [plans, setPlans] = useState([])
-  const [notifications, setNotifications] = useState(() => collectRecentComments(userId, lang))
-  const [readVersion, setReadVersion] = useState(0)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [showContact, setShowContact] = useState(false)
   const [showAvatarPicker, setShowAvatarPicker] = useState(false)
@@ -38,48 +35,10 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
   const [checkoutError, setCheckoutError] = useState(false)
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
-  const [showClearNotifs, setShowClearNotifs] = useState(false)
 
   const pro = isPro(userId)
-  const readIds = getReadIds(userId)
-  const dismissedIds = getDismissedIds(userId)
-  const visibleNotifications = notifications.filter(n => !dismissedIds.has(n.id))
-  const unreadNotifications = visibleNotifications.filter(n => !readIds.has(n.id)).length
 
-  const openNotification = (item) => {
-    markCommentsRead(userId, [item.id])
-    setReadVersion(v => v + 1)
-    onOpenNotification?.(item)
-  }
-
-  // "Tout effacer" ne supprime jamais le commentaire réel (visible côté plan) — seulement
-  // sa présence dans CE flux de notifications, pour repartir d'une liste vide quand elle
-  // devient trop longue à parcourir.
-  const clearAllNotifications = () => {
-    dismissComments(userId, visibleNotifications.map(n => n.id))
-    setReadVersion(v => v + 1)
-    setShowClearNotifs(false)
-  }
-
-  // Polling léger (toutes les 45s tant que cette page est ouverte) : va chercher côté
-  // serveur les commentaires postés depuis un autre appareil, sur des espaces jamais
-  // ouverts localement dans ce navigateur — sans ça, un commentaire posté ailleurs
-  // resterait invisible ici tant qu'on n'a pas soi-même rouvert cet espace. Réservé à Pro
-  // (voir tarification) : inutile d'interroger le serveur pour un flux qu'on n'affiche pas.
   const teamIdsKey = (team.myTeams || []).map(tm => tm.id).join(',')
-  useEffect(() => {
-    if (!userId || !pro) return
-    const teamIds = teamIdsKey ? teamIdsKey.split(',') : []
-    let cancelled = false
-    const poll = () => {
-      fetchRecentComments(userId, teamIds, lang).then(list => {
-        if (!cancelled) setNotifications(list)
-      })
-    }
-    poll()
-    const interval = setInterval(poll, 45000)
-    return () => { cancelled = true; clearInterval(interval) }
-  }, [userId, teamIdsKey, lang, pro])
 
   // "Historique de tous les plans" regroupe tous les espaces — réservé à Pro (voir
   // tarification). En gratuit, on reste utile (gérer ses propres plans reste possible)
@@ -179,6 +138,18 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
 
       <h2 className="settings-page-title"><IconUser width={20} height={20} /> {t(lang, 'auth.myAccount')}</h2>
 
+      {!team.teamId && (
+        <button className="account-section card space-page-upsell account-collab-cta" onClick={onCreateTeam}>
+          <IconBarChart width={20} height={20} />
+          <div>
+            <h3>{lang === 'fr' ? 'Envie de collaborer ?' : 'Want to collaborate?'}</h3>
+            <p>{lang === 'fr'
+              ? 'Crée une équipe pour partager tes plans, commenter et assigner des tâches à plusieurs.'
+              : 'Create a team to share your plans, comment and assign tasks with others.'}</p>
+          </div>
+        </button>
+      )}
+
       <div className="account-header card">
         <div className="account-avatar-wrap">
           <button className="account-avatar account-avatar-btn" onClick={() => setShowAvatarPicker(true)} title={t(lang, 'account.avatarChangeCta')}>
@@ -230,50 +201,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
               </>
             )}
           </>
-        )}
-      </div>
-
-      <div className="account-section card" id="account-notifications">
-        <h3 className="account-section-title-row">
-          <span>
-            <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
-            {!pro && <span className="export-pro-badge">PRO</span>}
-            {pro && unreadNotifications > 0 && <span className="account-notif-count">{unreadNotifications}</span>}
-          </span>
-          {pro && visibleNotifications.length > 0 && (
-            <button className="account-clear-btn" onClick={() => setShowClearNotifs(true)}>
-              {t(lang, 'account.clearNotifications')}
-            </button>
-          )}
-        </h3>
-        {!pro ? (
-          <div className="account-locked-teaser">
-            <p className="account-empty">{t(lang, 'account.notificationsProNote')}</p>
-            <button className="account-pro-cta" onClick={() => setShowUpgrade(true)}>
-              <IconRocket width={14} height={14} /> {t(lang, 'account.upgradeCta')}
-            </button>
-          </div>
-        ) : visibleNotifications.length === 0 ? (
-          <p className="account-empty">{lang === 'fr' ? 'Aucune notification pour le moment.' : 'No notifications yet.'}</p>
-        ) : (
-          <div className="account-list">
-            {visibleNotifications.slice(0, 8).map(item => (
-              <button
-                key={item.id}
-                className={`account-notif-item ${readIds.has(item.id) ? '' : 'is-unread'}`}
-                onClick={() => openNotification(item)}
-              >
-                <span className="account-notif-head">
-                  <strong>{item.authorName}</strong>
-                  {lang === 'fr' ? ' a commenté ' : ' commented on '}
-                  <em>{item.planName}</em>
-                  <span className="account-notif-space">{item.spaceId ? (item.spaceName || t(lang, 'team.myTeams')) : getPersonalSpace(userId, lang).name}</span>
-                </span>
-                <span className="account-notif-text">{item.text}</span>
-                <span className="account-notif-date">{formatFullDateTime(item.createdAt, lang)}</span>
-              </button>
-            ))}
-          </div>
         )}
       </div>
 
@@ -363,20 +290,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
       )}
 
       {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
-
-      {showClearNotifs && (
-        <div className="confirm-modal-backdrop" onClick={() => setShowClearNotifs(false)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
-            <h3>{t(lang, 'account.clearNotificationsConfirmTitle')}</h3>
-            <p>{t(lang, 'account.clearNotificationsConfirmBody')}</p>
-            <div className="confirm-modal-actions">
-              <button className="btn-secondary" onClick={() => setShowClearNotifs(false)}>{t(lang, 'plans.cancel')}</button>
-              <button className="btn-danger" onClick={clearAllNotifications}>{t(lang, 'account.clearNotifications')}</button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {deletePlanTarget && (
         <div className="confirm-modal-backdrop" onClick={() => setDeletePlanTarget(null)}>

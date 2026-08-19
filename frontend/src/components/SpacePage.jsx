@@ -5,7 +5,7 @@ import { getAllPlans, deletePlan, duplicatePlan, toggleFavorite } from '../lib/p
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
-import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
+import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
 import { teamColor } from './TeamAvatar'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
@@ -264,18 +264,6 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
               ))}
             </div>
           )}
-        </div>
-      )}
-
-      {!isTeam && (
-        <div className="space-page-section card space-page-upsell">
-          <IconBarChart width={20} height={20} />
-          <div>
-            <h3>{lang === 'fr' ? 'Envie de collaborer ?' : 'Want to collaborate?'}</h3>
-            <p>{lang === 'fr'
-              ? 'Crée une équipe pour partager tes plans, commenter et assigner des tâches à plusieurs.'
-              : 'Create a team to share your plans, comment and assign tasks with others.'}</p>
-          </div>
         </div>
       )}
 

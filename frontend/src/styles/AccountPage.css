@@ -22,6 +22,18 @@
 
 .account-back-btn:hover { color: var(--color-accent); }
 
+.account-collab-cta {
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.account-collab-cta:hover {
+  border-color: rgba(145, 132, 217, 0.4);
+}
+
 .account-header {
   display: flex;
   align-items: center;
