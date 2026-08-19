@@ -61,7 +61,10 @@ export default function GalleryPage({ lang, onOpenPlan }) {
                 ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
                 : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
               <div className="gallery-card-body">
-                <h3>{p.product?.name || t(lang, 'plans.untitled')}</h3>
+                <h3>
+                  {p.product?.name || t(lang, 'plans.untitled')}
+                  {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                </h3>
                 {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
                 <p className="gallery-card-pitch">{p.product?.pitch || p.executiveSummary || ''}</p>
               </div>
