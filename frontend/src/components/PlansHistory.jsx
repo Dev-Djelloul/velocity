@@ -3,7 +3,7 @@ import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan, s
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
-import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy, IconPencil } from './Icons'
+import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy, IconPencil, IconSearch, IconX } from './Icons'
 import '../styles/PlansHistory.css'
 
 export default function PlansHistory({ lang, onLoadPlan, onClose }) {
@@ -13,10 +13,20 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [editingId, setEditingId] = useState(null)
   const [editValue, setEditValue] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     setPlans(getAllPlans())
   }, [])
+
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const visiblePlans = normalizedQuery
+    ? plans.filter(plan => {
+        const name = plan.product?.name || t(lang, 'plans.untitled')
+        return name.toLowerCase().includes(normalizedQuery)
+          || plan.classification?.toLowerCase().includes(normalizedQuery)
+      })
+    : plans
 
   const confirmDelete = () => {
     deletePlan(deleteTarget.id)
@@ -78,8 +88,30 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
     <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.title')} onClose={onClose} wide>
       <p className="plans-intro">{t(lang, 'plans.intro')}</p>
 
+      {plans.length > 3 && (
+        <div className="plans-search">
+          <IconSearch width={15} height={15} className="plans-search-icon" />
+          <input
+            type="text"
+            className="plans-search-input"
+            placeholder={t(lang, 'plans.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="plans-search-clear" onClick={() => setSearchQuery('')} title={t(lang, 'plans.cancel')}>
+              <IconX width={13} height={13} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {visiblePlans.length === 0 && (
+        <p className="plans-empty-state">{t(lang, 'plans.noSearchResults')}</p>
+      )}
+
       <div className="plans-list">
-        {plans.map(plan => (
+        {visiblePlans.map(plan => (
           <div key={plan.id} className="plan-item">
             {plan.coverImage
               ? <img src={plan.coverImage} alt="" className="plan-item-thumb" />

@@ -4,6 +4,60 @@
   margin: -12px 0 24px;
 }
 
+.plans-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.plans-search-icon {
+  position: absolute;
+  left: 12px;
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.plans-search-input {
+  width: 100%;
+  padding: 9px 34px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-tertiary);
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-family: inherit;
+}
+
+.plans-search-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.plans-search-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.plans-search-clear {
+  position: absolute;
+  right: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: none;
+  background: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.plans-search-clear:hover {
+  background: rgba(145, 132, 217, 0.15);
+  color: var(--color-text-primary);
+}
+
 .plans-empty-state {
   padding: 32px 0 8px;
   text-align: center;
