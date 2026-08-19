@@ -32,7 +32,15 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   // correspondent plus à rien.
   useEffect(() => {
     if (!contextMenu) return
-    const close = () => setContextMenu(null)
+    // mousedown (pas click) : un clic sur un item du menu déclenche d'abord mousedown, qui
+    // fermerait le menu et démonterait le bouton avant que son propre onClick n'ait la
+    // moindre chance de se déclencher — d'où le "stopPropagation()" sur l'onClick du menu
+    // (voir plus bas) qui ne suffisait pas. On ignore ici tout mousedown qui tombe dans le
+    // menu lui-même (menuRef), et on ne ferme que pour un clic réellement extérieur.
+    const close = (e) => {
+      if (menuRef.current && e && menuRef.current.contains(e.target)) return
+      setContextMenu(null)
+    }
     const onKeyDown = (e) => { if (e.key === 'Escape') close() }
     document.addEventListener('mousedown', close)
     document.addEventListener('keydown', onKeyDown)
