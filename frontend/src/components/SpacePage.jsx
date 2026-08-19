@@ -229,7 +229,9 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
 
       {!isTeam && (
         <div className="space-page-section card">
-          <h3><IconSave width={16} height={16} /> {t(lang, 'account.draftsSectionTitle')}</h3>
+          <div className="space-page-section-head">
+            <h3><IconSave width={16} height={16} /> {t(lang, 'account.draftsSectionTitle')}</h3>
+          </div>
           {drafts.length === 0 ? (
             <p className="account-empty">{t(lang, 'account.noDrafts')}</p>
           ) : (
