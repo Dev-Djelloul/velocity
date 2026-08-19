@@ -29,47 +29,6 @@ export default function SettingsPage({
       <h2 className="settings-page-title"><IconSettings width={20} height={20} /> {t(lang, 'settings.title')}</h2>
 
       <div className="account-section card">
-        <h3>{t(lang, 'settings.appearanceTitle')}</h3>
-        <div className="settings-row">
-          <div>
-            <p className="settings-row-label">{t(lang, 'settings.themeLabel')}</p>
-          </div>
-          <div className="settings-toggle-group">
-            <button className={theme === 'dark' ? 'active' : ''} onClick={() => theme !== 'dark' && onToggleTheme()}>
-              <IconMoon width={14} height={14} /> {t(lang, 'settings.themeDark')}
-            </button>
-            <button className={theme === 'light' ? 'active' : ''} onClick={() => theme !== 'light' && onToggleTheme()}>
-              <IconSun width={14} height={14} /> {t(lang, 'settings.themeLight')}
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div className="account-section card">
-        <h3>{t(lang, 'settings.languageTitle')}</h3>
-        <p className="account-security-note">{t(lang, 'settings.languageBody')}</p>
-        <div className="settings-toggle-group">
-          <button className={lang === 'fr' ? 'active' : ''} onClick={() => onChangeLang('fr')}>FR</button>
-          <button className={lang === 'en' ? 'active' : ''} onClick={() => onChangeLang('en')}>EN</button>
-        </div>
-      </div>
-
-      <div className="account-section card">
-        <h3><IconClock width={16} height={16} /> {t(lang, 'settings.timezoneTitle')}</h3>
-        <p className="account-security-note">{t(lang, 'settings.timezoneBody')}</p>
-        <select
-          className="settings-select"
-          value={timezone}
-          onChange={(e) => onChangeTimezone(e.target.value)}
-        >
-          <option value="auto">{t(lang, 'settings.timezoneAuto')}</option>
-          {COMMON_TIMEZONES.map(tz => (
-            <option key={tz} value={tz}>{tz.replace('_', ' ')}</option>
-          ))}
-        </select>
-      </div>
-
-      <div className="account-section card">
         <h3>{t(lang, 'settings.accessibilityTitle')}</h3>
 
         <div className="settings-row">
@@ -116,6 +75,30 @@ export default function SettingsPage({
       </div>
 
       <div className="account-section card">
+        <h3>{t(lang, 'settings.languageTitle')}</h3>
+        <p className="account-security-note">{t(lang, 'settings.languageBody')}</p>
+        <div className="settings-toggle-group">
+          <button className={lang === 'fr' ? 'active' : ''} onClick={() => onChangeLang('fr')}>FR</button>
+          <button className={lang === 'en' ? 'active' : ''} onClick={() => onChangeLang('en')}>EN</button>
+        </div>
+      </div>
+
+      <div className="account-section card">
+        <h3><IconClock width={16} height={16} /> {t(lang, 'settings.timezoneTitle')}</h3>
+        <p className="account-security-note">{t(lang, 'settings.timezoneBody')}</p>
+        <select
+          className="settings-select"
+          value={timezone}
+          onChange={(e) => onChangeTimezone(e.target.value)}
+        >
+          <option value="auto">{t(lang, 'settings.timezoneAuto')}</option>
+          {COMMON_TIMEZONES.map(tz => (
+            <option key={tz} value={tz}>{tz.replace('_', ' ')}</option>
+          ))}
+        </select>
+      </div>
+
+      <div className="account-section card">
         <h3>{t(lang, 'settings.formatsTitle')}</h3>
 
         <div className="settings-row">
@@ -140,6 +123,23 @@ export default function SettingsPage({
             <option value="USD">USD ($)</option>
             <option value="GBP">GBP (£)</option>
           </select>
+        </div>
+      </div>
+
+      <div className="account-section card">
+        <h3>{t(lang, 'settings.appearanceTitle')}</h3>
+        <div className="settings-row">
+          <div>
+            <p className="settings-row-label">{t(lang, 'settings.themeLabel')}</p>
+          </div>
+          <div className="settings-toggle-group">
+            <button className={theme === 'dark' ? 'active' : ''} onClick={() => theme !== 'dark' && onToggleTheme()}>
+              <IconMoon width={14} height={14} /> {t(lang, 'settings.themeDark')}
+            </button>
+            <button className={theme === 'light' ? 'active' : ''} onClick={() => theme !== 'light' && onToggleTheme()}>
+              <IconSun width={14} height={14} /> {t(lang, 'settings.themeLight')}
+            </button>
+          </div>
         </div>
       </div>
 
