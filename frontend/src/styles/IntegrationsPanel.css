@@ -1,21 +1,43 @@
+.integrations-list {
+  margin-top: 0.5rem;
+}
+
 .integration-row {
+  display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  /* Espacement généreux (contre l'effet "tout collé" de la version précédente, qui
+     réutilisait .settings-row — pensée pour de simples lignes toggle, pas des lignes
+     icône + badge + détail) + séparateur discret entre chaque service. */
+  padding: 1.1rem 0.25rem;
+}
+
+.integration-row + .integration-row {
+  border-top: 1px solid rgba(145, 132, 217, 0.12);
 }
 
 .integration-info {
   display: flex;
   align-items: center;
-  gap: 0.85rem;
+  gap: 1rem;
+  min-width: 0;
+}
+
+.integration-info > div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
 }
 
 .integration-icon {
   flex-shrink: 0;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
   object-fit: contain;
   background: rgba(255, 255, 255, 0.06);
-  padding: 5px;
+  padding: 6px;
 }
 
 /* Le logo Linear "dark" (blanc/clair) a été pensé pour un bouton plein-couleur, pas un fond
@@ -25,25 +47,23 @@
   background: #1a1a1a;
 }
 
-.integration-icon-gcal {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #4285f4;
-  background: rgba(66, 133, 244, 0.12);
-}
-
 .integration-badge {
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  margin-top: 0.2rem;
+  width: fit-content;
   padding: 0.15rem 0.55rem;
   border-radius: 999px;
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.02em;
+}
+
+.integration-detail {
+  margin: 0;
+  font-size: var(--font-size-sm, 0.85rem);
+  color: var(--color-text-muted);
 }
 
 .integration-badge.is-disconnected {

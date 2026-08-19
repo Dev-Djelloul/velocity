@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n'
 import { notionStatus, notionDisconnect, jiraStatus, jiraDisconnect, linearStatus, linearDisconnect, googleCalendarStatus, googleCalendarDisconnect } from '../lib/serverStorage'
-import { IconCalendar, IconCheckCircle, IconCircleDot } from './Icons'
+import { IconCheckCircle, IconCircleDot } from './Icons'
 import '../styles/IntegrationsPanel.css'
 
 // Récap des intégrations tierces connectées (Notion, Jira, Linear, Google Calendar), avec
@@ -14,7 +14,7 @@ const INTEGRATIONS_META = {
   notion: { icon: '/assets/icons/icons8-notion-32.png', brand: 'notion' },
   jira: { icon: '/assets/icons/icons8-jira-32.png', brand: 'jira' },
   linear: { icon: '/assets/icons/linear-dark.png', brand: 'linear' },
-  gcal: { icon: null, brand: 'gcal' }
+  gcal: { icon: '/assets/icons/icons8-google-calendar-64.png', brand: 'gcal' }
 }
 
 function StatusBadge({ connected, brand, lang }) {
@@ -23,6 +23,29 @@ function StatusBadge({ connected, brand, lang }) {
       {connected ? <IconCheckCircle width={12} height={12} /> : <IconCircleDot width={12} height={12} />}
       {connected ? t(lang, 'settings.integrationsConnectedBadge') : t(lang, 'settings.integrationsNotConnectedBadge')}
     </span>
+  )
+}
+
+// Une ligne par service — factorisée pour ne pas répéter 4 fois la même structure (icône,
+// nom, badge, détail optionnel, bouton déconnecter). Le détail (workspace/projet/équipe/
+// calendrier) ne s'affiche que s'il existe vraiment : avant, un détail vide retombait sur
+// "Connecté" tout court, dupliquant l'info déjà donnée par le badge juste au-dessus.
+function IntegrationRow({ name, meta, status, detail, onDisconnect, lang, iconClassName = '' }) {
+  const connected = !!status?.connected
+  return (
+    <div className="integration-row">
+      <div className="integration-info">
+        <img src={meta.icon} alt="" className={`integration-icon ${iconClassName}`} />
+        <div>
+          <p className="settings-row-label">{name}</p>
+          <StatusBadge connected={connected} brand={meta.brand} lang={lang} />
+          {connected && detail && <p className="integration-detail">{detail}</p>}
+        </div>
+      </div>
+      {connected && (
+        <button className="btn-secondary" onClick={onDisconnect}>{t(lang, 'settings.integrationsDisconnect')}</button>
+      )}
+    </div>
   )
 }
 
@@ -67,60 +90,40 @@ export default function IntegrationsPanel({ lang, userId }) {
       <h3>{t(lang, 'settings.integrationsTitle')}</h3>
       <p className="account-security-note">{t(lang, 'settings.integrationsBody')}</p>
 
-      <div className="settings-row integration-row">
-        <div className="integration-info">
-          <img src={INTEGRATIONS_META.notion.icon} alt="" className="integration-icon" />
-          <div>
-            <p className="settings-row-label">Notion</p>
-            <StatusBadge connected={!!notion?.connected} brand="notion" lang={lang} />
-            {notion?.connected && <p className="account-security-note">{t(lang, 'settings.integrationsConnected')(notion.workspace)}</p>}
-          </div>
-        </div>
-        {notion?.connected && (
-          <button className="btn-secondary" onClick={disconnectNotion}>{t(lang, 'settings.integrationsDisconnect')}</button>
-        )}
-      </div>
-
-      <div className="settings-row integration-row">
-        <div className="integration-info">
-          <img src={INTEGRATIONS_META.jira.icon} alt="" className="integration-icon" />
-          <div>
-            <p className="settings-row-label">Jira</p>
-            <StatusBadge connected={!!jira?.connected} brand="jira" lang={lang} />
-            {jira?.connected && <p className="account-security-note">{t(lang, 'settings.integrationsConnected')(jira.project ? `${jira.site} · ${jira.project.name}` : jira.site)}</p>}
-          </div>
-        </div>
-        {jira?.connected && (
-          <button className="btn-secondary" onClick={disconnectJira}>{t(lang, 'settings.integrationsDisconnect')}</button>
-        )}
-      </div>
-
-      <div className="settings-row integration-row">
-        <div className="integration-info">
-          <img src={INTEGRATIONS_META.linear.icon} alt="" className="integration-icon integration-icon-linear" />
-          <div>
-            <p className="settings-row-label">Linear</p>
-            <StatusBadge connected={!!linear?.connected} brand="linear" lang={lang} />
-            {linear?.connected && <p className="account-security-note">{t(lang, 'settings.integrationsConnected')(linear.team?.name)}</p>}
-          </div>
-        </div>
-        {linear?.connected && (
-          <button className="btn-secondary" onClick={disconnectLinear}>{t(lang, 'settings.integrationsDisconnect')}</button>
-        )}
-      </div>
-
-      <div className="settings-row integration-row">
-        <div className="integration-info">
-          <span className="integration-icon integration-icon-gcal"><IconCalendar width={17} height={17} /></span>
-          <div>
-            <p className="settings-row-label">Google Calendar</p>
-            <StatusBadge connected={!!gcal?.connected} brand="gcal" lang={lang} />
-            {gcal?.connected && <p className="account-security-note">{t(lang, 'settings.integrationsConnected')(gcal.calendar?.name)}</p>}
-          </div>
-        </div>
-        {gcal?.connected && (
-          <button className="btn-secondary" onClick={disconnectGcal}>{t(lang, 'settings.integrationsDisconnect')}</button>
-        )}
+      <div className="integrations-list">
+        <IntegrationRow
+          name="Notion"
+          meta={INTEGRATIONS_META.notion}
+          status={notion}
+          detail={notion?.workspace}
+          onDisconnect={disconnectNotion}
+          lang={lang}
+        />
+        <IntegrationRow
+          name="Jira"
+          meta={INTEGRATIONS_META.jira}
+          status={jira}
+          detail={jira?.project ? `${jira.site} · ${jira.project.name}` : jira?.site}
+          onDisconnect={disconnectJira}
+          lang={lang}
+        />
+        <IntegrationRow
+          name="Linear"
+          meta={INTEGRATIONS_META.linear}
+          status={linear}
+          detail={linear?.team?.name}
+          onDisconnect={disconnectLinear}
+          lang={lang}
+          iconClassName="integration-icon-linear"
+        />
+        <IntegrationRow
+          name="Google Calendar"
+          meta={INTEGRATIONS_META.gcal}
+          status={gcal}
+          detail={gcal?.calendar?.name}
+          onDisconnect={disconnectGcal}
+          lang={lang}
+        />
       </div>
     </div>
   )
