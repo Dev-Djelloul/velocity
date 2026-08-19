@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useTeam, useUser, useAuth } from '../lib/auth'
 import { getAllPlans, deletePlan, duplicatePlan, toggleFavorite } from '../lib/planStorage'
-import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
+import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
 import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
@@ -10,6 +10,7 @@ import { teamColor } from './TeamAvatar'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
 import '../styles/SpacePage.css'
+import '../styles/GalleryPage.css'
 
 // Combien de plans "récents" afficher dans l'espace personnel — un aperçu rapide, pas un
 // archivage complet (celui-ci reste dans "Mon compte" → Historique de tous les plans).
@@ -34,6 +35,8 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [drafts, setDrafts] = useState(isTeam ? [] : getAllDrafts)
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
+  const [renameDraftTarget, setRenameDraftTarget] = useState(null)
+  const [draftEditValue, setDraftEditValue] = useState('')
   const [personalSpace, setPersonalSpace] = useState(() => getPersonalSpace(userId, lang))
   const [showEditPersonal, setShowEditPersonal] = useState(false)
   const [showPersonalAvatarPicker, setShowPersonalAvatarPicker] = useState(false)
@@ -95,6 +98,24 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     e.stopPropagation()
     toggleFavorite(plan)
     setPlans(getAllPlans())
+  }
+
+  // Modale dédiée plutôt qu'édition inline dans la carte : account-list-item-main est un
+  // <button> (clic = charger le brouillon), et un <input> imbriqué dedans se comporte de
+  // façon peu fiable selon les navigateurs (même problème déjà rencontré et corrigé pour le
+  // renommage des plans dans la galerie — voir GalleryPage.jsx).
+  const openRenameDraft = (draft) => {
+    setRenameDraftTarget(draft)
+    setDraftEditValue(draft.name)
+  }
+
+  const commitRenameDraft = () => {
+    const trimmed = draftEditValue.trim()
+    if (trimmed && trimmed !== renameDraftTarget.name) {
+      renameDraft(renameDraftTarget.id, trimmed)
+      setDrafts(getAllDrafts())
+    }
+    setRenameDraftTarget(null)
   }
 
   const confirmDeleteDraft = () => {
@@ -262,6 +283,9 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                   <button className="account-list-item-main" onClick={() => onLoadDraft(d.data)}>
                     <span className="account-list-item-name">{d.name}</span>
                   </button>
+                  <button className="account-list-item-move" onClick={() => openRenameDraft(d)} title={lang === 'fr' ? 'Renommer' : 'Rename'}>
+                    <IconPencil width={14} height={14} />
+                  </button>
                   <button className="account-list-item-delete" onClick={() => setDeleteDraftTarget(d)} title="Delete">
                     <IconTrash width={14} height={14} />
                   </button>
@@ -322,6 +346,30 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <div className="confirm-modal-actions">
               <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>{t(lang, 'plans.cancel')}</button>
               <button className="btn-danger" onClick={confirmDelete}>{t(lang, 'plans.delete')}</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {renameDraftTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setRenameDraftTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconPencil width={22} height={22} /></div>
+            <h3>{lang === 'fr' ? 'Renommer le brouillon' : 'Rename draft'}</h3>
+            <input
+              type="text"
+              className="gallery-rename-input"
+              value={draftEditValue}
+              autoFocus
+              onChange={(e) => setDraftEditValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') { e.preventDefault(); commitRenameDraft() }
+                if (e.key === 'Escape') { e.preventDefault(); setRenameDraftTarget(null) }
+              }}
+            />
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setRenameDraftTarget(null)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-primary" onClick={commitRenameDraft} disabled={!draftEditValue.trim()}>{t(lang, 'app.save')}</button>
             </div>
           </div>
         </div>
