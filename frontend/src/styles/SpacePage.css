@@ -238,7 +238,10 @@
 .space-page-plain-note {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
-  margin: 0;
+  /* Décalé pour démarrer sous le mot "Mes" du titre juste au-dessus (icône 18px + gap
+     0.85rem, voir .space-page-section-head h3) — sans ça le texte repart du bord de la
+     carte, sous l'icône, au lieu de s'aligner avec le titre. */
+  margin: 0 0 0 calc(18px + 0.85rem);
 }
 
 .space-page-upsell h3 {
