@@ -267,6 +267,8 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
 
       <ExportBrandingSection lang={lang} userId={userId} isPro={pro} onRequestUpgrade={() => setShowUpgrade(true)} />
 
+      <PrivacySection lang={lang} userId={userId} />
+
       {openSecurity && (
         <div className="account-section account-security card">
           <h3><IconShield width={16} height={16} /> {t(lang, 'account.securityTitle')}</h3>
@@ -274,8 +276,6 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
           <button className="btn-security" onClick={openSecurity}>{t(lang, 'account.securityCta')}</button>
         </div>
       )}
-
-      <PrivacySection lang={lang} userId={userId} />
 
       {showUpgrade && (
         <div className="modal-backdrop" onClick={() => setShowUpgrade(false)}>
