@@ -25,6 +25,20 @@
 
 .copilot-fab:hover { filter: brightness(1.08); transform: translateY(-1px); }
 
+.copilot-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  object-fit: cover;
+  background: #fff;
+}
+
+.copilot-msg-avatar {
+  width: 22px;
+  height: 22px;
+}
+
 .copilot-panel {
   position: fixed;
   right: 24px;
@@ -76,8 +90,6 @@
   font-weight: 700;
   font-size: 14px;
 }
-
-.copilot-panel-title svg { color: var(--color-accent); flex-shrink: 0; }
 
 .copilot-panel-title span {
   background: var(--wordmark-gradient);
@@ -164,9 +176,32 @@
   color: var(--color-text-primary);
 }
 
+/* Chaque message est une ligne avatar + bulle (l'avatar n'apparaît que côté Nova, voir
+   copilot-msg-row-assistant) — la ligne elle-même porte la limite de largeur et l'alignement
+   gauche/droite, la bulle se contente de remplir l'espace qu'il lui reste. */
+.copilot-msg-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  max-width: 92%;
+}
+
+.copilot-msg-row-user {
+  align-self: flex-end;
+  justify-content: flex-end;
+}
+
+.copilot-msg-row-assistant {
+  align-self: flex-start;
+}
+
+.copilot-msg-avatar {
+  margin-bottom: 2px;
+}
+
 .copilot-msg {
   position: relative;
-  max-width: 92%;
+  min-width: 0;
   padding: 8px 12px;
   border-radius: var(--radius-lg);
   font-size: 13.5px;
@@ -176,14 +211,12 @@
 .copilot-msg p { margin: 0; }
 
 .copilot-msg-user {
-  align-self: flex-end;
   background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
   color: #fff;
   border-bottom-right-radius: 4px;
 }
 
 .copilot-msg-assistant {
-  align-self: flex-start;
   background: var(--color-bg-tertiary);
   color: var(--color-text-primary);
   border: 1px solid rgba(145, 132, 217, 0.12);

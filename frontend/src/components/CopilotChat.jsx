@@ -1,8 +1,10 @@
 import { useState, useRef, useEffect } from 'react'
 import { copilotChat } from '../lib/serverStorage'
 import { t } from '../lib/i18n'
-import { IconMessageCircle, IconX, IconSend, IconSparkle, IconTrash, IconCopy, IconCheckCircle } from './Icons'
+import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle } from './Icons'
 import '../styles/CopilotChat.css'
+
+const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
 
 // Copilote IA conversationnel : chat flottant qui laisse l'utilisateur itérer sur son plan
 // en langage naturel. Le backend (/copilot/chat) renvoie une réponse conversationnelle et,
@@ -78,7 +80,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
   return (
     <>
       <button type="button" className="copilot-fab" onClick={() => setOpen(o => !o)}>
-        <IconMessageCircle width={20} height={20} />
+        <img className="copilot-avatar" src={NOVA_AVATAR} alt="" />
         <span>{t(lang, 'copilot.openButton')}</span>
       </button>
 
@@ -86,7 +88,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
         <div className="copilot-panel">
           <div className="copilot-panel-header">
             <div className="copilot-panel-title">
-              <IconSparkle width={16} height={16} />
+              <img className="copilot-avatar" src={NOVA_AVATAR} alt="" />
               <span>{t(lang, 'copilot.title')}</span>
             </div>
             <div className="copilot-panel-header-actions">
@@ -115,22 +117,28 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
               </div>
             )}
             {messages.map((m, i) => (
-              <div key={i} className={`copilot-msg copilot-msg-${m.role}${m.error ? ' copilot-msg-error' : ''}`}>
-                <p>{m.content}</p>
-                {m.note && <p className="copilot-msg-note">{m.note}</p>}
-                {m.role === 'assistant' && !m.error && (
-                  <button type="button" className="copilot-msg-copy" onClick={() => copyReply(m.content, i)} title={t(lang, 'copilot.copyReply')}>
-                    {copiedIndex === i ? <IconCheckCircle width={12} height={12} /> : <IconCopy width={12} height={12} />}
-                    {copiedIndex === i ? t(lang, 'copilot.copied') : t(lang, 'copilot.copyReply')}
-                  </button>
-                )}
+              <div key={i} className={`copilot-msg-row copilot-msg-row-${m.role}`}>
+                {m.role === 'assistant' && <img className="copilot-avatar copilot-msg-avatar" src={NOVA_AVATAR} alt="" />}
+                <div className={`copilot-msg copilot-msg-${m.role}${m.error ? ' copilot-msg-error' : ''}`}>
+                  <p>{m.content}</p>
+                  {m.note && <p className="copilot-msg-note">{m.note}</p>}
+                  {m.role === 'assistant' && !m.error && (
+                    <button type="button" className="copilot-msg-copy" onClick={() => copyReply(m.content, i)} title={t(lang, 'copilot.copyReply')}>
+                      {copiedIndex === i ? <IconCheckCircle width={12} height={12} /> : <IconCopy width={12} height={12} />}
+                      {copiedIndex === i ? t(lang, 'copilot.copied') : t(lang, 'copilot.copyReply')}
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
             {busy && (
-              <div className="copilot-msg copilot-msg-assistant copilot-msg-thinking">
-                <span className="copilot-typing-dot" />
-                <span className="copilot-typing-dot" />
-                <span className="copilot-typing-dot" />
+              <div className="copilot-msg-row copilot-msg-row-assistant">
+                <img className="copilot-avatar copilot-msg-avatar" src={NOVA_AVATAR} alt="" />
+                <div className="copilot-msg copilot-msg-assistant copilot-msg-thinking">
+                  <span className="copilot-typing-dot" />
+                  <span className="copilot-typing-dot" />
+                  <span className="copilot-typing-dot" />
+                </div>
               </div>
             )}
           </div>
