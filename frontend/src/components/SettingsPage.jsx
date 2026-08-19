@@ -1,10 +1,5 @@
 import { t } from '../lib/i18n'
 import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings } from './Icons'
-import IntegrationsPanel from './IntegrationsPanel'
-import NotificationsSection from './NotificationsSection'
-import WebhooksSection from './WebhooksSection'
-import ExportBrandingSection from './ExportBrandingSection'
-import PrivacySection from './PrivacySection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 
@@ -23,7 +18,7 @@ export default function SettingsPage({
   lang, theme, onToggleTheme, onChangeLang, timezone, onChangeTimezone,
   reduceMotion, onToggleReduceMotion, fontSize, onChangeFontSize,
   highContrast, onToggleHighContrast, dateFormat, onChangeDateFormat,
-  currency, onChangeCurrency, userId, isPro, onRequestUpgrade, onBack
+  currency, onChangeCurrency, onBack
 }) {
   return (
     <div className="account-page">
@@ -148,11 +143,6 @@ export default function SettingsPage({
         </div>
       </div>
 
-      <NotificationsSection lang={lang} userId={userId} />
-      <IntegrationsPanel lang={lang} userId={userId} />
-      <WebhooksSection lang={lang} userId={userId} />
-      <ExportBrandingSection lang={lang} userId={userId} isPro={isPro} onRequestUpgrade={onRequestUpgrade} />
-      <PrivacySection lang={lang} userId={userId} />
     </div>
   )
 }

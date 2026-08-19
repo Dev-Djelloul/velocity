@@ -16,6 +16,8 @@ const PROVIDER_ICONS = {
 import AvatarPicker from './AvatarPicker'
 import PricingCards from './PricingCards'
 import { ContactModal } from './CompanyModals'
+import ExportBrandingSection from './ExportBrandingSection'
+import PrivacySection from './PrivacySection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 import '../styles/SpacePage.css'
@@ -258,6 +260,8 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
         )}
       </div>
 
+      <ExportBrandingSection lang={lang} userId={userId} isPro={pro} onRequestUpgrade={() => setShowUpgrade(true)} />
+
       {openSecurity && (
         <div className="account-section account-security card">
           <h3><IconShield width={16} height={16} /> {t(lang, 'account.securityTitle')}</h3>
@@ -265,6 +269,8 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
           <button className="btn-security" onClick={openSecurity}>{t(lang, 'account.securityCta')}</button>
         </div>
       )}
+
+      <PrivacySection lang={lang} userId={userId} />
 
       {showUpgrade && (
         <div className="modal-backdrop" onClick={() => setShowUpgrade(false)}>

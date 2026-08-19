@@ -10,13 +10,14 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { IconArrowLeft, IconMessageCircle, IconRocket, IconAlertTriangle, IconX } from './Icons'
 import PricingCards from './PricingCards'
 import { ContactModal } from './CompanyModals'
+import NotificationsSection from './NotificationsSection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 
-// Page dédiée au fil de notifications (@mentions/commentaires reçus) — extraite de
-// AccountPage, sur le même modèle que SettingsPage (retour + titre à icône). Distincte des
-// préférences de notification (email/Slack, voir NotificationsSection.jsx dans Paramètres) :
-// ici c'est la boîte de réception elle-même, pas sa configuration.
+// Page dédiée aux notifications : le fil (@mentions/commentaires reçus) ET, depuis leur
+// déménagement hors de Paramètres, les préférences email/Slack (NotificationsSection) —
+// tout ce qui concerne les notifications vit maintenant au même endroit, plutôt que d'avoir
+// la boîte de réception ici et sa configuration ailleurs.
 export default function NotificationsPage({ lang, onBack, onOpenNotification }) {
   const { user } = useUser()
   const { userId } = useAuth()
@@ -126,6 +127,8 @@ export default function NotificationsPage({ lang, onBack, onOpenNotification }) 
           </div>
         )}
       </div>
+
+      <NotificationsSection lang={lang} userId={userId} />
 
       {showUpgrade && (
         <div className="modal-backdrop" onClick={() => setShowUpgrade(false)}>

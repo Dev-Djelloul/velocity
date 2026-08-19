@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import Landing from './components/Landing'
 import DemoModal from './components/DemoModal'
 import Wordmark from './components/Wordmark'
-import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart, IconMessageCircle, IconMenu, IconX } from './components/Icons'
+import { IconClipboard, IconUser, IconLogin, IconLock, IconSparkle, IconSun, IconMoon, IconSettings, IconLogOut, IconChevronDown, IconUsers, IconCheckCircle, IconPlus, IconBarChart, IconMessageCircle, IconMenu, IconX, IconLink } from './components/Icons'
 import InfoModal from './components/InfoModal'
 import Questionnaire from './components/Questionnaire'
 import PlanViewer from './components/PlanViewer'
@@ -16,6 +16,7 @@ import HowItWorksPage from './components/HowItWorksPage'
 import GalleryPage from './components/GalleryPage'
 import AccountPage from './components/AccountPage'
 import NotificationsPage from './components/NotificationsPage'
+import IntegrationsPage from './components/IntegrationsPage'
 import TeamPage from './components/TeamPage'
 import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
@@ -39,7 +40,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications']
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -57,7 +58,8 @@ const PAGE_TO_PATH = {
   space: '/mon-espace',
   gallery: '/ma-galerie',
   settings: '/parametres',
-  notifications: '/notifications'
+  notifications: '/notifications',
+  integrations: '/integrations'
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
@@ -71,7 +73,8 @@ const PATH_TO_PAGE = {
   '/mon-espace': 'space',
   '/ma-galerie': 'gallery',
   '/notifications': 'notifications',
-  '/parametres': 'settings'
+  '/parametres': 'settings',
+  '/integrations': 'integrations'
 }
 
 // URL "jolie" pour le partage (/s/:shareId) — interceptée côté Cloudflare Pages Functions
@@ -555,6 +558,11 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  const goToIntegrations = () => {
+    setCurrentPage('integrations')
+    window.scrollTo(0, 0)
+  }
+
   // Point d'entrée unique vers la modal Pro depuis n'importe où dans l'app (limite de
   // plans atteinte, export/intégration réservée à Pro…) — toujours "Mon compte" avec la
   // modal auto-ouverte, voir pendingAction dans AccountPage.jsx.
@@ -823,10 +831,12 @@ export default function App() {
                         <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
                         {unreadNotifCount > 0 && <span className="header-dropdown-item-badge">{unreadNotifCount}</span>}
                       </button>
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToIntegrations() }}>
+                        <IconLink width={16} height={16} /> {lang === 'fr' ? 'Intégrations' : 'Integrations'}
+                      </button>
                       <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToSettings() }}>
                         <IconSettings width={16} height={16} /> {t(lang, 'settings.title')}
                       </button>
-                      <div className="header-dropdown-divider" />
                       <div className="header-dropdown-divider" />
 
                       <button className="header-dropdown-item header-dropdown-item-danger" onClick={() => { setOpenHeaderMenu(null); signOut() }}>
@@ -1002,9 +1012,13 @@ export default function App() {
             onChangeDateFormat={setDateFormat}
             currency={currency}
             onChangeCurrency={setCurrency}
+            onBack={() => setCurrentPage('landing')}
+          />
+        )}
+        {currentPage === 'integrations' && isSignedIn && (
+          <IntegrationsPage
+            lang={lang}
             userId={userId}
-            isPro={pro}
-            onRequestUpgrade={goToUpgrade}
             onBack={() => setCurrentPage('landing')}
           />
         )}
