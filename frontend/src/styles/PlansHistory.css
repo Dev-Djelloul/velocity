@@ -37,6 +37,29 @@
   box-shadow: 0 6px 20px rgba(145, 132, 217, 0.22);
 }
 
+/* Regroupe la miniature + les infos texte comme un seul bloc pour .plan-item (qui répartit
+   ses enfants directs en space-between) — sans ce wrapper, ajouter la miniature comme
+   troisième enfant aurait aussi inséré un espace indésirable entre elle et le texte. */
+.plan-item-lead {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-width: 0;
+}
+
+.plan-item-thumb {
+  flex-shrink: 0;
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-md, 8px);
+  object-fit: cover;
+}
+
+.plan-item-thumb-placeholder {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  opacity: 0.5;
+}
+
 .plan-info h3 {
   font-size: 16px;
   font-weight: 600;
