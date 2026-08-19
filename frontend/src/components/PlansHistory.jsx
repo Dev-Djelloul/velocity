@@ -102,23 +102,21 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
     <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.title')} onClose={onClose} wide>
       <p className="plans-intro">{t(lang, 'plans.intro')}</p>
 
-      {plans.length > 3 && (
-        <div className="plans-search">
-          <IconSearch width={15} height={15} className="plans-search-icon" />
-          <input
-            type="text"
-            className="plans-search-input"
-            placeholder={t(lang, 'plans.searchPlaceholder')}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="plans-search-clear" onClick={() => setSearchQuery('')} title={t(lang, 'plans.cancel')}>
-              <IconX width={13} height={13} />
-            </button>
-          )}
-        </div>
-      )}
+      <div className="plans-search">
+        <IconSearch width={15} height={15} className="plans-search-icon" />
+        <input
+          type="text"
+          className="plans-search-input"
+          placeholder={t(lang, 'plans.searchPlaceholder')}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searchQuery && (
+          <button className="plans-search-clear" onClick={() => setSearchQuery('')} title={t(lang, 'plans.cancel')}>
+            <IconX width={13} height={13} />
+          </button>
+        )}
+      </div>
 
       {allTags.length > 0 && (
         <div className="tag-filter-row">

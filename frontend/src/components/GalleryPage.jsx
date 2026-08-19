@@ -182,7 +182,7 @@ export default function GalleryPage({ lang, onOpenPlan }) {
         </div>
       )}
 
-      {galleryPlans.length > 3 && (
+      {galleryPlans.length > 0 && (
         <div className="plans-search gallery-search">
           <IconSearch width={15} height={15} className="plans-search-icon" />
           <input
