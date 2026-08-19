@@ -742,6 +742,18 @@ export const translations = {
         entries: [
           {
             date: '19 août 2026',
+            title: 'Nouvelle identité visuelle de la page d\'accueil et de "Comment ça marche"',
+            items: [
+              'Refonte complète de la landing page à partir de la charte visuelle générée avec Ploy (palette lavande/indigo/cyan sur fond quasi noir, typographies Source Serif 4 pour les titres et IBM Plex Sans pour le corps de texte)',
+              'Nouveau hero avec visuel de chemin lumineux à travers les montagnes, badge "Lancez plus vite que jamais" en bleu nuit et police technique, extrait de commande façon terminal, et 3 boutons d\'action tenant sur une seule ligne en FR comme en EN',
+              'Nouvelle page "Comment ça marche" entièrement reconstruite : hero, 4 bénéfices illustrés, 3 étapes détaillées avec captures produit, aperçu de l\'expérience, bandeau témoignages et FAQ, avec les visuels du kit produit Ploy',
+              'Section "Une carte de contrôle pour votre lancement" et "Aperçu du produit" restaurées comme deux blocs distincts avec leurs propres visuels',
+              'Lien FAQ ajouté à la navigation (visible hors connexion), correction du renvoi vers la mauvaise page depuis "Comment ça marche"',
+              'Boutons de connexion Google / Apple / Slack redessinés (padding, bordures, badge "Dernière utilisation" en cyan) au lieu d\'être collés aux bords'
+            ]
+          },
+          {
+            date: '19 août 2026',
             title: 'Galerie 100% privée, Copilote Nova et navigation compte réorganisée',
             items: [
               'Galerie repensée : suppression de l\'ancienne galerie publique (plus aucun plan consultable sans compte), nouvelle galerie 100% privée avec opt-in explicite par plan ("Ajouter à la galerie" dans l\'aperçu du plan), favoris triés en premier, menu contextuel clic droit (ouvrir/favori/renommer/partager/dupliquer/retirer/supprimer), aperçu image en bandeau plein cadre',
@@ -2005,6 +2017,18 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 19, 2026',
+            title: 'New visual identity for the homepage and "How it works"',
+            items: [
+              'Full landing page redesign based on the visual brand kit generated with Ploy (lavender/indigo/cyan palette on a near-black background, Source Serif 4 for headings, IBM Plex Sans for body text)',
+              'New hero with a glowing path-through-mountains visual, a "Launch faster than ever" badge in midnight blue with a technical font, a terminal-style command line, and 3 CTA buttons that stay on one line in both FR and EN',
+              'New "How it works" page fully rebuilt: hero, 4 illustrated benefits, 3 detailed steps with product screenshots, experience overview, testimonial banner and FAQ, using the Ploy product asset kit',
+              '"A control card for your launch" and "Product preview" restored as two distinct sections, each with its own visual',
+              'FAQ link added to the navigation (visible when signed out), fixed a bug where it navigated to the wrong page from "How it works"',
+              'Google / Apple / Slack sign-in buttons redesigned (padding, borders, cyan "Last used" badge) instead of touching the edges'
+            ]
+          },
           {
             date: 'August 19, 2026',
             title: '100% private gallery, Nova Copilot and reorganized account navigation',

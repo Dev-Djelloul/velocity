@@ -118,7 +118,10 @@ export function useCounterAnimation(endValue, isVisible, duration = 2000) {
  */
 export function useAiImages() {
   const images = {
-    heroIsometric: '/assets/ai-images/isometric-3d-concept-of-an-ai-transforming-raw-not.png',
+    heroIsometric: '/assets/ai-images/velocity-hero-launch-landscape.webp',
+    controlCard: '/assets/ai-images/velocity-launch-system-network.webp',
+    howItWorksNetwork: '/assets/ai-images/velocity-planning-control.webp',
+    obsidianAtmosphere: '/assets/ai-images/velocity-obsidian-atmosphere.webp',
     heroIsometricAlt: '/assets/ai-images/isometric-3d-concept-of-an-ai-transforming-raw-not (1).png',
 
     howItWorksWorkflow: '/assets/ai-images/gpt-image-2_Product_launch_workflow_visualization_digital_strategy_diagram_with_5_steps_flow-0.jpg',
@@ -126,17 +129,17 @@ export function useAiImages() {
     professionalMan: '/assets/ai-images/lucid-origin_a_cinematic_photo_of_Professional_man_at_modern_desk_using_laptop_with_glowing_q-0.jpg',
     professionalWoman: '/assets/ai-images/lucid-origin_professional_photo_of_Professional_woman_at_modern_desk_using_laptop_with_glowin-0.jpg',
 
-    teamFounders: '/assets/ai-images/lucid-origin_a_cinematic_photo_of_Group_of_diverse_founders_and_startup_entrepreneurs_celebra-0.jpg',
+    teamFounders: '/assets/ai-images/velocity-founders.jpg',
 
     dashboardPreview: '/assets/ai-images/modern-saas-dashboard-dark-mode-ui-preview--isomet.png',
     dashboardPreviewAlt: '/assets/ai-images/modern-saas-dashboard-dark-mode-ui-preview--isomet (1).png',
     dashboardMockup: '/assets/ai-images/gpt-image-2_professional_photo_of_Dashboard_interface_mockup_for_product_launch_platform_col-0.jpg',
 
     // Aperçu produit v2 (4 cartes) - remplace les 3 précédentes dans Landing.jsx
-    productPreview1: '/assets/ai-images/high-level-description-a-3d-render-of-a-_JMY8FI9FVQ-JUFFq7E1RjQ_dfn8eFbnRgmWLvCn2EZSYw.jpg',
+    productPreview1: '/assets/ai-images/velocity-product-roadmap-sprint.jpg',
     productPreview2: '/assets/ai-images/high-level-description-a-3d-render-of-a-_QEvFEFjVXDGbQyI5bRy5LQ_dfn8eFbnRgmWLvCn2EZSYw.jpg',
-    productPreview3: '/assets/ai-images/high-level-description-a-3d-render-of-a-_iZJBZ9C4WfeRBz8TrqJEEw_dfn8eFbnRgmWLvCn2EZSYw.jpg',
-    productPreview4: '/assets/ai-images/high-level-description-a-3d-render-of-a-_zpMrbERYWWal--c2PYMVhA_dfn8eFbnRgmWLvCn2EZSYw_cover.jpg',
+    productPreview3: '/assets/ai-images/velocity-product-analytics.jpg',
+    productPreview4: '/assets/ai-images/velocity-product-gantt-velocity.jpg',
 
     // Icônes 3D pour les 4 cartes "Pensé pour les founders pressés" (HowItWorksPage)
     valueFast: '/assets/ai-images/fast.jpg',
@@ -146,7 +149,7 @@ export function useAiImages() {
 
     industriesSplit: '/assets/ai-images/gpt-image-2_exquisite_high_fashion_photography_of_Split-screen_showing_different_industries_-0.jpg',
     industriesAlt: '/assets/ai-images/gpt-image-2_professional_photo_of_Split-screen_showing_different_industries_using_launch_pla-0.jpg',
-    industriesSaas: '/assets/ai-images/industry-saas.jpg',
+    industriesSaas: '/assets/ai-images/velocity-industries.jpg',
 
     speedProductivity: '/assets/ai-images/lucid-origin_Abstract_3D_isometric_illustration_representing_speed_and_productivity_for_a_Saa-0.jpg',
 

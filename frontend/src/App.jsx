@@ -552,6 +552,13 @@ export default function App() {
   }
 
   const handleNavAnchor = (anchorId) => {
+    // Si la section existe déjà sur la page affichée (ex: #faq présent à la fois sur
+    // l'accueil et sur "Comment ça marche"), on y scrolle sans changer de page — sinon
+    // on force un retour à l'accueil, seule page à porter les autres ancres (#features...).
+    if (document.getElementById(anchorId)) {
+      document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      return
+    }
     setCurrentPage('landing')
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -693,6 +700,11 @@ export default function App() {
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
+            {!isSignedIn && (
+              <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('faq') }}>
+                FAQ
+              </button>
+            )}
             {!isSignedIn && (
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); setShowDemo(true) }}>
                 {lang === 'fr' ? 'Démo' : 'Demo'}

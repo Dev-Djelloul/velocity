@@ -96,6 +96,10 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
           <p className="hero-footnote hero-footnote-animated">
             {tLanding(lang, 'hero.footnote')}
           </p>
+
+          <div className="hero-terminal hero-terminal-animated">
+            {tLanding(lang, 'hero.terminal')}
+          </div>
         </div>
       </section>
 
@@ -134,6 +138,23 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
         </div>
       </section>
 
+      {/* Control Card - carte de contrôle du lancement */}
+      <section className="control-card-section" id="control-card">
+        <div className="section-header">
+          <h2>{tLanding(lang, 'controlCard.title')}</h2>
+          <p>{tLanding(lang, 'controlCard.subtitle')}</p>
+        </div>
+
+        <div className="product-preview-banner">
+          <img
+            src={images.controlCard}
+            alt={tLanding(lang, 'controlCard.title')}
+            className="product-preview-banner-image"
+            loading="lazy"
+          />
+        </div>
+      </section>
+
       {/* Product Preview - 3 vues distinctes de l'interface */}
       <section className="product-preview" id="product-preview">
         <div className="section-header">
@@ -167,7 +188,15 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
       <section className="how-it-works" id="how-it-works">
         <div className="section-header">
           <h2>{tLanding(lang, 'howItWorks.title')}</h2>
-          <p>{tLanding(lang, 'howItWorks.subtitle')}</p>
+        </div>
+
+        <div className="how-it-works-image-container">
+          <img
+            src={images.howItWorksNetwork}
+            alt={tLanding(lang, 'howItWorks.title')}
+            className="how-it-works-image"
+            loading="lazy"
+          />
         </div>
 
         <div className="steps-grid">
@@ -189,7 +218,7 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
         </div>
 
         <button className="link-demo how-it-works-link" onClick={onDiscoverClick}>
-          {lang === 'fr' ? 'Voir le guide complet' : 'See the full guide'}
+          {lang === 'fr' ? 'Voir le guide' : 'See the guide'}
           <span className="arrow">→</span>
         </button>
       </section>
@@ -197,8 +226,8 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
       {/* Industries & Use Cases */}
       <section className="industries-section" id="industries">
         <div className="section-header">
-          <h2>{lang === 'fr' ? 'Pour tous les secteurs' : 'For Every Industry'}</h2>
-          <p>{lang === 'fr' ? 'VelocityLaunch s\'adapte à votre domaine d\'activité' : 'VelocityLaunch adapts to your industry'}</p>
+          <h2>{tLanding(lang, 'industries.title')}</h2>
+          <p>{tLanding(lang, 'industries.subtitle')}</p>
         </div>
 
         <div className="industries-container">
@@ -228,21 +257,14 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
           </div>
         )}
 
-      </section>
-
-      {/* CTA Section - Mid Page */}
-      <section className="cta-mid-section">
-        <div className="cta-content">
-          <h2>{tLanding(lang, 'ctaMid.title')}</h2>
-          <p>{tLanding(lang, 'ctaMid.subtitle')}</p>
-          <button className="btn-cta-large" onClick={onStartClick}>
-            {tLanding(lang, 'ctaMid.button')}
-          </button>
-        </div>
+        <button className="btn-cta-primary testimonials-cta" onClick={onStartClick}>
+          {tLanding(lang, 'hero.ctaPrimary')}
+          <span className="arrow">→</span>
+        </button>
       </section>
 
       {/* FAQ Preview */}
-      <section className="faq-section">
+      <section className="faq-section" id="faq">
         <div className="section-header">
           <h2>{tLanding(lang, 'faq.title')}</h2>
         </div>
@@ -268,7 +290,10 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
       </section>
 
       {/* Final CTA */}
-      <section className="final-cta">
+      <section
+        className="final-cta"
+        style={{ backgroundImage: `url(${images.obsidianAtmosphere})` }}
+      >
         <div className="final-cta-content">
           <h2>{tLanding(lang, 'finalCta.title')}</h2>
           <p>{tLanding(lang, 'finalCta.subtitle')}</p>

@@ -30,8 +30,13 @@ function getClerkAppearance(theme) {
       card: { background: 'transparent', boxShadow: 'none', padding: 0, width: '100%' },
       cardBox: { width: '100%' },
       socialButtonsRoot: { width: '100%' },
-      socialButtons: { width: '100%', justifyContent: 'center' },
-      socialButtonsIconButton: { flex: '1 1 0' },
+      socialButtons: { width: '100%', justifyContent: 'center', gap: '0.6rem' },
+      badge: {
+        background: '#06b6d4',
+        color: '#04141a',
+        border: 'none',
+        fontWeight: 600
+      },
       footer: { display: 'none' },
       header: { display: 'none' }
     }

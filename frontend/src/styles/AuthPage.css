@@ -146,6 +146,15 @@
   overflow: visible !important;
 }
 
+/* Filet de sécurité pour le badge "Last used" (rempli, cyan de la charte) au cas où la
+   classe stable cl-badge diffère de celle stylée via appearance.elements.badge côté JS. */
+.auth-clerk-widget .cl-badge {
+  background: #06b6d4 !important;
+  color: #04141a !important;
+  border: none !important;
+  font-weight: 600 !important;
+}
+
 .auth-clerk-widget .cl-socialButtonsRoot {
   margin-top: 1.5rem !important;
 }
@@ -194,8 +203,30 @@
   gap: 0.6rem !important;
 }
 
-.auth-clerk-widget .cl-socialButtonsBlockButton {
+.auth-clerk-widget .cl-socialButtonsBlockButton,
+.auth-clerk-widget .cl-socialButtonsIconButton {
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.6rem !important;
   margin: 0 !important;
+  padding: 0.85rem 1.1rem !important;
+  min-height: 46px !important;
+  box-sizing: border-box !important;
+  border-radius: var(--border-radius-sm) !important;
+  border: 1px solid rgba(145, 132, 217, 0.2) !important;
+  background: var(--color-bg-secondary) !important;
+  transition: all 0.15s ease !important;
+}
+
+.auth-clerk-widget .cl-socialButtonsBlockButton:hover,
+.auth-clerk-widget .cl-socialButtonsIconButton:hover {
+  border-color: var(--color-accent) !important;
+  background: rgba(145, 132, 217, 0.08) !important;
+}
+
+.auth-clerk-widget .cl-socialButtonsBlockButton__text,
+.auth-clerk-widget .cl-socialButtonsProviderIcon {
+  flex-shrink: 0 !important;
 }
 
 .auth-clerk-widget .cl-dividerRow {
