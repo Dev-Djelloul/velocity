@@ -75,10 +75,16 @@
   gap: 6px;
   font-weight: 700;
   font-size: 14px;
-  color: var(--color-text-primary);
 }
 
-.copilot-panel-title svg { color: var(--color-accent); }
+.copilot-panel-title svg { color: var(--color-accent); flex-shrink: 0; }
+
+.copilot-panel-title span {
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 .copilot-panel-header-actions {
   display: flex;
@@ -91,9 +97,14 @@
   background: transparent;
   cursor: pointer;
   color: var(--color-text-secondary);
-  padding: 6px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
   border-radius: var(--radius-sm);
   display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
   transition: background 0.15s ease, color 0.15s ease;
 }
 
