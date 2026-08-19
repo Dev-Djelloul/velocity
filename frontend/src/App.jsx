@@ -108,6 +108,7 @@ export default function App() {
     parsePrettyShareUrl(window.location.pathname) ? 'result' : (PATH_TO_PAGE[window.location.pathname] || 'landing')
   ))
   const [plan, setPlan] = useState(null)
+  const [novaToggle, setNovaToggle] = useState(0)
   const [justGenerated, setJustGenerated] = useState(false)
   const [initialFormData, setInitialFormData] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -167,6 +168,22 @@ export default function App() {
   useEffect(() => {
     setMobileNavOpen(false)
   }, [currentPage])
+
+  // ⌘K/Ctrl+K global : bascule Nova depuis n'importe quelle page de l'app, pas seulement
+  // depuis la vue du plan où le panneau est monté. S'il n'y a pas de plan chargé, Nova n'a
+  // rien à commenter — on ignore silencieusement plutôt que d'ouvrir un panneau vide.
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault()
+        if (!plan) return
+        setCurrentPage(p => p === 'result' ? p : 'result')
+        setNovaToggle(t => t + 1)
+      }
+    }
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [plan])
 
   const { isSignedIn, isLoaded, user } = useUser()
   const { userId, signOut } = useAuth()
@@ -955,6 +972,7 @@ export default function App() {
             onRequestUpgrade={goToUpgrade}
             readOnly={isSharedView}
             onDuplicateReadOnly={handleDuplicateReadOnlyPlan}
+            novaToggle={novaToggle}
           />
         )}
         {currentPage === 'account' && isSignedIn && (

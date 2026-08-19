@@ -12,7 +12,7 @@ const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
 // appliquées ici via onApplyChanges (fourni par PlanViewer), qui les fait passer par le
 // même circuit markChanged()/pendingChanges que toute autre édition : rien n'est jamais
 // enregistré silencieusement, l'utilisateur garde la main via le bouton "Enregistrer".
-export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
+export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggleSignal }) {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
@@ -26,23 +26,26 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, open, busy])
 
-  // Raccourcis globaux : ⌘K/Ctrl+K bascule le panneau depuis n'importe où dans l'app
-  // (comme un command palette), Échap le referme. On ne les enregistre qu'une fois —
-  // pas de dépendance sur `open`, l'état est lu via un toggle fonctionnel pour rester à jour.
+  // ⌘K/Ctrl+K est géré au niveau de App.jsx (seul endroit qui sait naviguer vers la page du
+  // plan depuis n'importe où dans l'app) — toggleSignal change à chaque pression, on bascule
+  // le panneau en réaction plutôt que d'écouter le raccourci ici, ce qui doublerait le
+  // basculement quand ce composant est déjà monté. Le premier rendu (toggleSignal=0/undefined)
+  // ne doit rien ouvrir.
+  const firstToggle = useRef(true)
   useEffect(() => {
+    if (firstToggle.current) { firstToggle.current = false; return }
+    setOpen(o => !o)
+  }, [toggleSignal])
+
+  // Échap referme le panneau localement (n'a de sens que quand il est déjà monté et ouvert).
+  useEffect(() => {
+    if (!open) return
     const onKeyDown = (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
-        e.preventDefault()
-        setOpen(o => !o)
-        return
-      }
-      if (e.key === 'Escape') {
-        setOpen(o => o ? false : o)
-      }
+      if (e.key === 'Escape') setOpen(false)
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
-  }, [])
+  }, [open])
 
   // Focus le champ de saisie à l'ouverture, pour pouvoir taper immédiatement après ⌘K.
   useEffect(() => {

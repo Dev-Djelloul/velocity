@@ -65,6 +65,17 @@
   font-size: 14px;
 }
 
+.plans-search-clear-filters {
+  margin-top: 8px;
+  border: none;
+  background: none;
+  color: var(--color-accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
 .plans-list {
   display: flex;
   flex-direction: column;

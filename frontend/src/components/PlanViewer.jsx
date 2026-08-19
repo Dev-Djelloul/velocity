@@ -63,7 +63,7 @@ const SECTION_LIST = [
   { id: 'section-whatif', labelKey: 'whatif.title' }
 ]
 
-export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly }) {
+export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly, novaToggle }) {
   // Choke point unique : un plan partagé (lien /s/:id) ouvert par un visiteur
   // connecté avec SON PROPRE compte ne doit jamais pouvoir écraser le plan d'un autre —
   // avant ce garde-fou, n'importe quel visiteur connecté pouvait modifier la roadmap, le
@@ -656,7 +656,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         </InfoModal>
       )}
 
-      {!readOnly && <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} />}
+      {!readOnly && <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} toggleSignal={novaToggle} />}
       </div>
     </div>
   )

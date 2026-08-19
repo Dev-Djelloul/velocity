@@ -143,7 +143,14 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
       )}
 
       {visiblePlans.length === 0 && (
-        <p className="plans-empty-state">{t(lang, 'plans.noSearchResults')}</p>
+        <div className="plans-empty-state">
+          <p>{t(lang, 'plans.noSearchResults')}</p>
+          {(searchQuery || activeTag) && (
+            <button type="button" className="plans-search-clear-filters" onClick={() => { setSearchQuery(''); setActiveTag(null) }}>
+              {t(lang, 'plans.clearFilters')}
+            </button>
+          )}
+        </div>
       )}
 
       <div className="plans-list">
