@@ -191,6 +191,33 @@
   color: var(--color-primary);
 }
 
+.space-page-gallery-link {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  color: var(--color-accent);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  transition: border-color 0.15s ease;
+}
+
+.space-page-gallery-link:hover {
+  border-color: rgba(145, 132, 217, 0.4);
+}
+
+.space-page-gallery-link h3 {
+  color: var(--color-text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.space-page-gallery-link p {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0;
+}
+
 .space-page-upsell h3 {
   color: var(--color-text-primary);
   margin-bottom: 0.25rem;

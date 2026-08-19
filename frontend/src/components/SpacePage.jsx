@@ -5,7 +5,7 @@ import { getAllPlans, deletePlan, duplicatePlan } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
-import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy } from './Icons'
+import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconBarChart, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
 import { teamColor } from './TeamAvatar'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
@@ -25,7 +25,7 @@ function byRecency(a, b) {
 // crédits et sert désormais d'historique complet de tous les plans de l'espace, pendant
 // que cette page ne montre que les derniers plans actifs (personnel) ou le tableau de bord
 // partagé (équipe).
-export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onPersonalSpaceChange }) {
+export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenGallery, onPersonalSpaceChange }) {
   const team = useTeam()
   const { user } = useUser()
   const { userId } = useAuth()
@@ -206,6 +206,16 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           </button>
         )}
       </div>
+
+      {!isTeam && (
+        <button className="space-page-section card space-page-gallery-link" onClick={onOpenGallery}>
+          <IconImage width={18} height={18} />
+          <div>
+            <h3>{t(lang, 'gallery.title')}</h3>
+            <p>{t(lang, 'gallery.subtitle')}</p>
+          </div>
+        </button>
+      )}
 
       {!isTeam && (
         <div className="space-page-section card">

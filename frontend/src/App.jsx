@@ -632,14 +632,6 @@ export default function App() {
             >
               {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
             </button>
-            {isSignedIn && (
-              <button
-                className={`header-nav-link ${currentPage === 'gallery' ? 'active' : ''}`}
-                onClick={() => { setMobileNavOpen(false); setCurrentPage('gallery'); window.scrollTo(0, 0) }}
-              >
-                {lang === 'fr' ? 'Galerie' : 'Gallery'}
-              </button>
-            )}
             {!isSignedIn && (
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); setShowDemo(true) }}>
                 {lang === 'fr' ? 'Démo' : 'Demo'}
@@ -944,6 +936,7 @@ export default function App() {
             onCreatePlan={handleStartClick}
             onOpenTeamSettings={() => { setCurrentPage('team'); window.scrollTo(0, 0) }}
             onSeeFullHistory={() => { setCurrentPage('account'); window.scrollTo(0, 0) }}
+            onOpenGallery={() => { setCurrentPage('gallery'); window.scrollTo(0, 0) }}
             onPersonalSpaceChange={() => setDataVersion(v => v + 1)}
           />
         )}
