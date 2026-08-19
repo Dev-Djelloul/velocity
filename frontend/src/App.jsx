@@ -300,12 +300,20 @@ export default function App() {
   // Resynchronise la liste des plans à chaque changement d'espace actif (personnel <->
   // équipe, ou passage d'une équipe à une autre) — couvre aussi la sync initiale au login,
   // team.teamId valant alors null (espace personnel) le temps que Clerk charge l'org active.
+  // Dépend de userDisplayName (primitif) plutôt que de l'objet `user` de Clerk : ce dernier
+  // change de référence à chaque rafraîchissement de token (indépendamment de tout vrai
+  // changement d'espace), ce qui redéclenchait cet effet et donc syncPlansFromServer —
+  // syncPlansFromServer ÉCRASE tout le cache local avec la version serveur, ce qui pouvait
+  // effacer une modification locale toute récente (ex. toggle "Ajouter à la galerie") si son
+  // envoi au serveur (fire-and-forget, voir savePlan/pushPlan) n'avait pas encore été commité
+  // au moment où ce resync repartait.
+  const userDisplayName = user?.fullName || user?.firstName || null
   useEffect(() => {
     if (!isLoaded || !isSignedIn || !userId || !team.isLoaded) return
     setPlanActiveTeam(team.teamId, team.role, team.teamName)
-    setPlanActiveCreator(user?.fullName || user?.firstName || null)
+    setPlanActiveCreator(userDisplayName)
     syncPlansFromServer(userId, team.teamId).then(() => setDataVersion(v => v + 1))
-  }, [isLoaded, isSignedIn, userId, team.teamId, team.role, team.teamName, team.isLoaded, user])
+  }, [isLoaded, isSignedIn, userId, team.teamId, team.role, team.teamName, team.isLoaded, userDisplayName])
 
   // Retour depuis Stripe Checkout : le webhook a normalement déjà activé le Pro
   // côté serveur, on resynchronise le cache local et on nettoie l'URL.
