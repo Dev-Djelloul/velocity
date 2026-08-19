@@ -5,7 +5,12 @@ export default function InfoModal({ icon, title, onClose, children, wide, banner
     <div className="info-modal-backdrop" onClick={onClose}>
       <div className={`info-modal${wide ? ' wide' : ''}${banner ? ' has-banner' : ''}`} onClick={e => e.stopPropagation()}>
         <button className="info-modal-close" onClick={onClose} aria-label="Fermer">×</button>
-        {banner && <img src={banner} alt="" className="info-modal-banner" />}
+        {banner && (
+          <div className="info-modal-banner-wrap">
+            <img src={banner} alt="" className="info-modal-banner-bg" aria-hidden="true" />
+            <img src={banner} alt="" className="info-modal-banner" />
+          </div>
+        )}
         <div className="info-modal-content">
           <h1>{icon}{title}</h1>
           {children}

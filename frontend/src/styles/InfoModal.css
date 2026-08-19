@@ -31,6 +31,7 @@
   position: absolute;
   top: 16px;
   right: 16px;
+  z-index: 2;
   background: none;
   border: none;
   font-size: 28px;
@@ -59,14 +60,35 @@
   background: rgba(15, 15, 20, 0.7);
 }
 
-.info-modal-banner {
-  display: block;
+.info-modal-banner-wrap {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
   width: calc(100% + 80px);
-  height: 180px;
-  object-fit: cover;
-  object-position: center 30%;
+  height: 200px;
   margin: -40px -40px 24px -40px;
   border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+/* Copie floutée et agrandie de l'image, en fond plein cadre — évite les bandes vides
+   d'un object-fit:contain nu tout en montrant l'image de premier plan entière, non rognée. */
+.info-modal-banner-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(28px) brightness(0.75) saturate(1.3);
+  transform: scale(1.25);
+}
+
+.info-modal-banner {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .info-modal-content h1 {
@@ -332,9 +354,9 @@
     right: 12px;
   }
 
-  .info-modal-banner {
+  .info-modal-banner-wrap {
     width: calc(100% + 48px);
-    height: 130px;
+    height: 150px;
     margin: -24px -24px 20px -24px;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   }
