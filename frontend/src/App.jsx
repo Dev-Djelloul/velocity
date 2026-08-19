@@ -370,6 +370,10 @@ export default function App() {
     const generatedPlan = generatePlan({ ...demoData, language: lang })
     // Id éphémère (non persisté) pour que la section Agents IA s'affiche aussi en démo
     generatedPlan.id = `demo-${generateId()}`
+    // Marqueur qui survit à un "Enregistrer" explicite de l'utilisateur (contrairement à
+    // l'id ci-dessus, dont le préfixe seul ne suffit pas à distinguer une démo dans les
+    // listes de plans une fois sauvegardée) — sert à afficher le badge "Démo".
+    generatedPlan.isDemo = true
     setPlan(generatedPlan)
     setJustGenerated(true)
     setIsSharedView(false)

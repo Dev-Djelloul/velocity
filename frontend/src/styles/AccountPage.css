@@ -302,6 +302,20 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.plan-demo-badge {
+  display: inline-block;
+  margin-left: 0.45rem;
+  padding: 0.1rem 0.45rem;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  border-radius: 999px;
+  background: rgba(6, 182, 212, 0.16);
+  color: var(--color-info);
+  vertical-align: middle;
+}
+
 .account-list-item-delete {
   flex-shrink: 0;
   background: none;

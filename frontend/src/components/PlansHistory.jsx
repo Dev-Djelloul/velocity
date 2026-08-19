@@ -66,7 +66,10 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
         {plans.map(plan => (
           <div key={plan.id} className="plan-item">
             <div className="plan-info">
-              <h3>{plan.product?.name || t(lang, 'plans.untitled')}</h3>
+              <h3>
+                {plan.product?.name || t(lang, 'plans.untitled')}
+                {(plan.isDemo || plan.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+              </h3>
               <p className="plan-meta">
                 {t(lang, 'plans.createdAtPrefix')} {formatDateTime(plan.savedAt, lang)}
               </p>
