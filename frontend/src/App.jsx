@@ -813,9 +813,6 @@ export default function App() {
                       <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToAccount() }}>
                         <IconUser width={16} height={16} /> {t(lang, 'auth.myAccount')}
                       </button>
-                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowHistory(true) }}>
-                        <IconClipboard width={16} height={16} /> {lang === 'fr' ? 'Mes plans' : 'My plans'}
-                      </button>
                       <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); goToNotifications() }}>
                         <IconMessageCircle width={16} height={16} /> {lang === 'fr' ? 'Notifications' : 'Notifications'}
                         {unreadNotifCount > 0 && <span className="header-dropdown-item-badge">{unreadNotifCount}</span>}
@@ -968,6 +965,7 @@ export default function App() {
             onCreatePlan={handleStartClick}
             onOpenTeamSettings={() => { setCurrentPage('team'); window.scrollTo(0, 0) }}
             onSeeFullHistory={() => { setCurrentPage('account'); window.scrollTo(0, 0) }}
+            onOpenHistory={() => setShowHistory(true)}
             onOpenGallery={() => { setCurrentPage('gallery'); window.scrollTo(0, 0) }}
             onPersonalSpaceChange={() => setDataVersion(v => v + 1)}
           />

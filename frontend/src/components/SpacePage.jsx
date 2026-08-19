@@ -25,7 +25,7 @@ function byRecency(a, b) {
 // crédits et sert désormais d'historique complet de tous les plans de l'espace, pendant
 // que cette page ne montre que les derniers plans actifs (personnel) ou le tableau de bord
 // partagé (équipe).
-export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenGallery, onPersonalSpaceChange }) {
+export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenHistory, onOpenGallery, onPersonalSpaceChange }) {
   const team = useTeam()
   const { user } = useUser()
   const { userId } = useAuth()
@@ -206,6 +206,16 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           </button>
         )}
       </div>
+
+      {!isTeam && (
+        <button className="space-page-section card space-page-gallery-link" onClick={onOpenHistory}>
+          <IconClipboard width={18} height={18} />
+          <div>
+            <h3>{lang === 'fr' ? 'Mes plans' : 'My plans'}</h3>
+            <p>{lang === 'fr' ? 'Recherchez, partagez ou dupliquez n\'importe lequel de vos plans.' : 'Search, share or duplicate any of your plans.'}</p>
+          </div>
+        </button>
+      )}
 
       {!isTeam && (
         <button className="space-page-section card space-page-gallery-link" onClick={onOpenGallery}>
