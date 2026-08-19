@@ -57,8 +57,14 @@
   height: min(640px, calc(100vh - 244px));
   display: flex;
   flex-direction: column;
-  background: var(--color-dashboard);
-  border: 1px solid rgba(145, 132, 217, 0.2);
+  /* Bordure en dégradé (même technique que .demo-card) : un fond opaque en padding-box par
+     dessus le dégradé en border-box, pour que seule la bordure elle-même soit colorée — le
+     panneau se détache ainsi nettement du reste de la page au lieu d'un simple liseré
+     violet discret. */
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
+    var(--wordmark-gradient) border-box;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-lg), 0 16px 48px rgba(15, 23, 42, 0.22);
   overflow: hidden;
