@@ -81,10 +81,10 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
       <div className="plans-list">
         {plans.map(plan => (
           <div key={plan.id} className="plan-item">
-            <div className="plan-item-lead">
             {plan.coverImage
               ? <img src={plan.coverImage} alt="" className="plan-item-thumb" />
               : <div className="plan-item-thumb plan-item-thumb-placeholder" aria-hidden="true" />}
+            <div className="plan-item-lead">
             <div className="plan-info">
               {editingId === plan.id ? (
                 <input

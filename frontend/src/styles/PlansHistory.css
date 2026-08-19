@@ -19,16 +19,22 @@
 }
 
 .plan-item {
+  position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 16px;
-  padding: 16px 20px;
+  /* Le padding gauche laisse la place à la miniature en bandeau (voir .plan-item-thumb,
+     positionnée en absolu par-dessus) au lieu de la pousser comme un simple bloc de plus
+     dans le flux — c'est ce qui lui permet de coller aux bords de la carte plutôt que de
+     flotter comme une vignette isolée. */
+  padding: 16px 20px 16px calc(20% + 20px);
   border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
   background:
     linear-gradient(135deg, rgba(145, 132, 217, 0.16) 0%, rgba(99, 102, 241, 0.13) 55%, rgba(6, 182, 212, 0.1) 100%) padding-box,
     linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -37,21 +43,24 @@
   box-shadow: 0 6px 20px rgba(145, 132, 217, 0.22);
 }
 
-/* Regroupe la miniature + les infos texte comme un seul bloc pour .plan-item (qui répartit
-   ses enfants directs en space-between) — sans ce wrapper, ajouter la miniature comme
-   troisième enfant aurait aussi inséré un espace indésirable entre elle et le texte. */
 .plan-item-lead {
   display: flex;
   align-items: center;
-  gap: 16px;
   min-width: 0;
 }
 
+/* Bandeau plein cadre (100% de la hauteur de la carte, ~20% de sa largeur) collé au bord
+   gauche, plutôt qu'une vignette carrée flottant avec sa propre marge à l'intérieur — le
+   padding-left de .plan-item ci-dessus réserve la place pour que le texte ne passe jamais
+   dessous. */
 .plan-item-thumb {
-  flex-shrink: 0;
-  width: 52px;
-  height: 52px;
-  border-radius: var(--radius-md, 8px);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20%;
+  min-width: 90px;
+  height: 100%;
+  border-radius: 0;
   object-fit: cover;
 }
 
