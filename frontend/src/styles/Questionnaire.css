@@ -389,6 +389,85 @@
   justify-content: center;
 }
 
+.button-group-row-last {
+  width: 100%;
+  justify-content: center;
+}
+
+.button-group-row-last .btn-secondary {
+  flex: 0 1 auto;
+}
+
+/* Info tooltip on Select labels (glossary of acronyms/metrics) */
+.field-label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-help-wrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.field-help-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1px solid rgba(145, 132, 217, 0.4);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 10px;
+  font-style: italic;
+  font-weight: 700;
+  font-family: Georgia, serif;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+.field-help-btn:hover {
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+}
+
+.field-help-popover {
+  position: absolute;
+  top: 22px;
+  left: 0;
+  z-index: 20;
+  width: 280px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary, #16161d);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.field-help-popover ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field-help-popover li {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--color-text-secondary);
+}
+
+.field-help-popover li strong {
+  color: var(--color-text-primary);
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .questionnaire-container {

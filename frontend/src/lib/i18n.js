@@ -44,6 +44,14 @@ export const translations = {
       namePh: 'ex : AI Note Taker',
       stage: 'Stade',
       stageOptions: { idea: 'Idée / concept', prelaunch: 'Pre-launch', mvp: 'MVP', beta: 'Beta privée', growing: 'Growing', scaleup: 'Scale-up' },
+      stageGlossary: {
+        idea: "Encore au stade d'idée, rien n'est construit.",
+        prelaunch: "Produit en cours de développement, pas encore public.",
+        mvp: "Minimum Viable Product — version minimale testable par de vrais utilisateurs.",
+        beta: "Version testée par un groupe restreint avant le lancement public.",
+        growing: "Lancé, avec une croissance d'utilisateurs en cours.",
+        scaleup: "Traction confirmée, phase de mise à l'échelle."
+      },
       category: 'Catégorie SaaS',
       categoryOptions: { pm: 'Project mgmt', analytics: 'Analytics', automation: 'Automation', hr: 'HR', finance: 'Finance', saas: 'SaaS B2B', marketplace: 'Marketplace', mobile: 'App mobile', ecommerce: 'E-commerce', fintech: 'Fintech', edtech: 'EdTech', healthtech: 'HealthTech', devtools: 'Dev tools', ai: 'IA / ML', media: 'Contenu / Média', other: 'Autre' },
       pitch: 'Pitch court',
@@ -51,7 +59,17 @@ export const translations = {
       usp: 'USP (proposition de valeur unique)',
       uspPh: 'Ce qui te différencie…',
       targetUser: 'Utilisateur cible',
-      targetUserOptions: { freelancers: 'Freelancers', smb: 'PME', enterprise: 'Entreprise', niche: 'Niche', developers: 'Développeurs', startups: 'Startups', creators: 'Créateurs', consumers: 'Grand public' }
+      targetUserOptions: { freelancers: 'Freelancers', smb: 'PME', enterprise: 'Entreprise', niche: 'Niche', developers: 'Développeurs', startups: 'Startups', creators: 'Créateurs', consumers: 'Grand public' },
+      targetUserGlossary: {
+        freelancers: 'Travailleurs indépendants.',
+        smb: 'PME — Petite ou Moyenne Entreprise (moins de 250 salariés).',
+        enterprise: 'Grande entreprise, souvent avec des cycles de vente longs.',
+        niche: 'Public restreint et très spécifique.',
+        developers: 'Profils techniques (devs, DevOps...).',
+        startups: 'Jeunes entreprises en phase de croissance rapide.',
+        creators: 'Créateurs de contenu (influenceurs, YouTubers...).',
+        consumers: 'Grand public, utilisateurs particuliers.'
+      }
     },
     market: {
       title: 'Marché & audience',
@@ -59,6 +77,14 @@ export const translations = {
       geographyOptions: { france: 'France', eu: 'UE', na: 'Amérique du Nord', latam: 'Amérique latine', apac: 'Asie-Pacifique', mena: 'MENA', africa: 'Afrique', global: 'Global' },
       b2bVsB2c: 'B2B vs B2C',
       b2bVsB2cOptions: { b2b: 'B2B', b2c: 'B2C', hybrid: 'Hybride', b2b2c: 'B2B2C', b2g: 'B2G (secteur public)', d2c: 'D2C' },
+      b2bVsB2cGlossary: {
+        b2b: 'Business to Business — tu vends à d\'autres entreprises.',
+        b2c: 'Business to Consumer — tu vends directement aux particuliers.',
+        hybrid: 'Un mix de B2B et B2C.',
+        b2b2c: 'Business to Business to Consumer — tu vends via des entreprises qui touchent ensuite le grand public.',
+        b2g: 'Business to Government — tu vends à des administrations ou au secteur public.',
+        d2c: 'Direct to Consumer — vente directe au consommateur, sans intermédiaire.'
+      },
       segment: 'Segment principal',
       segmentPh: 'ex : Équipes remote / Hybrid orgs',
       audienceSize: "Taille d'audience potentielle",
@@ -87,6 +113,17 @@ export const translations = {
       riskOptions: { none: 'Aucun', notready: 'Produit non prêt', pmf: 'Product-market fit incertain', budget: 'Budget limité', regulatory: 'Réglementaire / conformité', techdebt: 'Dette technique', platform: 'Dépendance à une plateforme', timing: 'Timing marché', hiring: 'Recrutement' },
       successMetric: 'Métrique de succès',
       successOptions: { signups: '# Inscriptions', arr: 'ARR', retention: 'Rétention', community: 'Taille communauté', mrr: 'MRR', nps: 'NPS', ltv: 'LTV', conversion: 'Taux de conversion', activeUsers: 'DAU/MAU' },
+      successGlossary: {
+        signups: "Nombre d'inscriptions — nouveaux comptes créés.",
+        arr: 'Annual Recurring Revenue — revenu récurrent annuel généré par les abonnements.',
+        retention: 'Part des utilisateurs qui restent actifs dans le temps.',
+        community: 'Taille de la communauté (membres, followers, abonnés...).',
+        mrr: 'Monthly Recurring Revenue — revenu récurrent mensuel généré par les abonnements.',
+        nps: 'Net Promoter Score — indicateur de satisfaction et de recommandation (de -100 à 100).',
+        ltv: 'Lifetime Value — revenu total généré par un client sur toute sa durée de vie.',
+        conversion: 'Taux de conversion — part des visiteurs qui deviennent clients.',
+        activeUsers: 'DAU/MAU — utilisateurs actifs quotidiens / mensuels (Daily/Monthly Active Users).'
+      },
       rules: 'Règles de génération (optionnel)',
       rulesOptions: {
         marketingFirst: 'Priorise le marketing avant le dev',
@@ -1192,6 +1229,14 @@ export const translations = {
       namePh: 'e.g. AI Note Taker',
       stage: 'Stage',
       stageOptions: { idea: 'Idea / concept', prelaunch: 'Pre-launch', mvp: 'MVP', beta: 'Private beta', growing: 'Growing', scaleup: 'Scale-up' },
+      stageGlossary: {
+        idea: 'Still an idea, nothing has been built yet.',
+        prelaunch: 'Product is being built, not yet public.',
+        mvp: 'Minimum Viable Product — the smallest version testable by real users.',
+        beta: 'Tested by a small group before the public launch.',
+        growing: 'Launched, with an ongoing user growth phase.',
+        scaleup: 'Confirmed traction, scaling phase.'
+      },
       category: 'SaaS category',
       categoryOptions: { pm: 'Project mgmt', analytics: 'Analytics', automation: 'Automation', hr: 'HR', finance: 'Finance', saas: 'B2B SaaS', marketplace: 'Marketplace', mobile: 'Mobile app', ecommerce: 'E-commerce', fintech: 'Fintech', edtech: 'EdTech', healthtech: 'HealthTech', devtools: 'Dev tools', ai: 'AI / ML', media: 'Content / Media', other: 'Other' },
       pitch: 'Short pitch',
@@ -1199,7 +1244,17 @@ export const translations = {
       usp: 'USP (Unique Selling Point)',
       uspPh: 'What sets you apart…',
       targetUser: 'Target user',
-      targetUserOptions: { freelancers: 'Freelancers', smb: 'SMB', enterprise: 'Enterprise', niche: 'Niche', developers: 'Developers', startups: 'Startups', creators: 'Creators', consumers: 'Consumers' }
+      targetUserOptions: { freelancers: 'Freelancers', smb: 'SMB', enterprise: 'Enterprise', niche: 'Niche', developers: 'Developers', startups: 'Startups', creators: 'Creators', consumers: 'Consumers' },
+      targetUserGlossary: {
+        freelancers: 'Independent workers.',
+        smb: 'SMB — Small or Medium-sized Business (under ~250 employees).',
+        enterprise: 'Large company, often with long sales cycles.',
+        niche: 'A narrow, very specific audience.',
+        developers: 'Technical profiles (devs, DevOps...).',
+        startups: 'Young companies in a fast-growth phase.',
+        creators: 'Content creators (influencers, YouTubers...).',
+        consumers: 'General public, individual users.'
+      }
     },
     market: {
       title: 'Market & audience',
@@ -1207,6 +1262,14 @@ export const translations = {
       geographyOptions: { france: 'France', eu: 'EU', na: 'North America', latam: 'Latin America', apac: 'Asia-Pacific', mena: 'MENA', africa: 'Africa', global: 'Global' },
       b2bVsB2c: 'B2B vs B2C',
       b2bVsB2cOptions: { b2b: 'B2B', b2c: 'B2C', hybrid: 'Hybrid', b2b2c: 'B2B2C', b2g: 'B2G (public sector)', d2c: 'D2C' },
+      b2bVsB2cGlossary: {
+        b2b: 'Business to Business — you sell to other companies.',
+        b2c: 'Business to Consumer — you sell directly to individuals.',
+        hybrid: 'A mix of B2B and B2C.',
+        b2b2c: 'Business to Business to Consumer — you sell through companies that reach the general public.',
+        b2g: 'Business to Government — you sell to public administrations or the public sector.',
+        d2c: 'Direct to Consumer — direct sales to the consumer, no middleman.'
+      },
       segment: 'Main segment',
       segmentPh: 'e.g. Remote teams / Hybrid orgs',
       audienceSize: 'Potential audience size',
@@ -1235,6 +1298,17 @@ export const translations = {
       riskOptions: { none: 'None', notready: 'Product not ready', pmf: 'Market fit unclear', budget: 'Budget limits', regulatory: 'Regulatory / compliance', techdebt: 'Technical debt', platform: 'Platform dependency', timing: 'Market timing', hiring: 'Hiring' },
       successMetric: 'Success metric',
       successOptions: { signups: '# Signups', arr: 'ARR', retention: 'Retention', community: 'Community size', mrr: 'MRR', nps: 'NPS', ltv: 'LTV', conversion: 'Conversion rate', activeUsers: 'DAU/MAU' },
+      successGlossary: {
+        signups: 'Number of signups — new accounts created.',
+        arr: 'Annual Recurring Revenue — yearly recurring revenue from subscriptions.',
+        retention: 'Share of users who stay active over time.',
+        community: 'Size of your community (members, followers, subscribers...).',
+        mrr: 'Monthly Recurring Revenue — monthly recurring revenue from subscriptions.',
+        nps: 'Net Promoter Score — satisfaction and referral indicator (from -100 to 100).',
+        ltv: 'Lifetime Value — total revenue generated by a customer over their whole relationship with you.',
+        conversion: 'Conversion rate — share of visitors who become customers.',
+        activeUsers: 'DAU/MAU — Daily/Monthly Active Users.'
+      },
       rules: 'Generation rules (optional)',
       rulesOptions: {
         marketingFirst: 'Prioritize marketing before dev',

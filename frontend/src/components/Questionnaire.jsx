@@ -22,10 +22,35 @@ function loadInitial(initialData) {
   }
 }
 
-function Select({ formData, onChange, section, field, label, options }) {
+function Select({ formData, onChange, section, field, label, options, glossary }) {
+  const [showHelp, setShowHelp] = useState(false)
   return (
     <label className="field">
-      <span>{label}</span>
+      <span className="field-label-row">
+        {label}
+        {glossary && (
+          <span className="field-help-wrap" onMouseLeave={() => setShowHelp(false)}>
+            <button
+              type="button"
+              className="field-help-btn"
+              aria-label="Définitions"
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowHelp(v => !v) }}
+              onMouseEnter={() => setShowHelp(true)}
+            >
+              i
+            </button>
+            {showHelp && (
+              <div className="field-help-popover" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+                <ul>
+                  {Object.entries(options).map(([key, val]) => glossary[key] && (
+                    <li key={key}><strong>{val}</strong> — {glossary[key]}</li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </span>
+        )}
+      </span>
       <select value={formData[section][field]} onChange={e => onChange(section, field, e.target.value)}>
         {Object.entries(options).map(([key, val]) => (
           <option key={key} value={key}>{val}</option>
@@ -141,11 +166,11 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
           <>
             <h2>{t(lang, 'product.title')}</h2>
             <Text formData={formData} onChange={handleChange} section="product" field="name" label={t(lang, 'product.name')} placeholder={t(lang, 'product.namePh')} />
-            <Select formData={formData} onChange={handleChange} section="product" field="stage" label={t(lang, 'product.stage')} options={t(lang, 'product.stageOptions')} />
+            <Select formData={formData} onChange={handleChange} section="product" field="stage" label={t(lang, 'product.stage')} options={t(lang, 'product.stageOptions')} glossary={t(lang, 'product.stageGlossary')} />
             <Select formData={formData} onChange={handleChange} section="product" field="category" label={t(lang, 'product.category')} options={t(lang, 'product.categoryOptions')} />
             <Text formData={formData} onChange={handleChange} section="product" field="pitch" label={t(lang, 'product.pitch')} placeholder={t(lang, 'product.pitchPh')} textarea />
             <Text formData={formData} onChange={handleChange} section="product" field="usp" label={t(lang, 'product.usp')} placeholder={t(lang, 'product.uspPh')} />
-            <Select formData={formData} onChange={handleChange} section="product" field="targetUser" label={t(lang, 'product.targetUser')} options={t(lang, 'product.targetUserOptions')} />
+            <Select formData={formData} onChange={handleChange} section="product" field="targetUser" label={t(lang, 'product.targetUser')} options={t(lang, 'product.targetUserOptions')} glossary={t(lang, 'product.targetUserGlossary')} />
           </>
         )}
 
@@ -153,7 +178,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
           <>
             <h2>{t(lang, 'market.title')}</h2>
             <Select formData={formData} onChange={handleChange} section="market" field="geography" label={t(lang, 'market.geography')} options={t(lang, 'market.geographyOptions')} />
-            <Select formData={formData} onChange={handleChange} section="market" field="b2bVsB2c" label={t(lang, 'market.b2bVsB2c')} options={t(lang, 'market.b2bVsB2cOptions')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="b2bVsB2c" label={t(lang, 'market.b2bVsB2c')} options={t(lang, 'market.b2bVsB2cOptions')} glossary={t(lang, 'market.b2bVsB2cGlossary')} />
             <Text formData={formData} onChange={handleChange} section="market" field="segment" label={t(lang, 'market.segment')} placeholder={t(lang, 'market.segmentPh')} />
             <Select formData={formData} onChange={handleChange} section="market" field="audienceSize" label={t(lang, 'market.audienceSize')} options={t(lang, 'market.audienceSizeOptions')} />
             <Select formData={formData} onChange={handleChange} section="market" field="competition" label={t(lang, 'market.competition')} options={t(lang, 'market.competitionOptions')} />
@@ -187,7 +212,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
             <Select formData={formData} onChange={handleChange} section="priorities" field="focus" label={t(lang, 'priorities.focus')} options={t(lang, 'priorities.focusOptions')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} />
-            <Select formData={formData} onChange={handleChange} section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} glossary={t(lang, 'priorities.successGlossary')} />
             <div className="field">
               <span>{t(lang, 'priorities.rules')}</span>
               <div className="chip-group">
@@ -210,7 +235,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
       </div>
 
       <div className="button-group">
-        <div className="button-group-row">
+        <div className={`button-group-row${step === steps.length - 1 ? ' button-group-row-last' : ''}`}>
           <button className="btn-secondary" onClick={() => setStep(Math.max(0, step - 1))} disabled={step === 0}>
             {t(lang, 'nav.previous')}
           </button>
