@@ -38,37 +38,6 @@
   gap: 0.6rem;
 }
 
-.gallery-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  justify-content: center;
-  margin-bottom: 1.5rem;
-}
-
-.gallery-filter-chip {
-  font-size: 0.8rem;
-  padding: 0.35rem 0.85rem;
-  border-radius: 999px;
-  border: 1px solid rgba(145, 132, 217, 0.25);
-  background: transparent;
-  color: var(--color-text-secondary);
-  cursor: pointer;
-  transition: all 0.15s ease;
-  font-family: inherit;
-}
-
-.gallery-filter-chip:hover {
-  border-color: rgba(145, 132, 217, 0.5);
-  color: var(--color-text-primary);
-}
-
-.gallery-filter-chip.active {
-  background: var(--color-accent);
-  border-color: var(--color-accent);
-  color: #fff;
-}
-
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));

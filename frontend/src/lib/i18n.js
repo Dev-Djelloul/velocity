@@ -892,16 +892,15 @@ export const translations = {
     },
     gallery: {
       title: 'Ma galerie',
-      subtitle: 'Retrouvez et classez tous vos plans de lancement en un coup d’œil.',
+      subtitle: 'Les plans que vous avez choisi d’y épingler, pour les retrouver d’un coup d’œil.',
       loading: 'Chargement...',
-      empty: "Vous n'avez pas encore de plan. Créez-en un pour le retrouver ici.",
-      filterAll: 'Toutes catégories',
-      filterNoMatch: 'Aucun plan ne correspond à ce filtre.',
+      empty: "Aucun plan dans votre galerie pour l'instant. Ouvrez un plan et cliquez sur \"Ajouter à la galerie\" pour l'épingler ici.",
       favorite: 'Favori',
       favoriteAdd: 'Ajouter aux favoris',
       favoriteRemove: 'Retirer des favoris',
-      editCategory: 'Changer la catégorie',
-      setCategory: 'Définir une catégorie'
+      addToGallery: 'Ajouter à la galerie',
+      removeFromGallery: 'Retirer de la galerie',
+      inGallery: 'Dans la galerie'
     },
     plans: {
       title: 'Mes plans',
@@ -2008,16 +2007,15 @@ export const translations = {
     },
     gallery: {
       title: 'My gallery',
-      subtitle: 'Find and organize all your launch plans at a glance.',
+      subtitle: 'The plans you\'ve chosen to pin here, to find at a glance.',
       loading: 'Loading...',
-      empty: "You don't have any plans yet. Create one to see it here.",
-      filterAll: 'All categories',
-      filterNoMatch: 'No plans match this filter.',
+      empty: 'No plans in your gallery yet. Open a plan and click "Add to gallery" to pin it here.',
       favorite: 'Favorite',
       favoriteAdd: 'Add to favorites',
       favoriteRemove: 'Remove from favorites',
-      editCategory: 'Change category',
-      setCategory: 'Set a category'
+      addToGallery: 'Add to gallery',
+      removeFromGallery: 'Remove from gallery',
+      inGallery: 'In gallery'
     },
     plans: {
       title: 'My plans',

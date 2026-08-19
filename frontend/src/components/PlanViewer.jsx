@@ -31,7 +31,7 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -86,7 +86,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
-  const [editingCategory, setEditingCategory] = useState(false)
   const captureRef = useRef(null)
 
   const isDirty = pendingChanges.length > 0
@@ -263,14 +262,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
-  // Catégorie produit : fixée au questionnaire de création, mais reclassable ensuite —
-  // même circuit immédiat que la couverture ci-dessus (pas soumis au bouton "Enregistrer"),
-  // pour que le classement dans la galerie privée reste indépendant d'éventuelles autres
-  // modifications de contenu en attente.
-  const updateCategory = (value) => {
-    const nextPlan = { ...plan, product: { ...plan.product, category: value } }
+  // Appartenance à la galerie privée : opt-in explicite (contrairement à l'ancienne version
+  // qui listait automatiquement tous les plans) — même circuit immédiat que la couverture
+  // ci-dessus, indépendant du bouton "Enregistrer".
+  const toggleInGallery = () => {
+    if (!plan.id) return
+    const nextPlan = { ...plan, inGallery: !plan.inGallery }
     setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+    savePlan(nextPlan)
   }
 
   const updateGoogleCalendar = (nextGoogleCalendar) => {
@@ -496,31 +495,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             <div className="plan-badges">
               {plan.classification && <span className="plan-badge plan-badge-accent">{plan.classification}</span>}
               {plan.product?.stage && <span className="plan-badge plan-badge-stage">{t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}</span>}
-              {!readOnly && editingCategory ? (
-                <select
-                  className="plan-badge-category-select"
-                  autoFocus
-                  value={plan.product?.category || ''}
-                  onChange={(e) => { updateCategory(e.target.value); setEditingCategory(false) }}
-                  onBlur={() => setEditingCategory(false)}
-                >
-                  {Object.entries(t(lang, 'product.categoryOptions')).map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
-                  ))}
-                </select>
-              ) : (
-                (plan.product?.category || !readOnly) && (
-                  <span
-                    className={`plan-badge plan-badge-category${!readOnly ? ' plan-badge-editable' : ''}`}
-                    onClick={() => !readOnly && setEditingCategory(true)}
-                    title={!readOnly ? t(lang, 'gallery.editCategory') : undefined}
-                  >
-                    {plan.product?.category
-                      ? (t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category)
-                      : t(lang, 'gallery.setCategory')}
-                  </span>
-                )
-              )}
+              {plan.product?.category && <span className="plan-badge plan-badge-category">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
             </div>
           </div>
 
@@ -553,6 +528,16 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </div>
         </div>
         <div className="plan-actions">
+          {plan.id && !readOnly && (
+            <button
+              className={`btn-secondary plan-gallery-toggle ${plan.inGallery ? 'is-in-gallery' : ''}`}
+              onClick={toggleInGallery}
+              title={plan.inGallery ? t(lang, 'gallery.removeFromGallery') : t(lang, 'gallery.addToGallery')}
+            >
+              {plan.inGallery ? <IconCheckCircle width={14} height={14} /> : <IconPlus width={14} height={14} />}
+              {plan.inGallery ? t(lang, 'gallery.inGallery') : t(lang, 'gallery.addToGallery')}
+            </button>
+          )}
           <button className="btn-secondary" onClick={() => setShowExport(true)}>{t(lang, 'app.export')}</button>
           {!readOnly && (
             <button
