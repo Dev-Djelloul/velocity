@@ -22,34 +22,43 @@ function loadInitial(initialData) {
   }
 }
 
-function Select({ formData, onChange, section, field, label, options, glossary }) {
-  const [showHelp, setShowHelp] = useState(false)
+function FieldHelp({ text, glossary, options }) {
+  const [show, setShow] = useState(false)
+  if (!text && !glossary) return null
+  return (
+    <span className="field-help-wrap" onMouseLeave={() => setShow(false)}>
+      <button
+        type="button"
+        className="field-help-btn"
+        aria-label="Aide"
+        onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShow(v => !v) }}
+        onMouseEnter={() => setShow(true)}
+      >
+        i
+      </button>
+      {show && (
+        <div className="field-help-popover" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
+          {glossary ? (
+            <ul>
+              {Object.entries(options).map(([key, val]) => glossary[key] && (
+                <li key={key}><strong>{val}</strong> — {glossary[key]}</li>
+              ))}
+            </ul>
+          ) : (
+            <p>{text}</p>
+          )}
+        </div>
+      )}
+    </span>
+  )
+}
+
+function Select({ formData, onChange, section, field, label, options, glossary, help }) {
   return (
     <label className="field">
       <span className="field-label-row">
         {label}
-        {glossary && (
-          <span className="field-help-wrap" onMouseLeave={() => setShowHelp(false)}>
-            <button
-              type="button"
-              className="field-help-btn"
-              aria-label="Définitions"
-              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowHelp(v => !v) }}
-              onMouseEnter={() => setShowHelp(true)}
-            >
-              i
-            </button>
-            {showHelp && (
-              <div className="field-help-popover" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
-                <ul>
-                  {Object.entries(options).map(([key, val]) => glossary[key] && (
-                    <li key={key}><strong>{val}</strong> — {glossary[key]}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </span>
-        )}
+        <FieldHelp text={help} glossary={glossary} options={options} />
       </span>
       <select value={formData[section][field]} onChange={e => onChange(section, field, e.target.value)}>
         {Object.entries(options).map(([key, val]) => (
@@ -75,10 +84,13 @@ function nextIncrement(progress) {
 
 const STEP_THRESHOLDS = [22, 48, 74, 100]
 
-function Text({ formData, onChange, section, field, label, placeholder, textarea }) {
+function Text({ formData, onChange, section, field, label, placeholder, textarea, help }) {
   return (
     <label className="field">
-      <span>{label}</span>
+      <span className="field-label-row">
+        {label}
+        <FieldHelp text={help} />
+      </span>
       {textarea ? (
         <textarea rows={3} value={formData[section][field]} placeholder={placeholder}
           onChange={e => onChange(section, field, e.target.value)} />
@@ -165,11 +177,11 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
         {step === 0 && (
           <>
             <h2>{t(lang, 'product.title')}</h2>
-            <Text formData={formData} onChange={handleChange} section="product" field="name" label={t(lang, 'product.name')} placeholder={t(lang, 'product.namePh')} />
+            <Text formData={formData} onChange={handleChange} section="product" field="name" label={t(lang, 'product.name')} placeholder={t(lang, 'product.namePh')} help={t(lang, 'product.nameHelp')} />
             <Select formData={formData} onChange={handleChange} section="product" field="stage" label={t(lang, 'product.stage')} options={t(lang, 'product.stageOptions')} glossary={t(lang, 'product.stageGlossary')} />
-            <Select formData={formData} onChange={handleChange} section="product" field="category" label={t(lang, 'product.category')} options={t(lang, 'product.categoryOptions')} />
-            <Text formData={formData} onChange={handleChange} section="product" field="pitch" label={t(lang, 'product.pitch')} placeholder={t(lang, 'product.pitchPh')} textarea />
-            <Text formData={formData} onChange={handleChange} section="product" field="usp" label={t(lang, 'product.usp')} placeholder={t(lang, 'product.uspPh')} />
+            <Select formData={formData} onChange={handleChange} section="product" field="category" label={t(lang, 'product.category')} options={t(lang, 'product.categoryOptions')} glossary={t(lang, 'product.categoryGlossary')} />
+            <Text formData={formData} onChange={handleChange} section="product" field="pitch" label={t(lang, 'product.pitch')} placeholder={t(lang, 'product.pitchPh')} textarea help={t(lang, 'product.pitchHelp')} />
+            <Text formData={formData} onChange={handleChange} section="product" field="usp" label={t(lang, 'product.usp')} placeholder={t(lang, 'product.uspPh')} help={t(lang, 'product.uspHelp')} />
             <Select formData={formData} onChange={handleChange} section="product" field="targetUser" label={t(lang, 'product.targetUser')} options={t(lang, 'product.targetUserOptions')} glossary={t(lang, 'product.targetUserGlossary')} />
           </>
         )}
@@ -177,22 +189,25 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
         {step === 1 && (
           <>
             <h2>{t(lang, 'market.title')}</h2>
-            <Select formData={formData} onChange={handleChange} section="market" field="geography" label={t(lang, 'market.geography')} options={t(lang, 'market.geographyOptions')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="geography" label={t(lang, 'market.geography')} options={t(lang, 'market.geographyOptions')} glossary={t(lang, 'market.geographyGlossary')} />
             <Select formData={formData} onChange={handleChange} section="market" field="b2bVsB2c" label={t(lang, 'market.b2bVsB2c')} options={t(lang, 'market.b2bVsB2cOptions')} glossary={t(lang, 'market.b2bVsB2cGlossary')} />
-            <Text formData={formData} onChange={handleChange} section="market" field="segment" label={t(lang, 'market.segment')} placeholder={t(lang, 'market.segmentPh')} />
-            <Select formData={formData} onChange={handleChange} section="market" field="audienceSize" label={t(lang, 'market.audienceSize')} options={t(lang, 'market.audienceSizeOptions')} />
-            <Select formData={formData} onChange={handleChange} section="market" field="competition" label={t(lang, 'market.competition')} options={t(lang, 'market.competitionOptions')} />
+            <Text formData={formData} onChange={handleChange} section="market" field="segment" label={t(lang, 'market.segment')} placeholder={t(lang, 'market.segmentPh')} help={t(lang, 'market.segmentHelp')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="audienceSize" label={t(lang, 'market.audienceSize')} options={t(lang, 'market.audienceSizeOptions')} help={t(lang, 'market.audienceSizeHelp')} />
+            <Select formData={formData} onChange={handleChange} section="market" field="competition" label={t(lang, 'market.competition')} options={t(lang, 'market.competitionOptions')} glossary={t(lang, 'market.competitionGlossary')} />
           </>
         )}
 
         {step === 2 && (
           <>
             <h2>{t(lang, 'resources.title')}</h2>
-            <Select formData={formData} onChange={handleChange} section="resources" field="timelineWeeks" label={t(lang, 'resources.timelineWeeks')} options={t(lang, 'resources.timelineOptions')} />
-            <Select formData={formData} onChange={handleChange} section="resources" field="budgetEur" label={t(lang, 'resources.budgetEur')} options={t(lang, 'resources.budgetOptions')} />
-            <Select formData={formData} onChange={handleChange} section="resources" field="teamSize" label={t(lang, 'resources.teamSize')} options={t(lang, 'resources.teamSizeOptions')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="timelineWeeks" label={t(lang, 'resources.timelineWeeks')} options={t(lang, 'resources.timelineOptions')} help={t(lang, 'resources.timelineWeeksHelp')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="budgetEur" label={t(lang, 'resources.budgetEur')} options={t(lang, 'resources.budgetOptions')} help={t(lang, 'resources.budgetEurHelp')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="teamSize" label={t(lang, 'resources.teamSize')} options={t(lang, 'resources.teamSizeOptions')} help={t(lang, 'resources.teamSizeHelp')} />
             <div className="field">
-              <span>{t(lang, 'resources.rolesPresent')}</span>
+              <span className="field-label-row">
+                {t(lang, 'resources.rolesPresent')}
+                <FieldHelp text={t(lang, 'resources.rolesPresentHelp')} />
+              </span>
               <div className="chip-group">
                 {Object.entries(t(lang, 'resources.roles')).map(([key, label]) => (
                   <button type="button" key={key}
@@ -209,12 +224,15 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
         {step === 3 && (
           <>
             <h2>{t(lang, 'priorities.title')}</h2>
-            <Select formData={formData} onChange={handleChange} section="priorities" field="focus" label={t(lang, 'priorities.focus')} options={t(lang, 'priorities.focusOptions')} />
-            <Select formData={formData} onChange={handleChange} section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} />
-            <Select formData={formData} onChange={handleChange} section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="focus" label={t(lang, 'priorities.focus')} options={t(lang, 'priorities.focusOptions')} glossary={t(lang, 'priorities.focusGlossary')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="engagement" label={t(lang, 'priorities.engagement')} options={t(lang, 'priorities.engagementOptions')} help={t(lang, 'priorities.engagementHelp')} />
+            <Select formData={formData} onChange={handleChange} section="priorities" field="riskKnown" label={t(lang, 'priorities.riskKnown')} options={t(lang, 'priorities.riskOptions')} glossary={t(lang, 'priorities.riskGlossary')} />
             <Select formData={formData} onChange={handleChange} section="priorities" field="successMetric" label={t(lang, 'priorities.successMetric')} options={t(lang, 'priorities.successOptions')} glossary={t(lang, 'priorities.successGlossary')} />
             <div className="field">
-              <span>{t(lang, 'priorities.rules')}</span>
+              <span className="field-label-row">
+                {t(lang, 'priorities.rules')}
+                <FieldHelp glossary={t(lang, 'priorities.rulesGlossary')} options={t(lang, 'priorities.rulesOptions')} />
+              </span>
               <div className="chip-group">
                 {Object.entries(t(lang, 'priorities.rulesOptions')).map(([key, label]) => (
                   <button type="button" key={key}
@@ -226,7 +244,10 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
               </div>
             </div>
             <label className="field">
-              <span>{t(lang, 'priorities.context')}</span>
+              <span className="field-label-row">
+                {t(lang, 'priorities.context')}
+                <FieldHelp text={t(lang, 'priorities.contextHelp')} />
+              </span>
               <textarea rows={3} value={formData.context} placeholder={t(lang, 'priorities.contextPh')}
                 onChange={e => handleContextChange(e.target.value)} />
             </label>

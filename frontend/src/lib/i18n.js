@@ -42,6 +42,7 @@ export const translations = {
       title: 'Informations produit',
       name: 'Nom du produit',
       namePh: 'ex : AI Note Taker',
+      nameHelp: 'Le nom de marque ou de produit tel qu\'il apparaîtra dans le plan généré.',
       stage: 'Stade',
       stageOptions: { idea: 'Idée / concept', prelaunch: 'Pre-launch', mvp: 'MVP', beta: 'Beta privée', growing: 'Growing', scaleup: 'Scale-up' },
       stageGlossary: {
@@ -54,10 +55,30 @@ export const translations = {
       },
       category: 'Catégorie SaaS',
       categoryOptions: { pm: 'Project mgmt', analytics: 'Analytics', automation: 'Automation', hr: 'HR', finance: 'Finance', saas: 'SaaS B2B', marketplace: 'Marketplace', mobile: 'App mobile', ecommerce: 'E-commerce', fintech: 'Fintech', edtech: 'EdTech', healthtech: 'HealthTech', devtools: 'Dev tools', ai: 'IA / ML', media: 'Contenu / Média', other: 'Autre' },
+      categoryGlossary: {
+        pm: 'Project management — outils de gestion de projet et de tâches.',
+        analytics: 'Suivi et analyse de données (tableaux de bord, reporting...).',
+        automation: "Automatisation de tâches ou de processus métier.",
+        hr: 'Human Resources — ressources humaines (recrutement, paie, RH...).',
+        finance: 'Comptabilité, facturation, gestion financière.',
+        saas: 'Software as a Service vendu à d\'autres entreprises (B2B).',
+        marketplace: 'Plateforme qui met en relation deux types d\'utilisateurs (acheteurs/vendeurs).',
+        mobile: 'Application principalement pensée pour smartphone.',
+        ecommerce: 'Vente de produits en ligne.',
+        fintech: 'Technologie financière (paiement, banque, investissement...).',
+        edtech: 'Education Technology — technologie appliquée à l\'apprentissage.',
+        healthtech: 'Health Technology — technologie appliquée à la santé.',
+        devtools: 'Outils destinés aux développeurs.',
+        ai: 'Intelligence artificielle / Machine Learning.',
+        media: 'Contenu éditorial, streaming, ou média en général.',
+        other: 'Aucune des catégories ci-dessus ne correspond.'
+      },
       pitch: 'Pitch court',
       pitchPh: 'Décris ton produit en 2-3 lignes…',
+      pitchHelp: 'Un résumé en 2-3 phrases : ce que fait ton produit, pour qui, et le problème qu\'il résout.',
       usp: 'USP (proposition de valeur unique)',
       uspPh: 'Ce qui te différencie…',
+      uspHelp: 'Unique Selling Proposition — ce qui te différencie clairement de la concurrence (une fonctionnalité, un prix, une audience...).',
       targetUser: 'Utilisateur cible',
       targetUserOptions: { freelancers: 'Freelancers', smb: 'PME', enterprise: 'Entreprise', niche: 'Niche', developers: 'Développeurs', startups: 'Startups', creators: 'Créateurs', consumers: 'Grand public' },
       targetUserGlossary: {
@@ -75,6 +96,16 @@ export const translations = {
       title: 'Marché & audience',
       geography: 'Géographie',
       geographyOptions: { france: 'France', eu: 'UE', na: 'Amérique du Nord', latam: 'Amérique latine', apac: 'Asie-Pacifique', mena: 'MENA', africa: 'Afrique', global: 'Global' },
+      geographyGlossary: {
+        france: 'Marché français uniquement.',
+        eu: 'Union européenne — l\'ensemble des 27 pays membres.',
+        na: 'Amérique du Nord — États-Unis et Canada principalement.',
+        latam: 'Amérique latine — Mexique, Brésil, Amérique centrale et du Sud.',
+        apac: 'Asia-Pacific — Asie et région Pacifique (Chine, Inde, Japon, Australie...).',
+        mena: 'Middle East & North Africa — Moyen-Orient et Afrique du Nord.',
+        africa: 'Continent africain (hors Afrique du Nord si MENA est utilisé séparément).',
+        global: 'Aucune région ciblée en priorité, marché mondial.'
+      },
       b2bVsB2c: 'B2B vs B2C',
       b2bVsB2cOptions: { b2b: 'B2B', b2c: 'B2C', hybrid: 'Hybride', b2b2c: 'B2B2C', b2g: 'B2G (secteur public)', d2c: 'D2C' },
       b2bVsB2cGlossary: {
@@ -87,30 +118,65 @@ export const translations = {
       },
       segment: 'Segment principal',
       segmentPh: 'ex : Équipes remote / Hybrid orgs',
+      segmentHelp: 'Le profil précis de client que tu vises : secteur, taille d\'entreprise, usage ou métier concerné.',
       audienceSize: "Taille d'audience potentielle",
       audienceSizeOptions: { xs: '< 1k', s: '1k-10k', m: '10k-100k', l: '100k+', xl: '1M+' },
+      audienceSizeHelp: 'Estimation du nombre total de personnes ou d\'entreprises qui pourraient être intéressées par ton produit.',
       competition: 'Concurrence',
-      competitionOptions: { none: 'Aucune', low: 'Faible', moderate: 'Modérée', high: 'Forte', emerging: 'Marché naissant', saturated: 'Saturé (red ocean)' }
+      competitionOptions: { none: 'Aucune', low: 'Faible', moderate: 'Modérée', high: 'Forte', emerging: 'Marché naissant', saturated: 'Saturé (red ocean)' },
+      competitionGlossary: {
+        none: 'Aucun concurrent identifié sur ce marché.',
+        low: 'Quelques concurrents, marché encore ouvert.',
+        moderate: 'Plusieurs concurrents établis, marché disputé mais accessible.',
+        high: 'Beaucoup de concurrents, marché difficile à percer.',
+        emerging: 'Marché récent, encore en formation.',
+        saturated: '« Red ocean » — marché mature où la concurrence est féroce et les marges sous pression, par opposition à un « blue ocean » (marché neuf, sans concurrence directe).'
+      }
     },
     resources: {
       title: 'Timeline & ressources',
       timelineWeeks: 'Durée avant lancement',
       timelineOptions: { w2: '2 semaines', w4: '4 semaines', w8: '8 semaines', w12: '12 semaines', w16: '16 semaines', w26: '6 mois', w36: '9 mois', w52: '12 mois' },
+      timelineWeeksHelp: 'Le délai que tu vises entre aujourd\'hui et le lancement public — il détermine le rythme des sprints du plan.',
       budgetEur: 'Budget marketing total',
       budgetOptions: { b500: '500 €', b1k: '1 000 €', b2k: '2 000 €', b5k: '5 000 €', b10k: '10 000 €', b25k: '25 000 €', b50k: '50 000 €', b100k: '100 000 €+' },
+      budgetEurHelp: 'Le budget total que tu comptes consacrer au marketing jusqu\'au lancement (hors salaires et développement produit).',
       teamSize: "Taille d'équipe",
       teamSizeOptions: { solo: 'Solo', small: '2-3', medium: '4-6', large: '7+', xlarge: '10-20', xxlarge: '20+' },
+      teamSizeHelp: 'Le nombre de personnes qui travaillent activement sur le projet aujourd\'hui.',
       rolesPresent: 'Rôles présents',
+      rolesPresentHelp: 'Les compétences déjà présentes dans ton équipe — coche tout ce qui s\'applique.',
       roles: { product: 'Product', marketing: 'Marketing', dev: 'Dev', design: 'Design', data: 'Data', growth: 'Growth', sales: 'Sales', support: 'Support', ops: 'Ops' }
     },
     priorities: {
       title: 'Priorités & contexte',
       focus: 'Priorité',
       focusOptions: { acquire: 'Acquérir des utilisateurs', retain: 'Retenir', monetize: 'Monétiser', fundraise: 'Lever des fonds', pmf: 'Atteindre le product-market fit', churn: 'Réduire le churn', international: "S'internationaliser" },
+      focusGlossary: {
+        acquire: 'Faire grossir le nombre d\'utilisateurs ou de clients.',
+        retain: 'Garder les utilisateurs existants actifs sur la durée.',
+        monetize: 'Générer ou augmenter les revenus.',
+        fundraise: 'Préparer ou réussir une levée de fonds auprès d\'investisseurs.',
+        pmf: 'Product-Market Fit — le moment où ton produit répond enfin à un vrai besoin de marché, validé par la demande.',
+        churn: 'Réduire le taux de résiliation / d\'abandon des clients.',
+        international: 'Étendre le produit à de nouveaux pays ou marchés.'
+      },
       engagement: 'Engagement requis',
       engagementOptions: { minimal: 'Minimal (passif)', moderate: 'Modéré', high: 'Élevé (communauté)', community: 'Communauté active', whiteglove: 'Accompagnement premium' },
+      engagementHelp: 'Le niveau d\'implication que tu attends de tes utilisateurs au quotidien : simple usage passif ou véritable communauté active.',
       riskKnown: 'Risques connus',
       riskOptions: { none: 'Aucun', notready: 'Produit non prêt', pmf: 'Product-market fit incertain', budget: 'Budget limité', regulatory: 'Réglementaire / conformité', techdebt: 'Dette technique', platform: 'Dépendance à une plateforme', timing: 'Timing marché', hiring: 'Recrutement' },
+      riskGlossary: {
+        none: 'Aucun risque majeur identifié pour l\'instant.',
+        notready: 'Le produit n\'est pas encore assez abouti pour être lancé.',
+        pmf: 'Product-Market Fit incertain — le produit n\'a pas encore prouvé qu\'il répond à un vrai besoin.',
+        budget: 'Le budget disponible pourrait ne pas suffire.',
+        regulatory: 'Contraintes légales, réglementaires ou de conformité (RGPD, licences...).',
+        techdebt: 'Dette technique — du code ou une architecture à refaire qui ralentit le développement.',
+        platform: 'Dépendance forte à une plateforme tierce (app store, API, réseau social...).',
+        timing: 'Risque de mauvais timing sur le marché (trop tôt ou trop tard).',
+        hiring: 'Difficulté à recruter les bons profils à temps.'
+      },
       successMetric: 'Métrique de succès',
       successOptions: { signups: '# Inscriptions', arr: 'ARR', retention: 'Rétention', community: 'Taille communauté', mrr: 'MRR', nps: 'NPS', ltv: 'LTV', conversion: 'Taux de conversion', activeUsers: 'DAU/MAU' },
       successGlossary: {
@@ -135,8 +201,19 @@ export const translations = {
         plg: 'Product-led growth',
         complianceFirst: "Conformité d'abord"
       },
+      rulesGlossary: {
+        marketingFirst: 'Le plan met l\'accent sur les actions marketing avant les tâches de développement.',
+        designFirst: 'Le plan priorise le travail de design et d\'expérience utilisateur.',
+        devFirst: 'Le plan priorise les tâches de développement produit.',
+        mobileFirst: 'Le plan conçoit d\'abord pour mobile avant le desktop.',
+        dataDriven: 'Data-driven — les décisions s\'appuient sur des données et métriques plutôt que sur l\'intuition.',
+        salesLed: 'Sales-led — la croissance passe d\'abord par une équipe commerciale plutôt que par le produit seul.',
+        plg: 'Product-Led Growth — le produit lui-même (essai gratuit, usage) est le principal moteur d\'acquisition.',
+        complianceFirst: 'Le plan traite en priorité les sujets légaux et de conformité (RGPD, réglementation...).'
+      },
       context: 'Autre chose à préciser ? (optionnel)',
-      contextPh: 'Contraintes spécifiques, particularités du marché, éléments que le questionnaire ne couvre pas...'
+      contextPh: 'Contraintes spécifiques, particularités du marché, éléments que le questionnaire ne couvre pas...',
+      contextHelp: 'Tout ce qui n\'est pas couvert par les questions précédentes : contraintes légales, partenariats déjà en place, particularités locales...'
     },
     gantt: {
       title: 'Gantt interactif',
@@ -1227,6 +1304,7 @@ export const translations = {
       title: 'Product information',
       name: 'Product name',
       namePh: 'e.g. AI Note Taker',
+      nameHelp: 'The brand or product name as it will appear in the generated plan.',
       stage: 'Stage',
       stageOptions: { idea: 'Idea / concept', prelaunch: 'Pre-launch', mvp: 'MVP', beta: 'Private beta', growing: 'Growing', scaleup: 'Scale-up' },
       stageGlossary: {
@@ -1239,10 +1317,30 @@ export const translations = {
       },
       category: 'SaaS category',
       categoryOptions: { pm: 'Project mgmt', analytics: 'Analytics', automation: 'Automation', hr: 'HR', finance: 'Finance', saas: 'B2B SaaS', marketplace: 'Marketplace', mobile: 'Mobile app', ecommerce: 'E-commerce', fintech: 'Fintech', edtech: 'EdTech', healthtech: 'HealthTech', devtools: 'Dev tools', ai: 'AI / ML', media: 'Content / Media', other: 'Other' },
+      categoryGlossary: {
+        pm: 'Project management — tools for managing projects and tasks.',
+        analytics: 'Data tracking and analysis (dashboards, reporting...).',
+        automation: 'Automating tasks or business processes.',
+        hr: 'Human Resources (hiring, payroll, HR management...).',
+        finance: 'Accounting, invoicing, financial management.',
+        saas: 'Software as a Service sold to other businesses (B2B).',
+        marketplace: 'A platform connecting two types of users (buyers/sellers).',
+        mobile: 'An app primarily built for smartphones.',
+        ecommerce: 'Selling products online.',
+        fintech: 'Financial technology (payments, banking, investing...).',
+        edtech: 'Education Technology — technology applied to learning.',
+        healthtech: 'Health Technology — technology applied to healthcare.',
+        devtools: 'Tools built for developers.',
+        ai: 'Artificial Intelligence / Machine Learning.',
+        media: 'Editorial content, streaming, or media in general.',
+        other: 'None of the above categories fit.'
+      },
       pitch: 'Short pitch',
       pitchPh: 'Describe your product in 2-3 lines…',
+      pitchHelp: 'A 2-3 sentence summary: what your product does, who it\'s for, and the problem it solves.',
       usp: 'USP (Unique Selling Point)',
       uspPh: 'What sets you apart…',
+      uspHelp: 'Unique Selling Proposition — what clearly sets you apart from competitors (a feature, a price, an audience...).',
       targetUser: 'Target user',
       targetUserOptions: { freelancers: 'Freelancers', smb: 'SMB', enterprise: 'Enterprise', niche: 'Niche', developers: 'Developers', startups: 'Startups', creators: 'Creators', consumers: 'Consumers' },
       targetUserGlossary: {
@@ -1260,6 +1358,16 @@ export const translations = {
       title: 'Market & audience',
       geography: 'Geography',
       geographyOptions: { france: 'France', eu: 'EU', na: 'North America', latam: 'Latin America', apac: 'Asia-Pacific', mena: 'MENA', africa: 'Africa', global: 'Global' },
+      geographyGlossary: {
+        france: 'French market only.',
+        eu: 'European Union — all 27 member states.',
+        na: 'North America — mainly the US and Canada.',
+        latam: 'Latin America — Mexico, Brazil, Central and South America.',
+        apac: 'Asia-Pacific — Asia and the Pacific region (China, India, Japan, Australia...).',
+        mena: 'Middle East & North Africa.',
+        africa: 'The African continent (excluding North Africa if MENA is used separately).',
+        global: 'No priority region, worldwide market.'
+      },
       b2bVsB2c: 'B2B vs B2C',
       b2bVsB2cOptions: { b2b: 'B2B', b2c: 'B2C', hybrid: 'Hybrid', b2b2c: 'B2B2C', b2g: 'B2G (public sector)', d2c: 'D2C' },
       b2bVsB2cGlossary: {
@@ -1272,30 +1380,65 @@ export const translations = {
       },
       segment: 'Main segment',
       segmentPh: 'e.g. Remote teams / Hybrid orgs',
+      segmentHelp: 'The precise customer profile you\'re targeting: industry, company size, use case or role.',
       audienceSize: 'Potential audience size',
       audienceSizeOptions: { xs: '< 1k', s: '1k-10k', m: '10k-100k', l: '100k+', xl: '1M+' },
+      audienceSizeHelp: 'Estimated total number of people or businesses who could be interested in your product.',
       competition: 'Competition',
-      competitionOptions: { none: 'None', low: 'Low', moderate: 'Moderate', high: 'High', emerging: 'Emerging market', saturated: 'Saturated (red ocean)' }
+      competitionOptions: { none: 'None', low: 'Low', moderate: 'Moderate', high: 'High', emerging: 'Emerging market', saturated: 'Saturated (red ocean)' },
+      competitionGlossary: {
+        none: 'No competitors identified in this market.',
+        low: 'A few competitors, market still open.',
+        moderate: 'Several established competitors, contested but accessible market.',
+        high: 'Many competitors, hard market to break into.',
+        emerging: 'Recent market, still forming.',
+        saturated: '"Red ocean" — a mature market with fierce competition and squeezed margins, as opposed to a "blue ocean" (a new market with no direct competition).'
+      }
     },
     resources: {
       title: 'Timeline & resources',
       timelineWeeks: 'Time until launch',
       timelineOptions: { w2: '2 weeks', w4: '4 weeks', w8: '8 weeks', w12: '12 weeks', w16: '16 weeks', w26: '6 months', w36: '9 months', w52: '12 months' },
+      timelineWeeksHelp: 'The delay you\'re aiming for between today and the public launch — it sets the pace of the plan\'s sprints.',
       budgetEur: 'Total marketing budget',
       budgetOptions: { b500: '€500', b1k: '€1,000', b2k: '€2,000', b5k: '€5,000', b10k: '€10,000', b25k: '€25,000', b50k: '€50,000', b100k: '€100,000+' },
+      budgetEurHelp: 'The total budget you plan to spend on marketing until launch (excluding salaries and product development).',
       teamSize: 'Team size',
       teamSizeOptions: { solo: 'Solo', small: '2-3', medium: '4-6', large: '7+', xlarge: '10-20', xxlarge: '20+' },
+      teamSizeHelp: 'The number of people actively working on the project today.',
       rolesPresent: 'Roles present',
+      rolesPresentHelp: 'The skills already present in your team — check everything that applies.',
       roles: { product: 'Product', marketing: 'Marketing', dev: 'Dev', design: 'Design', data: 'Data', growth: 'Growth', sales: 'Sales', support: 'Support', ops: 'Ops' }
     },
     priorities: {
       title: 'Priorities & context',
       focus: 'Priority',
       focusOptions: { acquire: 'Acquire users', retain: 'Retain', monetize: 'Monetize', fundraise: 'Raise funds', pmf: 'Reach product-market fit', churn: 'Reduce churn', international: 'Go international' },
+      focusGlossary: {
+        acquire: 'Grow the number of users or customers.',
+        retain: 'Keep existing users active over time.',
+        monetize: 'Generate or increase revenue.',
+        fundraise: 'Prepare for or close a funding round with investors.',
+        pmf: 'Product-Market Fit — the point where your product finally meets a real market need, validated by demand.',
+        churn: 'Reduce the customer cancellation / drop-off rate.',
+        international: 'Expand the product to new countries or markets.'
+      },
       engagement: 'Engagement required',
       engagementOptions: { minimal: 'Minimal (passive)', moderate: 'Moderate', high: 'High (community)', community: 'Active community', whiteglove: 'White-glove support' },
+      engagementHelp: 'How involved you expect your users to be day to day: simple passive use vs. an actual active community.',
       riskKnown: 'Known risks',
       riskOptions: { none: 'None', notready: 'Product not ready', pmf: 'Market fit unclear', budget: 'Budget limits', regulatory: 'Regulatory / compliance', techdebt: 'Technical debt', platform: 'Platform dependency', timing: 'Market timing', hiring: 'Hiring' },
+      riskGlossary: {
+        none: 'No major risk identified for now.',
+        notready: 'The product isn\'t polished enough to launch yet.',
+        pmf: 'Product-Market Fit unclear — the product hasn\'t yet proven it meets a real need.',
+        budget: 'Available budget may not be enough.',
+        regulatory: 'Legal, regulatory, or compliance constraints (GDPR, licenses...).',
+        techdebt: 'Technical debt — code or architecture that needs rework and slows development down.',
+        platform: 'Heavy dependency on a third-party platform (app store, API, social network...).',
+        timing: 'Risk of bad market timing (too early or too late).',
+        hiring: 'Difficulty hiring the right people in time.'
+      },
       successMetric: 'Success metric',
       successOptions: { signups: '# Signups', arr: 'ARR', retention: 'Retention', community: 'Community size', mrr: 'MRR', nps: 'NPS', ltv: 'LTV', conversion: 'Conversion rate', activeUsers: 'DAU/MAU' },
       successGlossary: {
@@ -1320,8 +1463,19 @@ export const translations = {
         plg: 'Product-led growth',
         complianceFirst: 'Compliance-first'
       },
+      rulesGlossary: {
+        marketingFirst: 'The plan emphasizes marketing actions before development tasks.',
+        designFirst: 'The plan prioritizes design and user experience work.',
+        devFirst: 'The plan prioritizes product development tasks.',
+        mobileFirst: 'The plan is designed for mobile before desktop.',
+        dataDriven: 'Data-driven — decisions rely on data and metrics rather than intuition.',
+        salesLed: 'Sales-led — growth is driven primarily by a sales team rather than the product alone.',
+        plg: 'Product-Led Growth — the product itself (free trial, usage) is the main acquisition driver.',
+        complianceFirst: 'The plan addresses legal and compliance topics first (GDPR, regulation...).'
+      },
       context: 'Anything else to add? (optional)',
-      contextPh: "Specific constraints, market particularities, anything the questionnaire doesn't cover..."
+      contextPh: "Specific constraints, market particularities, anything the questionnaire doesn't cover...",
+      contextHelp: "Anything the previous questions don't cover: legal constraints, existing partnerships, local particularities..."
     },
     gantt: {
       title: 'Interactive Gantt',
