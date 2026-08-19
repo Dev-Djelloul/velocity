@@ -276,7 +276,10 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
             {plans.map(p => (
               <div key={p.id} className="account-list-item">
                 <button className="account-list-item-main" onClick={() => onLoadPlan(p)}>
-                  <span className="account-list-item-name">{p.product?.name}</span>
+                  <span className="account-list-item-name">
+                    {p.product?.name}
+                    {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                  </span>
                   <span className="account-list-item-meta">{p.classification}</span>
                   <span className="plan-origin-tag">
                     <span className={`plan-origin-dot ${p.team_id ? 'is-team' : 'is-personal'}`} />
