@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
-import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil } from './Icons'
+import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil, IconSearch } from './Icons'
 import '../styles/GalleryPage.css'
+import '../styles/PlansHistory.css'
 
 // Galerie privée : vue en grille des plans que l'utilisateur a explicitement épinglés
 // (plan.inGallery, bouton "Ajouter à la galerie" dans PlanViewer) — opt-in, pas une liste
@@ -16,6 +17,7 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const [toast, setToast] = useState(null)
   const [renameTarget, setRenameTarget] = useState(null)
   const [editValue, setEditValue] = useState('')
+  const [searchQuery, setSearchQuery] = useState('')
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -28,6 +30,16 @@ export default function GalleryPage({ lang, onOpenPlan }) {
       return (b.updatedAt || b.savedAt || '').localeCompare(a.updatedAt || a.savedAt || '')
     })
   }, [plans])
+
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const visibleGalleryPlans = useMemo(() => {
+    if (!normalizedQuery) return galleryPlans
+    return galleryPlans.filter(p => {
+      const name = p.product?.name || t(lang, 'plans.untitled')
+      return name.toLowerCase().includes(normalizedQuery)
+        || p.classification?.toLowerCase().includes(normalizedQuery)
+    })
+  }, [galleryPlans, normalizedQuery, lang])
 
   // Ferme le menu contextuel au premier clic ailleurs, à l'échappement, ou si la fenêtre
   // défile/redimensionne — sans ça il resterait affiché à des coordonnées qui ne
@@ -155,9 +167,31 @@ export default function GalleryPage({ lang, onOpenPlan }) {
         </div>
       )}
 
-      {!!galleryPlans.length && (
+      {galleryPlans.length > 3 && (
+        <div className="plans-search gallery-search">
+          <IconSearch width={15} height={15} className="plans-search-icon" />
+          <input
+            type="text"
+            className="plans-search-input"
+            placeholder={t(lang, 'plans.searchPlaceholder')}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          {searchQuery && (
+            <button className="plans-search-clear" onClick={() => setSearchQuery('')} title={t(lang, 'plans.cancel')}>
+              <IconX width={13} height={13} />
+            </button>
+          )}
+        </div>
+      )}
+
+      {!!galleryPlans.length && visibleGalleryPlans.length === 0 && (
+        <p className="plans-empty-state">{t(lang, 'plans.noSearchResults')}</p>
+      )}
+
+      {!!visibleGalleryPlans.length && (
         <div className="gallery-grid">
-          {galleryPlans.map(p => (
+          {visibleGalleryPlans.map(p => (
             <button
               key={p.id}
               className={`gallery-card${p.isFavorite ? ' gallery-card-featured' : ''}`}

@@ -24,6 +24,11 @@
   margin: 0 auto;
 }
 
+.gallery-search {
+  max-width: 420px;
+  margin: 0 auto 1.5rem;
+}
+
 .gallery-empty,
 .gallery-empty-state {
   text-align: center;
