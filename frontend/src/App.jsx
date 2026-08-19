@@ -740,16 +740,6 @@ export default function App() {
                   </button>
                   {openHeaderMenu === 'space' && (
                     <div className="header-dropdown header-space-dropdown">
-                      <button
-                        className="header-dropdown-item header-dropdown-item-primary"
-                        onClick={() => { setOpenHeaderMenu(null); setCurrentPage('space'); window.scrollTo(0, 0) }}
-                      >
-                        <IconBarChart width={16} height={16} /> {lang === 'fr' ? 'Tableau de bord' : 'Dashboard'}
-                      </button>
-                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
-                        <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
-                      </button>
-
                       <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
                       <button
                         className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
@@ -788,6 +778,18 @@ export default function App() {
                           </button>
                         </div>
                       ))}
+
+                      <div className="header-dropdown-divider" />
+
+                      <button
+                        className="header-dropdown-item"
+                        onClick={() => { setOpenHeaderMenu(null); setCurrentPage('space'); window.scrollTo(0, 0) }}
+                      >
+                        <IconBarChart width={14} height={14} /> {lang === 'fr' ? 'Tableau de bord' : 'Dashboard'}
+                      </button>
+                      <button className="header-dropdown-item" onClick={() => { setOpenHeaderMenu(null); setShowCreateTeam(true) }}>
+                        <IconPlus width={14} height={14} /> {t(lang, 'team.createTeam')}
+                      </button>
                     </div>
                   )}
                 </div>
