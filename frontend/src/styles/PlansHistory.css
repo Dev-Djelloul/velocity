@@ -14,7 +14,7 @@
 .plans-list {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 24px;
 }
 
@@ -28,7 +28,8 @@
      positionnée en absolu par-dessus) au lieu de la pousser comme un simple bloc de plus
      dans le flux — c'est ce qui lui permet de coller aux bords de la carte plutôt que de
      flotter comme une vignette isolée. */
-  padding: 16px 20px 16px calc(20% + 20px);
+  padding: 10px 16px 10px calc(16% + 16px);
+  min-height: 76px;
   border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
   background:
@@ -57,8 +58,8 @@
   position: absolute;
   left: 0;
   top: 0;
-  width: 20%;
-  min-width: 90px;
+  width: 16%;
+  min-width: 64px;
   height: 100%;
   border-radius: 0;
   object-fit: cover;
@@ -70,9 +71,9 @@
 }
 
 .plan-info h3 {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
   color: var(--color-text-primary);
 }
 
@@ -80,6 +81,7 @@
   display: flex;
   align-items: center;
   gap: 5px;
+  line-height: 1.2;
 }
 
 .plan-name-text {
@@ -127,31 +129,33 @@
 }
 
 .plan-meta {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-text-muted);
-  margin-bottom: 2px;
+  margin-bottom: 1px;
+  line-height: 1.2;
 }
 
 .plan-type {
-  font-size: 12px;
+  font-size: 11px;
   color: var(--color-primary);
   font-weight: 500;
+  line-height: 1.2;
 }
 
 .plan-actions {
   display: flex;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .plan-actions .btn-secondary {
-  padding: 0.4rem 0.85rem;
-  font-size: 12px;
+  padding: 0.3rem 0.65rem;
+  font-size: 11px;
 }
 
 .plan-favorite-btn {
-  padding: 0.4rem 0.6rem !important;
-  font-size: 14px !important;
+  padding: 0.3rem 0.5rem !important;
+  font-size: 13px !important;
   line-height: 1;
 }
 
@@ -161,8 +165,8 @@
 }
 
 .btn-plan-danger {
-  padding: 0.4rem 0.85rem;
-  font-size: 12px;
+  padding: 0.3rem 0.65rem;
+  font-size: 11px;
   border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: var(--radius-md);
   background: transparent;
