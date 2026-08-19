@@ -1,5 +1,5 @@
 .space-page {
-  max-width: 860px;
+  max-width: 960px;
   margin: 2rem auto;
   padding: 0 1.5rem 4rem;
   display: flex;
@@ -160,6 +160,16 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  /* Un <h3> dans un <button> (voir .space-page-gallery-link, "Mes plans"/"Ma galerie") ne
+     hérite pas du font-size ambiant — les boutons ont leur propre taille par défaut côté
+     navigateur — d'où un texte visiblement plus grand ici (h3 dans une simple <div>) sans
+     cette valeur explicite alignée sur l'autre. */
+  font-size: 1rem;
+}
+
+.space-page-icon-accent {
+  display: inline-flex;
+  color: var(--color-accent);
 }
 
 .space-page-new-btn {
@@ -210,6 +220,7 @@
 .space-page-gallery-link h3 {
   color: var(--color-text-primary);
   margin-bottom: 0.25rem;
+  font-size: 1rem;
 }
 
 .space-page-gallery-link p {

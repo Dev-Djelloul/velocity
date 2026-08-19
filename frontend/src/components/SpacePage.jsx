@@ -186,18 +186,23 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           <div className="account-list">
             {visiblePlans.map(p => (
               <div key={p.id} className="account-list-item">
-                <button className="account-list-item-main" onClick={() => onLoadPlan(p)}>
-                  <span className="account-list-item-name">
-                    {p.product?.name}
-                    {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
-                  </span>
-                  <span className="account-list-item-meta">{p.classification}</span>
-                  <span className="plan-origin-tag">
-                    <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
-                    {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
-                    {p.createdByName && ` · ${p.createdByName}`}
-                    {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
-                  </span>
+                <button className="account-list-item-main has-thumb" onClick={() => onLoadPlan(p)}>
+                  {p.coverImage
+                    ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
+                    : <div className="account-list-item-thumb account-list-item-thumb-placeholder" aria-hidden="true" />}
+                  <div className="account-list-item-text">
+                    <span className="account-list-item-name">
+                      {p.product?.name}
+                      {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                    </span>
+                    <span className="account-list-item-meta">{p.classification}</span>
+                    <span className="plan-origin-tag">
+                      <span className={`plan-origin-dot ${p.createdSpaceId ? 'is-team' : 'is-personal'}`} />
+                      {p.createdSpaceId ? (p.createdSpaceName || t(lang, 'team.myTeams')) : t(lang, 'team.personalSpace')}
+                      {p.createdByName && ` · ${p.createdByName}`}
+                      {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
+                    </span>
+                  </div>
                 </button>
                 <button
                   className={`account-list-item-favorite ${p.isFavorite ? 'is-favorite' : ''}`}
@@ -246,7 +251,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
       {!isTeam && (
         <div className="space-page-section card">
           <div className="space-page-section-head">
-            <h3><IconSave width={18} height={18} /> {t(lang, 'account.draftsSectionTitle')}</h3>
+            <h3><span className="space-page-icon-accent"><IconSave width={18} height={18} /></span> {t(lang, 'account.draftsSectionTitle')}</h3>
           </div>
           {drafts.length === 0 ? (
             <p className="space-page-plain-note">{t(lang, 'account.noDrafts')}</p>
