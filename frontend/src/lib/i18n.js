@@ -313,7 +313,17 @@ export const translations = {
       error: 'Le copilote est indisponible pour le moment. Réessayez dans un instant.',
       changesApplied: 'changement(s) appliqué(s) au plan — pensez à cliquer sur "Enregistrer" pour les conserver',
       noChanges: 'Aucune modification appliquée.',
-      close: 'Fermer le copilote'
+      close: 'Fermer le copilote',
+      newConversation: 'Nouvelle conversation',
+      copyReply: 'Copier la réponse',
+      copied: 'Copié !',
+      inputHint: '↵ Envoyer · Maj+↵ Nouvelle ligne',
+      suggestions: [
+        'Réduis le budget marketing de 20%',
+        'Ajoute un persona B2C',
+        'Résume les principaux risques',
+        'Propose une story prioritaire'
+      ]
     },
     agents: {
       title: 'Agents IA',
@@ -1433,7 +1443,17 @@ export const translations = {
       error: 'The copilot is unavailable right now. Please try again shortly.',
       changesApplied: 'change(s) applied to the plan — remember to click "Save" to keep them',
       noChanges: 'No changes applied.',
-      close: 'Close copilot'
+      close: 'Close copilot',
+      newConversation: 'New conversation',
+      copyReply: 'Copy reply',
+      copied: 'Copied!',
+      inputHint: '↵ Send · Shift+↵ New line',
+      suggestions: [
+        'Cut marketing budget by 20%',
+        'Add a B2C persona',
+        'Summarize the main risks',
+        'Suggest a priority story'
+      ]
     },
     agents: {
       title: 'AI Agents',

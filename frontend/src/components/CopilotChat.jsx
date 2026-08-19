@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { copilotChat } from '../lib/serverStorage'
 import { t } from '../lib/i18n'
-import { IconMessageCircle, IconX, IconSend, IconSparkle } from './Icons'
+import { IconMessageCircle, IconX, IconSend, IconSparkle, IconTrash, IconCopy, IconCheckCircle } from './Icons'
 import '../styles/CopilotChat.css'
 
 // Copilote IA conversationnel : chat flottant qui laisse l'utilisateur itérer sur son plan
@@ -15,21 +15,33 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
+  const [copiedIndex, setCopiedIndex] = useState(null)
   const listRef = useRef(null)
+  const textareaRef = useRef(null)
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
-  }, [messages, open])
+  }, [messages, open, busy])
 
-  const send = async () => {
-    const text = input.trim()
-    if (!text || busy) return
+  // Auto-grandit avec le contenu jusqu'à une limite (voir max-height en CSS) plutôt qu'un
+  // nombre de lignes fixe — plus confortable pour taper une demande un peu détaillée sans
+  // que le textarea reste minuscule ni que le panneau entier gonfle sans limite.
+  useEffect(() => {
+    const el = textareaRef.current
+    if (!el) return
+    el.style.height = 'auto'
+    el.style.height = `${el.scrollHeight}px`
+  }, [input])
+
+  const send = async (text) => {
+    const value = (text ?? input).trim()
+    if (!value || busy) return
     const history = messages.map(m => ({ role: m.role, content: m.content }))
-    setMessages(prev => [...prev, { role: 'user', content: text }])
+    setMessages(prev => [...prev, { role: 'user', content: value }])
     setInput('')
     setBusy(true)
     try {
-      const result = await copilotChat(plan, text, history, lang, userId)
+      const result = await copilotChat(plan, value, history, lang, userId)
       if (!result) {
         setMessages(prev => [...prev, { role: 'assistant', content: t(lang, 'copilot.error'), error: true }])
         return
@@ -54,6 +66,15 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
     }
   }
 
+  const copyReply = (text, i) => {
+    navigator.clipboard.writeText(text).then(() => {
+      setCopiedIndex(i)
+      setTimeout(() => setCopiedIndex(null), 1500)
+    }).catch(() => {})
+  }
+
+  const suggestions = t(lang, 'copilot.suggestions')
+
   return (
     <>
       <button type="button" className="copilot-fab" onClick={() => setOpen(o => !o)}>
@@ -68,38 +89,67 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges }) {
               <IconSparkle width={16} height={16} />
               <span>{t(lang, 'copilot.title')}</span>
             </div>
-            <button type="button" className="copilot-panel-close" onClick={() => setOpen(false)} aria-label={t(lang, 'copilot.close')}>
-              <IconX width={16} height={16} />
-            </button>
+            <div className="copilot-panel-header-actions">
+              {messages.length > 0 && (
+                <button type="button" className="copilot-panel-icon-btn" onClick={() => setMessages([])} title={t(lang, 'copilot.newConversation')} aria-label={t(lang, 'copilot.newConversation')}>
+                  <IconTrash width={14} height={14} />
+                </button>
+              )}
+              <button type="button" className="copilot-panel-icon-btn" onClick={() => setOpen(false)} aria-label={t(lang, 'copilot.close')}>
+                <IconX width={16} height={16} />
+              </button>
+            </div>
           </div>
-          <p className="copilot-panel-subtitle">{t(lang, 'copilot.subtitle')}</p>
 
           <div className="copilot-messages" ref={listRef}>
             {messages.length === 0 && (
-              <p className="copilot-empty">{t(lang, 'copilot.empty')}</p>
+              <div className="copilot-empty-state">
+                <p className="copilot-empty">{t(lang, 'copilot.empty')}</p>
+                <div className="copilot-suggestions">
+                  {Array.isArray(suggestions) && suggestions.map((s, i) => (
+                    <button key={i} type="button" className="copilot-suggestion-chip" onClick={() => send(s)}>
+                      {s}
+                    </button>
+                  ))}
+                </div>
+              </div>
             )}
             {messages.map((m, i) => (
               <div key={i} className={`copilot-msg copilot-msg-${m.role}${m.error ? ' copilot-msg-error' : ''}`}>
                 <p>{m.content}</p>
                 {m.note && <p className="copilot-msg-note">{m.note}</p>}
+                {m.role === 'assistant' && !m.error && (
+                  <button type="button" className="copilot-msg-copy" onClick={() => copyReply(m.content, i)} title={t(lang, 'copilot.copyReply')}>
+                    {copiedIndex === i ? <IconCheckCircle width={12} height={12} /> : <IconCopy width={12} height={12} />}
+                    {copiedIndex === i ? t(lang, 'copilot.copied') : t(lang, 'copilot.copyReply')}
+                  </button>
+                )}
               </div>
             ))}
-            {busy && <div className="copilot-msg copilot-msg-assistant copilot-msg-thinking">{t(lang, 'copilot.thinking')}</div>}
+            {busy && (
+              <div className="copilot-msg copilot-msg-assistant copilot-msg-thinking">
+                <span className="copilot-typing-dot" />
+                <span className="copilot-typing-dot" />
+                <span className="copilot-typing-dot" />
+              </div>
+            )}
           </div>
 
           <div className="copilot-input-row">
             <textarea
+              ref={textareaRef}
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder={t(lang, 'copilot.placeholder')}
-              rows={2}
+              rows={1}
               disabled={busy}
             />
-            <button type="button" onClick={send} disabled={busy || !input.trim()} aria-label={t(lang, 'copilot.send')}>
+            <button type="button" onClick={() => send()} disabled={busy || !input.trim()} aria-label={t(lang, 'copilot.send')}>
               <IconSend width={16} height={16} />
             </button>
           </div>
+          <p className="copilot-input-hint">{t(lang, 'copilot.inputHint')}</p>
         </div>
       )}
     </>
