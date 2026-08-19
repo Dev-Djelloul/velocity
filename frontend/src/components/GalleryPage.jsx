@@ -23,9 +23,9 @@ export default function GalleryPage({ lang, onOpenPlan }) {
     })
   }, [plans])
 
-  const handleToggleFavorite = (e, id) => {
+  const handleToggleFavorite = (e, plan) => {
     e.stopPropagation()
-    toggleFavorite(id)
+    toggleFavorite(plan)
     setPlans(getAllPlans())
   }
 
@@ -52,8 +52,8 @@ export default function GalleryPage({ lang, onOpenPlan }) {
                 role="button"
                 tabIndex={0}
                 title={p.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
-                onClick={(e) => handleToggleFavorite(e, p.id)}
-                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleToggleFavorite(e, p.id) }}
+                onClick={(e) => handleToggleFavorite(e, p)}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') handleToggleFavorite(e, p) }}
               >
                 {p.isFavorite ? '⭐' : '☆'}
               </span>

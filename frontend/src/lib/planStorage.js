@@ -207,11 +207,14 @@ export async function getShareLink(shareId) {
   return { share, plan }
 }
 
-// Classement personnel (galerie privée) : bascule plan.isFavorite et resauvegarde tel
-// quel — même circuit que n'importe quelle autre modification de plan, pas de champ ni de
-// table dédiés côté serveur (le JSON complet du plan est déjà synchronisé).
-export function toggleFavorite(id) {
-  const plan = getPlanById(id)
+// Classement personnel (utilisable dans toute liste de plans, pas que la galerie privée) :
+// bascule plan.isFavorite et resauvegarde tel quel — même circuit que n'importe quelle autre
+// modification de plan, pas de champ ni de table dédiés côté serveur (le JSON complet du
+// plan est déjà synchronisé). Prend le plan complet plutôt qu'un id : getPlanById()/
+// getAllPlans() ne voient que l'espace actuellement actif, donc un id seul échouerait
+// silencieusement pour un plan affiché depuis un autre espace (ex. "Mon compte", qui agrège
+// tous les espaces) — savePlan() sait lui déjà écrire au bon endroit via plan.team_id.
+export function toggleFavorite(plan) {
   if (!plan) return null
   return savePlan({ ...plan, isFavorite: !plan.isFavorite })
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useUser, useAuth, useTeam, isMockAuth, useOpenSecurity, useAuthProvider } from '../lib/auth'
-import { deletePlan, movePlanToTeam, fetchAllPlansAggregated, getAllPlans } from '../lib/planStorage'
+import { deletePlan, movePlanToTeam, fetchAllPlansAggregated, getAllPlans, toggleFavorite } from '../lib/planStorage'
 import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib/creditTracker'
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
@@ -156,6 +156,17 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
     setDeletePlanTarget(null)
   }
 
+  // Mise à jour optimiste plutôt que refreshPlans() : en Pro, refreshPlans() relance un
+  // aller-retour serveur (fetchAllPlansAggregated) dont le résultat peut ne pas encore
+  // refléter l'écriture qu'on vient de faire (même risque de course que celui déjà corrigé
+  // ailleurs pour la resync auto des plans) — ici la donnée à jour est déjà connue
+  // localement, pas besoin de la redemander.
+  const handleToggleFavorite = (e, plan) => {
+    e.stopPropagation()
+    toggleFavorite(plan)
+    setPlans(prev => prev.map(p => p.id === plan.id ? { ...p, isFavorite: !p.isFavorite } : p))
+  }
+
   const displayName = user?.fullName || user?.firstName || user?.primaryEmailAddress?.emailAddress || 'User'
   const email = user?.primaryEmailAddress?.emailAddress
 
@@ -287,6 +298,13 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onOpenNotificati
                     {p.createdByName && ` · ${lang === 'fr' ? 'créé par' : 'created by'} ${p.createdByName}`}
                     {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
                   </span>
+                </button>
+                <button
+                  className={`account-list-item-favorite ${p.isFavorite ? 'is-favorite' : ''}`}
+                  onClick={(e) => handleToggleFavorite(e, p)}
+                  title={p.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
+                >
+                  {p.isFavorite ? '⭐' : '☆'}
                 </button>
                 {(p.team_id || null) === (team.teamId || null) ? (
                   <>

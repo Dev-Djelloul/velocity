@@ -316,6 +316,20 @@
   vertical-align: middle;
 }
 
+.account-list-item-favorite {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0.65rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.account-list-item-favorite:hover { color: #eab308; }
+.account-list-item-favorite.is-favorite { color: #eab308; }
+
 .account-list-item-delete {
   flex-shrink: 0;
   background: none;

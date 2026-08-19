@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan } from '../lib/planStorage'
+import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan, toggleFavorite } from '../lib/planStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
@@ -49,6 +49,11 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
     onClose()
   }
 
+  const handleToggleFavorite = (plan) => {
+    toggleFavorite(plan)
+    setPlans(getAllPlans())
+  }
+
   if (plans.length === 0) {
     return (
       <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.emptyTitle')} onClose={onClose}>
@@ -79,6 +84,13 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
             </div>
 
             <div className="plan-actions">
+              <button
+                className={`btn-secondary plan-favorite-btn ${plan.isFavorite ? 'is-favorite' : ''}`}
+                onClick={() => handleToggleFavorite(plan)}
+                title={plan.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
+              >
+                {plan.isFavorite ? '⭐' : '☆'}
+              </button>
               <button className="btn-secondary" onClick={() => handleLoad(plan)}>
                 {t(lang, 'plans.load')}
               </button>

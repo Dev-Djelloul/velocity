@@ -67,6 +67,17 @@
   font-size: 12px;
 }
 
+.plan-favorite-btn {
+  padding: 0.4rem 0.6rem !important;
+  font-size: 14px !important;
+  line-height: 1;
+}
+
+.plan-favorite-btn.is-favorite {
+  color: #eab308;
+  border-color: rgba(234, 179, 8, 0.4);
+}
+
 .btn-plan-danger {
   padding: 0.4rem 0.85rem;
   font-size: 12px;

@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useTeam, useUser, useAuth } from '../lib/auth'
-import { getAllPlans, deletePlan, duplicatePlan } from '../lib/planStorage'
+import { getAllPlans, deletePlan, duplicatePlan, toggleFavorite } from '../lib/planStorage'
 import { getAllDrafts, deleteDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
@@ -89,6 +89,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     const copy = duplicatePlan(plan, lang)
     setPlans(getAllPlans())
     onLoadPlan(copy)
+  }
+
+  const handleToggleFavorite = (e, plan) => {
+    e.stopPropagation()
+    toggleFavorite(plan)
+    setPlans(getAllPlans())
   }
 
   const confirmDeleteDraft = () => {
@@ -192,6 +198,13 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                     {p.createdByName && ` · ${p.createdByName}`}
                     {' · '}{formatFullDateTime(p.updatedAt || p.savedAt, lang)}
                   </span>
+                </button>
+                <button
+                  className={`account-list-item-favorite ${p.isFavorite ? 'is-favorite' : ''}`}
+                  onClick={(e) => handleToggleFavorite(e, p)}
+                  title={p.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
+                >
+                  {p.isFavorite ? '⭐' : '☆'}
                 </button>
                 <button className="account-list-item-move" onClick={() => handleDuplicate(p)} title={t(lang, 'plans.duplicate')}>
                   <IconCopy width={14} height={14} />
