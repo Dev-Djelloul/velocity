@@ -4,6 +4,40 @@
   padding: 2rem 1.5rem 4rem;
 }
 
+.gallery-page-cover {
+  position: relative;
+  width: 100%;
+  height: 220px;
+  border-radius: var(--radius-lg, 14px);
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.gallery-page-cover-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(30px) brightness(0.7) saturate(1.3);
+  transform: scale(1.2);
+}
+
+.gallery-page-cover-img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .gallery-page-cover {
+    height: 140px;
+  }
+}
+
 .gallery-page-header {
   text-align: center;
   margin-bottom: 2rem;

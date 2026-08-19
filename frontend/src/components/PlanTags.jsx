@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { addTag, removeTag } from '../lib/planStorage'
 import { t } from '../lib/i18n'
-import { IconX } from './Icons'
+import { IconX, IconPlus } from './Icons'
 import '../styles/PlanTags.css'
 
 // Éditeur de tags réutilisé dans "Mes plans" (PlansHistory) et "Ma galerie" (GalleryPage) —
@@ -64,8 +64,8 @@ export default function PlanTags({ plan, lang, onChange, compact }) {
         />
       ) : (
         tags.length < 10 && (
-          <button type="button" className="plan-tag-add" onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditing(true) }}>
-            + {t(lang, 'tags.add')}
+          <button type="button" className="plan-tag-add" title={t(lang, 'tags.add')} aria-label={t(lang, 'tags.add')} onClick={(e) => { e.preventDefault(); e.stopPropagation(); setEditing(true) }}>
+            <IconPlus width={9} height={9} />
           </button>
         )
       )}

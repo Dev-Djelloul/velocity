@@ -3,6 +3,7 @@ import { t } from '../lib/i18n'
 import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
 import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil, IconSearch } from './Icons'
 import PlanTags from './PlanTags'
+import galleryCover from '../../assets/img/hiw-gallery-presentation.webp'
 import '../styles/GalleryPage.css'
 import '../styles/PlansHistory.css'
 
@@ -170,6 +171,11 @@ export default function GalleryPage({ lang, onOpenPlan }) {
 
   return (
     <div className="gallery-page">
+      <div className="gallery-page-cover">
+        <img src={galleryCover} alt="" className="gallery-page-cover-bg" aria-hidden="true" />
+        <img src={galleryCover} alt="" className="gallery-page-cover-img" />
+      </div>
+
       <div className="gallery-page-header">
         <h1><IconSparkle width={22} height={22} /> {t(lang, 'gallery.title')}</h1>
         <p className="gallery-page-subtitle">{t(lang, 'gallery.subtitle')}</p>
