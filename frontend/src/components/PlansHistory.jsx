@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react'
-import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan } from '../lib/planStorage'
+import { getAllPlans, deletePlan, createShareLink, getPlanById, duplicatePlan, savePlan } from '../lib/planStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
-import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy } from './Icons'
+import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy, IconPencil } from './Icons'
 import '../styles/PlansHistory.css'
 
 export default function PlansHistory({ lang, onLoadPlan, onClose }) {
@@ -11,6 +11,8 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
   const [shareLink, setShareLink] = useState(null)
   const [copiedShareId, setCopiedShareId] = useState(null)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [editingId, setEditingId] = useState(null)
+  const [editValue, setEditValue] = useState('')
 
   useEffect(() => {
     setPlans(getAllPlans())
@@ -49,6 +51,20 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
     onClose()
   }
 
+  const startRename = (plan) => {
+    setEditingId(plan.id)
+    setEditValue(plan.product?.name || '')
+  }
+
+  const commitRename = (plan) => {
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== plan.product?.name) {
+      savePlan({ ...plan, product: { ...plan.product, name: trimmed } })
+      setPlans(getAllPlans())
+    }
+    setEditingId(null)
+  }
+
   if (plans.length === 0) {
     return (
       <InfoModal icon={<IconClipboard width={26} height={26} />} title={t(lang, 'plans.emptyTitle')} onClose={onClose}>
@@ -66,10 +82,28 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
         {plans.map(plan => (
           <div key={plan.id} className="plan-item">
             <div className="plan-info">
-              <h3>
-                {plan.product?.name || t(lang, 'plans.untitled')}
-                {(plan.isDemo || plan.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
-              </h3>
+              {editingId === plan.id ? (
+                <input
+                  type="text"
+                  className="plan-name-input"
+                  value={editValue}
+                  autoFocus
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onBlur={() => commitRename(plan)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); commitRename(plan) }
+                    if (e.key === 'Escape') { e.preventDefault(); setEditingId(null) }
+                  }}
+                />
+              ) : (
+                <h3 className="plan-name-row">
+                  <span className="plan-name-text">{plan.product?.name || t(lang, 'plans.untitled')}</span>
+                  <button className="plan-rename-btn" title={lang === 'fr' ? 'Renommer' : 'Rename'} onClick={() => startRename(plan)}>
+                    <IconPencil width={12} height={12} />
+                  </button>
+                  {(plan.isDemo || plan.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                </h3>
+              )}
               <p className="plan-meta">
                 {t(lang, 'plans.createdAtPrefix')} {formatDateTime(plan.savedAt, lang)}
               </p>

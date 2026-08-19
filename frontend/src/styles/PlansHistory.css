@@ -44,6 +44,71 @@
   color: var(--color-text-primary);
 }
 
+.plan-name-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.plan-name-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Crayon caché par défaut pour économiser la place, révélé au survol de la carte plutôt
+   que du bouton lui-même — sans ça il faudrait déjà viser une icône invisible pour la
+   faire apparaître. */
+.plan-rename-btn {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: none;
+  background: none;
+  border-radius: 4px;
+  color: var(--color-text-muted);
+  opacity: 0;
+  cursor: pointer;
+  transition: opacity 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.plan-item:hover .plan-rename-btn {
+  opacity: 0.7;
+}
+
+.plan-rename-btn:hover {
+  opacity: 1 !important;
+  background: rgba(145, 132, 217, 0.15);
+  color: var(--color-accent);
+}
+
+@media (hover: none) {
+  .plan-rename-btn { opacity: 0.6; }
+}
+
+.plan-name-input {
+  width: 100%;
+  max-width: 280px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  padding: 3px 8px;
+  font-size: 16px;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.plan-name-input:focus {
+  outline: none;
+}
+
 .plan-meta {
   font-size: 12px;
   color: var(--color-text-muted);

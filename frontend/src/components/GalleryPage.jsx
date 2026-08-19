@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
-import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle } from './Icons'
+import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil } from './Icons'
 import '../styles/GalleryPage.css'
 
 // Galerie privée : vue en grille des plans que l'utilisateur a explicitement épinglés
@@ -14,6 +14,8 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const [contextMenu, setContextMenu] = useState(null) // { plan, x, y }
   const [deleteTarget, setDeleteTarget] = useState(null)
   const [toast, setToast] = useState(null)
+  const [editingId, setEditingId] = useState(null)
+  const [editValue, setEditValue] = useState('')
   const menuRef = useRef(null)
 
   useEffect(() => {
@@ -119,6 +121,21 @@ export default function GalleryPage({ lang, onOpenPlan }) {
     setDeleteTarget(null)
   }
 
+  const startRename = (e, plan) => {
+    e.stopPropagation()
+    setEditingId(plan.id)
+    setEditValue(plan.product?.name || '')
+  }
+
+  const commitRename = (plan) => {
+    const trimmed = editValue.trim()
+    if (trimmed && trimmed !== plan.product?.name) {
+      savePlan({ ...plan, product: { ...plan.product, name: trimmed } })
+      setPlans(getAllPlans())
+    }
+    setEditingId(null)
+  }
+
   return (
     <div className="gallery-page">
       <div className="gallery-page-header">
@@ -156,10 +173,36 @@ export default function GalleryPage({ lang, onOpenPlan }) {
                 ? <img src={p.coverImage} alt="" className="gallery-card-cover" />
                 : <div className="gallery-card-cover gallery-card-cover-placeholder" aria-hidden="true" />}
               <div className="gallery-card-body">
-                <h3>
-                  {p.product?.name || t(lang, 'plans.untitled')}
-                  {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
-                </h3>
+                {editingId === p.id ? (
+                  <input
+                    type="text"
+                    className="gallery-card-name-input"
+                    value={editValue}
+                    autoFocus
+                    onClick={(e) => e.stopPropagation()}
+                    onChange={(e) => setEditValue(e.target.value)}
+                    onBlur={() => commitRename(p)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') { e.preventDefault(); commitRename(p) }
+                      if (e.key === 'Escape') { e.preventDefault(); setEditingId(null) }
+                    }}
+                  />
+                ) : (
+                  <h3 className="gallery-card-name-row">
+                    <span className="gallery-card-name-text">{p.product?.name || t(lang, 'plans.untitled')}</span>
+                    <span
+                      className="gallery-card-rename-btn"
+                      role="button"
+                      tabIndex={0}
+                      title={lang === 'fr' ? 'Renommer' : 'Rename'}
+                      onClick={(e) => startRename(e, p)}
+                      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') startRename(e, p) }}
+                    >
+                      <IconPencil width={12} height={12} />
+                    </span>
+                    {(p.isDemo || p.id?.startsWith('demo-')) && <span className="plan-demo-badge">{lang === 'fr' ? 'Démo' : 'Demo'}</span>}
+                  </h3>
+                )}
                 {p.classification && <span className="gallery-card-tag">{p.classification}</span>}
                 <p className="gallery-card-pitch">{p.product?.pitch || p.executiveSummary || ''}</p>
               </div>
