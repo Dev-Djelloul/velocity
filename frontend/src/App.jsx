@@ -38,7 +38,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'settings']
+const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -54,6 +54,7 @@ const PAGE_TO_PATH = {
   account: '/mon-compte',
   team: '/mon-equipe',
   space: '/mon-espace',
+  gallery: '/ma-galerie',
   settings: '/parametres'
 }
 const PATH_TO_PAGE = {
@@ -66,6 +67,7 @@ const PATH_TO_PAGE = {
   '/mon-compte': 'account',
   '/mon-equipe': 'team',
   '/mon-espace': 'space',
+  '/ma-galerie': 'gallery',
   '/parametres': 'settings'
 }
 
