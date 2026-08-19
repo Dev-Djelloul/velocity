@@ -19,13 +19,9 @@ function = "og-share"
 path = "/p/*"
 function = "og-gallery"
 
-# Fait passer l'image OG par le domaine principal plutôt que d'exposer l'URL brute
-# *.workers.dev aux robots des réseaux sociaux : ce domaine générique très utilisé pour le
-# spam/phishing est traité avec méfiance par certains crawlers (LinkedIn en particulier),
-# qui ignorent silencieusement l'image au lieu de la refuser explicitement (constaté via
-# Post Inspector : "No image found" malgré une image tout à fait valide en accès direct).
-[[redirects]]
-from = "/og/*"
-to = "https://velocity-launch.djelloulabid75.workers.dev/og/:splat"
-status = 200
-force = true
+# Le proxy /og/* -> le Worker (pour éviter d'exposer l'URL *.workers.dev brute aux robots
+# des réseaux sociaux, voir plus haut) vit dans frontend/public/_redirects, PAS ici : dans
+# ce projet, les règles de _redirects l'emportent en pratique sur celles déclarées dans ce
+# fichier pour un même chemin, malgré la doc Netlify qui documente l'inverse — vérifié
+# empiriquement (une règle [[redirects]] ici pour /og/* était silencieusement ignorée au
+# profit du fallback SPA générique de _redirects).
