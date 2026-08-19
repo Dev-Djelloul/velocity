@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
-import { getAllPlans, toggleFavorite } from '../lib/planStorage'
-import { IconClipboard, IconSparkle } from './Icons'
+import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
+import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle } from './Icons'
 import '../styles/GalleryPage.css'
 
 // Galerie privée : vue en grille des plans que l'utilisateur a explicitement épinglés
@@ -11,6 +11,10 @@ import '../styles/GalleryPage.css'
 // côté planStorage.
 export default function GalleryPage({ lang, onOpenPlan }) {
   const [plans, setPlans] = useState(() => getAllPlans())
+  const [contextMenu, setContextMenu] = useState(null) // { plan, x, y }
+  const [deleteTarget, setDeleteTarget] = useState(null)
+  const [toast, setToast] = useState(null)
+  const menuRef = useRef(null)
 
   useEffect(() => {
     setPlans(getAllPlans())
@@ -23,10 +27,88 @@ export default function GalleryPage({ lang, onOpenPlan }) {
     })
   }, [plans])
 
+  // Ferme le menu contextuel au premier clic ailleurs, à l'échappement, ou si la fenêtre
+  // défile/redimensionne — sans ça il resterait affiché à des coordonnées qui ne
+  // correspondent plus à rien.
+  useEffect(() => {
+    if (!contextMenu) return
+    const close = () => setContextMenu(null)
+    const onKeyDown = (e) => { if (e.key === 'Escape') close() }
+    document.addEventListener('mousedown', close)
+    document.addEventListener('keydown', onKeyDown)
+    window.addEventListener('scroll', close, true)
+    window.addEventListener('resize', close)
+    return () => {
+      document.removeEventListener('mousedown', close)
+      document.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close)
+    }
+  }, [contextMenu])
+
+  useEffect(() => {
+    if (!toast) return
+    const timer = setTimeout(() => setToast(null), 2000)
+    return () => clearTimeout(timer)
+  }, [toast])
+
+  const openContextMenu = (e, plan) => {
+    e.preventDefault()
+    // Le menu se dessine hors-écran une frame pour mesurer sa vraie taille (largeur/hauteur
+    // variables selon la langue), sinon impossible de le caler proprement contre les bords
+    // droit/bas de la fenêtre pour un clic proche d'un coin.
+    setContextMenu({ plan, x: e.clientX, y: e.clientY })
+  }
+
+  useEffect(() => {
+    if (!contextMenu || !menuRef.current) return
+    const menu = menuRef.current
+    const { innerWidth, innerHeight } = window
+    const rect = menu.getBoundingClientRect()
+    let x = contextMenu.x
+    let y = contextMenu.y
+    if (x + rect.width > innerWidth - 8) x = innerWidth - rect.width - 8
+    if (y + rect.height > innerHeight - 8) y = innerHeight - rect.height - 8
+    menu.style.left = `${Math.max(8, x)}px`
+    menu.style.top = `${Math.max(8, y)}px`
+  }, [contextMenu])
+
   const handleToggleFavorite = (e, plan) => {
     e.stopPropagation()
     toggleFavorite(plan)
     setPlans(getAllPlans())
+  }
+
+  const closeMenu = () => setContextMenu(null)
+
+  const handleShare = async (plan) => {
+    closeMenu()
+    const shareId = await createShareLink(plan.id)
+    if (!shareId) return
+    const url = `${window.location.origin}/s/${shareId}`
+    try {
+      await navigator.clipboard.writeText(url)
+      setToast(t(lang, 'gallery.linkCopied'))
+    } catch { /* clipboard indisponible, on ignore silencieusement */ }
+  }
+
+  const handleDuplicate = (plan) => {
+    closeMenu()
+    duplicatePlan(plan, lang)
+    setPlans(getAllPlans())
+    setToast(t(lang, 'gallery.duplicated'))
+  }
+
+  const handleRemoveFromGallery = (plan) => {
+    closeMenu()
+    savePlan({ ...plan, inGallery: false })
+    setPlans(getAllPlans())
+  }
+
+  const confirmDelete = () => {
+    deletePlan(deleteTarget.id)
+    setPlans(getAllPlans())
+    setDeleteTarget(null)
   }
 
   return (
@@ -46,7 +128,12 @@ export default function GalleryPage({ lang, onOpenPlan }) {
       {!!galleryPlans.length && (
         <div className="gallery-grid">
           {galleryPlans.map(p => (
-            <button key={p.id} className={`gallery-card${p.isFavorite ? ' gallery-card-featured' : ''}`} onClick={() => onOpenPlan(p)}>
+            <button
+              key={p.id}
+              className={`gallery-card${p.isFavorite ? ' gallery-card-featured' : ''}`}
+              onClick={() => onOpenPlan(p)}
+              onContextMenu={(e) => openContextMenu(e, p)}
+            >
               <span
                 className="gallery-card-favorite-toggle"
                 role="button"
@@ -70,6 +157,55 @@ export default function GalleryPage({ lang, onOpenPlan }) {
               </div>
             </button>
           ))}
+        </div>
+      )}
+
+      {contextMenu && (
+        <div
+          className="gallery-context-menu"
+          ref={menuRef}
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <button className="gallery-context-item" onClick={() => { closeMenu(); onOpenPlan(contextMenu.plan) }}>
+            <IconExternalLink width={14} height={14} /> {t(lang, 'gallery.open')}
+          </button>
+          <button className="gallery-context-item" onClick={(e) => handleToggleFavorite(e, contextMenu.plan)}>
+            <span className="gallery-context-star">{contextMenu.plan.isFavorite ? '⭐' : '☆'}</span>
+            {contextMenu.plan.isFavorite ? t(lang, 'gallery.favoriteRemove') : t(lang, 'gallery.favoriteAdd')}
+          </button>
+          <button className="gallery-context-item" onClick={() => handleShare(contextMenu.plan)}>
+            <IconLink width={14} height={14} /> {t(lang, 'plans.share')}
+          </button>
+          <button className="gallery-context-item" onClick={() => handleDuplicate(contextMenu.plan)}>
+            <IconCopy width={14} height={14} /> {t(lang, 'plans.duplicate')}
+          </button>
+          <button className="gallery-context-item" onClick={() => handleRemoveFromGallery(contextMenu.plan)}>
+            <IconX width={14} height={14} /> {t(lang, 'gallery.removeFromGallery')}
+          </button>
+          <div className="gallery-context-divider" />
+          <button
+            className="gallery-context-item gallery-context-item-danger"
+            onClick={() => { setDeleteTarget(contextMenu.plan); closeMenu() }}
+          >
+            <IconTrash width={14} height={14} /> {t(lang, 'plans.delete')}
+          </button>
+        </div>
+      )}
+
+      {toast && <div className="gallery-toast">{toast}</div>}
+
+      {deleteTarget && (
+        <div className="confirm-modal-backdrop" onClick={() => setDeleteTarget(null)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>{t(lang, 'plans.deleteConfirmTitle')}</h3>
+            <p><strong>{deleteTarget.product?.name || t(lang, 'plans.defaultPlanName')}</strong> {t(lang, 'plans.deleteConfirmSuffix')}</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteTarget(null)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-danger" onClick={confirmDelete}>{t(lang, 'plans.delete')}</button>
+            </div>
+          </div>
         </div>
       )}
     </div>

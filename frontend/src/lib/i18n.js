@@ -910,7 +910,10 @@ export const translations = {
       favoriteRemove: 'Retirer des favoris',
       addToGallery: 'Ajouter à la galerie',
       removeFromGallery: 'Retirer de la galerie',
-      inGallery: 'Dans la galerie'
+      inGallery: 'Dans la galerie',
+      open: 'Ouvrir',
+      linkCopied: 'Lien copié !',
+      duplicated: 'Plan dupliqué'
     },
     plans: {
       title: 'Mes plans',
@@ -2035,7 +2038,10 @@ export const translations = {
       favoriteRemove: 'Remove from favorites',
       addToGallery: 'Add to gallery',
       removeFromGallery: 'Remove from gallery',
-      inGallery: 'In gallery'
+      inGallery: 'In gallery',
+      open: 'Open',
+      linkCopied: 'Link copied!',
+      duplicated: 'Plan duplicated'
     },
     plans: {
       title: 'My plans',
