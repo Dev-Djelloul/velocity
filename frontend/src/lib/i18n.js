@@ -626,6 +626,17 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '19 août 2026',
+            title: 'Galerie 100% privée, Copilote Nova et navigation compte réorganisée',
+            items: [
+              'Galerie repensée : suppression de l\'ancienne galerie publique (plus aucun plan consultable sans compte), nouvelle galerie 100% privée avec opt-in explicite par plan ("Ajouter à la galerie" dans l\'aperçu du plan), favoris triés en premier, menu contextuel clic droit (ouvrir/favori/renommer/partager/dupliquer/retirer/supprimer), aperçu image en bandeau plein cadre',
+              'Copilote IA rebaptisé "Nova" : fenêtre agrandie, en-tête compact, avatar dédié, suggestions rapides cliquables, nouvelle conversation, copie d\'une réponse, indicateur de frappe animé, titre en dégradé et bordure violet/bleu/cyan encadrant toute la fenêtre',
+              'Navigation compte réorganisée : "Notifications" devient sa propre page, nouvelle page "Intégrations" (icônes de marque, badges de statut colorés), Paramètres recentré sur les préférences pures, "Envie de collaborer ?" déplacée dans Mon compte, "Mes plans"/"Ma galerie" ajoutées comme cartes dans l\'espace personnel, menu du sélecteur d\'espace repensé',
+              'Cohérence visuelle : pages élargies (960px), aperçu image ajouté à toutes les listes de plans, renommage inline des plans et brouillons via modale dédiée, anneau en dégradé violet/bleu/cyan sur tous les avatars, badge "Démo" sur les plans d\'exemple',
+              'Corrections : perte du plan démo après connexion Google/Apple/Slack, menu contextuel de la galerie insensible au clic, page Galerie devenue inaccessible'
+            ]
+          },
+          {
             date: '18 août 2026',
             title: 'Intégration Jira, notifications par email et Paramètres enrichis',
             items: [
@@ -1755,6 +1766,17 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 19, 2026',
+            title: '100% private gallery, Nova Copilot and reorganized account navigation',
+            items: [
+              'Reworked gallery: removed the old public gallery (no plan viewable without an account), new 100% private gallery with explicit opt-in per plan ("Add to gallery" in the plan preview), favorites sorted first, right-click context menu (open/favorite/rename/share/duplicate/remove/delete), full-bleed banner image preview',
+              'AI Copilot renamed "Nova": larger window, compact header, dedicated avatar, clickable quick suggestions, new conversation, copy a reply, animated typing indicator, gradient title and a violet/blue/cyan gradient border around the whole window',
+              'Reorganized account navigation: "Notifications" becomes its own page, new "Integrations" page (brand icons, colored status badges), Settings refocused on pure preferences, "Want to collaborate?" moved into My Account, "My Plans"/"My Gallery" added as cards in the personal workspace, redesigned workspace switcher menu',
+              'Visual consistency: pages widened (960px), image preview added to every plan list, inline renaming for plans and drafts via a dedicated modal, violet/blue/cyan gradient ring on all profile avatars, "Demo" badge on sample plans',
+              'Bug fixes: demo plan lost after signing in via Google/Apple/Slack, gallery context menu unresponsive to clicks, Gallery page became unreachable'
+            ]
+          },
           {
             date: 'August 18, 2026',
             title: 'Jira integration, email notifications and richer Settings',
