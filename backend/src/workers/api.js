@@ -234,6 +234,9 @@ export async function handleApi(request, env, url) {
       classification: p.classification || null,
       executiveSummary: p.executiveSummary || null,
       coverImage: p.coverImage || null,
+      category: p.product?.category || null,
+      b2bVsB2c: p.market?.b2bVsB2c || null,
+      isFeatured: !!p.isFeatured,
       updatedAt: p.updatedAt
     })))
   }

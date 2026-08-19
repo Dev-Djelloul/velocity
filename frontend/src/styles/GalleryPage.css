@@ -38,6 +38,37 @@
   gap: 0.6rem;
 }
 
+.gallery-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+.gallery-filter-chip {
+  font-size: 0.8rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: transparent;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+}
+
+.gallery-filter-chip:hover {
+  border-color: rgba(145, 132, 217, 0.5);
+  color: var(--color-text-primary);
+}
+
+.gallery-filter-chip.active {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+  color: #fff;
+}
+
 .gallery-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
@@ -45,6 +76,7 @@
 }
 
 .gallery-card {
+  position: relative;
   text-align: left;
   background: var(--color-dashboard);
   border: 1px solid rgba(145, 132, 217, 0.15);
@@ -62,6 +94,24 @@
 .gallery-card:hover {
   border-color: rgba(145, 132, 217, 0.4);
   transform: translateY(-2px);
+}
+
+.gallery-card-featured {
+  border-color: rgba(234, 179, 8, 0.5);
+  box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.25);
+}
+
+.gallery-card-featured-badge {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.6rem;
+  z-index: 1;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: #eab308;
+  color: #1a1a1a;
 }
 
 .gallery-card-cover {

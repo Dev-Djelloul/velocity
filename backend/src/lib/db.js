@@ -176,9 +176,9 @@ export async function resolveShare(env, shareId) {
 // spécifique à l'utilisateur type user_id n'est exposé ici).
 export async function listPublicPlans(env, { limit = 24, offset = 0 } = {}) {
   const { results } = await env.DB.prepare(
-    'SELECT id, data, updated_at FROM plans WHERE is_public = 1 ORDER BY updated_at DESC LIMIT ? OFFSET ?'
+    'SELECT id, data, updated_at, is_featured FROM plans WHERE is_public = 1 ORDER BY is_featured DESC, updated_at DESC LIMIT ? OFFSET ?'
   ).bind(limit, offset).all()
-  return results.map(row => ({ ...JSON.parse(row.data), id: row.id, updatedAt: row.updated_at }))
+  return results.map(row => ({ ...JSON.parse(row.data), id: row.id, updatedAt: row.updated_at, isFeatured: !!row.is_featured }))
 }
 
 // Contrairement à resolveShare (lien temporaire, 30 jours), un plan public reste

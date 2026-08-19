@@ -900,7 +900,10 @@ export const translations = {
       title: 'Galerie publique',
       subtitle: 'Plans de lancement partagés publiquement par leurs auteurs, pour inspiration.',
       loading: 'Chargement...',
-      empty: "Aucun plan public pour l'instant. Rendez le vôtre visible depuis sa page pour être le premier !"
+      empty: "Aucun plan public pour l'instant. Rendez le vôtre visible depuis sa page pour être le premier !",
+      filterAll: 'Toutes catégories',
+      filterNoMatch: 'Aucun plan ne correspond à ce filtre.',
+      featured: 'À la une'
     },
     plans: {
       title: 'Mes plans',
@@ -2015,7 +2018,10 @@ export const translations = {
       title: 'Public gallery',
       subtitle: 'Launch plans shared publicly by their authors, for inspiration.',
       loading: 'Loading...',
-      empty: 'No public plans yet. Make yours visible from its page to be the first!'
+      empty: 'No public plans yet. Make yours visible from its page to be the first!',
+      filterAll: 'All categories',
+      filterNoMatch: 'No plans match this filter.',
+      featured: 'Featured'
     },
     plans: {
       title: 'My plans',
