@@ -79,13 +79,20 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 44px;
-  height: 44px;
-  margin: 0 auto 0.75rem;
+  width: 56px;
+  height: 56px;
+  margin: 0 auto 0.85rem;
   border-radius: var(--radius-lg);
-  background: rgba(145, 132, 217, 0.12);
-  color: var(--color-primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.22);
 }
+
+/* Vignette en dégradé distincte par catégorie — tient lieu d'aperçu visuel du plan tant
+   qu'on n'a pas de vraies captures d'écran par catégorie à afficher. */
+.demo-gradient-indigo { background: linear-gradient(135deg, #6366f1, #4338ca); }
+.demo-gradient-rose { background: linear-gradient(135deg, #f472b6, #db2777); }
+.demo-gradient-cyan { background: linear-gradient(135deg, #22d3ee, #0891b2); }
+.demo-gradient-violet { background: linear-gradient(135deg, #a78bfa, #7c3aed); }
 
 .demo-card h3 {
   font-size: var(--font-size-sm);

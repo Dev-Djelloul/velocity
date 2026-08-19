@@ -11,25 +11,29 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
       id: 'saas',
       title: 'SaaS B2B',
       desc: lang === 'fr' ? 'Gestion de projet pour PME' : 'Project management for SMBs',
-      Icon: IconBriefcase
+      Icon: IconBriefcase,
+      gradient: 'demo-gradient-indigo'
     },
     {
       id: 'ecommerce',
       title: 'E-commerce',
       desc: lang === 'fr' ? 'Mode éco-responsable, pré-lancement' : 'Eco-friendly fashion, pre-launch',
-      Icon: IconShoppingBag
+      Icon: IconShoppingBag,
+      gradient: 'demo-gradient-rose'
     },
     {
       id: 'mobile',
       title: lang === 'fr' ? 'Application Mobile' : 'Mobile App',
       desc: lang === 'fr' ? 'Automatisation pour équipes distribuées' : 'Automation for distributed teams',
-      Icon: IconSmartphone
+      Icon: IconSmartphone,
+      gradient: 'demo-gradient-cyan'
     },
     {
       id: 'ai',
       title: lang === 'fr' ? 'Plateforme IA' : 'AI Platform',
       desc: lang === 'fr' ? 'Copilote data pour entreprises' : 'Data copilot for enterprises',
-      Icon: IconSparkle
+      Icon: IconSparkle,
+      gradient: 'demo-gradient-violet'
     }
   ]
 
@@ -172,7 +176,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
               className={`demo-card ${selectedDemo === demo.id ? 'selected' : ''}`}
               onClick={() => setSelectedDemo(demo.id)}
             >
-              <div className="demo-icon"><demo.Icon width={22} height={22} /></div>
+              <div className={`demo-icon ${demo.gradient}`}><demo.Icon width={26} height={26} /></div>
               <h3>{demo.title}</h3>
               <p>{demo.desc}</p>
             </button>
