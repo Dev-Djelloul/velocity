@@ -22,6 +22,10 @@ import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 import '../styles/SpacePage.css'
 
+// Asset statique servi tel quel depuis public/ (généré par IA, pas de traitement Vite
+// nécessaire) plutôt qu'importé depuis src/assets comme les photos de marque.
+const ACCOUNT_BACKGROUND = '/assets/ai-images/cinematic-photo-of-a-focused-tech-founder-working-.png'
+
 export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pendingAction, onConsumeAction }) {
   const { user } = useUser()
   const { userId, signOut } = useAuth()
@@ -133,7 +137,9 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
   const email = user?.primaryEmailAddress?.emailAddress
 
   return (
-    <div className="account-page">
+    <div className="account-page-outer">
+      <div className="account-page-bg" style={{ backgroundImage: `url(${ACCOUNT_BACKGROUND})` }} aria-hidden="true" />
+      <div className="account-page account-page-inner">
       <button className="account-back-btn" onClick={onBack}>
         <IconArrowLeft width={16} height={16} /> {t(lang, 'account.backToApp')}
       </button>
@@ -335,6 +341,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
