@@ -25,20 +25,52 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 
 ## Fonctionnalités
 
-- **Questionnaire guidé en 4 étapes** — produit, marché, ressources, priorités — avec sauvegarde automatique et brouillons nommés pour reprendre plus tard.
+### Génération du plan
+
+- **Questionnaire guidé en 4 étapes** — produit, marché, ressources, priorités — avec sauvegarde automatique, brouillons nommés pour reprendre plus tard, et **import de document** (PDF, Word, Excel, PowerPoint) : le texte est extrait côté client et ajouté au contexte transmis à l'IA, dans un champ éditable avant génération.
+- **Budget marketing et budget total du lancement distincts** — le budget marketing pilote la répartition par canal, le budget total (dev + marketing + ops) pilote le prévisionnel financier ; les deux sont saisis séparément pour éviter la confusion entre les deux montants.
 - **Génération par IA avec filet de sécurité** — le backend interroge un modèle de langage (via OpenRouter) pour produire un plan sur mesure ; en cas d'échec ou d'absence de clé API, un moteur à règles déterministe prend le relais localement, sans jamais bloquer l'utilisateur.
+- **Copilote IA conversationnel (Nova)** — chat flottant dans le plan pour itérer en langage naturel ("réduis le budget marketing de 20%", "ajoute un persona B2C") ; les changements proposés passent par le même circuit "modifications en attente" que les autres éditions, rien n'est appliqué sans validation.
+
+### Contenu du plan
+
 - **Roadmap Agile** — sprints, user stories, effort en points, coûts estimés, alertes de dépassement de budget, et un Gantt interactif où les stories peuvent être glissées d'un sprint à l'autre.
 - **Stratégie marketing** — répartition budgétaire par canal, objectifs et calculateur A/B test intégré.
-- **Dashboard KPI** — métriques de succès personnalisées selon le contexte du produit, avec formules affichées.
+- **Dashboard KPI & tableaux générés par IA** — métriques de succès personnalisées selon le contexte du produit, avec formules affichées.
 - **Prévisionnel financier & toolkit stratégique** — burn rate simplifié, seuils de rentabilité, et supports générés (accroche landing, brief réseaux sociaux, objet email).
-- **Export & partage** — PDF, PPTX, CSV, JSON, issues GitHub/Jira, capture image, et lien de partage privé (expire après 30 jours).
-- **Historique & brouillons** — tous les plans générés sont sauvegardés localement (`localStorage`) et consultables depuis "Mes plans" ; les réponses en cours peuvent être sauvegardées comme brouillon nommé.
-- **Bilingue FR / EN** — interface, contenu généré et documents exportés s'adaptent à la langue choisie.
+- **Veille, benchmarks, calendriers éditorial/pub, conformité RGPD** — sections générées par IA à la demande, avec veille automatique hebdomadaire et diff des nouveautés.
+- **Suivi post-lancement & simulateur budget/timeline** — mesures réelles vs prévisionnel, simulation en direct sans modifier le plan initial.
+- **Agents IA asynchrones** (Cloudflare Queues) — brief d'exécution, recalcul de KPIs, analyse des risques, optimisation budgétaire, notifiés par email/Slack à la fin.
+- **Fil d'activité & commentaires** — historique des modifications par plan, commentaires d'équipe avec @mentions notifiées, tags transversaux pour organiser ses plans.
+
+### Export, partage & organisation
+
+- **Export & partage** — PDF, PPTX (pitch deck 9 diapositives, marque personnalisable en Pro), CSV, PNG, JSON, issues GitHub/Jira, et lien de partage privé (expire après 30 jours) ou image Open Graph dédiée.
+- **Galerie publique (opt-in)** — un plan peut être rendu consultable sans compte via un lien dédié, réversible à tout moment par son auteur ; aucune modération centralisée, l'auteur contrôle seul sa visibilité.
+- **Modèles & duplication** — dupliquer un plan existant comme point de départ d'un nouveau, sans ses données propres à l'instance d'origine (id, commentaires, liens providers...).
+- **Historique & brouillons** — tous les plans générés sont sauvegardés localement (`localStorage`, synchronisé serveur pour les brouillons) et consultables depuis "Mes plans" ; les réponses en cours peuvent être sauvegardées comme brouillon nommé, repris plus tard sans perte.
+- **Webhooks sortants (Zapier-compatible)** — déclenchés sur `generation.completed` et `story.completed`, signature HMAC, gérés depuis les Paramètres.
+
+### Compte, équipe & notifications
+
 - **Compte & crédits** — connexion via Clerk (Google, Apple, Slack ou email), quota de plans gratuits par utilisateur, passage en illimité via un abonnement Stripe.
 - **Espaces d'équipe** — organisations Clerk : espace personnel + équipes (invitations, rôles), plans déplaçables entre espaces, historique et notifications de commentaires partagés. Limite d'espaces par plan (1 Gratuit / 5 Pro / illimité Entreprise), appliquée côté interface et côté serveur via un webhook Clerk.
-- **Tarification à 3 offres** — Gratuit, Pro (mensuel ou annuel, checkout Stripe) et Entreprise (sur devis, formulaire de contact). PPTX, intégrations Notion/Jira/GitHub, historique multi-espaces et notifications d'équipe réservés à Pro.
-- **Page Paramètres** — thème clair/sombre, langue, fuseau horaire (appliqué aux dates affichées), réduction des animations, accès aux appareils actifs et à la sécurité du compte (panneau natif Clerk).
-- **Intégrations Notion, Jira et GitHub** — connexion OAuth par utilisateur, export d'une page Notion structurée (roadmap + calendrier éditorial/pub unifiés), création d'Epics/Stories Jira et d'issues/milestones GitHub à partir du plan, avec synchronisation bidirectionnelle idempotente.
+- **Tarification à 3 offres** — Gratuit, Pro (mensuel ou annuel, checkout Stripe) et Entreprise (sur devis, formulaire de contact). PPTX, intégrations, historique multi-espaces et notifications d'équipe réservés à Pro.
+- **Notifications email (Resend) & Slack** — génération IA terminée, rappel d'inactivité (14j), veille hebdomadaire automatique, résumé hebdomadaire d'avancement (plans actifs uniquement) ; chaque préférence est activable indépendamment.
+- **Page Paramètres** — thème clair/sombre, langue, fuseau horaire, formats date/devise, accessibilité (police/contraste/animations), export RGPD des données et suppression de compte, panneau des intégrations connectées.
+
+### Intégrations
+
+- **Notion** — export OAuth d'une page structurée avec bases de données natives (roadmap + calendrier éditorial/pub).
+- **Jira** — OAuth, création d'Epics par phase et de Stories liées, sync incrémental idempotent, deep-links depuis le Backlog.
+- **GitHub** — OAuth, création d'issues/milestones à partir du plan.
+- **Linear** — clé API personnelle (sans OAuth), export en issues labellisées pour resynchronisation sans doublon.
+- **Google Calendar** — OAuth, synchronise date de lancement, calendrier éditorial et calendrier publicitaire en événements idempotents.
+
+### Autres
+
+- **Bilingue FR / EN** — interface, contenu généré et documents exportés s'adaptent à la langue choisie.
+- **Recherche globale (⌘K)** et navigation clavier.
 
 ## Stack technique
 
@@ -48,11 +80,13 @@ VelocityLaunch transforme une idée de produit en plan de lancement actionnable 
 | Backend | Cloudflare Workers (JavaScript, sans framework) |
 | Authentification | Clerk (Google, Apple, Slack, email) + Organizations (espaces d'équipe) — mode démo local (session + équipe simulées) si aucune clé n'est configurée |
 | Paiement | Stripe (abonnement Pro récurrent, mensuel ou annuel) |
-| Base de données | Cloudflare D1 (comptes, crédits, tokens OAuth Notion/Jira/GitHub) |
-| Tâches asynchrones | Cloudflare Queues (agents IA) |
-| Intégrations tierces | Notion, Jira, GitHub — OAuth + API REST propres à chaque provider |
+| Base de données | Cloudflare D1 (comptes, crédits, tokens OAuth, webhooks, préférences de notification) |
+| Tâches planifiées | Cloudflare Queues (agents IA) + Cron Triggers (rappels, veille hebdo, résumé hebdo) |
+| Intégrations tierces | Notion, Jira, GitHub, Google Calendar — OAuth ; Linear — clé API personnelle |
+| Notifications | Resend (email) + Slack (Incoming Webhooks) |
 | Génération IA | OpenRouter (modèle configurable via `AI_MODEL`), function calling avec schéma structuré |
 | Génération de secours | Moteur à règles déterministe, 100 % local, aucune dépendance externe |
+| Extraction de document | `pdfjs-dist`, `mammoth`, `xlsx`, `jszip` — parsing 100 % côté client, en import dynamique |
 | Export | `html2canvas`, `pdfmake`, `pptxgenjs` |
 | Formulaire de contact | Web3Forms (envoi direct sans backend dédié) |
 | SEO | Meta tags/Open Graph, robots.txt + sitemap.xml, prérendu HTML statique des pages publiques |

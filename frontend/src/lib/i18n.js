@@ -763,6 +763,18 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '20 août 2026',
+            title: 'Budget total, import de document et corrections de fond',
+            items: [
+              'Budget total du lancement, distinct du budget marketing : le prévisionnel financier se base désormais sur l\'enveloppe globale (dev + marketing + ops) plutôt que de réutiliser silencieusement le seul budget marketing comme s\'il s\'agissait du total',
+              'Import de document dans le questionnaire (PDF, Word, Excel, PowerPoint) : le texte est extrait dans le navigateur et ajouté au contexte envoyé à l\'IA, dans un champ relu et modifiable avant génération',
+              'Correction du chargement de brouillon : le formulaire ne se mettait pas à jour si un brouillon était chargé depuis la page questionnaire elle-même ; chaque sauvegarde créait en plus un nouveau brouillon au lieu de mettre à jour celui en cours, et un renommage manuel était écrasé à la sauvegarde suivante',
+              'Bouton discret pour annuler les modifications en attente sur un plan, en plus du bouton "Enregistrer"',
+              'Correction d\'un bug d\'accessibilité qui forçait une taille minimale de 44x44px sur de nombreux petits boutons-icônes dans toute l\'application (tags, suivi post-lancement, sidebar, copilote...), les faisant apparaître disproportionnés',
+              'Dégradé de marque appliqué aux titres des glossaires d\'aide du questionnaire'
+            ]
+          },
+          {
             date: '19 août 2026',
             title: 'Nouvelle identité visuelle de la page d\'accueil et de "Comment ça marche"',
             items: [
@@ -920,7 +932,24 @@ export const translations = {
         columns: [
           {
             label: 'Disponible',
-            items: ['Questionnaire guidé multi-phases', 'Modèles de plan par secteur (KPIs, canaux et risques adaptés à 10 secteurs)', 'Roadmap, sprints & backlog priorisé', 'Gantt en swim-lanes & burndown à dates réelles', 'Statut tri-état des stories, synchronisé Jira & Notion', 'Calendrier de contenu & publicité unifié, export .ics', 'Stratégie marketing, KPIs & prévisions financières', 'Dashboard BI & tableaux générés par IA', 'Agents IA asynchrones (4 capacités)', 'Suivi post-lancement & simulateur budget/timeline en direct', 'Sommaire actif avec suivi de lecture', 'Export PDF / CSV, partage par lien', 'FR / EN']
+            items: [
+              'Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint) comme contexte IA',
+              'Génération IA avec filet de sécurité (moteur à règles local si l\'IA échoue)',
+              'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel',
+              'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
+              'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
+              'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
+              'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
+              'Suivi post-lancement & simulateur budget/timeline en direct',
+              'Agents IA asynchrones (brief d\'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire)',
+              'Espaces d\'équipe (Clerk Organizations), commentaires avec @mentions, fil d\'activité par plan, tags transversaux',
+              'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
+              'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
+              'Notifications email (Resend) et Slack : génération terminée, rappel d\'inactivité, résumé hebdomadaire',
+              'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in',
+              'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, partage par lien ou image Open Graph',
+              'Recherche globale (⌘K), FR / EN'
+            ]
           },
           {
             label: 'En cours',
@@ -928,7 +957,14 @@ export const translations = {
           },
           {
             label: 'Envisagé',
-            items: ["Comptes et espaces d'équipe", 'Historique cloud synchronisé', 'API publique', 'Collaboration en temps réel']
+            items: [
+              'API publique pour générer un plan par programmation (clé API, palier Entreprise)',
+              'Collaboration en temps réel (édition simultanée à plusieurs sur un même plan)',
+              'Application mobile / PWA installable',
+              'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)',
+              'Bibliothèque de plans "avant/après" pour comparer plusieurs versions d\'un même lancement',
+              'Rapport de conformité exportable pour investisseurs (synthèse RGPD + financier en un document)'
+            ]
           }
         ]
       },
@@ -2062,6 +2098,18 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: 'August 20, 2026',
+            title: 'Total budget, document import and core fixes',
+            items: [
+              'Total launch budget, distinct from the marketing budget: the financial forecast now uses the overall envelope (dev + marketing + ops) instead of silently reusing the marketing budget alone as if it were the total',
+              'Document import in the questionnaire (PDF, Word, Excel, PowerPoint): text is extracted in the browser and added to the context sent to the AI, in a field you can review and edit before generating',
+              'Fixed draft loading: the form wasn\'t updating when a draft was loaded from the questionnaire page itself; every save was also creating a new draft instead of updating the current one, and a manual rename was overwritten on the next save',
+              'Discreet button to discard pending changes on a plan, next to the "Save" button',
+              'Fixed an accessibility bug that forced a 44x44px minimum size on many small icon buttons throughout the app (tags, post-launch tracking, sidebar, copilot...), making them look oversized',
+              'Brand gradient applied to the questionnaire\'s help glossary titles'
+            ]
+          },
+          {
             date: 'August 19, 2026',
             title: 'New visual identity for the homepage and "How it works"',
             items: [
@@ -2219,7 +2267,24 @@ export const translations = {
         columns: [
           {
             label: 'Available',
-            items: ['Guided multi-phase questionnaire', 'Sector-specific plan templates (KPIs, channels and risks tailored to 10 sectors)', 'Roadmap, sprints & prioritized backlog', 'Swim-lane Gantt & real-date burndown', 'Tri-state story status, synced with Jira & Notion', 'Unified content & advertising calendar, .ics export', 'Marketing strategy, KPIs & financial forecasts', 'BI dashboard & AI-generated tables', 'Asynchronous AI agents (4 capabilities)', 'Post-launch tracking & live budget/timeline simulator', 'Active reading sidebar with scroll tracking', 'PDF / CSV export, link sharing', 'FR / EN']
+            items: [
+              'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint) as AI context',
+              'AI generation with a safety net (local rules engine if the AI call fails)',
+              'Conversational AI copilot (Nova) to edit the plan in natural language',
+              'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
+              'Distinct marketing budget and total launch budget, with an associated financial forecast',
+              'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
+              'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
+              'Post-launch tracking & live budget/timeline simulator',
+              'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization)',
+              'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
+              '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
+              'Notion, Jira, GitHub, Linear and Google Calendar integrations',
+              'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
+              'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery',
+              'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, link sharing or dedicated Open Graph image',
+              'Global search (⌘K), FR / EN'
+            ]
           },
           {
             label: 'In progress',
@@ -2227,7 +2292,14 @@ export const translations = {
           },
           {
             label: 'Considered',
-            items: ['Accounts and team spaces', 'Synced cloud history', 'Public API', 'Real-time collaboration']
+            items: [
+              'Public API to generate a plan programmatically (API key, Enterprise tier)',
+              'Real-time collaboration (multiple people editing the same plan at once)',
+              'Mobile app / installable PWA',
+              'OCR for scanned documents (image-based business plans, not detected today)',
+              'A "before/after" plan library to compare several versions of the same launch',
+              'Exportable compliance report for investors (GDPR + financial summary in one document)'
+            ]
           }
         ]
       },
