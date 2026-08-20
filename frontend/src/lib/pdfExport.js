@@ -286,8 +286,24 @@ const abs = (path) => (typeof window !== 'undefined' ? window.location.origin + 
 // hauteur de boîte réaliste avant de positionner l'élément suivant.
 function estimateTextHeight(text, widthIn, fontSize, lineHeightMult = 1.3) {
   const charsPerLine = Math.max(1, Math.floor((widthIn * 72) / (fontSize * 0.52)))
-  const lines = Math.max(1, Math.ceil(String(text || '').length / charsPerLine))
+  // Un saut de ligne explicite force une nouvelle ligne quel que soit le nombre de
+  // caractères restants — l'ignorer sous-estimait la hauteur nécessaire dès qu'un texte
+  // contenait plusieurs paragraphes (cas du pitch produit), d'où le chevauchement constaté
+  // avec l'élément positionné juste en dessous.
+  const segments = String(text || '').split('\n')
+  const lines = segments.reduce((sum, seg) => sum + Math.max(1, Math.ceil(seg.length / charsPerLine)), 0)
   return (lines * fontSize * lineHeightMult) / 72
+}
+
+// Tronque au dernier mot complet avant la limite, avec une ellipse — jamais une coupure en
+// plein milieu d'un mot comme le faisait un simple .slice() (donnait l'impression d'un
+// export cassé, ex: "...pour rassurer sur" qui s'arrêtait net sans explication).
+function truncateText(text, maxChars) {
+  const str = String(text ?? '')
+  if (str.length <= maxChars) return str
+  const cut = str.slice(0, maxChars)
+  const lastSpace = cut.lastIndexOf(' ')
+  return (lastSpace > maxChars * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd() + '…'
 }
 
 // pptxgenjs (4.0.1) ne mesure jamais les dimensions réelles de l'image pour calculer un
@@ -398,25 +414,66 @@ export async function exportPPTX(plan, lang, branding) {
       { x: 6.5, y: 5.28, w: 3, h: 0.25, fontSize: 8, color: BRAND_GRAY, italic: true, align: 'right' })
   }
 
-  // En-tête de section : barre d'accent + titre + sous-titre optionnel. Réserve la zone y=1.15+ pour le contenu.
+  // En-tête de section : barre d'accent + titre + sous-titre optionnel. Le sous-titre peut
+  // faire plus d'une ligne selon sa longueur (ex: positionnement concurrentiel généré par
+  // l'IA) — sa hauteur est donc estimée dynamiquement plutôt que figée à 0.3, sans quoi son
+  // texte débordait par-dessus le contenu positionné juste en dessous. header() retourne le
+  // y à partir duquel ce contenu peut commencer sans risque de chevauchement.
   const header = (s, title, subtitle) => {
     s.background = { color: BRAND_DARK }
     s.addShape(pptx.ShapeType.rect, { x: 0.5, y: 0.48, w: 0.1, h: 0.5, fill: { color: BRAND_VIOLET }, line: { color: BRAND_VIOLET } })
     s.addText(title, { x: 0.75, y: 0.38, w: 8.6, h: 0.55, fontSize: 22, bold: true, color: 'FFFFFF' })
-    if (subtitle) s.addText(subtitle, { x: 0.75, y: 0.9, w: 8.6, h: 0.3, fontSize: 11, color: BRAND_VIOLET })
+    let contentY = 1.35
+    if (subtitle) {
+      const subtitleH = Math.max(0.3, estimateTextHeight(subtitle, 8.6, 11))
+      s.addText(subtitle, { x: 0.75, y: 0.9, w: 8.6, h: subtitleH, fontSize: 11, color: BRAND_VIOLET })
+      contentY = Math.max(contentY, 0.9 + subtitleH + 0.2)
+    }
     stamp(s)
+    return contentY
   }
   const bullets = (items, max = 6) => items.filter(Boolean).slice(0, max).map(text => ({
-    text: String(text).slice(0, 220),
+    text: truncateText(text, 220),
     options: { bullet: { code: '2022' }, color: 'FFFFFF', fontSize: 12, paraSpaceAfter: 6 }
   }))
-  const brandTable = (s, head, rows, colW, opts = {}) => s.addTable(
-    [
-      head.map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10, fill: { color: BRAND_CARD } } })),
-      ...rows.slice(0, opts.maxRows || 10).map(r => r.map(text => ({ text: String(text ?? '').slice(0, 140), options: { color: 'FFFFFF', fontSize: 9 } })))
-    ],
-    { x: opts.x || 0.5, y: opts.y || 1.35, w: opts.w || 9, colW, border: { type: 'solid', color: '2C3340', pt: 0.5 }, rowH: opts.rowH || 0.32, valign: 'middle' }
-  )
+  // Tableau de marque : la hauteur de chaque ligne est calculée à partir du texte réel de
+  // chaque cellule (au lieu d'une hauteur fixe pour toutes les lignes) — une ligne fixe trop
+  // courte pour son contenu ne s'agrandit jamais avec pptxgenjs, le texte débordant est alors
+  // visuellement coupé net sans ellipse (bug constaté sur Marché cible, Roadmap, Benchmarks).
+  // Chaque cellule est aussi tronquée proprement (mot entier + ellipse) à une longueur
+  // raisonnable, et les lignes en trop pour tenir sur la diapo sont abandonnées plutôt que de
+  // déborder hors du cadre.
+  const CELL_FONT_SIZE = 9
+  const brandTable = (s, head, rows, colW, opts = {}) => {
+    const x = opts.x ?? 0.5
+    const y = opts.y ?? 1.35
+    const headerH = 0.32
+    const cellCap = opts.cellCharCap || 200
+    const maxBottomY = opts.maxBottomY ?? 5.05
+    const candidateRows = rows.slice(0, opts.maxRows || 10).map(r => r.map(text => truncateText(text, cellCap)))
+    const rowHeights = candidateRows.map(r =>
+      Math.max(opts.rowH || 0.32, ...r.map((text, i) => estimateTextHeight(text, Math.max(0.5, (colW[i] || 1) - 0.2), CELL_FONT_SIZE) + 0.14))
+    )
+    // N'inclut que les lignes qui tiennent réellement dans l'espace vertical restant sur la
+    // diapo, plutôt que de laisser un tableau trop long déborder par-dessus le pied de page.
+    const visibleRows = []
+    const visibleHeights = []
+    let cumulative = y + headerH
+    for (let i = 0; i < candidateRows.length; i++) {
+      if (cumulative + rowHeights[i] > maxBottomY && visibleRows.length > 0) break
+      visibleRows.push(candidateRows[i])
+      visibleHeights.push(rowHeights[i])
+      cumulative += rowHeights[i]
+    }
+    s.addTable(
+      [
+        head.map(text => ({ text, options: { bold: true, color: BRAND_VIOLET, fontSize: 10, fill: { color: BRAND_CARD } } })),
+        ...visibleRows.map(r => r.map(text => ({ text, options: { color: 'FFFFFF', fontSize: CELL_FONT_SIZE } })))
+      ],
+      { x, y, w: opts.w || 9, colW, border: { type: 'solid', color: '2C3340', pt: 0.5 }, rowH: [headerH, ...visibleHeights], valign: 'middle' }
+    )
+    return { bottomY: cumulative }
+  }
 
   // Place une image "contain" (jamais déformée) centrée dans une boîte — même logique que
   // la diapo Solution plus bas, factorisée ici pour être réutilisée par le logo du client
@@ -466,11 +523,20 @@ export async function exportPPTX(plan, lang, branding) {
   // ---------- 2. Le problème (persona) ----------
   if (plan.persona) {
     const s = pptx.addSlide()
-    header(s, en ? 'The problem' : 'Le problème', plan.persona.title)
-    try { s.addImage({ data: dataOf('problem'), x: 6.4, y: 1.4, w: 3, h: 3.4 }) } catch { /* skip */ }
-    if (plan.persona.name) s.addText(plan.persona.name, { x: 0.5, y: 1.35, w: 5.7, h: 0.35, fontSize: 12, bold: true, color: BRAND_VIOLET })
-    if (plan.persona.quote) s.addText(`" ${plan.persona.quote} "`, { x: 0.5, y: 1.75, w: 5.7, h: 0.9, fontSize: 12, italic: true, color: BRAND_GRAY })
-    s.addText(bullets(plan.persona.painPoints || [], 4), { x: 0.5, y: 2.8, w: 5.7, h: 2.2 })
+    const contentY = header(s, en ? 'The problem' : 'Le problème', plan.persona.title)
+    try { s.addImage({ data: dataOf('problem'), x: 6.4, y: contentY, w: 3, h: 3.4 }) } catch { /* skip */ }
+    let cy = contentY
+    if (plan.persona.name) {
+      s.addText(plan.persona.name, { x: 0.5, y: cy, w: 5.7, h: 0.35, fontSize: 12, bold: true, color: BRAND_VIOLET })
+      cy += 0.4
+    }
+    if (plan.persona.quote) {
+      const quoteText = `" ${plan.persona.quote} "`
+      const quoteH = Math.max(0.4, estimateTextHeight(quoteText, 5.7, 12))
+      s.addText(quoteText, { x: 0.5, y: cy, w: 5.7, h: quoteH, fontSize: 12, italic: true, color: BRAND_GRAY })
+      cy += quoteH + 0.2
+    }
+    s.addText(bullets(plan.persona.painPoints || [], 4), { x: 0.5, y: cy, w: 5.7, h: Math.max(0.5, 5.05 - cy) })
   }
 
   // ---------- 3. La solution ----------
@@ -489,79 +555,113 @@ export async function exportPPTX(plan, lang, branding) {
       sol.addImage({ data: dataOf('solution'), x: boxX + (boxW - w) / 2, y: boxY + (boxH - h) / 2, w, h })
     }
   } catch { /* skip */ }
-  sol.addText(plan.product?.pitch || '', { x: 0.5, y: 1.4, w: 5.5, h: 1.6, fontSize: 14, color: 'FFFFFF' })
+  // La boîte "Ce qui nous différencie" était positionnée à un y fixe (3.25) sans tenir
+  // compte de la hauteur réelle du pitch juste au-dessus : un pitch un peu long (plus de
+  // ~4 lignes à cette taille) débordait dessus (bug constaté). Sa position est maintenant
+  // calculée après le pitch, comme pour la diapo de couverture.
+  const solPitchText = plan.product?.pitch || ''
+  const solPitchH = Math.max(0.4, estimateTextHeight(solPitchText, 5.5, 14))
+  sol.addText(solPitchText, { x: 0.5, y: 1.4, w: 5.5, h: solPitchH, fontSize: 14, color: 'FFFFFF' })
   if (plan.product?.usp) {
-    sol.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 3.25, w: 5.5, h: 1.6, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.08 })
-    sol.addText(en ? 'What sets us apart' : 'Ce qui nous différencie', { x: 0.75, y: 3.4, w: 5, h: 0.35, fontSize: 10, bold: true, color: BRAND_VIOLET })
-    sol.addText(plan.product.usp, { x: 0.75, y: 3.75, w: 5, h: 1, fontSize: 12, color: 'FFFFFF' })
+    const uspBoxY = Math.min(1.4 + solPitchH + 0.25, 3.6)
+    const uspH = Math.max(0.7, estimateTextHeight(plan.product.usp, 5, 12))
+    const uspBoxH = Math.min(0.65 + uspH, 5.0 - uspBoxY)
+    sol.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: uspBoxY, w: 5.5, h: uspBoxH, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.08 })
+    sol.addText(en ? 'What sets us apart' : 'Ce qui nous différencie', { x: 0.75, y: uspBoxY + 0.15, w: 5, h: 0.35, fontSize: 10, bold: true, color: BRAND_VIOLET })
+    sol.addText(plan.product.usp, { x: 0.75, y: uspBoxY + 0.5, w: 5, h: uspBoxH - 0.6, fontSize: 12, color: 'FFFFFF' })
   }
 
   // ---------- 4. Marché cible ----------
   if (plan.persona || plan.market) {
     const s = pptx.addSlide()
-    header(s, en ? 'Target market' : 'Marché cible')
-    try { s.addImage({ data: dataOf('market'), x: 6.4, y: 1.4, w: 3, h: 2.6 }) } catch { /* skip */ }
+    const contentY = header(s, en ? 'Target market' : 'Marché cible')
+    try { s.addImage({ data: dataOf('market'), x: 6.4, y: contentY, w: 3, h: 2.6 }) } catch { /* skip */ }
     const rows = [
       plan.persona?.title && [en ? 'Profile' : 'Profil', plan.persona.title],
       plan.market?.segment && [en ? 'Segment' : 'Segment', plan.market.segment],
       plan.persona?.preferredChannel && [en ? 'Preferred channel' : 'Canal privilégié', plan.persona.preferredChannel],
       plan.persona?.context && [en ? 'Context' : 'Contexte', plan.persona.context]
     ].filter(Boolean)
-    if (rows.length) brandTable(s, [en ? 'Dimension' : 'Dimension', ''], rows, [1.8, 4], { w: 5.7, rowH: 0.35 })
-    if (plan.persona?.buyingTrigger) s.addText(`${en ? 'Buying trigger' : 'Déclencheur d\'achat'} : ${plan.persona.buyingTrigger}`, { x: 0.5, y: 4.45, w: 9, h: 0.5, fontSize: 10, italic: true, color: BRAND_GRAY })
+    let tableBottom = contentY
+    if (rows.length) {
+      const { bottomY } = brandTable(s, [en ? 'Dimension' : 'Dimension', ''], rows, [1.8, 4], { y: contentY, w: 5.7, rowH: 0.35, maxBottomY: 4.3 })
+      tableBottom = bottomY
+    }
+    if (plan.persona?.buyingTrigger) {
+      const triggerY = Math.max(tableBottom + 0.25, 4.45)
+      s.addText(`${en ? 'Buying trigger' : 'Déclencheur d\'achat'} : ${plan.persona.buyingTrigger}`, { x: 0.5, y: triggerY, w: 9, h: Math.max(0.4, 5.05 - triggerY), fontSize: 10, italic: true, color: BRAND_GRAY })
+    }
   }
 
   // ---------- 4bis. Positionnement concurrentiel (SWOT) ----------
   if (plan.strategyToolkit?.swot) {
     const { swot, competitivePositioning } = plan.strategyToolkit
     const s = pptx.addSlide()
-    header(s, t(lang, 'outputs.strategy.title'), competitivePositioning ? competitivePositioning.slice(0, 140) : undefined)
-    const quadrants = [
-      { key: 'strengths', label: t(lang, 'outputs.strategy.strengths'), color: '4ade80', x: 0.5, y: 1.35 },
-      { key: 'weaknesses', label: t(lang, 'outputs.strategy.weaknesses'), color: 'ef4444', x: 5.15, y: 1.35 },
-      { key: 'opportunities', label: t(lang, 'outputs.strategy.opportunities'), color: '4ade80', x: 0.5, y: 3.35 },
-      { key: 'threats', label: t(lang, 'outputs.strategy.threats'), color: 'ef4444', x: 5.15, y: 3.35 }
-    ]
-    quadrants.forEach(({ key, label, color, x, y }) => {
-      s.addShape(pptx.ShapeType.roundRect, { x, y, w: 4.35, h: 1.85, fill: { color: BRAND_CARD }, line: { color, width: 1 }, rectRadius: 0.06 })
+    const contentY = header(s, t(lang, 'outputs.strategy.title'), competitivePositioning ? truncateText(competitivePositioning, 160) : undefined)
+    const colW = 4.35
+    const gap = 0.3
+    const bulletW = colW - 0.4
+    // La hauteur de chaque quadrant s'adapte au texte réel de ses puces plutôt qu'une
+    // hauteur fixe (1.85) : avec des puces longues (texte généré par l'IA, longueur
+    // variable d'un plan à l'autre), le texte débordait par-dessus le quadrant suivant.
+    const quadH = (items) => {
+      const list = (items || []).filter(Boolean).slice(0, 3)
+      const textH = list.reduce((sum, txt) => sum + estimateTextHeight(truncateText(txt, 220), bulletW, 9.5) + 0.1, 0)
+      return Math.max(1.85, 0.55 + textH)
+    }
+    const draw = (key, label, color, x, y, h) => {
+      s.addShape(pptx.ShapeType.roundRect, { x, y, w: colW, h, fill: { color: BRAND_CARD }, line: { color, width: 1 }, rectRadius: 0.06 })
       s.addText(label, { x: x + 0.2, y: y + 0.12, w: 4, h: 0.3, fontSize: 11, bold: true, color })
-      s.addText(bullets(swot[key] || [], 3), { x: x + 0.2, y: y + 0.48, w: 3.95, h: 1.3, fontSize: 9.5 })
-    })
+      s.addText(bullets(swot[key] || [], 3), { x: x + 0.2, y: y + 0.48, w: bulletW, h: h - 0.6, fontSize: 9.5 })
+    }
+    const row1H = Math.max(quadH(swot.strengths), quadH(swot.weaknesses))
+    draw('strengths', t(lang, 'outputs.strategy.strengths'), '4ade80', 0.5, contentY, row1H)
+    draw('weaknesses', t(lang, 'outputs.strategy.weaknesses'), 'ef4444', 0.5 + colW + gap, contentY, row1H)
+    const row2Y = contentY + row1H + gap
+    const row2H = Math.min(Math.max(quadH(swot.opportunities), quadH(swot.threats)), 5.0 - row2Y)
+    draw('opportunities', t(lang, 'outputs.strategy.opportunities'), '4ade80', 0.5, row2Y, row2H)
+    draw('threats', t(lang, 'outputs.strategy.threats'), 'ef4444', 0.5 + colW + gap, row2Y, row2H)
   }
 
   // ---------- 5. Roadmap ----------
   if (plan.roadmap?.sprints?.length) {
     const s = pptx.addSlide()
-    header(s, t(lang, 'outputs.roadmap'), `${plan.roadmap.sprints.length} ${en ? 'sprints' : 'sprints'} · ${plan.roadmap.estimatedCost} €`)
-    try { s.addImage({ data: dataOf('roadmap'), x: 7, y: 1.35, w: 2.5, h: 1.5 }) } catch { /* skip */ }
+    const contentY = header(s, t(lang, 'outputs.roadmap'), `${plan.roadmap.sprints.length} ${en ? 'sprints' : 'sprints'} · ${plan.roadmap.estimatedCost} €`)
+    try { s.addImage({ data: dataOf('roadmap'), x: 7, y: contentY, w: 2.5, h: 1.5 }) } catch { /* skip */ }
+    // Largeur réduite à 6.3 (au lieu de 6.8) : à x=0.5, le tableau finissait à x=7.3, soit
+    // 0.3 po À L'INTÉRIEUR de l'image posée à x=7 — chevauchement visible sur l'export
+    // précédent. Colonnes réduites proportionnellement pour garder les mêmes proportions.
     brandTable(s,
       [t(lang, 'outputs.sprint'), t(lang, 'outputs.summary'), t(lang, 'outputs.estimatedCostEur')],
       plan.roadmap.sprints.map(sp => [sp.sprintId, sp.stories.map(x => x.title).join(', '), `${sp.estimatedCost} €`]),
-      [0.6, 4.6, 1.6], { w: 6.8, maxRows: 8, rowH: 0.35 }
+      [0.55, 4.25, 1.5], { y: contentY, w: 6.3, maxRows: 8, rowH: 0.35 }
     )
   }
 
   // ---------- 6. Go-to-market ----------
   if (plan.marketing?.channels?.length) {
     const s = pptx.addSlide()
-    header(s, `${t(lang, 'outputs.marketing')}`, `${en ? 'Total budget' : 'Budget total'} : ${plan.marketing.totalBudget} €`)
-    try { s.addImage({ data: dataOf('gtm'), x: 7, y: 1.35, w: 2.5, h: 1.5 }) } catch { /* skip */ }
+    const contentY = header(s, `${t(lang, 'outputs.marketing')}`, `${en ? 'Total budget' : 'Budget total'} : ${plan.marketing.totalBudget} €`)
+    try { s.addImage({ data: dataOf('gtm'), x: 7, y: contentY, w: 2.5, h: 1.5 }) } catch { /* skip */ }
+    // Même correctif de largeur que Roadmap ci-dessus (chevauchement avec l'image à x=7).
     brandTable(s,
       [t(lang, 'outputs.channel'), t(lang, 'outputs.estimatedCostEur'), t(lang, 'outputs.goal')],
       plan.marketing.channels.map(ch => [ch.name, `${ch.budget} €`, ch.goal]),
-      [1.5, 1.5, 3.8], { w: 6.8, maxRows: 8, rowH: 0.35 }
+      [1.4, 1.4, 3.5], { y: contentY, w: 6.3, maxRows: 8, rowH: 0.35 }
     )
   }
 
   // ---------- 7. KPIs ----------
   if (plan.kpis?.length) {
     const s = pptx.addSlide()
-    header(s, t(lang, 'outputs.kpis'))
-    try { s.addImage({ data: dataOf('dashboard'), x: 6.6, y: 1.35, w: 2.9, h: 1.75 }) } catch { /* skip */ }
+    const contentY = header(s, t(lang, 'outputs.kpis'))
+    try { s.addImage({ data: dataOf('dashboard'), x: 6.6, y: contentY, w: 2.9, h: 1.75 }) } catch { /* skip */ }
+    // Largeur réduite à 5.9 (au lieu de 6.2) : le tableau finissait à x=6.7, dans l'image
+    // posée à x=6.6 — même chevauchement corrigé.
     brandTable(s,
       [t(lang, 'outputs.name'), t(lang, 'outputs.target'), t(lang, 'outputs.unit')],
       plan.kpis.map(k => [k.name, k.target ?? '—', k.unit || '']),
-      [3.4, 1.4, 1.4], { w: 6.2, maxRows: 8, rowH: 0.35 }
+      [3.2, 1.35, 1.35], { y: contentY, w: 5.9, maxRows: 8, rowH: 0.35 }
     )
   }
 
@@ -569,15 +669,18 @@ export async function exportPPTX(plan, lang, branding) {
   if (plan.benchmarks?.metrics?.length) {
     const b = plan.benchmarks
     const s = pptx.addSlide()
-    header(s, t(lang, 'benchmarks.title'), t(lang, 'benchmarks.subtitle'))
-    brandTable(s,
+    const contentY = header(s, t(lang, 'benchmarks.title'), t(lang, 'benchmarks.subtitle'))
+    const { bottomY } = brandTable(s,
       [t(lang, 'benchmarks.metric'), t(lang, 'benchmarks.industry'), t(lang, 'benchmarks.yours'), t(lang, 'benchmarks.verdictLabel')],
       b.metrics.map(row => [row.metric, row.industry, row.yours, t(lang, `benchmarks.verdict.${row.verdict}`) || row.verdict]),
-      [3.1, 2, 2.7, 1.2], { w: 9, maxRows: 5, rowH: 0.4 }
+      [3.1, 2, 2.7, 1.2], { y: contentY, w: 9, maxRows: 5, rowH: 0.4, maxBottomY: 3.5 }
     )
     if (b.takeaway) {
-      s.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: 3.55, w: 9, h: 1.2, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.06 })
-      s.addText(b.takeaway.slice(0, 260), { x: 0.75, y: 3.7, w: 8.5, h: 0.9, fontSize: 11, color: 'FFFFFF', italic: true })
+      const takeawayY = bottomY + 0.2
+      const takeawayText = truncateText(b.takeaway, 320)
+      const takeawayH = Math.min(Math.max(0.9, estimateTextHeight(takeawayText, 8.5, 11) + 0.3), 5.0 - takeawayY)
+      s.addShape(pptx.ShapeType.roundRect, { x: 0.5, y: takeawayY, w: 9, h: takeawayH, fill: { color: BRAND_CARD }, line: { color: BRAND_VIOLET, width: 1 }, rectRadius: 0.06 })
+      s.addText(takeawayText, { x: 0.75, y: takeawayY + 0.15, w: 8.5, h: takeawayH - 0.3, fontSize: 11, color: 'FFFFFF', italic: true })
     }
   }
 
@@ -585,7 +688,7 @@ export async function exportPPTX(plan, lang, branding) {
   if (plan.financials) {
     const f = plan.financials
     const s = pptx.addSlide()
-    header(s, t(lang, 'outputs.financials.title'))
+    const contentY = header(s, t(lang, 'outputs.financials.title'))
     const stats = [
       [`${f.monthlyBurn} €`, t(lang, 'outputs.financials.monthlyBurn')],
       [`${f.runwayMonths} ${t(lang, 'outputs.financials.months')}`, t(lang, 'outputs.financials.runway')],
@@ -593,13 +696,14 @@ export async function exportPPTX(plan, lang, branding) {
     ]
     stats.forEach(([value, label], i) => {
       const x = 0.5 + i * 3.05
-      s.addShape(pptx.ShapeType.roundRect, { x, y: 1.4, w: 2.8, h: 1.3, fill: { color: BRAND_CARD }, line: { color: '2C3340', width: 1 }, rectRadius: 0.08 })
-      s.addText(value, { x, y: 1.55, w: 2.8, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET, align: 'center' })
-      s.addText(label, { x, y: 2.15, w: 2.8, h: 0.4, fontSize: 10, color: BRAND_GRAY, align: 'center' })
+      s.addShape(pptx.ShapeType.roundRect, { x, y: contentY, w: 2.8, h: 1.3, fill: { color: BRAND_CARD }, line: { color: '2C3340', width: 1 }, rectRadius: 0.08 })
+      s.addText(value, { x, y: contentY + 0.15, w: 2.8, h: 0.6, fontSize: 20, bold: true, color: BRAND_VIOLET, align: 'center' })
+      s.addText(label, { x, y: contentY + 0.75, w: 2.8, h: 0.4, fontSize: 10, color: BRAND_GRAY, align: 'center' })
     })
     if (f.costBreakdown?.length) {
-      s.addText(en ? 'Cost breakdown' : 'Répartition des coûts', { x: 0.6, y: 3.05, w: 8.8, h: 0.3, fontSize: 11, bold: true, color: BRAND_VIOLET })
-      s.addText(bullets(f.costBreakdown.map(l => `${l.category}: ${l.amount} € (${l.pct}%)`), 5), { x: 0.6, y: 3.4, w: 8.8, h: 1.65 })
+      const breakdownY = contentY + 1.65
+      s.addText(en ? 'Cost breakdown' : 'Répartition des coûts', { x: 0.6, y: breakdownY, w: 8.8, h: 0.3, fontSize: 11, bold: true, color: BRAND_VIOLET })
+      s.addText(bullets(f.costBreakdown.map(l => `${l.category}: ${l.amount} € (${l.pct}%)`), 5), { x: 0.6, y: breakdownY + 0.35, w: 8.8, h: Math.max(0.5, 5.05 - (breakdownY + 0.35)) })
     }
   }
 
