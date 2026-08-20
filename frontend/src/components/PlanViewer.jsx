@@ -31,7 +31,7 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus, IconDroplet } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus, IconDroplet, IconX } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -77,6 +77,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const { user } = useUser()
   const team = useTeam()
   const [plan, setPlan] = useState(initialPlan)
+  // Référence à la dernière version réellement enregistrée (mise à jour dans handleSave),
+  // pour pouvoir y revenir depuis handleDiscardChanges — plan lui-même est déjà muté en
+  // mémoire à chaque édition (voir plus bas), donc lui seul ne suffit pas à "annuler".
+  const lastSavedPlanRef = useRef(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [showCoverPicker, setShowCoverPicker] = useState(false)
   const [showBgPicker, setShowBgPicker] = useState(false)
@@ -342,9 +346,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     ].slice(0, 50)
     const savedPlan = savePlan({ ...plan, changeLog: nextChangeLog })
     setPlan(savedPlan)
+    lastSavedPlanRef.current = savedPlan
     setPendingChanges([])
     setJustSaved(true)
     setTimeout(() => setJustSaved(false), 2500)
+  }
+
+  // Annule les modifications en attente : revient à la dernière version enregistrée plutôt
+  // que de simplement vider le journal, sinon les données déjà mutées en mémoire (roadmap
+  // déplacée, KPI édité...) resteraient affichées malgré le bandeau qui disparaît.
+  const handleDiscardChanges = () => {
+    setPlan(lastSavedPlanRef.current)
+    setPendingChanges([])
   }
 
   // Efface le journal des modifications (pas le plan lui-même) — action immédiate une fois
@@ -433,6 +446,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             <IconSave width={15} height={15} className="unsaved-banner-icon" />
             <span className="unsaved-banner-title">{t(lang, 'app.pendingChangesTitle')(pendingChanges.length)}</span>
             <button className="unsaved-banner-save" onClick={handleSave}>{t(lang, 'app.save')}</button>
+            <button
+              type="button"
+              className="unsaved-banner-discard"
+              onClick={handleDiscardChanges}
+              title={t(lang, 'app.discardPendingChanges')}
+              aria-label={t(lang, 'app.discardPendingChanges')}
+            >
+              <IconX width={13} height={13} />
+            </button>
           </div>
           <ul className="change-list">
             {pendingChanges.map(change => <ChangeRow key={change.key} change={change} />)}

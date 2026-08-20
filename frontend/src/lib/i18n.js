@@ -30,7 +30,8 @@ export const translations = {
       unsavedChangesBody: 'Tu as des modifications non enregistrées sur ce plan. Si tu continues sans les enregistrer, elles seront perdues.',
       discardChanges: 'Continuer sans enregistrer',
       saveAndContinue: 'Enregistrer et continuer',
-      pendingChangesTitle: (count) => count > 1 ? `${count} modifications en attente` : '1 modification en attente'
+      pendingChangesTitle: (count) => count > 1 ? `${count} modifications en attente` : '1 modification en attente',
+      discardPendingChanges: 'Annuler les modifications'
     },
     steps: ['Produit', 'Marché', 'Ressources', 'Priorités'],
     nav: {
@@ -1333,7 +1334,8 @@ export const translations = {
       unsavedChangesBody: 'This plan has unsaved changes. If you continue without saving, they will be lost.',
       discardChanges: 'Continue without saving',
       saveAndContinue: 'Save and continue',
-      pendingChangesTitle: (count) => count > 1 ? `${count} pending changes` : '1 pending change'
+      pendingChangesTitle: (count) => count > 1 ? `${count} pending changes` : '1 pending change',
+      discardPendingChanges: 'Discard changes'
     },
     steps: ['Product', 'Market', 'Resources', 'Priorities'],
     nav: {

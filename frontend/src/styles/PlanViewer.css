@@ -430,6 +430,31 @@
   filter: brightness(1.15);
 }
 
+/* Bouton discret : à côté du CTA plein "Enregistrer" en dégradé, un simple "x" transparent
+   suffit à signaler une action secondaire (annuler) sans lui faire concurrence visuelle. */
+.unsaved-banner-discard {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  min-width: 0;
+  min-height: 0;
+  border: none;
+  background: none;
+  border-radius: 50%;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.unsaved-banner-discard:hover {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
 .unsaved-banner .change-list {
   overflow-y: auto;
   padding-right: 0.25rem;
