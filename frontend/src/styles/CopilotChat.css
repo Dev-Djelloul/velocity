@@ -76,19 +76,6 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-/* Réduit : ne garde que la barre d'en-tête, pour libérer l'écran sans perdre la
-   conversation en cours (repliée, pas fermée — voir le bouton Réduire/Agrandir). */
-.copilot-panel-minimized {
-  height: auto;
-  max-height: none;
-  border-bottom-left-radius: var(--border-radius);
-  border-bottom-right-radius: var(--border-radius);
-}
-
-.copilot-panel-minimized .copilot-panel-header {
-  border-bottom: none;
-}
-
 /* En-tête compacté (une seule ligne, plus de sous-titre séparé) : le texte d'explication
    vit désormais dans l'état vide de la conversation (.copilot-empty), pas de le répéter
    deux fois dans un panneau qui, agrandi, gagne à laisser plus de place aux messages. */

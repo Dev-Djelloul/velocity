@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { copilotChat } from '../lib/serverStorage'
 import { t } from '../lib/i18n'
-import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle, IconChevronDown, IconChevronUp } from './Icons'
+import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle, IconMinus } from './Icons'
 import '../styles/CopilotChat.css'
 
 const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
@@ -14,7 +14,6 @@ const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
 // enregistré silencieusement, l'utilisateur garde la main via le bouton "Enregistrer".
 export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggleSignal }) {
   const [open, setOpen] = useState(false)
-  const [minimized, setMinimized] = useState(false)
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
@@ -50,13 +49,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggle
 
   // Focus le champ de saisie à l'ouverture, pour pouvoir taper immédiatement après ⌘K.
   useEffect(() => {
-    if (open && !minimized && textareaRef.current) textareaRef.current.focus()
-  }, [open, minimized])
-
-  // Repart toujours agrandi à la prochaine ouverture — l'état réduit n'a de sens que le
-  // temps de dégager de la place sur l'écran pendant qu'on garde le panneau ouvert.
-  useEffect(() => {
-    if (open) setMinimized(false)
+    if (open && textareaRef.current) textareaRef.current.focus()
   }, [open])
 
   const focusSuggestion = (index, total) => {
@@ -134,7 +127,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggle
       </button>
 
       {open && (
-        <div className={`copilot-panel${minimized ? ' copilot-panel-minimized' : ''}`}>
+        <div className="copilot-panel">
           <div className="copilot-panel-header">
             <div className="copilot-panel-title">
               <img className="copilot-avatar" src={NOVA_AVATAR} alt="" />
@@ -146,14 +139,8 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggle
                   <IconTrash width={14} height={14} />
                 </button>
               )}
-              <button
-                type="button"
-                className="copilot-panel-icon-btn"
-                onClick={() => setMinimized(m => !m)}
-                title={minimized ? t(lang, 'copilot.expand') : t(lang, 'copilot.minimize')}
-                aria-label={minimized ? t(lang, 'copilot.expand') : t(lang, 'copilot.minimize')}
-              >
-                {minimized ? <IconChevronUp width={14} height={14} /> : <IconChevronDown width={14} height={14} />}
+              <button type="button" className="copilot-panel-icon-btn" onClick={() => setOpen(false)} title={t(lang, 'copilot.minimize')} aria-label={t(lang, 'copilot.minimize')}>
+                <IconMinus width={14} height={14} />
               </button>
               <button type="button" className="copilot-panel-icon-btn" onClick={() => setOpen(false)} aria-label={t(lang, 'copilot.close')}>
                 <IconX width={16} height={16} />
@@ -161,7 +148,6 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggle
             </div>
           </div>
 
-          {!minimized && <>
           <div className="copilot-messages" ref={listRef}>
             {messages.length === 0 && (
               <div className="copilot-empty-state">
@@ -224,7 +210,6 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggle
             </button>
           </div>
           <p className="copilot-input-hint">{t(lang, 'copilot.inputHint')}</p>
-          </>}
         </div>
       )}
     </>
