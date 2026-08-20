@@ -25,6 +25,7 @@ import InfoModal from './InfoModal'
 import CopilotChat from './CopilotChat'
 import CoverPicker from './CoverPicker'
 import { generateMarketingStrategy } from '../lib/planGenerator'
+import { formatMoney } from '../lib/currency'
 import { savePlan as savePlanToStorage } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
 import { useAuth, useUser, useTeam } from '../lib/auth'
@@ -116,6 +117,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     window.addEventListener('beforeunload', handler)
     return () => window.removeEventListener('beforeunload', handler)
   }, [isDirty])
+
+  // Le slider de budget marketing (section Stratégie marketing) part d'une copie locale
+  // (`budget`) pour rester réactif pendant le drag sans réécrire le plan à chaque pixel —
+  // mais ça la déconnecte de `plan.marketing.totalBudget` une fois montée. Sans ce reset,
+  // une édition externe (copilote IA, régénération...) restait invisible tant que la page
+  // n'était pas rechargée. Se resynchronise donc dès que la valeur source du plan bouge.
+  useEffect(() => {
+    setBudget(plan.marketing.totalBudget)
+  }, [plan.marketing.totalBudget])
 
   // Une description précise (pas juste le nom de la section) pour chaque modification,
   // calculée au moment du changement pendant qu'on a encore l'ancienne ET la nouvelle
@@ -587,10 +597,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                 {t(lang, 'resources.budgetOptions')[plan.resources.totalBudget] || plan.resources.totalBudget}
               </span>
             )}
-            {plan.resources?.budgetEur && (
+            {(plan.marketing?.totalBudget != null || plan.resources?.budgetEur) && (
               <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.budgetEurHelp')}>
                 <IconMegaphone width={13} height={13} />
-                {t(lang, 'resources.budgetOptions')[plan.resources.budgetEur] || plan.resources.budgetEur}
+                {plan.marketing?.totalBudget != null
+                  ? formatMoney(plan.marketing.totalBudget)
+                  : (t(lang, 'resources.budgetOptions')[plan.resources.budgetEur] || plan.resources.budgetEur)}
               </span>
             )}
             {plan.resources?.timelineWeeks && (
