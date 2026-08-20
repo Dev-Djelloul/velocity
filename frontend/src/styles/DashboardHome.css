@@ -40,6 +40,26 @@
   color: var(--color-text-primary);
 }
 
+/* Le titre/sous-titre et les puces Historique/Galerie reposent sur la photo de fond
+   (.dashboard-home-bg), toujours assombrie quel que soit le thème (voir filter ci-dessus) —
+   en thème clair, leur couleur de texte suit pourtant la palette claire par défaut et
+   devient illisible sur cette image. Même correctif que .space-page-title dans
+   SpacePage.css : forcé en blanc avec une ombre portée, peu importe le thème. */
+[data-theme="light"] .dashboard-home-header h1,
+[data-theme="light"] .dashboard-home-header p {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="light"] .dashboard-home-link {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .dashboard-home-link:hover {
+  color: #fff;
+}
+
 .dashboard-home-header p {
   margin: 0;
   color: var(--color-text-secondary);
