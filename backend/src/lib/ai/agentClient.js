@@ -185,6 +185,108 @@ function kpiRecalcTool(l) {
   }
 }
 
+function dynamicRescheduleTool(l) {
+  return l === 'en' ? {
+    name: 'reschedule_roadmap',
+    description: 'Proposes sprint moves to keep the roadmap realistic given real progress, blocked dependencies and remaining capacity',
+    input_schema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string', description: 'One-sentence verdict on whether the current schedule still holds, IN ENGLISH.' },
+        moves: {
+          type: 'array',
+          description: '0 to 6 concrete story moves between sprints (only for unfinished stories), IN ENGLISH.',
+          items: {
+            type: 'object',
+            properties: {
+              storyId: { type: 'string' },
+              toSprint: { type: 'number', description: 'Target sprint number for this story.' },
+              rationale: { type: 'string', description: 'Why this move, IN ENGLISH.' }
+            },
+            required: ['storyId', 'toSprint', 'rationale']
+          }
+        }
+      },
+      required: ['summary', 'moves']
+    }
+  } : {
+    name: 'reschedule_roadmap',
+    description: 'Propose des déplacements de sprint pour garder la roadmap réaliste vu l\'avancement réel, les dépendances bloquées et la capacité restante',
+    input_schema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string', description: 'Verdict en une phrase sur la tenue du planning actuel, EN FRANÇAIS.' },
+        moves: {
+          type: 'array',
+          description: '0 à 6 déplacements concrets de stories entre sprints (uniquement les stories non terminées), EN FRANÇAIS.',
+          items: {
+            type: 'object',
+            properties: {
+              storyId: { type: 'string' },
+              toSprint: { type: 'number', description: 'Numéro du sprint cible pour cette story.' },
+              rationale: { type: 'string', description: 'Pourquoi ce déplacement, EN FRANÇAIS.' }
+            },
+            required: ['storyId', 'toSprint', 'rationale']
+          }
+        }
+      },
+      required: ['summary', 'moves']
+    }
+  }
+}
+
+function externalSignalPrioritizationTool(l) {
+  return l === 'en' ? {
+    name: 'prioritize_backlog_signals',
+    description: 'Scores backlog stories by urgency using external market signals (competition, trends, user demand)',
+    input_schema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string', description: 'One-sentence verdict on what should move up given the market context, IN ENGLISH.' },
+        priorities: {
+          type: 'array',
+          description: 'One entry per story provided, IN ENGLISH.',
+          items: {
+            type: 'object',
+            properties: {
+              storyId: { type: 'string' },
+              score: { type: 'number', description: 'Priority score from 1 (low) to 10 (urgent).' },
+              signal: { type: 'string', enum: ['market_trend', 'competitor_move', 'user_demand', 'regulatory'], description: 'Type of external signal driving this score.' },
+              rationale: { type: 'string', description: 'One sentence justifying the score from that signal, IN ENGLISH.' }
+            },
+            required: ['storyId', 'score', 'signal', 'rationale']
+          }
+        }
+      },
+      required: ['summary', 'priorities']
+    }
+  } : {
+    name: 'prioritize_backlog_signals',
+    description: 'Note les stories du backlog par urgence à partir de signaux marché externes (concurrence, tendances, demande utilisateurs)',
+    input_schema: {
+      type: 'object',
+      properties: {
+        summary: { type: 'string', description: 'Verdict en une phrase sur ce qui doit remonter vu le contexte marché, EN FRANÇAIS.' },
+        priorities: {
+          type: 'array',
+          description: 'Une entrée par story fournie, EN FRANÇAIS.',
+          items: {
+            type: 'object',
+            properties: {
+              storyId: { type: 'string' },
+              score: { type: 'number', description: 'Score de priorité de 1 (faible) à 10 (urgent).' },
+              signal: { type: 'string', enum: ['market_trend', 'competitor_move', 'user_demand', 'regulatory'], description: 'Type de signal externe à l\'origine de ce score.' },
+              rationale: { type: 'string', description: 'Une phrase justifiant le score à partir de ce signal, EN FRANÇAIS.' }
+            },
+            required: ['storyId', 'score', 'signal', 'rationale']
+          }
+        }
+      },
+      required: ['summary', 'priorities']
+    }
+  }
+}
+
 function lang(input) {
   return input?.lang === 'en' ? 'en' : 'fr'
 }
@@ -241,9 +343,37 @@ export async function runBudgetOptimization(env, input) {
   return callOpenRouterTool(env, { systemPrompt, userPrompt, tool: budgetOptimizationTool(l), timeoutMs: 25000 })
 }
 
+export async function runDynamicReschedule(env, input) {
+  const l = lang(input)
+  const systemPrompt = l === 'en'
+    ? 'You are a delivery lead doing dynamic re-scheduling of a startup roadmap. Only move unfinished stories, respect stated dependencies, and never propose more moves than necessary. Write every text field in ENGLISH.'
+    : 'Tu es un delivery lead qui replanifie dynamiquement une roadmap de startup. Ne déplace que des stories non terminées, respecte les dépendances indiquées, et ne propose jamais plus de mouvements que nécessaire. Écris chaque champ texte EN FRANÇAIS.'
+
+  const userPrompt = l === 'en'
+    ? `Product: ${input.productName}\nCurrent sprint: ${input.currentSprint}/${input.totalSprints}\nSprints: ${JSON.stringify(input.sprints)}`
+    : `Produit : ${input.productName}\nSprint actuel : ${input.currentSprint}/${input.totalSprints}\nSprints : ${JSON.stringify(input.sprints)}`
+
+  return callOpenRouterTool(env, { systemPrompt, userPrompt, tool: dynamicRescheduleTool(l), timeoutMs: 25000 })
+}
+
+export async function runExternalSignalPrioritization(env, input) {
+  const l = lang(input)
+  const systemPrompt = l === 'en'
+    ? 'You are a product strategist prioritizing a backlog using external market signals (competitor moves, market trends, user demand, regulation). Be specific to the product and market described, never generic. Write every text field in ENGLISH.'
+    : 'Tu es un product strategist qui priorise un backlog à partir de signaux marché externes (mouvements concurrents, tendances marché, demande utilisateurs, réglementation). Sois spécifique au produit et au marché décrits, jamais générique. Écris chaque champ texte EN FRANÇAIS.'
+
+  const userPrompt = l === 'en'
+    ? `Product: ${input.productName} — ${input.productPitch}\nMarket: ${input.market}\nBacklog stories: ${JSON.stringify(input.stories)}`
+    : `Produit : ${input.productName} — ${input.productPitch}\nMarché : ${input.market}\nStories du backlog : ${JSON.stringify(input.stories)}`
+
+  return callOpenRouterTool(env, { systemPrompt, userPrompt, tool: externalSignalPrioritizationTool(l), timeoutMs: 25000 })
+}
+
 export const AGENT_RUNNERS = {
   story_brief: runStoryBrief,
   recalc_kpis: runKpiRecalc,
   risk_analysis: runRiskAnalysis,
-  budget_optimization: runBudgetOptimization
+  budget_optimization: runBudgetOptimization,
+  dynamic_reschedule: runDynamicReschedule,
+  external_signal_prioritization: runExternalSignalPrioritization
 }

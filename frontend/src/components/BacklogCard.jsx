@@ -14,6 +14,7 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [myTasksOnly, setMyTasksOnly] = useState(false)
   const [search, setSearch] = useState('')
+  const [sortByPriority, setSortByPriority] = useState(false)
 
   // Sync Notion : une base dédiée avec une ligne par story, ouverte en un clic (pas de
   // deep-link par story — une page Notion individuelle par ligne est peu lisible seule).
@@ -72,6 +73,8 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
 
   const assignees = useMemo(() => [...new Set(allStories.map(s => s.assignee))], [allStories])
 
+  const hasPriorityScores = allStories.some(s => s.priorityScore != null)
+
   const filtered = allStories.filter(s => {
     if (statusFilter !== 'all' && (s.status || 'todo') !== statusFilter) return false
     if (assigneeFilter !== 'all' && s.assignee !== assigneeFilter) return false
@@ -79,6 +82,9 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
     if (search.trim() && !s.title.toLowerCase().includes(search.trim().toLowerCase())) return false
     return true
   })
+  if (sortByPriority) {
+    filtered.sort((a, b) => (b.priorityScore ?? -1) - (a.priorityScore ?? -1))
+  }
 
   const toggleStatus = (sprintId, storyId) => {
     const nextSprints = sprints.map(sp => {
@@ -168,6 +174,14 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
             <IconUser width={13} height={13} /> {lang === 'fr' ? 'Mes tâches assignées' : 'My assigned tasks'}
           </button>
         )}
+        {hasPriorityScores && (
+          <button
+            className={`backlog-mytasks-toggle ${sortByPriority ? 'active' : ''}`}
+            onClick={() => setSortByPriority(v => !v)}
+          >
+            <IconTarget width={13} height={13} /> {lang === 'fr' ? 'Trier par priorité' : 'Sort by priority'}
+          </button>
+        )}
       </div>
 
       <div className="backlog-list">
@@ -189,6 +203,11 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
               <span className="backlog-title">{story.title}</span>
               {story.description && <span className="backlog-description">{story.description}</span>}
             </div>
+            {story.priorityScore != null && (
+              <span className="backlog-meta backlog-priority" title={story.priorityRationale}>
+                <IconTarget width={12} height={12} /> {story.priorityScore}/10
+              </span>
+            )}
             <span className="backlog-meta"><IconTarget width={12} height={12} /> {story.effort}pts</span>
             <span className="backlog-meta"><IconUser width={12} height={12} /> {story.assignee}</span>
             <span className="backlog-meta"><IconCoin width={12} height={12} /> {story.cost}€</span>

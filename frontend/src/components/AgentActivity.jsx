@@ -10,10 +10,11 @@ function allStories(roadmap) {
   return (roadmap?.sprints || []).flatMap(sp => sp.stories)
 }
 
-export default function AgentActivity({ plan, userId, lang }) {
+export default function AgentActivity({ plan, userId, lang, onRoadmapChange }) {
   const [tasks, setTasks] = useState([])
   const [selectedStoryId, setSelectedStoryId] = useState('')
   const [busy, setBusy] = useState(false)
+  const [appliedIds, setAppliedIds] = useState(() => new Set())
   const pollRef = useRef(null)
   // Ids supprimés localement mais dont un refresh() déjà en vol (poll précédent) peut
   // encore renvoyer une version pré-suppression — sans ce filtre, cette réponse tardive
@@ -115,6 +116,76 @@ export default function AgentActivity({ plan, userId, lang }) {
     setBusy(false)
   }
 
+  const runDynamicReschedule = async () => {
+    if (busy) return
+    setBusy(true)
+    const sprints = plan.roadmap?.sprints || []
+    const currentSprint = sprints.find(sp => sp.stories.some(s => s.status !== 'done'))?.sprintId || sprints[sprints.length - 1]?.sprintId || 1
+    await enqueueAgentTask(planId, userId, 'dynamic_reschedule', {
+      lang,
+      productName: plan.product?.name,
+      currentSprint,
+      totalSprints: sprints.length,
+      sprints: sprints.map(sp => ({
+        sprintId: sp.sprintId,
+        stories: sp.stories.map(s => ({ id: s.id, title: s.title, effort: s.effort, status: s.status || 'todo', dependsOn: s.dependsOn || [] }))
+      }))
+    })
+    await refresh()
+    setBusy(false)
+  }
+
+  const runExternalPrioritization = async () => {
+    if (busy) return
+    setBusy(true)
+    const backlogStories = stories.filter(s => (s.status || 'todo') !== 'done')
+    await enqueueAgentTask(planId, userId, 'external_signal_prioritization', {
+      lang,
+      productName: plan.product?.name,
+      productPitch: plan.product?.pitch,
+      market: plan.market?.segment || plan.market?.b2bVsB2c,
+      stories: backlogStories.map(s => ({ id: s.id, title: s.title, description: s.description }))
+    })
+    await refresh()
+    setBusy(false)
+  }
+
+  const applyReschedule = (task) => {
+    if (!onRoadmapChange || !plan.roadmap) return
+    const moves = new Map((task.output?.moves || []).map(m => [m.storyId, m.toSprint]))
+    if (!moves.size) return
+    const allSprints = plan.roadmap.sprints
+    const storiesById = new Map()
+    allSprints.forEach(sp => sp.stories.forEach(s => storiesById.set(s.id, s)))
+    const nextSprints = allSprints.map(sp => ({
+      ...sp,
+      stories: sp.stories.filter(s => !moves.has(s.id) || moves.get(s.id) === sp.sprintId)
+    }))
+    moves.forEach((toSprint, storyId) => {
+      const story = storiesById.get(storyId)
+      const target = nextSprints.find(sp => sp.sprintId === toSprint)
+      if (story && target && !target.stories.some(s => s.id === storyId)) {
+        target.stories.push(story)
+      }
+    })
+    onRoadmapChange({ ...plan.roadmap, sprints: nextSprints })
+    setAppliedIds(prev => new Set(prev).add(task.id))
+  }
+
+  const applyPrioritization = (task) => {
+    if (!onRoadmapChange || !plan.roadmap) return
+    const priorities = new Map((task.output?.priorities || []).map(p => [p.storyId, p]))
+    if (!priorities.size) return
+    const nextSprints = plan.roadmap.sprints.map(sp => ({
+      ...sp,
+      stories: sp.stories.map(s => priorities.has(s.id)
+        ? { ...s, priorityScore: priorities.get(s.id).score, prioritySignal: priorities.get(s.id).signal, priorityRationale: priorities.get(s.id).rationale }
+        : s)
+    }))
+    onRoadmapChange({ ...plan.roadmap, sprints: nextSprints })
+    setAppliedIds(prev => new Set(prev).add(task.id))
+  }
+
   const deleteTask = async (taskId) => {
     deletedIdsRef.current.add(taskId)
     setTasks(prev => prev.filter(task => task.id !== taskId))
@@ -182,6 +253,26 @@ export default function AgentActivity({ plan, userId, lang }) {
             </button>
           </div>
         </div>
+
+        <div className="agent-trigger">
+          <div className="agent-trigger-label"><IconClock width={14} height={14} /> {t(lang, 'agents.rescheduleLabel')}</div>
+          <p className="agent-trigger-desc">{t(lang, 'agents.rescheduleDesc')}</p>
+          <div className="agent-trigger-row">
+            <button className="btn-ai-generate" onClick={runDynamicReschedule} disabled={busy}>
+              <span className="btn-ai-generate-label">{t(lang, 'agents.run')}</span>
+            </button>
+          </div>
+        </div>
+
+        <div className="agent-trigger">
+          <div className="agent-trigger-label"><IconTarget width={14} height={14} /> {t(lang, 'agents.prioritizeLabel')}</div>
+          <p className="agent-trigger-desc">{t(lang, 'agents.prioritizeDesc')}</p>
+          <div className="agent-trigger-row">
+            <button className="btn-ai-generate" onClick={runExternalPrioritization} disabled={busy}>
+              <span className="btn-ai-generate-label">{t(lang, 'agents.run')}</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="agent-log">
@@ -243,6 +334,34 @@ export default function AgentActivity({ plan, userId, lang }) {
                     <strong>{m.channel}</strong> — {t(lang, `agents.direction.${m.direction}`)} : {m.rationale}
                   </p>
                 ))}
+              </div>
+            )}
+
+            {task.status === 'done' && task.type === 'dynamic_reschedule' && task.output && (
+              <div className="agent-log-result">
+                <p className="agent-log-summary">{task.output.summary}</p>
+                {task.output.moves?.map((m, i) => (
+                  <p key={i}><strong>{m.storyId}</strong> → sprint {m.toSprint} — {m.rationale}</p>
+                ))}
+                {task.output.moves?.length > 0 && onRoadmapChange && (
+                  <button className="btn-ai-generate" onClick={() => applyReschedule(task)} disabled={appliedIds.has(task.id)}>
+                    <span className="btn-ai-generate-label">{t(lang, appliedIds.has(task.id) ? 'agents.applied' : 'agents.apply')}</span>
+                  </button>
+                )}
+              </div>
+            )}
+
+            {task.status === 'done' && task.type === 'external_signal_prioritization' && task.output && (
+              <div className="agent-log-result">
+                <p className="agent-log-summary">{task.output.summary}</p>
+                {task.output.priorities?.slice().sort((a, b) => (b.score || 0) - (a.score || 0)).map((p, i) => (
+                  <p key={i}><strong>{p.storyId}</strong> [{p.score}/10 · {t(lang, `agents.signal.${p.signal}`)}] — {p.rationale}</p>
+                ))}
+                {task.output.priorities?.length > 0 && onRoadmapChange && (
+                  <button className="btn-ai-generate" onClick={() => applyPrioritization(task)} disabled={appliedIds.has(task.id)}>
+                    <span className="btn-ai-generate-label">{t(lang, appliedIds.has(task.id) ? 'agents.applied' : 'agents.apply')}</span>
+                  </button>
+                )}
               </div>
             )}
 

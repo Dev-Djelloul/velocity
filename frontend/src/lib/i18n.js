@@ -476,8 +476,14 @@ export const translations = {
       riskDesc: 'L\'agent identifie 3 à 5 risques prioritaires spécifiques à votre produit et votre marché, avec une mitigation concrète pour chacun.',
       budgetLabel: 'Optimiser le budget marketing',
       budgetDesc: 'L\'agent revoit la répartition actuelle de votre budget par canal et propose des mouvements argumentés (augmenter, réduire, maintenir).',
+      rescheduleLabel: 'Auto-scheduling dynamique',
+      rescheduleDesc: 'L\'agent recalcule le planning des sprints à partir de l\'avancement réel et des dépendances bloquées, et propose des déplacements de stories.',
+      prioritizeLabel: 'Priorisation par signaux externes',
+      prioritizeDesc: 'L\'agent note les stories du backlog par urgence à partir de signaux marché externes (concurrence, tendances, demande utilisateurs).',
       selectStory: 'Choisir une story...',
       run: 'Lancer',
+      apply: 'Appliquer',
+      applied: 'Appliqué',
       logTitle: 'Journal d\'activité',
       logEmpty: 'Aucune action lancée pour le moment.',
       deleteTask: 'Supprimer cette génération',
@@ -485,7 +491,9 @@ export const translations = {
         story_brief: 'Brief d\'exécution',
         recalc_kpis: 'Recalcul des KPIs',
         risk_analysis: 'Analyse des risques',
-        budget_optimization: 'Optimisation budgétaire'
+        budget_optimization: 'Optimisation budgétaire',
+        dynamic_reschedule: 'Auto-scheduling dynamique',
+        external_signal_prioritization: 'Priorisation par signaux externes'
       },
       status: {
         queued: 'En attente',
@@ -494,7 +502,8 @@ export const translations = {
         error: 'Erreur'
       },
       severity: { high: 'Critique', medium: 'Modéré', low: 'Mineur' },
-      direction: { increase: 'Augmenter', decrease: 'Réduire', maintain: 'Maintenir' }
+      direction: { increase: 'Augmenter', decrease: 'Réduire', maintain: 'Maintenir' },
+      signal: { market_trend: 'Tendance marché', competitor_move: 'Mouvement concurrent', user_demand: 'Demande utilisateurs', regulatory: 'Réglementation' }
     },
     tracking: {
       title: 'Suivi post-lancement',
@@ -944,7 +953,7 @@ export const translations = {
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
               'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
               'Suivi post-lancement & simulateur budget/timeline en direct',
-              'Agents IA asynchrones (brief d\'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire)',
+              'Agents IA asynchrones (brief d\'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)',
               'Espaces d\'équipe (Clerk Organizations), commentaires avec @mentions, fil d\'activité par plan, tags transversaux',
               'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
               'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
@@ -956,7 +965,7 @@ export const translations = {
           },
           {
             label: 'En cours',
-            items: ['Auto-scheduling dynamique de la roadmap', 'Priorisation par signaux externes']
+            items: []
           },
           {
             label: 'Envisagé',
@@ -1832,8 +1841,14 @@ export const translations = {
       riskDesc: 'The agent identifies 3 to 5 priority risks specific to your product and market, each with a concrete mitigation.',
       budgetLabel: 'Optimize marketing budget',
       budgetDesc: 'The agent reviews your current per-channel budget split and proposes justified moves (increase, decrease, maintain).',
+      rescheduleLabel: 'Dynamic auto-scheduling',
+      rescheduleDesc: 'The agent recalculates the sprint schedule from real progress and blocked dependencies, and proposes story moves.',
+      prioritizeLabel: 'External signal prioritization',
+      prioritizeDesc: 'The agent scores backlog stories by urgency using external market signals (competition, trends, user demand).',
       selectStory: 'Choose a story...',
       run: 'Run',
+      apply: 'Apply',
+      applied: 'Applied',
       logTitle: 'Activity log',
       logEmpty: 'No action triggered yet.',
       deleteTask: 'Delete this generation',
@@ -1841,7 +1856,9 @@ export const translations = {
         story_brief: 'Execution brief',
         recalc_kpis: 'KPI recalculation',
         risk_analysis: 'Risk analysis',
-        budget_optimization: 'Budget optimization'
+        budget_optimization: 'Budget optimization',
+        dynamic_reschedule: 'Dynamic auto-scheduling',
+        external_signal_prioritization: 'External signal prioritization'
       },
       status: {
         queued: 'Queued',
@@ -1850,7 +1867,8 @@ export const translations = {
         error: 'Error'
       },
       severity: { high: 'Critical', medium: 'Moderate', low: 'Minor' },
-      direction: { increase: 'Increase', decrease: 'Decrease', maintain: 'Maintain' }
+      direction: { increase: 'Increase', decrease: 'Decrease', maintain: 'Maintain' },
+      signal: { market_trend: 'Market trend', competitor_move: 'Competitor move', user_demand: 'User demand', regulatory: 'Regulatory' }
     },
     tracking: {
       title: 'Post-launch tracking',
@@ -2295,7 +2313,7 @@ export const translations = {
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
               'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
               'Post-launch tracking & live budget/timeline simulator',
-              'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization)',
+              'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)',
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
               '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
               'Notion, Jira, GitHub, Linear and Google Calendar integrations',
@@ -2307,7 +2325,7 @@ export const translations = {
           },
           {
             label: 'In progress',
-            items: ['Dynamic roadmap auto-scheduling', 'Prioritization from external signals']
+            items: []
           },
           {
             label: 'Considered',

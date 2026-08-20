@@ -51,7 +51,7 @@ export function RoadmapModal({ lang, onClose }) {
         <p>{t(lang, 'modals.roadmap.intro')}</p>
       </section>
       <div className="roadmap-columns">
-        {columns.map((col, i) => (
+        {columns.filter(col => col.items.length > 0).map((col, i) => (
           <div key={i} className="roadmap-column">
             <h3>{col.label}</h3>
             <ul>

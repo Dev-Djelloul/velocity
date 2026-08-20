@@ -184,6 +184,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const updateRoadmap = updateRoadmapFrom('roadmap')
   const updateRoadmapFromGantt = updateRoadmapFrom('roadmapGantt')
   const updateRoadmapFromBacklog = updateRoadmapFrom('roadmapBacklog')
+  const updateRoadmapFromAgents = updateRoadmapFrom('roadmapAgents')
 
   const updatePlanStartDate = (dateStr) => {
     const nextIso = dateStr + 'T00:00:00Z'
@@ -708,7 +709,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.aitools')}</h2>
         <div id="section-table" className={`plan-section-anchor ${mobileSectionId === 'section-table' ? 'is-active' : ''}`}><GeneratedTable lang={lang} plan={{ ...plan, marketing: liveMarketing }} userId={userId} /></div>
-        <div id="section-agents" className={`plan-section-anchor ${mobileSectionId === 'section-agents' ? 'is-active' : ''}`}><AgentActivity plan={plan} userId={userId} lang={lang} /></div>
+        <div id="section-agents" className={`plan-section-anchor ${mobileSectionId === 'section-agents' ? 'is-active' : ''}`}><AgentActivity plan={plan} userId={userId} lang={lang} onRoadmapChange={updateRoadmapFromAgents} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.postlaunch')}</h2>
         <div id="section-tracking" className={`plan-section-anchor ${mobileSectionId === 'section-tracking' ? 'is-active' : ''}`}><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>

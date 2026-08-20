@@ -51,6 +51,8 @@ export const AGENT_TYPE_LABELS = {
   recalc_kpis: { fr: 'recalcul des KPIs', en: 'KPI recalculation' },
   risk_analysis: { fr: 'analyse des risques', en: 'risk analysis' },
   budget_optimization: { fr: 'optimisation budgétaire', en: 'budget optimization' },
+  dynamic_reschedule: { fr: 'replanification dynamique', en: 'dynamic reschedule' },
+  external_signal_prioritization: { fr: 'priorisation par signaux externes', en: 'external signal prioritization' },
   veille: { fr: 'veille IA', en: 'AI market watch' },
   benchmarks: { fr: 'benchmarks', en: 'benchmarks' },
   editorial: { fr: 'calendrier éditorial', en: 'editorial calendar' },
@@ -164,6 +166,22 @@ export function extractHighlights(taskType, output, en) {
         const dirLabel = { increase: L('↑ augmenter', '↑ increase'), decrease: L('↓ réduire', '↓ decrease'), maintain: L('= maintenir', '= maintain') }
         ;(output.moves || []).slice(0, 4).forEach(m => {
           lines.push(`${m.channel} (${dirLabel[m.direction] || m.direction}) — ${m.rationale}`)
+        })
+        return lines
+      }
+      case 'dynamic_reschedule': {
+        const lines = []
+        if (output.summary) lines.push(output.summary)
+        ;(output.moves || []).slice(0, 4).forEach(m => {
+          lines.push(`${m.storyId} → ${L('sprint', 'sprint')} ${m.toSprint} — ${m.rationale}`)
+        })
+        return lines
+      }
+      case 'external_signal_prioritization': {
+        const lines = []
+        if (output.summary) lines.push(output.summary)
+        ;(output.priorities || []).slice().sort((a, b) => (b.score || 0) - (a.score || 0)).slice(0, 4).forEach(p => {
+          lines.push(`${p.storyId} (${p.score}/10) — ${p.rationale}`)
         })
         return lines
       }
