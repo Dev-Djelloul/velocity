@@ -79,6 +79,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [plan, setPlan] = useState(initialPlan)
   const [showExport, setShowExport] = useState(false)
   const [showCoverPicker, setShowCoverPicker] = useState(false)
+  const [showBgPicker, setShowBgPicker] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
@@ -262,6 +263,22 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  // Fond de page derrière tout le plan (distinct de la couverture, qui reste une bannière en
+  // haut de page) — même circuit immédiat que coverImage ci-dessus. Le flou est activé par
+  // défaut (comme les fonds de Mon Espace/Mon compte...) mais désactivable, l'image choisie
+  // ici pouvant déjà être discrète (motif, dégradé...) et ne pas en avoir besoin.
+  const updatePageBackground = (value) => {
+    const nextPlan = { ...plan, pageBackground: value, pageBackgroundBlur: value ? (plan.pageBackgroundBlur ?? true) : plan.pageBackgroundBlur }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
+  const togglePageBackgroundBlur = () => {
+    const nextPlan = { ...plan, pageBackgroundBlur: !(plan.pageBackgroundBlur ?? true) }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   // Appartenance à la galerie privée : opt-in explicite (contrairement à l'ancienne version
   // qui listait automatiquement tous les plans) — même circuit immédiat que la couverture
   // ci-dessus, indépendant du bouton "Enregistrer".
@@ -428,6 +445,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         activeSection={mobileSectionId}
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
+      {plan.pageBackground && (
+        <div
+          className={`plan-viewer-bg${(plan.pageBackgroundBlur ?? true) ? ' page-bg-blur' : ''}`}
+          style={{ backgroundImage: `url(${plan.pageBackground})` }}
+          aria-hidden="true"
+        />
+      )}
+      <div className="plan-viewer-content">
       <div className="mobile-section-nav">
         <button
           className="mobile-section-nav-btn"
@@ -472,6 +497,20 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                 </button>
               )}
             </div>
+          )}
+        </div>
+      )}
+
+      {!readOnly && plan.id && (
+        <div className="plan-bg-controls">
+          <button className="plan-cover-banner-btn" onClick={() => setShowBgPicker(true)}>
+            <IconImage width={14} height={14} />
+            {plan.pageBackground ? t(lang, 'app.pageBgChange') : t(lang, 'app.pageBgAdd')}
+          </button>
+          {plan.pageBackground && (
+            <button className="plan-cover-banner-btn" onClick={togglePageBackgroundBlur}>
+              {(plan.pageBackgroundBlur ?? true) ? t(lang, 'app.pageBgBlurOn') : t(lang, 'app.pageBgBlurOff')}
+            </button>
           )}
         </div>
       )}
@@ -612,6 +651,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-tracking" className={`plan-section-anchor ${mobileSectionId === 'section-tracking' ? 'is-active' : ''}`}><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
         <div id="section-whatif" className={`plan-section-anchor ${mobileSectionId === 'section-whatif' ? 'is-active' : ''}`}><WhatIfScenarios plan={plan} lang={lang} /></div>
       </div>
+      </div>
 
       {showCoverPicker && (
         <CoverPicker
@@ -619,6 +659,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           hasCover={!!plan.coverImage}
           onChange={updateCoverImage}
           onClose={() => setShowCoverPicker(false)}
+        />
+      )}
+
+      {showBgPicker && (
+        <CoverPicker
+          lang={lang}
+          hasCover={!!plan.pageBackground}
+          onChange={updatePageBackground}
+          onClose={() => setShowBgPicker(false)}
+          title={t(lang, 'app.pageBgTitle')}
+          removeLabel={t(lang, 'app.pageBgRemove')}
         />
       )}
 

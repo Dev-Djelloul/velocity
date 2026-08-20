@@ -546,8 +546,38 @@
 }
 
 .plan-viewer-main {
+  position: relative;
   flex: 1;
   min-width: 0;
+}
+
+/* Fond de page choisi par l'utilisateur (voir plan-bg-controls dans PlanViewer.jsx). Même
+   procédé que Mon Espace/Mon compte/... : une vraie div en z-index positif plutôt qu'un
+   z-index négatif (qui échappe au contexte d'empilement local sans ancêtre positionné dédié
+   et finit peinte sous des éléments qu'on ne contrôle pas) + tout le contenu réel du plan
+   dans .plan-viewer-content, au z-index supérieur. */
+.plan-viewer-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  border-radius: var(--border-radius, 14px);
+}
+
+.plan-viewer-bg.page-bg-blur {
+  filter: blur(2px) brightness(0.55) saturate(1.1);
+}
+
+.plan-viewer-content {
+  position: relative;
+  z-index: 1;
+}
+
+.plan-bg-controls {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
 .plan-section-anchor {

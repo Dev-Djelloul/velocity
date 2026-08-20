@@ -48,7 +48,7 @@ function renderSwatch(css) {
   return canvas.toDataURL('image/jpeg', 0.9)
 }
 
-export default function CoverPicker({ lang, onChange, onClose, hasCover }) {
+export default function CoverPicker({ lang, onChange, onClose, hasCover, title, removeLabel }) {
   const [tab, setTab] = useState('gallery')
   const [linkInput, setLinkInput] = useState('')
   const [uploading, setUploading] = useState(false)
@@ -86,7 +86,7 @@ export default function CoverPicker({ lang, onChange, onClose, hasCover }) {
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal card cover-picker" onClick={e => e.stopPropagation()}>
-        <h3>{t(lang, 'app.coverImageTitle')}</h3>
+        <h3>{title || t(lang, 'app.coverImageTitle')}</h3>
 
         <div className="cover-picker-tabs">
           <button className={tab === 'gallery' ? 'active' : ''} onClick={() => setTab('gallery')}>{t(lang, 'app.coverTabGallery')}</button>
@@ -131,7 +131,7 @@ export default function CoverPicker({ lang, onChange, onClose, hasCover }) {
         <div className="cover-picker-footer">
           {hasCover && (
             <button className="cover-picker-remove" onClick={removeCover}>
-              <IconTrash width={13} height={13} /> {t(lang, 'app.coverRemove')}
+              <IconTrash width={13} height={13} /> {removeLabel || t(lang, 'app.coverRemove')}
             </button>
           )}
           <button className="btn-secondary" onClick={onClose}>{t(lang, 'export.close')}</button>
