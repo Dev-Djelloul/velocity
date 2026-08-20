@@ -135,6 +135,11 @@ export async function getPlanOwnerId(env, id) {
   return row?.user_id || null
 }
 
+export async function getPlanOwnerAndTeam(env, id) {
+  const row = await env.DB.prepare('SELECT user_id, team_id FROM plans WHERE id = ?').bind(id).first()
+  return row ? { userId: row.user_id, teamId: row.team_id || null } : { userId: null, teamId: null }
+}
+
 export async function listDrafts(env, userId) {
   const { results } = await env.DB.prepare(
     'SELECT id, name, data, created_at, updated_at FROM drafts WHERE user_id = ? ORDER BY updated_at DESC'
@@ -433,21 +438,25 @@ export async function getWebhooksForEvent(env, userId, eventType) {
 // --- Centre de notifications (flux persistant dans l'app, cloche du header — distinct
 // des préférences email/Slack ci-dessous, qui ne concernent que l'envoi externe) ---
 
-export async function createNotification(env, { userId, type, title, detail, planId }) {
+// teamId : espace (Clerk Organization) du plan concerné, ou null pour un plan personnel —
+// nécessaire pour que le clic sur la notification puisse y basculer avant d'ouvrir le plan
+// (voir handleOpenNotification côté frontend, App.jsx), sinon on ne trouve pas le plan
+// dans le cache local (getAllPlans() est scopé à l'espace actif).
+export async function createNotification(env, { userId, type, title, detail, planId, teamId }) {
   if (!userId) return null
   const id = genId()
   await env.DB.prepare(
-    `INSERT INTO notification_feed (id, user_id, type, title, detail, plan_id, read, created_at)
-     VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'))`
-  ).bind(id, userId, type, title, detail || null, planId || null).run()
-  return { id, userId, type, title, detail: detail || null, planId: planId || null, read: false }
+    `INSERT INTO notification_feed (id, user_id, type, title, detail, plan_id, team_id, read, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 0, datetime('now'))`
+  ).bind(id, userId, type, title, detail || null, planId || null, teamId || null).run()
+  return { id, userId, type, title, detail: detail || null, planId: planId || null, teamId: teamId || null, read: false }
 }
 
 export async function listNotifications(env, userId, limit = 30) {
   const { results } = await env.DB.prepare(
     'SELECT * FROM notification_feed WHERE user_id = ? ORDER BY created_at DESC LIMIT ?'
   ).bind(userId, limit).all()
-  return results.map(r => ({ id: r.id, type: r.type, title: r.title, detail: r.detail, planId: r.plan_id, read: !!r.read, createdAt: r.created_at }))
+  return results.map(r => ({ id: r.id, type: r.type, title: r.title, detail: r.detail, planId: r.plan_id, spaceId: r.team_id, read: !!r.read, createdAt: r.created_at }))
 }
 
 export async function countUnreadNotifications(env, userId) {

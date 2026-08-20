@@ -30,7 +30,8 @@ import { generatePlanOgImage } from '../lib/og/ogImage'
 // que l'un des deux) ; n'échoue jamais la réponse HTTP, même si un envoi rate.
 async function createFeedNotification(env, userId, lang, taskType, plan, output) {
   const { title, detail } = feedNotificationContent(taskType, output, lang)
-  await db.createNotification(env, { userId, type: taskType, title, detail, planId: plan?.id || null })
+  const { teamId } = plan?.id ? await db.getPlanOwnerAndTeam(env, plan.id) : { teamId: null }
+  await db.createNotification(env, { userId, type: taskType, title, detail, planId: plan?.id || null, teamId })
 }
 
 async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
@@ -275,6 +276,7 @@ export async function handleApi(request, env, url) {
     if (!Array.isArray(mentionedUserIds) || !mentionedUserIds.length) return json({ ok: true })
     const resolvedLang = lang || plan?.language || 'fr'
     const productName = plan?.product?.name
+    const { teamId } = plan?.id ? await db.getPlanOwnerAndTeam(env, plan.id) : { teamId: null }
     const results = await Promise.allSettled(mentionedUserIds
       .filter(uid => uid && uid !== authorId)
       .map(async (uid) => {
@@ -283,7 +285,8 @@ export async function handleApi(request, env, url) {
           type: 'mention',
           title: resolvedLang === 'en' ? `${comment?.authorName || 'Someone'} mentioned you` : `${comment?.authorName || 'Quelqu\'un'} vous a mentionné·e`,
           detail: comment?.text || null,
-          planId: plan?.id || null
+          planId: plan?.id || null,
+          teamId
         }).catch(() => {})
 
         const prefs = await db.getNotificationPrefs(env, uid).catch(() => null)

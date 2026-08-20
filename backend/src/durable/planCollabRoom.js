@@ -1,5 +1,5 @@
 import * as Y from 'yjs'
-import { getPlan, getPlanOwnerId, createNotification } from '../lib/db'
+import { getPlan, getPlanOwnerAndTeam, createNotification } from '../lib/db'
 
 const PERSIST_DEBOUNCE_MS = 1500
 
@@ -19,6 +19,7 @@ export class PlanCollabRoom {
     this.persistTimer = null
     this.planId = null
     this.ownerId = null
+    this.teamId = null
     this.lang = 'fr'
     this.pendingEditors = new Set()
   }
@@ -53,7 +54,9 @@ export class PlanCollabRoom {
     this.hydrated = (async () => {
       if (planId && this.env.DB) {
         try {
-          this.ownerId = await getPlanOwnerId(this.env, planId)
+          const owner = await getPlanOwnerAndTeam(this.env, planId)
+          this.ownerId = owner.userId
+          this.teamId = owner.teamId
           const plan = await getPlan(this.env, planId)
           this.lang = plan?.language || 'fr'
           const stored = await this.state.storage.get('ydoc')
@@ -130,13 +133,15 @@ export class PlanCollabRoom {
   }
 
   // Une seule notification groupée par rafale d'édits (pas une par update Yjs, ce qui
-  // spammerait pour une simple frappe continue) — seulement si au moins deux sessions
-  // étaient connectées (édition réellement collaborative, pas juste soi-même en solo,
-  // qu'on ne peut distinguer autrement faute de userId dans le protocole de présence).
+  // spammerait pour une simple frappe continue). Volontairement PAS conditionné à "au
+  // moins deux sessions connectées en ce moment" : c'est justement quand le propriétaire
+  // n'est plus là pour voir l'édition en direct (donc une seule session restante, la
+  // sienne) que la notification lui est le plus utile — exiger 2 sessions le privait de
+  // toute notification dans ce cas précis.
   async notifyOwnerOfEdits() {
     const editors = [...this.pendingEditors]
     this.pendingEditors.clear()
-    if (!editors.length || this.sessions.size < 2 || !this.ownerId || !this.env.DB) return
+    if (!editors.length || !this.ownerId || !this.env.DB) return
     try {
       const names = editors.slice(0, 3).join(', ') + (editors.length > 3 ? '…' : '')
       const title = this.lang === 'en' ? `${names} edited the roadmap` : `${names} a modifié la roadmap`
@@ -145,7 +150,8 @@ export class PlanCollabRoom {
         type: 'roadmap_collab',
         title,
         detail: null,
-        planId: this.planId
+        planId: this.planId,
+        teamId: this.teamId
       })
     } catch { /* best-effort */ }
   }

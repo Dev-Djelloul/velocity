@@ -76,7 +76,8 @@ async function notifyAgentDone(env, task, output) {
   })
 
   const { title, detail } = feedNotificationContent(task.type, output, lang)
-  await db.createNotification(env, { userId: task.userId, type: task.type, title, detail, planId: task.planId || null }).catch(() => {})
+  const { teamId } = task.planId ? await db.getPlanOwnerAndTeam(env, task.planId) : { teamId: null }
+  await db.createNotification(env, { userId: task.userId, type: task.type, title, detail, planId: task.planId || null, teamId }).catch(() => {})
 
   const prefs = await db.getNotificationPrefs(env, task.userId).catch(() => null)
   if (!prefs) { console.log(`[notify] skipped (agent:${task.type}): no prefs for userId=${task.userId}`); return }

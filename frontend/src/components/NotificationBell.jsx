@@ -5,13 +5,16 @@ import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFee
 import { IconBell, IconCheckCircle } from './Icons'
 import '../styles/NotificationBell.css'
 
-const POLL_MS = 20000
+const POLL_MS = 8000
 
 // Centre de notifications persistant (cloche du header global) — distinct du toast de
 // collaboration éphémère (PresenceBar/PlanViewer, qui disparaît après 5s) : ici, un
 // historique consultable pour tout événement notifiable (agents IA, mentions, édition
 // collaborative...), qui survit à une navigation ou une fermeture d'onglet.
-export default function NotificationBell({ userId, lang }) {
+// onOpen(item) : réutilise le même mécanisme que les notifications de commentaires
+// existantes (App.jsx, handleOpenNotification) pour basculer d'espace si besoin puis
+// ouvrir le plan concerné.
+export default function NotificationBell({ userId, lang, onOpen }) {
   const [items, setItems] = useState([])
   const [unread, setUnread] = useState(0)
   const [open, setOpen] = useState(false)
@@ -42,15 +45,14 @@ export default function NotificationBell({ userId, lang }) {
 
   if (!userId) return null
 
-  // Marque comme lu au clic ; pas de navigation directe vers le plan concerné pour
-  // l'instant (les plans s'ouvrent depuis le Dashboard, pas par URL/id direct) — une
-  // évolution possible plutôt que d'ajouter une route qui n'existe pas encore ailleurs.
   const openItem = (item) => {
     if (!item.read) {
       setItems(prev => prev.map(i => i.id === item.id ? { ...i, read: true } : i))
       setUnread(n => Math.max(0, n - 1))
       markNotificationFeedRead(userId, item.id)
     }
+    setOpen(false)
+    if (item.planId) onOpen?.(item)
   }
 
   const markAllRead = async (e) => {

@@ -801,7 +801,7 @@ export default function App() {
                 {/* Switcher d'espace, séparé du compte (même logique que le duo UserButton /
                     OrganizationSwitcher de Clerk) : le compte ne change jamais selon l'espace
                     actif, ça n'a donc pas de sens de les mélanger dans un seul menu. */}
-                <NotificationBell userId={userId} lang={lang} />
+                <NotificationBell userId={userId} lang={lang} onOpen={handleOpenNotification} />
                 <div className="header-menu">
                   <button
                     className={`header-space-btn ${openHeaderMenu === 'space' ? 'active' : ''}`}
