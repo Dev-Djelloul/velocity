@@ -12,21 +12,27 @@ function draftsKey(userId) {
   return `plp_drafts_${userId}`
 }
 
-export function saveDraft(formData, draftName = 'Brouillon') {
+// existingId permet de mettre à jour un brouillon déjà en cours plutôt que d'en créer un
+// nouveau à chaque clic sur "Continuer plus tard" (bug précédent : sans id transmis, chaque
+// sauvegarde générait un nouvel id aléatoire, empilant des doublons du même brouillon). Le nom
+// et la date de première sauvegarde d'un brouillon existant sont préservés — draftName ne sert
+// que par défaut à la création, pour ne jamais écraser un renommage manuel de l'utilisateur.
+export function saveDraft(formData, draftName = 'Brouillon', existingId = null) {
   if (!activeUserId) return null
   const drafts = getAllDrafts()
-  const draftId = formData.id || generateId()
+  const existing = existingId ? drafts.find(d => d.id === existingId) : null
+  const draftId = existingId || generateId()
   const draft = {
     id: draftId,
-    name: draftName,
+    name: existing?.name || draftName,
     data: formData,
-    savedAt: new Date().toISOString(),
+    savedAt: existing?.savedAt || new Date().toISOString(),
     updatedAt: new Date().toISOString()
   }
 
-  const existing = drafts.findIndex(d => d.id === draftId)
-  if (existing >= 0) {
-    drafts[existing] = draft
+  const existingIdx = drafts.findIndex(d => d.id === draftId)
+  if (existingIdx >= 0) {
+    drafts[existingIdx] = draft
   } else {
     drafts.push(draft)
   }

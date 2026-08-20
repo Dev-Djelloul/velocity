@@ -112,6 +112,11 @@ export default function App() {
   const [novaToggle, setNovaToggle] = useState(0)
   const [justGenerated, setJustGenerated] = useState(false)
   const [initialFormData, setInitialFormData] = useState(null)
+  // Questionnaire lit initialData une seule fois, dans un useState paresseux — sans key qui
+  // change, charger un brouillon alors qu'on est déjà sur la page questionnaire ne remonte pas
+  // le composant et le brouillon ne s'affiche jamais (currentPage restant "questionnaire", ce
+  // n'est pas un changement de page qui le remonterait naturellement).
+  const [questionnaireKey, setQuestionnaireKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
   const [inviteTicketDismissed, setInviteTicketDismissed] = useState(false)
@@ -552,6 +557,7 @@ export default function App() {
 
   const handleLoadDraft = (formData) => {
     setInitialFormData(formData)
+    setQuestionnaireKey(k => k + 1)
     setCurrentPage('questionnaire')
     window.scrollTo(0, 0)
   }
@@ -1026,7 +1032,7 @@ export default function App() {
           />
         )}
         {currentPage === 'questionnaire' && isSignedIn && (
-          <Questionnaire onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
+          <Questionnaire key={questionnaireKey} onSubmit={handleGenerate} loading={loading} lang={lang} onShowDrafts={() => setShowDrafts(true)} initialData={initialFormData} />
         )}
         {currentPage === 'result' && plan && (isSignedIn || isSharedView) && (
           <PlanViewer

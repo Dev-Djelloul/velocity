@@ -283,7 +283,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <div className="account-list">
               {drafts.map(d => (
                 <div key={d.id} className="account-list-item">
-                  <button className="account-list-item-main" onClick={() => onLoadDraft(d.data)}>
+                  <button className="account-list-item-main" onClick={() => onLoadDraft({ ...d.data, _draftId: d.id })}>
                     <span className="account-list-item-name">{d.name}</span>
                   </button>
                   <button className="account-list-item-move" onClick={() => openRenameDraft(d)} title={lang === 'fr' ? 'Renommer' : 'Rename'}>

@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { t } from '../lib/i18n'
 import { saveDraft } from '../lib/draftStorage'
 import { extractText } from '../lib/documentParser'
+import { formatDateTime } from '../lib/dateFormat'
 import { IconSave, IconClipboard, IconUpload, IconTrash, IconFileText } from './Icons'
 import '../styles/Questionnaire.css'
 
@@ -129,7 +130,13 @@ function Text({ formData, onChange, section, field, label, placeholder, textarea
 
 export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, initialData }) {
   const [step, setStep] = useState(0)
-  const [formData, setFormData] = useState(() => loadInitial(initialData))
+  const [formData, setFormData] = useState(() => {
+    const { _draftId, ...data } = loadInitial(initialData)
+    return data
+  })
+  // Le brouillon dont on continue l'édition, pour que "Continuer plus tard" mette à jour ce
+  // même brouillon au lieu d'en créer un nouveau à chaque clic (voir draftStorage.js).
+  const [draftId, setDraftId] = useState(() => initialData?._draftId || null)
   const [draftSaved, setDraftSaved] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
   const [docLoading, setDocLoading] = useState(false)
@@ -212,8 +219,19 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
     return true
   }
 
+  // Nom par défaut uniquement à la création (saveDraft préserve un nom déjà existant, y
+  // compris un renommage manuel) : le nom du produit s'il est rempli, sinon le segment de
+  // marché, sinon un horodatage — jamais un "Brouillon" générique indifférenciable des autres
+  // quand le formulaire est encore vide à ce stade.
+  const defaultDraftName = () => {
+    if (formData.product.name.trim()) return `${t(lang, 'nav.draftNamePrefix')} - ${formData.product.name.trim()}`
+    if (formData.market.segment.trim()) return `${t(lang, 'nav.draftNamePrefix')} - ${formData.market.segment.trim()}`
+    return `${t(lang, 'nav.draftUntitled')} · ${formatDateTime(new Date().toISOString(), lang)}`
+  }
+
   const handleSaveDraft = () => {
-    saveDraft(formData, `${t(lang, 'nav.draftNamePrefix')} - ${formData.product.name || t(lang, 'nav.draftUntitled')}`)
+    const saved = saveDraft(formData, defaultDraftName(), draftId)
+    if (saved) setDraftId(saved.id)
     setDraftSaved(true)
     setTimeout(() => setDraftSaved(false), 2000)
   }

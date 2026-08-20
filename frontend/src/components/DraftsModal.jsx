@@ -35,7 +35,9 @@ export default function DraftsModal({ lang, onLoadDraft, onClose }) {
   }
 
   const handleLoad = (draft) => {
-    if (onLoadDraft) onLoadDraft(draft.data)
+    // _draftId voyage avec les données pour que Questionnaire sache quel brouillon mettre à
+    // jour au prochain "Continuer plus tard", plutôt que d'en recréer un nouveau.
+    if (onLoadDraft) onLoadDraft({ ...draft.data, _draftId: draft.id })
     onClose()
   }
 
