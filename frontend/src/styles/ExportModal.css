@@ -46,11 +46,6 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* Export image (PNG), dernier bouton d'une liste impaire, occupe les deux colonnes */
-.export-modal .modal-actions .btn-primary:last-child {
-  grid-column: 1 / -1;
-}
-
 /* Boutons "primaires" (PDF, PPTX, CSV) : fond dégradé plein */
 .export-modal .modal-actions .btn-primary {
   background: var(--vl-gradient);
