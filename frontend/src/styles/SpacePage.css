@@ -115,6 +115,8 @@ img.space-page-avatar {
   justify-content: center;
   width: 30px;
   height: 30px;
+  min-width: 0;
+  min-height: 0;
   background: none;
   border: 1px solid rgba(145, 132, 217, 0.25);
   border-radius: 50%;

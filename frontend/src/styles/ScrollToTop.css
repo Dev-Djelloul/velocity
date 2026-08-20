@@ -4,6 +4,8 @@
   right: 1.5rem;
   width: 36px;
   height: 36px;
+  min-width: 0;
+  min-height: 0;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--color-accent), var(--color-accent-dark));
   border: none;
