@@ -9,7 +9,7 @@ import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { generateVeilleWithAI } from '../lib/ai/veilleClient'
 import * as db from '../lib/db'
 import { handleApi, CORS_HEADERS } from './api'
-import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, weeklyDigestEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
+import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, weeklyDigestEmail, extractHighlights, AGENT_TYPE_LABELS, feedNotificationContent } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, inactivityReminderSlackMessage, veilleUpdateSlackMessage, weeklyDigestSlackMessage } from '../lib/slack/slackClient'
 import { triggerWebhooks } from '../lib/webhooks/webhookClient'
 import { PlanCollabRoom } from '../durable/planCollabRoom'
@@ -74,6 +74,9 @@ async function notifyAgentDone(env, task, output) {
     planId: task.planId,
     productName: plan?.product?.name || null
   })
+
+  const { title, detail } = feedNotificationContent(task.type, output, lang)
+  await db.createNotification(env, { userId: task.userId, type: task.type, title, detail, planId: task.planId || null }).catch(() => {})
 
   const prefs = await db.getNotificationPrefs(env, task.userId).catch(() => null)
   if (!prefs) { console.log(`[notify] skipped (agent:${task.type}): no prefs for userId=${task.userId}`); return }

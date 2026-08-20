@@ -393,6 +393,30 @@ export function enqueueAgentTask(planId, userId, type, input) {
   })
 }
 
+// Centre de notifications (cloche du header global) — distinct de fetchNotifications
+// ci-dessus (notifications de commentaires calculées à la volée depuis les plans) et des
+// préférences email/Slack (NotificationsSection) : un flux d'événements persistant en
+// base, consultable même après coup.
+export function fetchNotificationFeed(userId) {
+  return safeFetch(`/notification-feed?userId=${encodeURIComponent(userId)}`).then(r => r || { items: [], unread: 0 })
+}
+
+export function markNotificationFeedRead(userId, id) {
+  return safeFetch(`/notification-feed/${encodeURIComponent(id)}/read`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
+export function markAllNotificationFeedRead(userId) {
+  return safeFetch('/notification-feed/read-all', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId })
+  })
+}
+
 export function fetchAgentTasks(planId) {
   return safeFetch(`/agents/tasks?planId=${encodeURIComponent(planId)}`).then(r => r || [])
 }

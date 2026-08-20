@@ -20,7 +20,7 @@ import * as jira from '../lib/jira/jiraClient'
 import * as linear from '../lib/linear/linearClient'
 import * as googleCalendar from '../lib/google/googleCalendarClient'
 import * as github from '../lib/github/githubClient'
-import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail } from '../lib/email/resendClient'
+import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail, feedNotificationContent } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
 import { triggerWebhooks, generateSecret } from '../lib/webhooks/webhookClient'
 import { generatePlanOgImage } from '../lib/og/ogImage'
@@ -28,6 +28,11 @@ import { generatePlanOgImage } from '../lib/og/ogImage'
 // Email + Slack best-effort à la fin d'une génération IA (veille, benchmarks, calendriers,
 // RGPD, tableau IA, ou agent async) — deux canaux indépendants (un utilisateur peut n'activer
 // que l'un des deux) ; n'échoue jamais la réponse HTTP, même si un envoi rate.
+async function createFeedNotification(env, userId, lang, taskType, plan, output) {
+  const { title, detail } = feedNotificationContent(taskType, output, lang)
+  await db.createNotification(env, { userId, type: taskType, title, detail, planId: plan?.id || null })
+}
+
 async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
   if (!userId) { console.log(`[notify] skipped (${taskType}): no userId`); return }
   const resolvedLang = lang || plan?.language || 'fr'
@@ -39,6 +44,10 @@ async function notifyGenerationDone(env, userId, plan, lang, taskType, output) {
     planId: plan?.id || null,
     productName: plan?.product?.name || null
   })
+
+  // Centre de notifications in-app : toujours créé, indépendamment des préférences
+  // email/Slack ci-dessous (celles-ci ne gouvernent que l'envoi externe).
+  await createFeedNotification(env, userId, resolvedLang, taskType, plan, output).catch(() => {})
 
   const prefs = await db.getNotificationPrefs(env, userId).catch(() => null)
   if (!prefs) { console.log(`[notify] skipped (${taskType}): no prefs`); return }
@@ -269,6 +278,14 @@ export async function handleApi(request, env, url) {
     const results = await Promise.allSettled(mentionedUserIds
       .filter(uid => uid && uid !== authorId)
       .map(async (uid) => {
+        await db.createNotification(env, {
+          userId: uid,
+          type: 'mention',
+          title: resolvedLang === 'en' ? `${comment?.authorName || 'Someone'} mentioned you` : `${comment?.authorName || 'Quelqu\'un'} vous a mentionné·e`,
+          detail: comment?.text || null,
+          planId: plan?.id || null
+        }).catch(() => {})
+
         const prefs = await db.getNotificationPrefs(env, uid).catch(() => null)
         if (!prefs || !prefs.mentions) return
         if (prefs.email) {
@@ -831,6 +848,35 @@ export async function handleApi(request, env, url) {
     if (!userId) return json({ error: 'userId required' }, 400)
     const deleted = await db.deleteAgentTask(env, userId, agentTaskMatch[1])
     if (!deleted) return json({ error: 'not found' }, 404)
+    return json({ ok: true })
+  }
+
+  // Centre de notifications (cloche du header) : flux persistant, distinct de la route
+  // /notifications ci-dessus (notifications de commentaires calculées à la volée depuis
+  // les plans, pas de table dédiée) et des routes /notification-prefs qui ne gèrent que
+  // l'envoi email/Slack.
+  if (pathname === '/notification-feed' && method === 'GET') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    const [items, unread] = await Promise.all([
+      db.listNotifications(env, userId),
+      db.countUnreadNotifications(env, userId)
+    ])
+    return json({ items, unread })
+  }
+
+  const notifReadMatch = pathname.match(/^\/notification-feed\/([^/]+)\/read$/)
+  if (notifReadMatch && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.markNotificationRead(env, userId, notifReadMatch[1])
+    return json({ ok: true })
+  }
+
+  if (pathname === '/notification-feed/read-all' && method === 'POST') {
+    const { userId } = await request.json()
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.markAllNotificationsRead(env, userId)
     return json({ ok: true })
   }
 

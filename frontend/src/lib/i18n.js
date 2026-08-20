@@ -690,6 +690,11 @@ export const translations = {
         progress: 'complété'
       }
     },
+    notifCenter: {
+      title: 'Notifications',
+      empty: 'Aucune notification pour le moment.',
+      markAllRead: 'Tout marquer comme lu'
+    },
     collab: {
       presenceTitle: 'Personnes ayant ce plan ouvert en ce moment',
       viewing: (n) => n === 1 ? '1 autre personne ici' : `${n} autres personnes ici`,
@@ -2059,6 +2064,11 @@ export const translations = {
         current: 'Current sprint',
         progress: 'complete'
       }
+    },
+    notifCenter: {
+      title: 'Notifications',
+      empty: 'No notifications yet.',
+      markAllRead: 'Mark all as read'
     },
     collab: {
       presenceTitle: 'People with this plan open right now',

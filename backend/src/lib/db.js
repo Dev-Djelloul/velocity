@@ -127,6 +127,14 @@ export async function getPlan(env, id) {
   return row ? JSON.parse(row.data) : null
 }
 
+// user_id est une colonne séparée du blob JSON `data` (voir upsertPlan) — nécessaire pour
+// attribuer une notification "quelqu'un a édité votre plan" au bon propriétaire sans
+// avoir à supposer qu'un champ userId existe dans le JSON lui-même (ce n'est pas le cas).
+export async function getPlanOwnerId(env, id) {
+  const row = await env.DB.prepare('SELECT user_id FROM plans WHERE id = ?').bind(id).first()
+  return row?.user_id || null
+}
+
 export async function listDrafts(env, userId) {
   const { results } = await env.DB.prepare(
     'SELECT id, name, data, created_at, updated_at FROM drafts WHERE user_id = ? ORDER BY updated_at DESC'
@@ -420,6 +428,39 @@ export async function deleteWebhook(env, userId, id) {
 export async function getWebhooksForEvent(env, userId, eventType) {
   const all = await listWebhooks(env, userId)
   return all.filter(w => w.enabled && w.events.includes(eventType))
+}
+
+// --- Centre de notifications (flux persistant dans l'app, cloche du header — distinct
+// des préférences email/Slack ci-dessous, qui ne concernent que l'envoi externe) ---
+
+export async function createNotification(env, { userId, type, title, detail, planId }) {
+  if (!userId) return null
+  const id = genId()
+  await env.DB.prepare(
+    `INSERT INTO notification_feed (id, user_id, type, title, detail, plan_id, read, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, 0, datetime('now'))`
+  ).bind(id, userId, type, title, detail || null, planId || null).run()
+  return { id, userId, type, title, detail: detail || null, planId: planId || null, read: false }
+}
+
+export async function listNotifications(env, userId, limit = 30) {
+  const { results } = await env.DB.prepare(
+    'SELECT * FROM notification_feed WHERE user_id = ? ORDER BY created_at DESC LIMIT ?'
+  ).bind(userId, limit).all()
+  return results.map(r => ({ id: r.id, type: r.type, title: r.title, detail: r.detail, planId: r.plan_id, read: !!r.read, createdAt: r.created_at }))
+}
+
+export async function countUnreadNotifications(env, userId) {
+  const row = await env.DB.prepare('SELECT COUNT(*) as n FROM notification_feed WHERE user_id = ? AND read = 0').bind(userId).first()
+  return row?.n || 0
+}
+
+export async function markNotificationRead(env, userId, id) {
+  await env.DB.prepare('UPDATE notification_feed SET read = 1 WHERE id = ? AND user_id = ?').bind(id, userId).run()
+}
+
+export async function markAllNotificationsRead(env, userId) {
+  await env.DB.prepare('UPDATE notification_feed SET read = 1 WHERE user_id = ? AND read = 0').bind(userId).run()
 }
 
 // --- Préférences de notification par email ---

@@ -1,5 +1,5 @@
 import * as Y from 'yjs'
-import { getPlan } from '../lib/db'
+import { getPlan, getPlanOwnerId, createNotification } from '../lib/db'
 
 const PERSIST_DEBOUNCE_MS = 1500
 
@@ -17,6 +17,10 @@ export class PlanCollabRoom {
     this.sessions = new Map() // WebSocket -> { id, name, color, section }
     this.hydrated = null
     this.persistTimer = null
+    this.planId = null
+    this.ownerId = null
+    this.lang = 'fr'
+    this.pendingEditors = new Set()
   }
 
   async fetch(request) {
@@ -44,17 +48,20 @@ export class PlanCollabRoom {
   }
 
   async hydrate(planId) {
+    this.planId = planId || this.planId
     if (this.hydrated) return this.hydrated
     this.hydrated = (async () => {
-      const stored = await this.state.storage.get('ydoc')
-      if (stored) {
-        Y.applyUpdate(this.doc, new Uint8Array(stored))
-        return
-      }
       if (planId && this.env.DB) {
         try {
+          this.ownerId = await getPlanOwnerId(this.env, planId)
           const plan = await getPlan(this.env, planId)
-          if (plan?.roadmap?.sprints) seedRoadmap(this.doc, plan.roadmap)
+          this.lang = plan?.language || 'fr'
+          const stored = await this.state.storage.get('ydoc')
+          if (stored) {
+            Y.applyUpdate(this.doc, new Uint8Array(stored))
+          } else if (plan?.roadmap?.sprints) {
+            seedRoadmap(this.doc, plan.roadmap)
+          }
         } catch { /* amorçage best-effort : une roadmap vide se remplira au premier edit */ }
       }
     })()
@@ -70,7 +77,12 @@ export class PlanCollabRoom {
       try {
         Y.applyUpdate(this.doc, new Uint8Array(msg.update))
       } catch { return }
-      this.relay(ws, { type: 'update', update: msg.update, name: msg.name || this.sessions.get(ws)?.name || null })
+      const editorName = msg.name || this.sessions.get(ws)?.name || null
+      this.relay(ws, { type: 'update', update: msg.update, name: editorName })
+      // L'auteur·e n'a pas besoin d'être notifié·e de sa propre édition — seul le
+      // propriétaire du plan compte ici (un membre d'équipe qui édite son propre plan
+      // personnel ne devrait jamais se voir notifier de ses propres changements).
+      if (editorName) this.pendingEditors.add(editorName)
       this.schedulePersist()
     } else if (msg.type === 'presence') {
       const session = this.sessions.get(ws)
@@ -113,7 +125,29 @@ export class PlanCollabRoom {
     this.persistTimer = setTimeout(() => {
       this.persistTimer = null
       this.state.storage.put('ydoc', Array.from(Y.encodeStateAsUpdate(this.doc))).catch(() => {})
+      this.notifyOwnerOfEdits()
     }, PERSIST_DEBOUNCE_MS)
+  }
+
+  // Une seule notification groupée par rafale d'édits (pas une par update Yjs, ce qui
+  // spammerait pour une simple frappe continue) — seulement si au moins deux sessions
+  // étaient connectées (édition réellement collaborative, pas juste soi-même en solo,
+  // qu'on ne peut distinguer autrement faute de userId dans le protocole de présence).
+  async notifyOwnerOfEdits() {
+    const editors = [...this.pendingEditors]
+    this.pendingEditors.clear()
+    if (!editors.length || this.sessions.size < 2 || !this.ownerId || !this.env.DB) return
+    try {
+      const names = editors.slice(0, 3).join(', ') + (editors.length > 3 ? '…' : '')
+      const title = this.lang === 'en' ? `${names} edited the roadmap` : `${names} a modifié la roadmap`
+      await createNotification(this.env, {
+        userId: this.ownerId,
+        type: 'roadmap_collab',
+        title,
+        detail: null,
+        planId: this.planId
+      })
+    } catch { /* best-effort */ }
   }
 }
 

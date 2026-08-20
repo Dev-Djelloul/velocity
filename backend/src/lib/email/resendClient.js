@@ -84,6 +84,17 @@ function tablePreviewHtml(output) {
 // Extrait quelques faits marquants du contenu généré, propres à chaque type — c'est ce
 // qui transforme l'email de "tâche terminée" (creux) en aperçu utile du résultat, sans
 // avoir à ouvrir l'app pour savoir si ça vaut le coup de regarder.
+// Titre + premier aperçu pour une entrée du centre de notifications in-app (cloche du
+// header) — même source que l'email (AGENT_TYPE_LABELS, extractHighlights) pour rester
+// cohérent, mais un format court adapté à une liste plutôt qu'à un message complet.
+export function feedNotificationContent(taskType, output, lang) {
+  const en = lang === 'en'
+  const typeLabel = AGENT_TYPE_LABELS[taskType]?.[en ? 'en' : 'fr'] || taskType
+  const title = en ? `${typeLabel} ready` : `${typeLabel} généré·e`
+  const highlights = extractHighlights(taskType, output, en)
+  return { title, detail: highlights[0] || null }
+}
+
 export function extractHighlights(taskType, output, en) {
   if (!output) return []
   const L = (fr, e) => (en ? e : fr)
