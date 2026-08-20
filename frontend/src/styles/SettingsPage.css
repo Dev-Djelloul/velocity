@@ -1,3 +1,22 @@
+.settings-page-outer {
+  position: relative;
+}
+
+/* Même procédé que Mon Espace / Intégrations / Mon compte. */
+.settings-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px) brightness(0.45) saturate(1.1);
+}
+
+.settings-page-inner {
+  position: relative;
+  z-index: 1;
+}
+
 .settings-page-title {
   display: flex;
   align-items: center;

@@ -3,6 +3,9 @@ import { IconArrowLeft, IconSun, IconMoon, IconClock, IconSettings } from './Ico
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 
+// Asset statique servi tel quel depuis public/ (généré par IA), comme le fond de Mon compte.
+const SETTINGS_BACKGROUND = '/assets/ai-images/isometric-3d-concept-of-an-ai-transforming-raw-not.png'
+
 // Sélection volontairement restreinte à des fuseaux courants plutôt que la liste IANA
 // complète (~400 entrées) — largement suffisant pour une équipe qui veut juste fixer un
 // fuseau de référence, sans noyer l'utilisateur dans un menu interminable.
@@ -21,7 +24,9 @@ export default function SettingsPage({
   currency, onChangeCurrency, onBack
 }) {
   return (
-    <div className="account-page">
+    <div className="settings-page-outer">
+      <div className="settings-page-bg" style={{ backgroundImage: `url(${SETTINGS_BACKGROUND})` }} aria-hidden="true" />
+      <div className="account-page settings-page-inner">
       <button className="account-back-btn" onClick={onBack}>
         <IconArrowLeft width={16} height={16} /> {t(lang, 'settings.backToApp')}
       </button>
@@ -143,6 +148,7 @@ export default function SettingsPage({
         </div>
       </div>
 
+      </div>
     </div>
   )
 }
