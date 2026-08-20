@@ -60,12 +60,6 @@ export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-page-visual">
-        <img src={authVisual} alt="" className="auth-page-visual-bg" aria-hidden="true" />
-        <img src={authVisual} alt="" className="auth-page-visual-img" />
-        <div className="auth-page-visual-scrim" />
-      </div>
-
       <div className="auth-page-content">
         <div className="auth-page-background">
           <div className="auth-page-gradient-overlay" />
@@ -107,6 +101,12 @@ export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme }) {
             {isSignUp ? t(lang, 'auth.switchToSignIn') : t(lang, 'auth.switchToSignUp')}
           </button>
         </div>
+      </div>
+
+      <div className="auth-page-visual">
+        <img src={authVisual} alt="" className="auth-page-visual-bg" aria-hidden="true" />
+        <img src={authVisual} alt="" className="auth-page-visual-img" />
+        <div className="auth-page-visual-scrim" />
       </div>
     </div>
   )
