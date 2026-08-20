@@ -1,0 +1,21 @@
+.integrations-page {
+  position: relative;
+}
+
+/* Même procédé que Mon Espace (SpacePage.css) : fond flouté plein viewport, fixed pour
+   couvrir toute la page pendant le défilement, z-index positif + contenu dans un wrapper
+   avec z-index supérieur (un z-index négatif combiné à position:fixed casse le rendu sur
+   certains moteurs — déjà vérifié et corrigé une fois sur Mon Espace). */
+.integrations-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px) brightness(0.45) saturate(1.1);
+}
+
+.integrations-page-inner {
+  position: relative;
+  z-index: 1;
+}
