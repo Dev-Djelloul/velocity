@@ -130,8 +130,8 @@
 }
 
 .pricing-card-v2-badge.is-current-badge {
-  background: rgba(6, 182, 212, 0.18);
-  color: #06b6d4;
+  background: #06b6d4;
+  color: #0b0c10;
 }
 
 .pricing-card-v2 h3 {
