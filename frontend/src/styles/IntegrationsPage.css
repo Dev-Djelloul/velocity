@@ -1,5 +1,6 @@
 .integrations-page {
   position: relative;
+  display: flow-root;
 }
 
 /* Même procédé que Mon Espace (SpacePage.css) : fond flouté plein viewport, fixed pour
@@ -7,12 +8,12 @@
    avec z-index supérieur (un z-index négatif combiné à position:fixed casse le rendu sur
    certains moteurs — déjà vérifié et corrigé une fois sur Mon Espace). */
 .integrations-page-bg {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(6px) brightness(0.45) saturate(1.1);
+  filter: blur(2px) brightness(0.55) saturate(1.1);
 }
 
 .integrations-page-inner {

@@ -1,17 +1,18 @@
 .account-page-outer {
   position: relative;
+  display: flow-root;
 }
 
 /* Même procédé que Mon Espace / Intégrations : fond flouté plein viewport, fixed pendant
    le défilement, z-index positif + contenu dans un wrapper au z-index supérieur (jamais de
    z-index négatif sur un élément fixed, ça casse le rendu sur certains moteurs). */
 .account-page-bg {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(6px) brightness(0.45) saturate(1.1);
+  filter: blur(2px) brightness(0.55) saturate(1.1);
 }
 
 .account-page-inner {

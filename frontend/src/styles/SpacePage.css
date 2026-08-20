@@ -15,12 +15,12 @@
    fiable, un z-index négatif combiné à position:fixed provoque des bugs de peinture sur
    certains moteurs/versions de navigateur. */
 .space-page-bg {
-  position: fixed;
+  position: absolute;
   inset: 0;
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(6px) brightness(0.45) saturate(1.1);
+  filter: blur(2px) brightness(0.55) saturate(1.1);
 }
 
 .space-page-inner {
