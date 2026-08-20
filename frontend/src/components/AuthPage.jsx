@@ -3,6 +3,7 @@ import { t } from '../lib/i18n'
 import { isMockAuth, useAuthProviders } from '../lib/auth'
 import Wordmark from './Wordmark'
 import { IconArrowLeft } from './Icons'
+import authVisual from '../../assets/img/hiw-step1-brainstorm.webp'
 import '../styles/AuthPage.css'
 
 // Thème Clerk aligné sur le design system du site (fond transparent, accents violets) —
@@ -59,45 +60,53 @@ export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme }) {
 
   return (
     <div className="auth-page">
-      <div className="auth-page-background">
-        <div className="auth-page-gradient-overlay" />
+      <div className="auth-page-visual">
+        <img src={authVisual} alt="" className="auth-page-visual-bg" aria-hidden="true" />
+        <img src={authVisual} alt="" className="auth-page-visual-img" />
+        <div className="auth-page-visual-scrim" />
       </div>
 
-      <div className="auth-page-card">
-        <button className="auth-back-btn" onClick={onBack}>
-          <IconArrowLeft width={16} height={16} /> {t(lang, 'auth.backToHome')}
-        </button>
+      <div className="auth-page-content">
+        <div className="auth-page-background">
+          <div className="auth-page-gradient-overlay" />
+        </div>
 
-        <div className="auth-page-brand"><Wordmark size={30} /></div>
+        <div className="auth-page-card">
+          <button className="auth-back-btn" onClick={onBack}>
+            <IconArrowLeft width={16} height={16} /> {t(lang, 'auth.backToHome')}
+          </button>
 
-        <h1 className="auth-page-title">
-          {isSignUp ? t(lang, 'auth.signUpTitle') : t(lang, 'auth.signInTitle')}
-        </h1>
-        <p className="auth-page-subtitle">
-          {isSignUp ? t(lang, 'auth.signUpSubtitle') : t(lang, 'auth.signInSubtitle')}
-        </p>
+          <div className="auth-page-brand"><Wordmark size={30} /></div>
 
-        {isMockAuth ? (
-          <div className="auth-provider-list">
-            {mock.providers.map(p => (
-              <button key={p.key} className="auth-provider-btn" onClick={() => mock.signIn(p.key)}>
-                <span className="auth-provider-dot" style={{ background: p.color }} />
-                {t(lang, 'auth.continueWith')} {p.label}
-              </button>
-            ))}
-            <p className="auth-mock-note">{t(lang, 'auth.demoModeNotice')}</p>
-          </div>
-        ) : (
-          <div className="auth-clerk-widget">
-            {isSignUp
-              ? <SignUp routing="virtual" appearance={clerkAppearance} />
-              : <SignIn routing="virtual" appearance={clerkAppearance} />}
-          </div>
-        )}
+          <h1 className="auth-page-title">
+            {isSignUp ? t(lang, 'auth.signUpTitle') : t(lang, 'auth.signInTitle')}
+          </h1>
+          <p className="auth-page-subtitle">
+            {isSignUp ? t(lang, 'auth.signUpSubtitle') : t(lang, 'auth.signInSubtitle')}
+          </p>
 
-        <button className="auth-switch-btn" onClick={onSwitchMode}>
-          {isSignUp ? t(lang, 'auth.switchToSignIn') : t(lang, 'auth.switchToSignUp')}
-        </button>
+          {isMockAuth ? (
+            <div className="auth-provider-list">
+              {mock.providers.map(p => (
+                <button key={p.key} className="auth-provider-btn" onClick={() => mock.signIn(p.key)}>
+                  <span className="auth-provider-dot" style={{ background: p.color }} />
+                  {t(lang, 'auth.continueWith')} {p.label}
+                </button>
+              ))}
+              <p className="auth-mock-note">{t(lang, 'auth.demoModeNotice')}</p>
+            </div>
+          ) : (
+            <div className="auth-clerk-widget">
+              {isSignUp
+                ? <SignUp routing="virtual" appearance={clerkAppearance} />
+                : <SignIn routing="virtual" appearance={clerkAppearance} />}
+            </div>
+          )}
+
+          <button className="auth-switch-btn" onClick={onSwitchMode}>
+            {isSignUp ? t(lang, 'auth.switchToSignIn') : t(lang, 'auth.switchToSignUp')}
+          </button>
+        </div>
       </div>
     </div>
   )
