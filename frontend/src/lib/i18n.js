@@ -219,7 +219,19 @@ export const translations = {
       },
       context: 'Autre chose à préciser ? (optionnel)',
       contextPh: 'Contraintes spécifiques, particularités du marché, éléments que le questionnaire ne couvre pas...',
-      contextHelp: 'Tout ce qui n\'est pas couvert par les questions précédentes : contraintes légales, partenariats déjà en place, particularités locales...'
+      contextHelp: 'Tout ce qui n\'est pas couvert par les questions précédentes : contraintes légales, partenariats déjà en place, particularités locales...',
+      contextDocument: 'Importer un document (optionnel)',
+      contextDocumentHelp: 'Business plan, notes, deck existant... Le texte est extrait automatiquement et ajouté au contexte envoyé à l\'IA. Tu peux le relire et le corriger avant de générer le plan. Formats acceptés : PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), 10 Mo max.',
+      contextDocumentButton: 'Importer un document',
+      contextDocumentAccepted: 'PDF, Word, Excel, PowerPoint · 10 Mo max',
+      contextDocumentReading: 'Lecture du fichier…',
+      contextDocumentRemove: 'Retirer',
+      contextDocumentReplace: 'Remplacer',
+      contextDocumentTruncated: 'Le document est long : seul le début a été conservé.',
+      contextDocumentErrorTooLarge: 'Fichier trop volumineux (10 Mo maximum).',
+      contextDocumentErrorFormat: 'Format non pris en charge. Utilise un PDF, Word, Excel ou PowerPoint.',
+      contextDocumentErrorEmpty: 'Aucun texte trouvé dans ce fichier (document scanné, protégé par mot de passe, ou vide).',
+      contextDocumentErrorGeneric: 'Impossible de lire ce fichier. Réessaie ou colle le contenu directement ci-dessus.'
     },
     gantt: {
       title: 'Gantt interactif',
@@ -1507,7 +1519,19 @@ export const translations = {
       },
       context: 'Anything else to add? (optional)',
       contextPh: "Specific constraints, market particularities, anything the questionnaire doesn't cover...",
-      contextHelp: "Anything the previous questions don't cover: legal constraints, existing partnerships, local particularities..."
+      contextHelp: "Anything the previous questions don't cover: legal constraints, existing partnerships, local particularities...",
+      contextDocument: 'Import a document (optional)',
+      contextDocumentHelp: "Business plan, notes, existing deck... The text is extracted automatically and added to the context sent to the AI. You can review and edit it before generating the plan. Accepted formats: PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), 10 MB max.",
+      contextDocumentButton: 'Import a document',
+      contextDocumentAccepted: 'PDF, Word, Excel, PowerPoint · 10 MB max',
+      contextDocumentReading: 'Reading the file…',
+      contextDocumentRemove: 'Remove',
+      contextDocumentReplace: 'Replace',
+      contextDocumentTruncated: 'This document is long: only the beginning was kept.',
+      contextDocumentErrorTooLarge: 'File too large (10 MB maximum).',
+      contextDocumentErrorFormat: 'Unsupported format. Use a PDF, Word, Excel or PowerPoint file.',
+      contextDocumentErrorEmpty: 'No text found in this file (scanned document, password-protected, or empty).',
+      contextDocumentErrorGeneric: 'Could not read this file. Try again or paste the content directly above.'
     },
     gantt: {
       title: 'Interactive Gantt',

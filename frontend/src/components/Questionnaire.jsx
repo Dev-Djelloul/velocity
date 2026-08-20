@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { t } from '../lib/i18n'
 import { saveDraft } from '../lib/draftStorage'
-import { IconSave, IconClipboard } from './Icons'
+import { extractText } from '../lib/documentParser'
+import { IconSave, IconClipboard, IconUpload, IconTrash, IconFileText } from './Icons'
 import '../styles/Questionnaire.css'
 
 const DEFAULT_DATA = {
@@ -9,7 +10,16 @@ const DEFAULT_DATA = {
   market: { geography: 'global', b2bVsB2c: 'b2b', segment: '', audienceSize: 's', competition: 'moderate' },
   resources: { timelineWeeks: 'w8', budgetEur: 'b5k', teamSize: 'small', rolesPresent: ['product', 'dev'] },
   priorities: { focus: 'acquire', engagement: 'moderate', riskKnown: 'none', successMetric: 'signups', rulesFlags: [] },
-  context: ''
+  context: '',
+  contextDocument: '',
+  contextDocumentName: ''
+}
+
+const DOCUMENT_ERROR_KEYS = {
+  'file-too-large': 'priorities.contextDocumentErrorTooLarge',
+  'unsupported-format': 'priorities.contextDocumentErrorFormat',
+  'empty-text': 'priorities.contextDocumentErrorEmpty',
+  'extraction-failed': 'priorities.contextDocumentErrorGeneric'
 }
 
 function loadInitial(initialData) {
@@ -107,6 +117,10 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
   const [formData, setFormData] = useState(() => loadInitial(initialData))
   const [draftSaved, setDraftSaved] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
+  const [docLoading, setDocLoading] = useState(false)
+  const [docError, setDocError] = useState(null)
+  const [docTruncated, setDocTruncated] = useState(false)
+  const fileInputRef = useRef(null)
 
   useEffect(() => {
     localStorage.setItem('plp_form', JSON.stringify(formData))
@@ -129,6 +143,35 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
 
   const handleContextChange = (value) => {
     setFormData(prev => ({ ...prev, context: value }))
+  }
+
+  const handleContextDocumentChange = (value) => {
+    setFormData(prev => ({ ...prev, contextDocument: value }))
+  }
+
+  const handleDocumentSelect = async (e) => {
+    const file = e.target.files?.[0]
+    e.target.value = '' // permet de re-sélectionner le même fichier après un retrait
+    if (!file) return
+
+    setDocError(null)
+    setDocTruncated(false)
+    setDocLoading(true)
+    try {
+      const { text, truncated } = await extractText(file)
+      setFormData(prev => ({ ...prev, contextDocument: text, contextDocumentName: file.name }))
+      setDocTruncated(truncated)
+    } catch (err) {
+      setDocError(DOCUMENT_ERROR_KEYS[err.code] || 'priorities.contextDocumentErrorGeneric')
+    } finally {
+      setDocLoading(false)
+    }
+  }
+
+  const handleDocumentRemove = () => {
+    setFormData(prev => ({ ...prev, contextDocument: '', contextDocumentName: '' }))
+    setDocError(null)
+    setDocTruncated(false)
   }
 
   const toggleRole = (role) => {
@@ -251,6 +294,63 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
               <textarea rows={3} value={formData.context} placeholder={t(lang, 'priorities.contextPh')}
                 onChange={e => handleContextChange(e.target.value)} />
             </label>
+
+            <div className="field">
+              <span className="field-label-row">
+                {t(lang, 'priorities.contextDocument')}
+                <FieldHelp text={t(lang, 'priorities.contextDocumentHelp')} />
+              </span>
+
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.docx,.xlsx,.xlsm,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                onChange={handleDocumentSelect}
+                style={{ display: 'none' }}
+              />
+
+              {!formData.contextDocumentName && !docLoading && (
+                <button type="button" className="btn-secondary btn-import-document" onClick={() => fileInputRef.current?.click()}>
+                  <IconUpload width={14} height={14} /> {t(lang, 'priorities.contextDocumentButton')}
+                </button>
+              )}
+
+              {!formData.contextDocumentName && !docLoading && (
+                <p className="field-hint">{t(lang, 'priorities.contextDocumentAccepted')}</p>
+              )}
+
+              {docLoading && (
+                <p className="field-hint document-reading">
+                  <span className="btn-spinner" aria-hidden="true" /> {t(lang, 'priorities.contextDocumentReading')}
+                </p>
+              )}
+
+              {docError && <p className="field-error">{t(lang, docError)}</p>}
+
+              {formData.contextDocumentName && !docLoading && (
+                <div className="document-imported">
+                  <div className="document-imported-header">
+                    <span className="document-imported-name">
+                      <IconFileText width={14} height={14} /> {formData.contextDocumentName}
+                    </span>
+                    <div className="document-imported-actions">
+                      <button type="button" className="btn-link" onClick={() => fileInputRef.current?.click()}>
+                        {t(lang, 'priorities.contextDocumentReplace')}
+                      </button>
+                      <button type="button" className="btn-link btn-link-danger" onClick={handleDocumentRemove}>
+                        <IconTrash width={14} height={14} /> {t(lang, 'priorities.contextDocumentRemove')}
+                      </button>
+                    </div>
+                  </div>
+                  {docTruncated && <p className="field-hint">{t(lang, 'priorities.contextDocumentTruncated')}</p>}
+                  <textarea
+                    rows={5}
+                    value={formData.contextDocument || ''}
+                    onChange={e => handleContextDocumentChange(e.target.value)}
+                  />
+                </div>
+              )}
+            </div>
           </>
         )}
       </div>

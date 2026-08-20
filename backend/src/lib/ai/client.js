@@ -30,6 +30,7 @@ const LABELS = {
     risk: 'risque connu',
     successMetric: 'Métrique de succès',
     context: 'Contexte additionnel fourni par le fondateur',
+    contextDocument: 'Document importé par le fondateur',
     outputInstruction: 'Génère tout le contenu du plan (texte, libellés, descriptions) en français.'
   },
   en: {
@@ -55,13 +56,20 @@ const LABELS = {
     risk: 'known risk',
     successMetric: 'Success metric',
     context: 'Additional context provided by the founder',
+    contextDocument: 'Document imported by the founder',
     outputInstruction: 'Generate all plan content (text, labels, descriptions) in English.'
   }
 }
 
+// Filet de sécurité côté serveur : le client tronque déjà à l'extraction (documentParser.js,
+// ~18k caractères) et l'utilisateur peut éditer/élaguer le texte avant envoi, mais on ne fait
+// jamais confiance à ce qui arrive du client pour la taille du prompt (payload forgé, ancien
+// build du frontend...).
+const MAX_CONTEXT_DOCUMENT_CHARS = 20000
+
 function buildUserPrompt(data, lang) {
   const l = LABELS[lang] || LABELS.fr
-  const { product, market, resources, priorities, context } = data
+  const { product, market, resources, priorities, context, contextDocument } = data
   const lines = [
     l.intro,
     '',
@@ -82,6 +90,14 @@ function buildUserPrompt(data, lang) {
 
   if (context && context.trim()) {
     lines.push('', `${l.context} : ${context.trim()}`)
+  }
+
+  if (contextDocument && contextDocument.trim()) {
+    const trimmed = contextDocument.trim()
+    const safe = trimmed.length > MAX_CONTEXT_DOCUMENT_CHARS
+      ? trimmed.slice(0, MAX_CONTEXT_DOCUMENT_CHARS) + '\n[tronqué]'
+      : trimmed
+    lines.push('', `${l.contextDocument} :`, safe)
   }
 
   lines.push('', l.outputInstruction)
