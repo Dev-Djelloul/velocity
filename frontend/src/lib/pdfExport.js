@@ -251,6 +251,152 @@ export async function exportPDF(plan, lang, branding) {
   pdfMake.createPdf(docDefinition).download(`${slug(plan.product?.name)}-launch-plan.pdf`)
 }
 
+// Document dédié aux investisseurs/due diligence : synthèse financière + conformité RGPD
+// en un seul PDF, distinct du plan complet (exportPDF) qui liste toutes les sections. Ne
+// dépend pas d'un plan.rgpd déjà généré : si absent, la section l'indique explicitement
+// plutôt que d'omettre silencieusement une synthèse censée être exhaustive pour un tiers.
+export async function exportComplianceReport(plan, lang, branding) {
+  const { default: pdfMake } = await import('pdfmake/build/pdfmake')
+  const { default: pdfFonts } = await import('pdfmake/build/vfs_fonts')
+  pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs
+
+  const en = lang === 'en'
+  const content = []
+
+  if (branding?.enabled && branding.logo) {
+    content.push({ image: branding.logo, width: 90, margin: [0, 0, 0, 12] })
+  }
+
+  const genDate = new Date().toLocaleDateString(en ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+  content.push(
+    { text: t(lang, 'export.complianceReport'), style: 'header' },
+    { text: plan.product?.name || 'Launch Plan', style: 'subheader' },
+    { text: en ? `Generated on ${genDate}` : `Généré le ${genDate}`, fontSize: 9, color: '#9ca3af', margin: [0, 0, 0, 10] }
+  )
+
+  if (plan.product?.pitch) {
+    content.push({ text: plan.product.pitch, margin: [0, 0, 0, 10], italics: true })
+  }
+
+  // ---------- Synthèse financière ----------
+  content.push({ text: t(lang, 'outputs.financials.title'), style: 'section' })
+  if (plan.financials) {
+    const f = plan.financials
+    content.push({
+      table: {
+        widths: ['*', '*', '*'],
+        body: [
+          [
+            { text: t(lang, 'outputs.financials.monthlyBurn'), bold: true, fontSize: 9 },
+            { text: t(lang, 'outputs.financials.runway'), bold: true, fontSize: 9 },
+            { text: t(lang, 'outputs.financials.breakEven'), bold: true, fontSize: 9 }
+          ],
+          [
+            `${f.monthlyBurn} €`,
+            `${f.runwayMonths} ${t(lang, 'outputs.financials.months')}`,
+            `${f.breakEvenUsers} ${t(lang, 'outputs.financials.clients')}`
+          ]
+        ]
+      },
+      layout: 'lightHorizontalLines',
+      margin: [0, 0, 0, 8]
+    })
+    if (f.costBreakdown?.length) {
+      content.push(
+        { text: t(lang, 'outputs.financials.breakdown'), bold: true, margin: [0, 0, 0, 4] },
+        {
+          table: {
+            widths: ['*', 'auto', 'auto'],
+            body: [
+              [
+                { text: t(lang, 'outputs.category'), bold: true, fontSize: 9 },
+                { text: t(lang, 'outputs.estimatedCostEur'), bold: true, fontSize: 9 },
+                { text: '%', bold: true, fontSize: 9 }
+              ],
+              ...f.costBreakdown.map(line => [line.category, `${line.amount} €`, `${line.pct}%`])
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 4]
+        }
+      )
+    }
+    if (f.arpuRationale) {
+      content.push({ text: f.arpuRationale, fontSize: 9, italics: true, color: '#6b7280', margin: [0, 2, 0, 0] })
+    }
+  } else {
+    content.push({ text: t(lang, 'export.complianceNoFinancials'), italics: true, color: '#6b7280' })
+  }
+
+  // ---------- Conformité RGPD ----------
+  content.push({ text: t(lang, 'rgpd.title'), style: 'section' })
+  if (plan.rgpd) {
+    const r = plan.rgpd
+    content.push(
+      { text: r.applicability, margin: [0, 0, 0, 6], italics: true },
+      { text: `${t(lang, 'rgpd.checklist')}:`, bold: true, margin: [0, 2, 0, 4] },
+      {
+        ul: (r.checklist || []).map(it => `${it.done ? '☑' : '☐'} ${it.item} — ${t(lang, `rgpd.priority.${it.priority}`) || it.priority}`),
+        margin: [0, 0, 0, 8]
+      }
+    )
+    if (r.register?.length) {
+      content.push(
+        { text: `${t(lang, 'rgpd.register')}:`, bold: true, margin: [0, 0, 0, 4] },
+        {
+          table: {
+            widths: ['*', '*', '*'],
+            body: [
+              [
+                { text: t(lang, 'rgpd.data'), bold: true, fontSize: 9 },
+                { text: t(lang, 'rgpd.purpose'), bold: true, fontSize: 9 },
+                { text: t(lang, 'rgpd.basis'), bold: true, fontSize: 9 }
+              ],
+              ...r.register.map(reg => [reg.data, reg.purpose, reg.basis])
+            ]
+          },
+          layout: 'lightHorizontalLines',
+          margin: [0, 0, 0, 8]
+        }
+      )
+    }
+    if (r.recommendations?.length) {
+      content.push(
+        { text: `${en ? 'Recommendations' : 'Recommandations'}:`, bold: true, margin: [0, 0, 0, 4] },
+        { ul: r.recommendations, margin: [0, 0, 0, 8] }
+      )
+    }
+    content.push({ text: t(lang, 'rgpd.disclaimer'), fontSize: 8, italics: true, color: '#9ca3af' })
+  } else {
+    content.push({ text: t(lang, 'export.complianceNoRgpd'), italics: true, color: '#6b7280' })
+  }
+
+  content.push({
+    text: t(lang, 'export.complianceDisclaimer'),
+    fontSize: 8,
+    italics: true,
+    color: '#9ca3af',
+    margin: [0, 16, 0, 0]
+  })
+
+  const docDefinition = {
+    content,
+    styles: {
+      header: { fontSize: 20, bold: true, color: '#6366f1' },
+      subheader: { fontSize: 13, bold: true, color: '#6b7280', margin: [0, 2, 0, 0] },
+      section: { fontSize: 14, bold: true, color: '#9184d9', margin: [0, 14, 0, 6] }
+    },
+    footer: (currentPage, pageCount) => ({
+      columns: [
+        { text: 'VelocityLaunch', margin: [40, 0, 0, 0], fontSize: 8, color: '#9184d9', bold: true },
+        { text: `${currentPage} / ${pageCount}`, alignment: 'right', margin: [0, 0, 40, 0], fontSize: 8, color: '#9ca3af' }
+      ]
+    })
+  }
+
+  pdfMake.createPdf(docDefinition).download(`${slug(plan.product?.name)}-compliance-report.pdf`)
+}
+
 const BRAND_VIOLET = '9184D9'
 const BRAND_DARK = '141922'
 

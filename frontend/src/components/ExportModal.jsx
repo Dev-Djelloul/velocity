@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
-import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage } from '../lib/pdfExport'
+import { exportJSON, exportCSV, exportPDF, exportPPTX, exportImage, exportComplianceReport } from '../lib/pdfExport'
 import { getExportBranding } from '../lib/exportBranding'
 import {
   notionExport, notionAuthorizeUrl, notionStatus,
@@ -376,6 +376,12 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
           <button className="btn-primary" onClick={() => exportCSV(plan, lang)}>{t(lang, 'export.csv')}</button>
           <button className="btn-primary" onClick={() => exportJSON(plan)}>{t(lang, 'export.json')}</button>
           <button className="btn-primary" onClick={() => exportImage(captureRef?.current, plan)}>{t(lang, 'export.image')}</button>
+          <button
+            className="btn-primary"
+            onClick={() => isPro ? exportComplianceReport(plan, lang, getExportBranding(userId)) : onRequestUpgrade?.()}
+          >
+            {t(lang, 'export.complianceReport')} {!isPro && <span className="export-pro-badge">PRO</span>}
+          </button>
         </div>
 
         <div className="export-integrations">

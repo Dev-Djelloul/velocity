@@ -697,6 +697,10 @@ export const translations = {
       pdf: 'Export PDF',
       pptx: 'Export pitch deck (PPTX)',
       image: 'Export image (PNG)',
+      complianceReport: 'Rapport de conformité (investisseurs)',
+      complianceNoFinancials: "Aucune donnée financière générée pour ce plan pour l'instant.",
+      complianceNoRgpd: "Aucune analyse RGPD générée pour ce plan pour l'instant — lancez-la depuis la section RGPD avant d'exporter ce rapport pour qu'il soit complet.",
+      complianceDisclaimer: "Document généré automatiquement à titre indicatif, à faire valider par un conseil juridique et financier avant transmission à des investisseurs ou partenaires.",
       integrations: 'Intégrations',
       notion: 'Exporter vers Notion',
       notionExporting: 'Export vers Notion...',
@@ -959,7 +963,7 @@ export const translations = {
               'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
               'Notifications email (Resend) et Slack : génération terminée, rappel d\'inactivité, résumé hebdomadaire',
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in',
-              'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, partage par lien ou image Open Graph',
+              'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph',
               'Recherche globale (⌘K), FR / EN'
             ]
           },
@@ -974,8 +978,7 @@ export const translations = {
               'Collaboration en temps réel (édition simultanée à plusieurs sur un même plan)',
               'Application mobile / PWA installable',
               'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)',
-              'Bibliothèque de plans "avant/après" pour comparer plusieurs versions d\'un même lancement',
-              'Rapport de conformité exportable pour investisseurs (synthèse RGPD + financier en un document)'
+              'Bibliothèque de plans "avant/après" pour comparer plusieurs versions d\'un même lancement'
             ]
           }
         ]
@@ -2057,6 +2060,10 @@ export const translations = {
       pdf: 'Export PDF',
       pptx: 'Export pitch deck (PPTX)',
       image: 'Export image (PNG)',
+      complianceReport: 'Compliance report (investors)',
+      complianceNoFinancials: 'No financial data generated for this plan yet.',
+      complianceNoRgpd: 'No GDPR analysis generated for this plan yet — run it from the GDPR section before exporting this report so it is complete.',
+      complianceDisclaimer: 'This document is generated automatically for guidance only — have it reviewed by legal and financial counsel before sharing it with investors or partners.',
       integrations: 'Integrations',
       notion: 'Export to Notion',
       notionExporting: 'Exporting to Notion...',
@@ -2319,7 +2326,7 @@ export const translations = {
               'Notion, Jira, GitHub, Linear and Google Calendar integrations',
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery',
-              'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, link sharing or dedicated Open Graph image',
+              'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image',
               'Global search (⌘K), FR / EN'
             ]
           },
@@ -2334,8 +2341,7 @@ export const translations = {
               'Real-time collaboration (multiple people editing the same plan at once)',
               'Mobile app / installable PWA',
               'OCR for scanned documents (image-based business plans, not detected today)',
-              'A "before/after" plan library to compare several versions of the same launch',
-              'Exportable compliance report for investors (GDPR + financial summary in one document)'
+              'A "before/after" plan library to compare several versions of the same launch'
             ]
           }
         ]
