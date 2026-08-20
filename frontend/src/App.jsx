@@ -21,6 +21,7 @@ import IntegrationsPage from './components/IntegrationsPage'
 import TeamPage from './components/TeamPage'
 import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
+import DashboardHome from './components/DashboardHome'
 import SettingsPage from './components/SettingsPage'
 import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
@@ -41,7 +42,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations']
+const AUTH_ONLY_PAGES = ['dashboard', 'questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -51,6 +52,7 @@ const AUTH_ONLY_PAGES = ['questionnaire', 'result', 'account', 'team', 'space', 
 // cette taille.
 const PAGE_TO_PATH = {
   landing: '/',
+  dashboard: '/accueil',
   howItWorks: '/comment-ca-marche',
   questionnaire: '/questionnaire',
   result: '/mon-plan',
@@ -64,6 +66,7 @@ const PAGE_TO_PATH = {
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
+  '/accueil': 'dashboard',
   '/comment-ca-marche': 'howItWorks',
   '/connexion': 'auth',
   '/inscription': 'auth',
@@ -340,7 +343,7 @@ export default function App() {
         handleLoadFromHistory(copy)
         setPendingDuplicatePlan(null)
       } else {
-        setCurrentPage(authIntent || 'account')
+        setCurrentPage(authIntent || 'dashboard')
       }
       setAuthIntent(null)
       sessionStorage.removeItem('plp_auth_intent')
@@ -393,7 +396,15 @@ export default function App() {
       setCurrentPage('landing')
     }
     if (currentPage === 'auth' && isSignedIn) {
-      setCurrentPage('landing')
+      setCurrentPage('dashboard')
+    }
+    // Une fois connecté, "/" (landing marketing) n'a plus de raison d'être affiché — évite
+    // de mélanger le produit d'entrée (démo, pitch, pricing) avec le produit une fois
+    // connecté, qui a son propre accueil (voir DashboardHome). Le logo du header renvoie
+    // ici vers 'dashboard' quand connecté (voir plus bas), donc ce cas ne couvre que les
+    // accès directs à "/" (lien externe, historique navigateur, retour arrière).
+    if (currentPage === 'landing' && isSignedIn) {
+      setCurrentPage('dashboard')
     }
   }, [currentPage, isSignedIn, isLoaded, isSharedView])
 
@@ -650,6 +661,15 @@ export default function App() {
     }
   }
 
+  // Depuis une carte du dashboard d'accueil : bascule l'espace actif (comme le switcher du
+  // header) PUIS navigue vers sa page dédiée — switchSpace seul ne change pas currentPage,
+  // volontairement neutre pour rester utilisable depuis n'importe quelle page via le header.
+  const openSpace = async (id) => {
+    await switchSpace(id)
+    setCurrentPage('space')
+    window.scrollTo(0, 0)
+  }
+
   const remaining = isSignedIn ? remainingCredits(userId) : 0
   const pro = isSignedIn && isPro(userId)
 
@@ -695,7 +715,7 @@ export default function App() {
       <header className={`header ${currentPage === 'landing' ? 'header-locked-dark' : ''}`}>
         <div className="header-top">
           <button className="header-brand-btn" onClick={() => {
-            setCurrentPage('landing')
+            setCurrentPage(isSignedIn ? 'dashboard' : 'landing')
             window.scrollTo(0, 0)
           }}>
             <Wordmark size={34} animated />
@@ -712,15 +732,19 @@ export default function App() {
           </button>
 
           <nav className={`header-nav ${mobileNavOpen ? 'is-open' : ''}`}>
-            <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('features') }}>
-              {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
-            </button>
-            <button
-              className={`header-nav-link ${currentPage === 'howItWorks' ? 'active' : ''}`}
-              onClick={() => { setMobileNavOpen(false); handleShowHowItWorks() }}
-            >
-              {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
-            </button>
+            {!isSignedIn && (
+              <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('features') }}>
+                {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
+              </button>
+            )}
+            {!isSignedIn && (
+              <button
+                className={`header-nav-link ${currentPage === 'howItWorks' ? 'active' : ''}`}
+                onClick={() => { setMobileNavOpen(false); handleShowHowItWorks() }}
+              >
+                {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
+              </button>
+            )}
             {!isSignedIn && (
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('faq') }}>
                 FAQ
@@ -1048,11 +1072,22 @@ export default function App() {
             novaToggle={novaToggle}
           />
         )}
+        {currentPage === 'dashboard' && isSignedIn && (
+          <DashboardHome
+            key={dataVersion}
+            lang={lang}
+            onOpenSpace={openSpace}
+            onCreatePlan={handleStartClick}
+            onOpenAccount={goToAccount}
+            onOpenGallery={() => { setCurrentPage('gallery'); window.scrollTo(0, 0) }}
+            onCreateTeam={() => setShowCreateTeam(true)}
+          />
+        )}
         {currentPage === 'account' && isSignedIn && (
           <AccountPage
             key={dataVersion}
             lang={lang}
-            onBack={() => setCurrentPage('landing')}
+            onBack={() => setCurrentPage('dashboard')}
             onLoadPlan={handleOpenPlanFromHistory}
             onCreateTeam={() => setShowCreateTeam(true)}
             pendingAction={pendingAccountAction}
@@ -1063,18 +1098,18 @@ export default function App() {
           <NotificationsPage
             key={dataVersion}
             lang={lang}
-            onBack={() => setCurrentPage('landing')}
+            onBack={() => setCurrentPage('dashboard')}
             onOpenNotification={handleOpenNotification}
           />
         )}
         {currentPage === 'team' && isSignedIn && (
-          <TeamPage lang={lang} onBack={() => setCurrentPage('landing')} />
+          <TeamPage lang={lang} onBack={() => setCurrentPage('dashboard')} />
         )}
         {currentPage === 'space' && isSignedIn && (
           <SpacePage
             key={dataVersion}
             lang={lang}
-            onBack={() => setCurrentPage('landing')}
+            onBack={() => setCurrentPage('dashboard')}
             onLoadPlan={handleLoadFromHistory}
             onLoadDraft={handleLoadDraft}
             onCreatePlan={handleStartClick}
@@ -1103,14 +1138,14 @@ export default function App() {
             onChangeDateFormat={setDateFormat}
             currency={currency}
             onChangeCurrency={setCurrency}
-            onBack={() => setCurrentPage('landing')}
+            onBack={() => setCurrentPage('dashboard')}
           />
         )}
         {currentPage === 'integrations' && isSignedIn && (
           <IntegrationsPage
             lang={lang}
             userId={userId}
-            onBack={() => setCurrentPage('landing')}
+            onBack={() => setCurrentPage('dashboard')}
           />
         )}
       </main>

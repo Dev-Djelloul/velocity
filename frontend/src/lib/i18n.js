@@ -1203,6 +1203,19 @@ export const translations = {
       switchToSignUp: "Pas encore de compte ? S'inscrire",
       continueWith: 'Continuer avec'
     },
+    dashboard: {
+      greeting: (name) => `Bonjour ${name}`,
+      greetingGeneric: 'Bonjour',
+      subtitle: 'Voici un aperçu de tes espaces',
+      createPlan: 'Créer un nouveau plan',
+      current: 'Actuel',
+      openSpace: 'Ouvrir',
+      planCount: (n) => `${n} plan${n > 1 ? 's' : ''}`,
+      createTeam: 'Créer une équipe',
+      createTeamDesc: 'Un espace partagé avec ton équipe',
+      viewHistory: 'Voir tout l\'historique',
+      viewGallery: 'Galerie publique'
+    },
     team: {
       personalSpace: 'Personnel',
       switcherTitle: 'Espace',
@@ -2540,6 +2553,19 @@ export const translations = {
       switchToSignIn: 'Already have an account? Sign in',
       switchToSignUp: 'No account yet? Sign up',
       continueWith: 'Continue with'
+    },
+    dashboard: {
+      greeting: (name) => `Hi ${name}`,
+      greetingGeneric: 'Hi there',
+      subtitle: 'Here\'s an overview of your spaces',
+      createPlan: 'Create a new plan',
+      current: 'Current',
+      openSpace: 'Open',
+      planCount: (n) => `${n} plan${n > 1 ? 's' : ''}`,
+      createTeam: 'Create a team',
+      createTeamDesc: 'A shared space with your team',
+      viewHistory: 'View full history',
+      viewGallery: 'Public gallery'
     },
     team: {
       personalSpace: 'Personal',
