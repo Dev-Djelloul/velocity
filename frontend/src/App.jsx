@@ -147,6 +147,10 @@ export default function App() {
   const [showLimitModal, setShowLimitModal] = useState(false)
   const [pendingAccountAction, setPendingAccountAction] = useState(null) // 'plans' | 'upgrade' | null
   const [openHeaderMenu, setOpenHeaderMenu] = useState(null) // 'settings' | 'account' | null
+  // Repliée par défaut : ne montre que l'espace actif, pour laisser "Tableau de bord" et
+  // "Créer une équipe" visibles sans avoir à faire défiler la liste complète des espaces
+  // (qui peut vite s'allonger avec plusieurs équipes).
+  const [spaceListExpanded, setSpaceListExpanded] = useState(false)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [showCreateTeam, setShowCreateTeam] = useState(false)
   const [switchingSpace, setSwitchingSpace] = useState(false)
@@ -788,7 +792,44 @@ export default function App() {
                   </button>
                   {openHeaderMenu === 'space' && (
                     <div className="header-dropdown header-space-dropdown">
-                      <div className="header-dropdown-label">{t(lang, 'team.switcherTitle')}</div>
+                      <button
+                        type="button"
+                        className="header-dropdown-label header-space-list-toggle"
+                        onClick={() => setSpaceListExpanded(v => !v)}
+                        aria-expanded={spaceListExpanded}
+                      >
+                        {t(lang, 'team.switcherTitle')}
+                        <IconChevronDown width={13} height={13} className={`header-space-list-caret ${spaceListExpanded ? 'is-open' : ''}`} />
+                      </button>
+
+                      {!spaceListExpanded && (
+                        team.teamId ? (
+                          <div className="header-space-row-wrap is-current">
+                            <span className="header-space-row header-space-row-static">
+                              <TeamAvatar id={team.teamId} name={team.teamName} imageUrl={team.teamImageUrl} />
+                              <span className="header-space-name">{team.teamName}</span>
+                              <IconCheckCircle width={14} height={14} className="header-space-check" />
+                            </span>
+                          </div>
+                        ) : (
+                          <span className="header-space-row header-space-row-static is-current">
+                            {getPersonalSpace(userId, lang).avatar ? (
+                              <img className="header-space-avatar" src={getPersonalSpace(userId, lang).avatar} alt="" />
+                            ) : user?.imageUrl ? (
+                              <img className="header-space-avatar" src={user.imageUrl} alt="" />
+                            ) : (
+                              <span className="header-space-avatar header-space-avatar-personal">
+                                <IconUser width={13} height={13} />
+                              </span>
+                            )}
+                            <span className="header-space-name">{personalSpaceName}</span>
+                            <IconCheckCircle width={14} height={14} className="header-space-check" />
+                          </span>
+                        )
+                      )}
+
+                      {spaceListExpanded && (
+                        <>
                       <button
                         className={`header-space-row ${!team.teamId ? 'is-current' : ''}`}
                         disabled={switchingSpace}
@@ -826,6 +867,8 @@ export default function App() {
                           </button>
                         </div>
                       ))}
+                        </>
+                      )}
 
                       <div className="header-dropdown-divider" />
 

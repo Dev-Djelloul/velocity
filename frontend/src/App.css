@@ -352,6 +352,36 @@
   padding: 0.5rem 0.6rem 0.3rem;
 }
 
+/* Repli de la liste d'espaces : ne montre que l'espace actif par défaut, pour laisser
+   "Tableau de bord"/"Créer une équipe" visibles sans scroll une fois qu'il y a plusieurs
+   équipes — le libellé "ESPACE" devient lui-même le bouton d'expansion. */
+.header-space-list-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.header-space-list-toggle:hover {
+  color: var(--color-text-secondary);
+}
+
+.header-space-list-caret {
+  transition: transform 0.15s ease;
+}
+
+.header-space-list-caret.is-open {
+  transform: rotate(180deg);
+}
+
+.header-space-row-static {
+  cursor: default;
+}
+
 .header-space-row {
   display: flex;
   align-items: center;
