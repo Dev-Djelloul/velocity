@@ -13,6 +13,10 @@ import { ContactModal } from './CompanyModals'
 import NotificationsSection from './NotificationsSection'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
+import '../styles/NotificationsPage.css'
+
+// Asset statique servi tel quel depuis public/ (généré par IA), comme les autres fonds de page.
+const NOTIFICATIONS_BACKGROUND = '/assets/ai-images/lucid-origin_Abstract_3D_isometric_illustration_representing_speed_and_productivity_for_a_Saa-0.jpg'
 
 // Page dédiée aux notifications : le fil (@mentions/commentaires reçus) ET, depuis leur
 // déménagement hors de Paramètres, les préférences email/Slack (NotificationsSection) —
@@ -81,7 +85,9 @@ export default function NotificationsPage({ lang, onBack, onOpenNotification }) 
   }
 
   return (
-    <div className="account-page">
+    <div className="notifications-page-outer">
+      <div className="notifications-page-bg" style={{ backgroundImage: `url(${NOTIFICATIONS_BACKGROUND})` }} aria-hidden="true" />
+      <div className="account-page notifications-page-inner">
       <button className="account-back-btn" onClick={onBack}>
         <IconArrowLeft width={16} height={16} /> {t(lang, 'settings.backToApp')}
       </button>
@@ -168,6 +174,7 @@ export default function NotificationsPage({ lang, onBack, onOpenNotification }) 
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }

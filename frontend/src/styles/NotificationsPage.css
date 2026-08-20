@@ -1,0 +1,18 @@
+.notifications-page-outer {
+  position: relative;
+}
+
+/* Même procédé que Mon Espace / Intégrations / Mon compte / Paramètres. */
+.notifications-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(6px) brightness(0.45) saturate(1.1);
+}
+
+.notifications-page-inner {
+  position: relative;
+  z-index: 1;
+}
