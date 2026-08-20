@@ -30,7 +30,7 @@ export class PlanCollabRoom {
     server.accept()
 
     const clientId = crypto.randomUUID().slice(0, 8)
-    this.sessions.set(server, { id: clientId, name: '', color: '', section: null })
+    this.sessions.set(server, { id: clientId, name: '', avatar: null, color: '', section: null })
 
     server.addEventListener('message', (evt) => this.handleMessage(server, evt.data))
     const cleanup = () => this.handleClose(server)
@@ -74,6 +74,7 @@ export class PlanCollabRoom {
       const session = this.sessions.get(ws)
       if (session) {
         session.name = msg.name || session.name
+        session.avatar = msg.avatar || null
         session.color = msg.color || session.color
         session.section = msg.section || null
       }

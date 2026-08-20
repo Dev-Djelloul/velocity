@@ -7,18 +7,23 @@ function initials(name) {
 }
 
 // Qui d'autre a ce plan ouvert en ce moment (voir lib/collab.js) — pas des curseurs
-// live ni une fusion caractère par caractère, juste "vous n'êtes pas seul·e ici".
+// live ni une fusion caractère par caractère, juste "vous n'êtes pas seul·e ici". Vrai
+// avatar (photo Clerk) quand disponible, sinon initiales sur fond coloré déterministe.
 export default function PresenceBar({ peers, lang }) {
   if (!peers || peers.length === 0) return null
+  const shown = peers.slice(0, 3)
+  const extra = peers.length - shown.length
   return (
     <div className="presence-bar" title={t(lang, 'collab.presenceTitle')}>
-      {peers.slice(0, 5).map(p => (
-        <span key={p.id} className="presence-avatar" style={{ background: p.color }} title={p.name}>
-          {initials(p.name)}
+      {shown.map(p => (
+        <span key={p.id} className="presence-person">
+          {p.avatar
+            ? <img className="presence-avatar-img" src={p.avatar} alt="" />
+            : <span className="presence-avatar" style={{ background: p.color }}>{initials(p.name)}</span>}
+          <span className="presence-name">{p.name} {t(lang, 'collab.onlineSuffix')}</span>
         </span>
       ))}
-      {peers.length > 5 && <span className="presence-avatar presence-more">+{peers.length - 5}</span>}
-      <span className="presence-label">{t(lang, 'collab.viewing')(peers.length)}</span>
+      {extra > 0 && <span className="presence-more">{t(lang, 'collab.moreOnline')(extra)}</span>}
     </div>
   )
 }

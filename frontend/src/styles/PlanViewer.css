@@ -595,3 +595,36 @@
 }
 
 .plan-section-title:first-child { margin-top: 0; }
+
+/* Notification de collaboration temps réel : ce qu'un pair vient de changer, visible
+   immédiatement plutôt que d'attendre que quelqu'un remarque une ligne discrète ajoutée
+   dans le panneau Historique (replié par défaut). */
+.collab-toast {
+  position: fixed;
+  top: 5.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: min(90vw, 520px);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius-lg, 10px);
+  background: var(--color-bg-secondary, #1a1f2b);
+  border: 1px solid rgba(145, 132, 217, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  color: var(--color-text-primary, #fff);
+  font-size: 0.85rem;
+  animation: collab-toast-in 0.2s ease-out;
+}
+
+.collab-toast-icon {
+  color: #9184d9;
+  flex-shrink: 0;
+}
+
+@keyframes collab-toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}

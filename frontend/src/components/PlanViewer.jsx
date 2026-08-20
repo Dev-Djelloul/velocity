@@ -96,6 +96,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
   const captureRef = useRef(null)
   const [presencePeers, setPresencePeers] = useState([])
+  const [collabToast, setCollabToast] = useState(null)
+  const collabToastTimerRef = useRef(null)
   // Doc Yjs partagé (voir lib/collab.js) : la référence "dernière roadmap synchronisée
   // avec le doc collab" évite de renvoyer en boucle un changement qu'on vient tout juste
   // de recevoir d'un pair (le remote-update met à jour cette ref en même temps que plan).
@@ -142,6 +144,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           // que refléter en direct, côté spectateur·rice, ce qui vient de changer chez l'autre,
           // sans déclencher la bannière "modifications non enregistrées" ici.
           const entry = { date: new Date().toISOString(), author: meta.by, changes: items.map(({ detail }) => ({ section: 'roadmapCollab', detail })) }
+          // Notification visible immédiatement (au lieu de compter sur que quelqu'un
+          // remarque une ligne ajoutée en silence dans le panneau Historique, replié par
+          // défaut) — l'utilisateur a signalé ne pas avoir vu la mise à jour sans recharger.
+          clearTimeout(collabToastTimerRef.current)
+          setCollabToast({ author: meta.by, detail: items[0].detail, count: items.length })
+          collabToastTimerRef.current = setTimeout(() => setCollabToast(null), 5000)
           return { ...nextPlan, changeLog: [entry, ...(p.changeLog || [])].slice(0, 50) }
         })
       },
@@ -149,11 +157,11 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       onReady: () => {
         seedDocFromRoadmap(collab.doc, plan.roadmap)
         const name = user?.fullName || user?.firstName || (lang === 'fr' ? 'Anonyme' : 'Anonymous')
-        collab.sendPresence(name)
+        collab.sendPresence(name, user?.imageUrl)
       }
     })
     collabRef.current = readOnly ? null : collab
-    return () => { collab.close(); collabRef.current = null }
+    return () => { collab.close(); collabRef.current = null; clearTimeout(collabToastTimerRef.current) }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan.id, readOnly])
 
@@ -497,6 +505,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   return (
     <div className="plan-page-outer">
+      {collabToast && (
+        <div className="collab-toast">
+          <IconSparkle width={14} height={14} className="collab-toast-icon" />
+          <span>
+            <strong>{collabToast.author}</strong>{' '}
+            {collabToast.count > 1
+              ? t(lang, 'collab.toastMultiple')(collabToast.count)
+              : collabToast.detail}
+          </span>
+        </div>
+      )}
       {plan.pageBackground && (
         <div
           className={`plan-page-bg${(plan.pageBackgroundBlur ?? true) ? ' page-bg-blur' : ''}`}

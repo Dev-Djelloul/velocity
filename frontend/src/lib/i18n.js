@@ -692,7 +692,10 @@ export const translations = {
     },
     collab: {
       presenceTitle: 'Personnes ayant ce plan ouvert en ce moment',
-      viewing: (n) => n === 1 ? '1 autre personne ici' : `${n} autres personnes ici`
+      viewing: (n) => n === 1 ? '1 autre personne ici' : `${n} autres personnes ici`,
+      onlineSuffix: 'est connecté·e',
+      moreOnline: (n) => `+${n} autre${n > 1 ? 's' : ''}`,
+      toastMultiple: (n) => `a modifié ${n} éléments de la roadmap`
     },
     export: {
       title: 'Exporter le plan',
@@ -2059,7 +2062,10 @@ export const translations = {
     },
     collab: {
       presenceTitle: 'People with this plan open right now',
-      viewing: (n) => n === 1 ? '1 other person here' : `${n} other people here`
+      viewing: (n) => n === 1 ? '1 other person here' : `${n} other people here`,
+      onlineSuffix: 'is online',
+      moreOnline: (n) => `+${n} more`,
+      toastMultiple: (n) => `edited ${n} roadmap items`
     },
     export: {
       title: 'Export plan',

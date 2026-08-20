@@ -156,10 +156,10 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
     }
   })
 
-  const sendPresence = (name, section) => {
+  const sendPresence = (name, avatar, section) => {
     myName = name
     if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'presence', name, color: colorFor(clientId || name), section }))
+      ws.send(JSON.stringify({ type: 'presence', name, avatar: avatar || null, color: colorFor(clientId || name), section }))
     }
   }
 
