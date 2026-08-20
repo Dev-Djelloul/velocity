@@ -56,6 +56,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
       },
       resources: {
         timelineWeeks: 'w12',
+        totalBudget: 'b25k',
         budgetEur: 'b10k',
         teamSize: 'medium',
         rolesPresent: ['product', 'dev', 'design', 'marketing']
@@ -85,6 +86,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
       },
       resources: {
         timelineWeeks: 'w8',
+        totalBudget: 'b10k',
         budgetEur: 'b5k',
         teamSize: 'small',
         rolesPresent: ['product', 'marketing', 'design']
@@ -114,6 +116,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
       },
       resources: {
         timelineWeeks: 'w26',
+        totalBudget: 'b50k',
         budgetEur: 'b25k',
         teamSize: 'large',
         rolesPresent: ['product', 'dev', 'design', 'marketing']
@@ -143,6 +146,7 @@ export default function DemoModal({ onClose, onLoadDemo, lang }) {
       },
       resources: {
         timelineWeeks: 'w12',
+        totalBudget: 'b100k',
         budgetEur: 'b50k',
         teamSize: 'large',
         rolesPresent: ['product', 'dev', 'design', 'marketing']
