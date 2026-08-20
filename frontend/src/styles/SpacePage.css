@@ -20,7 +20,7 @@
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(18px) brightness(0.35) saturate(1.1);
+  filter: blur(6px) brightness(0.45) saturate(1.1);
 }
 
 .space-page-inner {
