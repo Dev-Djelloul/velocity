@@ -235,6 +235,40 @@
 
 .plan-stat svg { color: var(--color-accent); flex-shrink: 0; }
 
+.plan-stat-tooltip {
+  position: relative;
+  cursor: help;
+}
+
+.plan-stat-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 240px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary, #16161d);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular, 400);
+  white-space: normal;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.plan-stat-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
 .plan-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
 
 .plan-save-btn {

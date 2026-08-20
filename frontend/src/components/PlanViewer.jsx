@@ -31,7 +31,7 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus, IconDroplet, IconX } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus, IconDroplet, IconX } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -555,34 +555,52 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           <div className="plan-header-top">
             <h2>{plan.product?.name}</h2>
             <div className="plan-badges">
-              {plan.classification && <span className="plan-badge plan-badge-accent">{plan.classification}</span>}
-              {plan.product?.stage && <span className="plan-badge plan-badge-stage">{t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}</span>}
-              {plan.product?.category && <span className="plan-badge plan-badge-category">{t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}</span>}
+              {plan.classification && (
+                <span className="plan-badge plan-badge-accent plan-stat-tooltip" data-tooltip={t(lang, 'resources.classificationHelp')}>
+                  {plan.classification}
+                </span>
+              )}
+              {plan.product?.stage && (
+                <span className="plan-badge plan-badge-stage plan-stat-tooltip" data-tooltip={t(lang, 'product.stageGlossary')[plan.product.stage]}>
+                  {t(lang, 'product.stageOptions')[plan.product.stage] || plan.product.stage}
+                </span>
+              )}
+              {plan.product?.category && (
+                <span className="plan-badge plan-badge-category plan-stat-tooltip" data-tooltip={t(lang, 'product.categoryGlossary')[plan.product.category]}>
+                  {t(lang, 'product.categoryOptions')[plan.product.category] || plan.product.category}
+                </span>
+              )}
             </div>
           </div>
 
           <div className="plan-header-stats">
             {plan.market?.b2bVsB2c && (
-              <span className="plan-stat">
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'market.marketStatHelp')}>
                 <IconCompass width={13} height={13} />
                 {t(lang, 'market.b2bVsB2cOptions')[plan.market.b2bVsB2c] || plan.market.b2bVsB2c}
                 {plan.market?.geography && ` · ${t(lang, 'market.geographyOptions')[plan.market.geography] || plan.market.geography}`}
               </span>
             )}
+            {plan.resources?.totalBudget && (
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.totalBudgetHelp')}>
+                <IconCreditCard width={13} height={13} />
+                {t(lang, 'resources.budgetOptions')[plan.resources.totalBudget] || plan.resources.totalBudget}
+              </span>
+            )}
             {plan.resources?.budgetEur && (
-              <span className="plan-stat">
-                <IconCoin width={13} height={13} />
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.budgetEurHelp')}>
+                <IconMegaphone width={13} height={13} />
                 {t(lang, 'resources.budgetOptions')[plan.resources.budgetEur] || plan.resources.budgetEur}
               </span>
             )}
             {plan.resources?.timelineWeeks && (
-              <span className="plan-stat">
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.timelineWeeksHelp')}>
                 <IconClock width={13} height={13} />
                 {t(lang, 'resources.timelineOptions')[plan.resources.timelineWeeks] || plan.resources.timelineWeeks}
               </span>
             )}
             {plan.resources?.teamSize && (
-              <span className="plan-stat">
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.teamSizeHelp')}>
                 <IconUser width={13} height={13} />
                 {t(lang, 'resources.teamSizeOptions')[plan.resources.teamSize] || plan.resources.teamSize}
               </span>

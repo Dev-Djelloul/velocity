@@ -22,6 +22,7 @@
 /* Dégradé wordmark VelocityLaunch, réutilisé sur tous les boutons du modal */
 .export-modal {
   --vl-gradient: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  width: 640px;
 }
 
 .export-modal h3 {
@@ -38,6 +39,16 @@
   flex-direction: column;
   gap: 0.6rem;
   margin-bottom: 1rem;
+}
+
+.export-modal .modal-actions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+}
+
+/* Export image (PNG), dernier bouton d'une liste impaire, occupe les deux colonnes */
+.export-modal .modal-actions .btn-primary:last-child {
+  grid-column: 1 / -1;
 }
 
 /* Boutons "primaires" (PDF, PPTX, CSV) : fond dégradé plein */

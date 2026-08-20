@@ -101,6 +101,7 @@ export const translations = {
     },
     market: {
       title: 'Marché & audience',
+      marketStatHelp: 'Modèle commercial (B2B/B2C) et zone géographique visés par ce lancement.',
       geography: 'Géographie',
       geographyOptions: { france: 'France', eu: 'UE', na: 'Amérique du Nord', latam: 'Amérique latine', apac: 'Asie-Pacifique', mena: 'MENA', africa: 'Afrique', global: 'Global' },
       geographyGlossary: {
@@ -142,6 +143,7 @@ export const translations = {
     },
     resources: {
       title: 'Timeline & ressources',
+      classificationHelp: 'Phase stratégique principale de ce plan, déduite de la priorité et des risques identifiés.',
       timelineWeeks: 'Durée avant lancement',
       timelineOptions: { w2: '2 semaines', w4: '4 semaines', w8: '8 semaines', w12: '12 semaines', w16: '16 semaines', w26: '6 mois', w36: '9 mois', w52: '12 mois' },
       timelineWeeksHelp: 'Le délai que tu vises entre aujourd\'hui et le lancement public — il détermine le rythme des sprints du plan.',
@@ -1441,6 +1443,7 @@ export const translations = {
     },
     market: {
       title: 'Market & audience',
+      marketStatHelp: 'Business model (B2B/B2C) and geographic zone targeted by this launch.',
       geography: 'Geography',
       geographyOptions: { france: 'France', eu: 'EU', na: 'North America', latam: 'Latin America', apac: 'Asia-Pacific', mena: 'MENA', africa: 'Africa', global: 'Global' },
       geographyGlossary: {
@@ -1482,6 +1485,7 @@ export const translations = {
     },
     resources: {
       title: 'Timeline & resources',
+      classificationHelp: 'This plan\'s main strategic phase, derived from the chosen priority and identified risks.',
       timelineWeeks: 'Time until launch',
       timelineOptions: { w2: '2 weeks', w4: '4 weeks', w8: '8 weeks', w12: '12 weeks', w16: '16 weeks', w26: '6 months', w36: '9 months', w52: '12 months' },
       timelineWeeksHelp: 'The delay you\'re aiming for between today and the public launch — it sets the pace of the plan\'s sprints.',
