@@ -9,7 +9,8 @@ import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock,
 import { teamColor } from './TeamAvatar'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
-import spaceBackground from '../../assets/img/hiw-step2-dashboard.webp'
+import teamSpaceBackground from '../../assets/img/hiw-step2-dashboard.webp'
+import personalSpaceBackground from '../../assets/img/my-velocity-space-bg.webp'
 import '../styles/SpacePage.css'
 import '../styles/GalleryPage.css'
 
@@ -127,7 +128,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
 
   return (
     <div className="space-page-outer">
-      <div className="space-page-bg" style={{ backgroundImage: `url(${spaceBackground})` }} aria-hidden="true" />
+      <div className="space-page-bg" style={{ backgroundImage: `url(${isTeam ? teamSpaceBackground : personalSpaceBackground})` }} aria-hidden="true" />
       <div className="space-page">
       <div className="space-page-header">
         <button className="team-back-btn" onClick={onBack}>
