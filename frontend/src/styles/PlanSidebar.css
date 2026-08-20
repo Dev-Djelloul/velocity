@@ -103,6 +103,8 @@
   z-index: 7;
   width: 8px;
   height: 8px;
+  min-width: 0;
+  min-height: 0;
   padding: 0;
   border: none;
   background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);

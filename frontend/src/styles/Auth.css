@@ -43,6 +43,8 @@
 .mock-user-button {
   width: 34px;
   height: 34px;
+  min-width: 0;
+  min-height: 0;
   border-radius: 50%;
   background: var(--color-bg-tertiary);
   border: 1px solid rgba(145, 132, 217, 0.3);

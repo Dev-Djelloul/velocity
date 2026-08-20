@@ -46,6 +46,8 @@
   justify-content: center;
   width: 22px;
   height: 22px;
+  min-width: 0;
+  min-height: 0;
   border: none;
   background: none;
   color: var(--color-text-muted);
@@ -164,6 +166,8 @@
   justify-content: center;
   width: 22px;
   height: 22px;
+  min-width: 0;
+  min-height: 0;
   border: none;
   background: none;
   border-radius: 5px;
