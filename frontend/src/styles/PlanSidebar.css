@@ -223,6 +223,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  color: #fff;
 }
 
 .plan-sidebar-label {
@@ -247,7 +248,7 @@
 }
 
 .plan-sidebar-item.active .plan-sidebar-icon {
-  color: #9184d9;
+  color: #fff;
 }
 
 .plan-sidebar-item.active::before {
