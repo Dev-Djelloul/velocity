@@ -117,6 +117,7 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
   let ws = null
   let closed = false
   let clientId = null
+  let myName = null
 
   const connect = () => {
     if (closed) return
@@ -132,11 +133,11 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
       if (msg.type === 'init') {
         clientId = msg.id
         Y.applyUpdate(doc, new Uint8Array(msg.update), 'remote')
-        onRoadmap?.(doc)
+        onRoadmap?.(doc, { by: null })
         onReady?.()
       } else if (msg.type === 'update') {
         Y.applyUpdate(doc, new Uint8Array(msg.update), 'remote')
-        onRoadmap?.(doc)
+        onRoadmap?.(doc, { by: msg.name || null })
       } else if (msg.type === 'presence') {
         onPresence?.((msg.peers || []).filter(p => p.id !== clientId))
       }
@@ -149,11 +150,14 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
   doc.on('update', (update, origin) => {
     if (origin === 'remote') return // évite de renvoyer au serveur ce qu'il vient d'envoyer
     if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'update', update: Array.from(update) }))
+      // `name` accompagne chaque update pour que les pairs puissent attribuer l'entrée
+      // d'historique correspondante (voir PlanViewer.jsx) sans protocole de présence séparé.
+      ws.send(JSON.stringify({ type: 'update', update: Array.from(update), name: myName }))
     }
   })
 
   const sendPresence = (name, section) => {
+    myName = name
     if (ws?.readyState === WebSocket.OPEN) {
       ws.send(JSON.stringify({ type: 'presence', name, color: colorFor(clientId || name), section }))
     }

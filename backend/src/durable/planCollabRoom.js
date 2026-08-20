@@ -68,7 +68,7 @@ export class PlanCollabRoom {
       try {
         Y.applyUpdate(this.doc, new Uint8Array(msg.update))
       } catch { return }
-      this.relay(ws, { type: 'update', update: msg.update })
+      this.relay(ws, { type: 'update', update: msg.update, name: msg.name || this.sessions.get(ws)?.name || null })
       this.schedulePersist()
     } else if (msg.type === 'presence') {
       const session = this.sessions.get(ws)

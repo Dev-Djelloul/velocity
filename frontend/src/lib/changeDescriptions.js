@@ -12,6 +12,7 @@ export const SECTION_LABELS = {
   roadmapGantt: { fr: 'Roadmap · Gantt', en: 'Roadmap · Gantt' },
   roadmapBacklog: { fr: 'Roadmap · Backlog', en: 'Roadmap · Backlog' },
   roadmapAgents: { fr: 'Roadmap · Agents IA', en: 'Roadmap · AI agents' },
+  roadmapCollab: { fr: 'Roadmap · Collaboration', en: 'Roadmap · Collaboration' },
   planStartDate: { fr: 'Date de démarrage', en: 'Start date' },
   kpis: { fr: 'KPIs', en: 'KPIs' },
   metrics: { fr: 'Suivi post-lancement', en: 'Post-launch tracking' },

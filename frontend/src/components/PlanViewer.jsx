@@ -126,10 +126,24 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   useEffect(() => {
     if (!plan.id) return
     const collab = connectCollab(plan.id, {
-      onRoadmap: (doc) => {
+      // meta.by est fourni par le pair à l'origine de la mutation (voir lib/collab.js) ;
+      // absent sur le message "init" (simple synchronisation initiale, pas une édition).
+      onRoadmap: (doc, meta) => {
+        const prev = lastSyncedRoadmapRef.current
         const next = roadmapFromDoc(doc, plan.roadmap)
         lastSyncedRoadmapRef.current = next
-        setPlan(p => ({ ...p, roadmap: next }))
+        setPlan(p => {
+          const nextPlan = { ...p, roadmap: next }
+          if (!meta?.by) return nextPlan
+          const items = diffRoadmapItems(prev, next, lang)
+          if (!items.length) return nextPlan
+          // Historique local uniquement : l'entrée "officielle" (persistée en base) sera
+          // celle que l'auteur écrira via son propre bouton "Enregistrer" — celle-ci ne fait
+          // que refléter en direct, côté spectateur·rice, ce qui vient de changer chez l'autre,
+          // sans déclencher la bannière "modifications non enregistrées" ici.
+          const entry = { date: new Date().toISOString(), author: meta.by, changes: items.map(({ detail }) => ({ section: 'roadmapCollab', detail })) }
+          return { ...nextPlan, changeLog: [entry, ...(p.changeLog || [])].slice(0, 50) }
+        })
       },
       onPresence: setPresencePeers,
       onReady: () => {
