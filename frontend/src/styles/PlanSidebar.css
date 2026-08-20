@@ -310,8 +310,40 @@
   margin-bottom: 0.6rem;
 }
 
+/* Même traitement dégradé que "Créer un nouveau plan" (bordure + icône + libellé) — les
+   trois panneaux (Historique, Commentaires, Conversation Nova) sont des points d'entrée au
+   même niveau d'importance dans le sommaire, ils doivent se distinguer aussi nettement des
+   liens de navigation ordinaires en dessous. */
 .plan-sidebar-history-toggle {
   justify-content: flex-start;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+  transition: filter 0.15s ease;
+}
+
+.plan-sidebar-history-toggle:hover {
+  filter: brightness(1.25);
+  background:
+    linear-gradient(var(--color-dashboard), var(--color-dashboard)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
+}
+
+.plan-sidebar-history-toggle .plan-sidebar-icon {
+  color: #9184d9;
+}
+
+.plan-sidebar-history-toggle .plan-sidebar-label {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-weight: 600;
+}
+
+.plan-sidebar-history-toggle .plan-sidebar-history-chevron {
+  color: #9184d9;
 }
 
 .plan-sidebar-history-toggle.open {
