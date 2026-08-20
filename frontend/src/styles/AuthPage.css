@@ -146,13 +146,14 @@
   overflow: visible !important;
 }
 
-/* Filet de sécurité pour le badge "Last used" (rempli, cyan de la charte) au cas où la
-   classe stable cl-badge diffère de celle stylée via appearance.elements.badge côté JS.
-   Sélecteur élargi par attribut (en plus de la classe exacte) au cas où Clerk préfixe ou
-   suffixe cl-badge différemment selon la version — et opacity/backdrop-filter réinitialisés
-   explicitement, la translucidité observée pouvant venir de là plutôt que du background. */
+/* Filet de sécurité pour le badge "Utilisé la dernière fois" (rempli, cyan de la charte).
+   Inspection DOM en direct (DevTools) : la vraie classe est cl-lastAuthenticationStrategyBadge,
+   pas cl-badge (qui couvre d'autres badges Clerk mais pas celui-ci) — d'où la couleur qui
+   restait translucide malgré l'override appearance.elements.badge. On garde cl-badge en plus
+   par précaution pour les autres badges Clerk éventuels sur cette page. */
 .auth-clerk-widget .cl-badge,
-.auth-clerk-widget [class*="cl-badge" i] {
+.auth-clerk-widget .cl-lastAuthenticationStrategyBadge,
+.auth-clerk-widget [class*="lastAuthenticationStrategyBadge" i] {
   background: #06b6d4 !important;
   color: #04141a !important;
   border: none !important;

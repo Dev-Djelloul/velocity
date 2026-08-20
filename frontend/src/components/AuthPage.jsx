@@ -37,6 +37,15 @@ function getClerkAppearance(theme) {
         border: 'none',
         fontWeight: 600
       },
+      // Vraie classe du badge "Utilisé la dernière fois" au-dessus du dernier provider
+      // OAuth utilisé (confirmé par inspection DOM : cl-lastAuthenticationStrategyBadge,
+      // distincte de cl-badge qui ne le couvrait pas).
+      lastAuthenticationStrategyBadge: {
+        background: '#06b6d4',
+        color: '#04141a',
+        border: 'none',
+        fontWeight: 600
+      },
       footer: { display: 'none' },
       header: { display: 'none' }
     }
