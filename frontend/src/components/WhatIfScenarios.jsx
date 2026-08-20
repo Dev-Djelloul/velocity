@@ -30,14 +30,19 @@ function closestIndex(steps, currentKey) {
 }
 
 export default function WhatIfScenarios({ plan, lang }) {
-  const [budgetIdx, setBudgetIdx] = useState(() => closestIndex(BUDGET_STEPS, plan.resources?.budgetEur))
+  // Un seul curseur "Budget" pilote à la fois le budget marketing et le budget total pour la
+  // simulation : ce simulateur ne prétend pas distinguer les deux (voir son sous-titre "impact
+  // sur tes finances, ta roadmap et ton marketing"), il grossit/réduit l'enveloppe globale en
+  // gardant leur proportion actuelle implicite. Sans ça, glisser le curseur ne bougerait plus
+  // les finances simulées (qui suivent désormais totalBudget, pas budgetEur).
+  const [budgetIdx, setBudgetIdx] = useState(() => closestIndex(BUDGET_STEPS, plan.resources?.totalBudget || plan.resources?.budgetEur))
   const [timelineIdx, setTimelineIdx] = useState(() => closestIndex(TIMELINE_STEPS, plan.resources?.timelineWeeks))
 
   const budgetStep = BUDGET_STEPS[budgetIdx]
   const timelineStep = TIMELINE_STEPS[timelineIdx]
 
   const simulated = useMemo(() => {
-    const resources = { ...plan.resources, budgetEur: budgetStep.key, timelineWeeks: timelineStep.key }
+    const resources = { ...plan.resources, totalBudget: budgetStep.key, budgetEur: budgetStep.key, timelineWeeks: timelineStep.key }
     const financials = generateFinancials(resources, plan.market, lang)
     const marketing = generateMarketingStrategy(plan.market, plan.priorities, budgetStep.key, lang, plan.product?.category)
     const sprints = sprintCount(timelineStep.weeks)

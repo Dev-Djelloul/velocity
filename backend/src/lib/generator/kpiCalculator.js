@@ -1,13 +1,14 @@
 import { kpiFocus, primaryTarget } from '../engine'
 import { c } from '../contentI18n'
-
-const BUDGET = { b500: 500, b1k: 1000, b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000, b100k: 100000 }
+import { budgetFromKey } from './budgetTiers'
 
 export function calculateKPIs(priorities, resources, market, lang) {
   const dict = c(lang)
   const focus = kpiFocus(priorities?.focus, lang)
   const target = primaryTarget(market)
-  const budget = BUDGET[resources?.budgetEur] ?? 5000
+  // CAC cible = budget marketing / objectif d'acquisition — reste sur budgetEur (le total
+  // du lancement n'est pas la bonne base pour un coût d'acquisition).
+  const budget = budgetFromKey(resources?.budgetEur)
 
   const monthly = lang === 'en' ? 'Monthly' : 'Mensuel'
   const weekly = lang === 'en' ? 'Weekly' : 'Hebdomadaire'

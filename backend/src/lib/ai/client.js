@@ -1,6 +1,7 @@
 import { PLAN_GENERATION_TOOL } from './planSchema'
 import { brandVoicePrompt } from './brandVoice'
 import { callOpenRouterTool } from './openrouter'
+import { budgetFromKey } from '../generator/budgetTiers'
 
 // Le prompt utilisateur (données brutes du questionnaire) doit être dans la langue cible :
 // le modèle suit surtout la langue du texte qu'il a sous les yeux, pas seulement les
@@ -21,7 +22,8 @@ const LABELS = {
     competition: 'concurrence',
     resources: 'Ressources',
     timeline: 'timeline',
-    budget: 'budget',
+    totalBudget: 'budget total du lancement (tous postes confondus)',
+    budget: 'budget marketing (part du budget total dédiée au marketing)',
     team: 'équipe',
     roles: 'Rôles présents',
     priorities: 'Priorités',
@@ -47,7 +49,8 @@ const LABELS = {
     competition: 'competition',
     resources: 'Resources',
     timeline: 'timeline',
-    budget: 'budget',
+    totalBudget: 'total launch budget (all costs included)',
+    budget: 'marketing budget (share of the total budget dedicated to marketing)',
     team: 'team',
     roles: 'Roles present',
     priorities: 'Priorities',
@@ -81,7 +84,7 @@ function buildUserPrompt(data, lang) {
     `${l.market} : ${market?.geography}, ${market?.b2bVsB2c}, ${l.segment} "${market?.segment}"`,
     `${l.audienceSize} : ${market?.audienceSize}, ${l.competition} : ${market?.competition}`,
     '',
-    `${l.resources} : ${l.timeline} ${resources?.timelineWeeks}, ${l.budget} ${resources?.budgetEur}, ${l.team} ${resources?.teamSize}`,
+    `${l.resources} : ${l.timeline} ${resources?.timelineWeeks}, ${l.totalBudget} ${budgetFromKey(resources?.totalBudget)} €, ${l.budget} ${budgetFromKey(resources?.budgetEur)} €, ${l.team} ${resources?.teamSize}`,
     `${l.roles} : ${(resources?.rolesPresent || []).join(', ')}`,
     '',
     `${l.priorities} : ${l.focus} ${priorities?.focus}, ${l.engagement} ${priorities?.engagement}, ${l.risk} ${priorities?.riskKnown}`,

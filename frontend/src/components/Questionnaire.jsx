@@ -8,7 +8,7 @@ import '../styles/Questionnaire.css'
 const DEFAULT_DATA = {
   product: { name: '', stage: 'mvp', category: 'pm', pitch: '', usp: '', targetUser: 'smb' },
   market: { geography: 'global', b2bVsB2c: 'b2b', segment: '', audienceSize: 's', competition: 'moderate' },
-  resources: { timelineWeeks: 'w8', budgetEur: 'b5k', teamSize: 'small', rolesPresent: ['product', 'dev'] },
+  resources: { timelineWeeks: 'w8', totalBudget: 'b10k', budgetEur: 'b5k', teamSize: 'small', rolesPresent: ['product', 'dev'] },
   priorities: { focus: 'acquire', engagement: 'moderate', riskKnown: 'none', successMetric: 'signups', rulesFlags: [] },
   context: '',
   contextDocument: '',
@@ -22,11 +22,26 @@ const DOCUMENT_ERROR_KEYS = {
   'extraction-failed': 'priorities.contextDocumentErrorGeneric'
 }
 
+// Fusionne avec DEFAULT_DATA (par section) plutôt que de renvoyer les données brutes : un
+// brouillon ou un plan sauvegardé avant l'ajout d'un champ (ex: resources.totalBudget) ne
+// l'aurait sinon jamais, laissant un <select> sans valeur correspondante.
+function mergeWithDefaults(data) {
+  if (!data) return DEFAULT_DATA
+  return {
+    ...DEFAULT_DATA,
+    ...data,
+    product: { ...DEFAULT_DATA.product, ...data.product },
+    market: { ...DEFAULT_DATA.market, ...data.market },
+    resources: { ...DEFAULT_DATA.resources, ...data.resources },
+    priorities: { ...DEFAULT_DATA.priorities, ...data.priorities }
+  }
+}
+
 function loadInitial(initialData) {
-  if (initialData) return initialData
+  if (initialData) return mergeWithDefaults(initialData)
   try {
     const saved = localStorage.getItem('plp_form')
-    return saved ? JSON.parse(saved) : DEFAULT_DATA
+    return saved ? mergeWithDefaults(JSON.parse(saved)) : DEFAULT_DATA
   } catch {
     return DEFAULT_DATA
   }
@@ -244,6 +259,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
           <>
             <h2>{t(lang, 'resources.title')}</h2>
             <Select formData={formData} onChange={handleChange} section="resources" field="timelineWeeks" label={t(lang, 'resources.timelineWeeks')} options={t(lang, 'resources.timelineOptions')} help={t(lang, 'resources.timelineWeeksHelp')} />
+            <Select formData={formData} onChange={handleChange} section="resources" field="totalBudget" label={t(lang, 'resources.totalBudget')} options={t(lang, 'resources.totalBudgetOptions')} help={t(lang, 'resources.totalBudgetHelp')} />
             <Select formData={formData} onChange={handleChange} section="resources" field="budgetEur" label={t(lang, 'resources.budgetEur')} options={t(lang, 'resources.budgetOptions')} help={t(lang, 'resources.budgetEurHelp')} />
             <Select formData={formData} onChange={handleChange} section="resources" field="teamSize" label={t(lang, 'resources.teamSize')} options={t(lang, 'resources.teamSizeOptions')} help={t(lang, 'resources.teamSizeHelp')} />
             <div className="field">

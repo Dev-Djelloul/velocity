@@ -3,6 +3,7 @@ import { costFor } from './costMatrix'
 import { generatePersona } from './personaGenerator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
 import { c } from './contentI18n'
+import { budgetFromKey } from './budgetTiers'
 
 const STORY_TEMPLATES = [
   { key: 'onboarding', category: 'product', type: 'frontend', effort: 8, assignee: 'Dev' },
@@ -42,10 +43,6 @@ function applyRules(templates, rulesFlags) {
 
 function timelineWeeksFromKey(key) {
   return { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }[key] ?? 8
-}
-
-function budgetFromKey(key) {
-  return { b500: 500, b1k: 1000, b2k: 2000, b5k: 5000, b10k: 10000, b25k: 25000, b50k: 50000, b100k: 100000 }[key] ?? 5000
 }
 
 export function generateRoadmap(resources, product, priorities, lang) {

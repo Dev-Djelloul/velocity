@@ -99,15 +99,15 @@ const COST_LINE_SCHEMA = {
 
 const FINANCIALS_SCHEMA = {
   type: 'object',
-  description: 'Prévisionnel financier simplifié, chiffré à partir du budget et du modèle économique déclarés',
+  description: 'Prévisionnel financier simplifié, chiffré à partir du BUDGET TOTAL du lancement déclaré (tous postes confondus — voir "budget total du lancement" dans le prompt), pas du budget marketing seul, et du modèle économique déclaré',
   properties: {
-    monthlyBurn: { type: 'integer', description: 'Dépense mensuelle moyenne en euros sur la durée du plan' },
-    runwayMonths: { type: 'number', description: 'Nombre de mois que couvre le budget déclaré à ce rythme de dépense' },
+    monthlyBurn: { type: 'integer', description: 'Dépense mensuelle moyenne en euros sur la durée du plan, calculée à partir du budget total' },
+    runwayMonths: { type: 'number', description: 'Nombre de mois que couvre le budget total déclaré à ce rythme de dépense' },
     assumedArpu: { type: 'integer', description: 'Revenu mensuel moyen par utilisateur/client supposé, en euros, réaliste pour ce type de produit et ce marché' },
     arpuRationale: { type: 'string', description: 'Une phrase justifiant ce montant d\'ARPU : sur quoi il se base (modèle économique, comparables du secteur, prix perçu du marché)' },
     breakEvenUsers: { type: 'integer', description: 'Nombre de clients payants nécessaires pour couvrir le burn mensuel, au prix (ARPU) supposé' },
     breakEvenMonthlyRevenue: { type: 'integer', description: 'Revenu mensuel correspondant au seuil de rentabilité, en euros' },
-    costBreakdown: { type: 'array', items: COST_LINE_SCHEMA, description: 'Répartition du budget total par poste, les montants doivent sommer exactement au budget total' }
+    costBreakdown: { type: 'array', items: COST_LINE_SCHEMA, description: 'Répartition du BUDGET TOTAL du lancement par poste (ex: Développement, Marketing, Opérations) — les montants doivent sommer exactement au budget total déclaré, pas au budget marketing seul ; la ligne "Marketing" doit rester cohérente avec le budget marketing déclaré séparément et avec marketing.totalBudget' }
   },
   required: ['monthlyBurn', 'runwayMonths', 'assumedArpu', 'arpuRationale', 'breakEvenUsers', 'breakEvenMonthlyRevenue', 'costBreakdown']
 }
