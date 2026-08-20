@@ -1,19 +1,13 @@
-.space-page {
+/* Wrapper plein largeur (pas les 960px de la colonne de contenu) — le fond flouté doit
+   couvrir toute la page, pas juste la colonne centrée, contrairement à .space-page qui reste
+   la colonne de contenu (960px, centrée). Même procédé que les autres pages (Mon compte,
+   Paramètres...) : display:flow-root empêche le margin-top de .space-page de "remonter" par
+   collapse de marge et de décaler le fond. */
+.space-page-outer {
   position: relative;
-  max-width: 960px;
-  margin: 2rem auto;
-  padding: 0 1.5rem 4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
+  display: flow-root;
 }
 
-/* Fond flouté plein viewport (pas juste la colonne de contenu de 960px) — fixed pour
-   couvrir toute la page même si son contenu défile, avec un voile sombre pour garder le
-   texte et les cartes lisibles par-dessus. z-index positif + tout le contenu réel dans
-   .space-page-inner (z-index supérieur) plutôt qu'un z-index négatif sur le fond : plus
-   fiable, un z-index négatif combiné à position:fixed provoque des bugs de peinture sur
-   certains moteurs/versions de navigateur. */
 .space-page-bg {
   position: absolute;
   inset: 0;
@@ -23,9 +17,12 @@
   filter: blur(2px) brightness(0.55) saturate(1.1);
 }
 
-.space-page-inner {
+.space-page {
   position: relative;
   z-index: 1;
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 4rem;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

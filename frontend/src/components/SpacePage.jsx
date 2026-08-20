@@ -126,9 +126,9 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   }
 
   return (
-    <div className="space-page">
+    <div className="space-page-outer">
       <div className="space-page-bg" style={{ backgroundImage: `url(${spaceBackground})` }} aria-hidden="true" />
-      <div className="space-page-inner">
+      <div className="space-page">
       <div className="space-page-header">
         <button className="team-back-btn" onClick={onBack}>
           <IconArrowLeft width={16} height={16} /> {t(lang, 'auth.backToHome')}
