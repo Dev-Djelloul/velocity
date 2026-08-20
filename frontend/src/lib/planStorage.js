@@ -246,14 +246,15 @@ export function generateId() {
 // comme n'importe quelle création, pas besoin d'un aller-retour serveur dédié. Retire tout
 // ce qui identifie un plan précis plutôt que son contenu : id/dates (nouvelle création),
 // espace d'origine (la copie naît dans l'espace ACTUELLEMENT actif, pas forcément celui de
-// l'original), historique de changements et commentaires (conversation propre à l'original,
-// pas au copie), et les liens providers (Jira/Linear/GitHub/Notion/Google Calendar
-// pointent vers des tickets/pages de l'original — les reprendre tel quel romprait la
-// synchronisation ou écraserait par erreur les tickets de l'original au prochain export).
+// l'original), historique de changements, commentaires et conversation avec le copilote IA
+// (propres à l'original, pas à la copie), et les liens providers (Jira/Linear/GitHub/Notion/
+// Google Calendar pointent vers des tickets/pages de l'original — les reprendre tel quel
+// romprait la synchronisation ou écraserait par erreur les tickets de l'original au prochain
+// export).
 export function duplicatePlan(source, lang) {
   const {
     id, savedAt, updatedAt, team_id, createdSpaceId, createdSpaceName, createdByName,
-    changeLog, comments, jira, github, notion, linear, googleCalendar, metricsHistory,
+    changeLog, comments, copilotHistory, jira, github, notion, linear, googleCalendar, metricsHistory,
     ...rest
   } = source
   const suffix = lang === 'en' ? '(copy)' : '(copie)'

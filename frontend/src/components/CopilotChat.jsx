@@ -12,9 +12,12 @@ const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
 // appliquées ici via onApplyChanges (fourni par PlanViewer), qui les fait passer par le
 // même circuit markChanged()/pendingChanges que toute autre édition : rien n'est jamais
 // enregistré silencieusement, l'utilisateur garde la main via le bouton "Enregistrer".
-export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggleSignal }) {
+export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHistoryChange, toggleSignal }) {
   const [open, setOpen] = useState(false)
-  const [messages, setMessages] = useState([])
+  // Repris depuis plan.copilotHistory (voir updateCopilotHistory dans PlanViewer.jsx) —
+  // survit à un rechargement de page ou à un changement de plan, contrairement à un simple
+  // état local. Lazy init : ne lit plan.copilotHistory qu'au montage, pas à chaque re-render.
+  const [messages, setMessages] = useState(() => plan.copilotHistory || [])
   const [input, setInput] = useState('')
   const [busy, setBusy] = useState(false)
   const [copiedIndex, setCopiedIndex] = useState(null)
@@ -25,6 +28,15 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, toggle
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, open, busy])
+
+  // Persiste la conversation sur le plan à chaque échange (voir onHistoryChange dans
+  // PlanViewer.jsx) — sauf au montage, où `messages` vient déjà de plan.copilotHistory et le
+  // resauvegarder serait un aller-retour inutile.
+  const isFirstMessagesRender = useRef(true)
+  useEffect(() => {
+    if (isFirstMessagesRender.current) { isFirstMessagesRender.current = false; return }
+    onHistoryChange?.(messages)
+  }, [messages])
 
   // ⌘K/Ctrl+K est géré au niveau de App.jsx (seul endroit qui sait naviguer vers la page du
   // plan depuis n'importe où dans l'app) — toggleSignal change à chaque pression, on bascule

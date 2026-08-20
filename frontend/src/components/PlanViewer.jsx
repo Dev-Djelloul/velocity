@@ -315,6 +315,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
+  // Historique du copilote IA : sauvegardé immédiatement comme les commentaires, pas soumis
+  // au bouton "Enregistrer" — c'est une conversation, pas une édition de contenu. Plafonné
+  // aux 50 derniers messages (même limite que changeLog) pour ne pas alourdir le plan indéfiniment.
+  const updateCopilotHistory = (nextMessages) => {
+    const nextPlan = { ...plan, copilotHistory: nextMessages.slice(-50) }
+    setPlan(nextPlan)
+    if (plan.id) savePlan(nextPlan)
+  }
+
   const updateNotion = (nextNotion) => {
     const nextPlan = { ...plan, notion: nextNotion }
     setPlan(nextPlan)
@@ -759,7 +768,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         </InfoModal>
       )}
 
-      {!readOnly && <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} toggleSignal={novaToggle} />}
+      {!readOnly && <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} onHistoryChange={updateCopilotHistory} toggleSignal={novaToggle} />}
       </div>
     </div>
     </div>
