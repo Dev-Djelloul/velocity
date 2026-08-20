@@ -8,6 +8,7 @@ import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { IconPlus, IconUser, IconUsers, IconClipboard, IconClock, IconImage } from './Icons'
 import TeamAvatar from './TeamAvatar'
+import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import '../styles/DashboardHome.css'
 
 function byRecency(a, b) {
@@ -75,7 +76,9 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   }, [personalSpace.name, personalSpace.avatar, teamIdsKey])
 
   return (
-    <div className="dashboard-home">
+    <div className="dashboard-home-outer">
+      <div className="dashboard-home-bg" style={{ backgroundImage: `url(${dashboardBackground})` }} aria-hidden="true" />
+      <div className="dashboard-home">
       <div className="dashboard-home-header">
         <div>
           <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
@@ -153,6 +156,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           <IconImage width={14} height={14} />
           {t(lang, 'dashboard.viewGallery')}
         </button>
+      </div>
       </div>
     </div>
   )

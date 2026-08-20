@@ -1,4 +1,23 @@
+/* Même procédé que SpacePage/AccountPage : le fond flouté couvre toute la largeur (pas
+   juste la colonne de contenu centrée), display:flow-root pour que le margin-top de
+   .dashboard-home ne "remonte" pas par collapse de marge et ne décale pas le fond. */
+.dashboard-home-outer {
+  position: relative;
+  display: flow-root;
+}
+
+.dashboard-home-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(2px) brightness(0.55) saturate(1.1);
+}
+
 .dashboard-home {
+  position: relative;
+  z-index: 1;
   max-width: 960px;
   margin: 3rem auto;
   padding: 0 1.5rem 4rem;
