@@ -31,12 +31,25 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
 
   // Persiste la conversation sur le plan à chaque échange (voir onHistoryChange dans
   // PlanViewer.jsx) — sauf au montage, où `messages` vient déjà de plan.copilotHistory et le
-  // resauvegarder serait un aller-retour inutile.
+  // resauvegarder serait un aller-retour inutile, et sauf pour le vidage déclenché par
+  // closeAndReset() ci-dessous (skipHistorySync), qui doit laisser l'historique archivé
+  // intact dans la sidebar plutôt que l'effacer en même temps que la fenêtre de chat.
   const isFirstMessagesRender = useRef(true)
+  const skipHistorySync = useRef(false)
   useEffect(() => {
     if (isFirstMessagesRender.current) { isFirstMessagesRender.current = false; return }
+    if (skipHistorySync.current) { skipHistorySync.current = false; return }
     onHistoryChange?.(messages)
   }, [messages])
+
+  // Fermer (croix) diffère désormais de Réduire (−) : ferme ET repart sur une conversation
+  // vierge à la prochaine ouverture, sans toucher à l'historique déjà archivé (visible dans
+  // la sidebar) — pense "classer cette conversation", pas "la supprimer".
+  const closeAndReset = () => {
+    skipHistorySync.current = true
+    setMessages([])
+    setOpen(false)
+  }
 
   // ⌘K/Ctrl+K est géré au niveau de App.jsx (seul endroit qui sait naviguer vers la page du
   // plan depuis n'importe où dans l'app) — toggleSignal change à chaque pression, on bascule
@@ -154,7 +167,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
               <button type="button" className="copilot-panel-icon-btn" onClick={() => setOpen(false)} title={t(lang, 'copilot.minimize')} aria-label={t(lang, 'copilot.minimize')}>
                 <IconMinus width={14} height={14} />
               </button>
-              <button type="button" className="copilot-panel-icon-btn" onClick={() => setOpen(false)} aria-label={t(lang, 'copilot.close')}>
+              <button type="button" className="copilot-panel-icon-btn" onClick={closeAndReset} title={t(lang, 'copilot.close')} aria-label={t(lang, 'copilot.close')}>
                 <IconX width={16} height={16} />
               </button>
             </div>

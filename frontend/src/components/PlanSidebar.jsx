@@ -95,7 +95,7 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers, copilotHistory }) {
   // Repliée par défaut sous 900px (tablette/mobile) — en pleine largeur forcée par le CSS
   // responsive, la version dépliée (groupes + libellés) occupe toute la hauteur de l'écran
   // et masque le contenu du plan tant qu'on n'a pas scrollé plusieurs écrans plus bas.
@@ -107,6 +107,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const [historyOpen, setHistoryOpen] = useState(false)
   const [confirmClearHistory, setConfirmClearHistory] = useState(false)
   const [commentsOpen, setCommentsOpen] = useState(false)
+  const [novaHistoryOpen, setNovaHistoryOpen] = useState(false)
   const [commentTopic, setCommentTopic] = useState('general')
   const [commentText, setCommentText] = useState('')
   const [mentionedIds, setMentionedIds] = useState([])
@@ -258,6 +259,15 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
       }
       return next
     })
+  }
+
+  const toggleNovaHistory = () => {
+    if (collapsed) {
+      setCollapsed(false)
+      setNovaHistoryOpen(true)
+      return
+    }
+    setNovaHistoryOpen(v => !v)
   }
 
   const renderItem = ({ id, labelKey, Icon }) => (
@@ -419,6 +429,39 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
                   ))}
                 </div>
               )}
+            </div>
+          )}
+        </div>
+      )}
+
+      {!!copilotHistory?.length && (
+        <div className="plan-sidebar-history">
+          <button
+            className={`plan-sidebar-item plan-sidebar-history-toggle ${novaHistoryOpen ? 'open' : ''}`}
+            onClick={toggleNovaHistory}
+            title={collapsed ? (lang === 'fr' ? 'Conversation Nova' : 'Nova conversation') : undefined}
+          >
+            <span className="plan-sidebar-icon"><IconSparkle width={16} height={16} /></span>
+            {!collapsed && (
+              <>
+                <span className="plan-sidebar-label">{lang === 'fr' ? 'Conversation Nova' : 'Nova conversation'}</span>
+                <IconChevronDown width={12} height={12} className="plan-sidebar-history-chevron" />
+              </>
+            )}
+          </button>
+
+          {!collapsed && novaHistoryOpen && (
+            <div className="plan-sidebar-history-panel">
+              <div className="plan-sidebar-history-list">
+                {copilotHistory.map((m, i) => (
+                  <div className="plan-sidebar-comment" key={i}>
+                    <div className="plan-sidebar-comment-head">
+                      <span className="change-section-tag">{m.role === 'user' ? (lang === 'fr' ? 'Vous' : 'You') : 'Nova'}</span>
+                    </div>
+                    <p className="plan-sidebar-comment-text">{m.content}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

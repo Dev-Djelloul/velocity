@@ -488,6 +488,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         comments={plan.comments}
         onAddComment={readOnly ? undefined : addComment}
         onDeleteComment={deleteComment}
+        copilotHistory={plan.copilotHistory}
         teamMembers={team.members}
         currentUserId={userId}
         onSectionSelect={goToMobileSection}

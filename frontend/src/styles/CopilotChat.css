@@ -44,10 +44,10 @@
   right: 24px;
   bottom: 144px;
   z-index: 151;
-  /* Agrandi (460px, ~640px de haut) par rapport à la version précédente (380x480) — plus
-     confortable pour une vraie conversation avec plusieurs échanges, tout en restant un
+  /* Élargi (620px) par rapport à la version précédente (460px) — plus confortable pour lire
+     de longues réponses sans que chaque ligne se coupe après 3-4 mots, tout en restant un
      panneau flottant (pas plein écran). */
-  width: min(460px, calc(100vw - 32px));
+  width: min(620px, calc(100vw - 32px));
   /* Le header applicatif est sticky (top: 0, z-index: 100 — voir design-system.css), donc
      au-dessus du panneau (z-index: 61) : s'il déborde en haut de l'écran, il passe derrière
      le header au lieu de simplement le chevaucher. On réserve donc explicitement sa hauteur
