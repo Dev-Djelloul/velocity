@@ -20,15 +20,21 @@
   filter: blur(2px) brightness(0.55) saturate(1.1);
 }
 
+/* position:relative (sans z-index explicite) suffit à faire peindre .plan-viewer-layout
+   au-dessus de .plan-page-bg (positionné, z-index:0) : un élément positionné en z-index:auto
+   peint après (au-dessus) tout sibling positionné en z-index:0/auto qui le précède dans le
+   DOM, sans avoir besoin d'un z-index explicite. C'est important : poser un vrai z-index ici
+   créerait un nouveau contexte d'empilement qui piégerait Nova (position:fixed, rendu plus
+   bas dans cet arbre) et le ferait disparaître derrière d'autres éléments de la page situés
+   hors de ce conteneur (bug rencontré et corrigé). */
 .plan-viewer-layout {
   position: relative;
-  z-index: 1;
   display: flex;
   align-items: flex-start;
   gap: 1.75rem;
   max-width: 1400px;
   margin: 0 auto;
-  padding: 2rem 1.5rem 0;
+  padding: 2rem 1.5rem 4rem;
 }
 
 /* Verre dépoli quand un fond de page est actif (voir .plan-page-outer ci-dessus) : la

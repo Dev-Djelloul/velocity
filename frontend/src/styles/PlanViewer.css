@@ -100,7 +100,7 @@
 .plan-cover-banner {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 340px;
   border-radius: var(--border-radius);
   overflow: hidden;
   margin-bottom: 1rem;
@@ -149,9 +149,14 @@
 
 .plan-cover-banner-btn:hover { background: rgba(15, 15, 20, 0.75); }
 
+.plan-cover-banner-btn.active {
+  background: rgba(6, 182, 212, 0.35);
+  border-color: rgba(6, 182, 212, 0.6);
+}
+
 @media (max-width: 640px) {
   .plan-cover-banner.has-image .plan-cover-banner-actions { opacity: 1; }
-  .plan-cover-banner { height: 140px; }
+  .plan-cover-banner { height: 200px; }
 }
 
 .plan-header-top {

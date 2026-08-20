@@ -31,7 +31,7 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCoin, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus, IconDroplet } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -508,7 +508,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             {plan.pageBackground ? t(lang, 'app.pageBgChange') : t(lang, 'app.pageBgAdd')}
           </button>
           {plan.pageBackground && (
-            <button className="plan-cover-banner-btn" onClick={togglePageBackgroundBlur}>
+            <button className={`plan-cover-banner-btn${(plan.pageBackgroundBlur ?? true) ? ' active' : ''}`} onClick={togglePageBackgroundBlur}>
+              <IconDroplet width={14} height={14} />
               {(plan.pageBackgroundBlur ?? true) ? t(lang, 'app.pageBgBlurOn') : t(lang, 'app.pageBgBlurOff')}
             </button>
           )}

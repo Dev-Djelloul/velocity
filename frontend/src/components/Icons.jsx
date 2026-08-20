@@ -561,3 +561,11 @@ export function IconMenu(props) {
     </svg>
   )
 }
+
+export function IconDroplet(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 2.5s7 7.4 7 12a7 7 0 0 1-14 0c0-4.6 7-12 7-12z" />
+    </svg>
+  )
+}
