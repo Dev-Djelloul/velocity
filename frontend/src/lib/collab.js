@@ -118,6 +118,30 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
   let closed = false
   let clientId = null
   let myName = null
+  let heartbeatTimer = null
+  let pongTimeoutTimer = null
+
+  // Une connexion WebSocket non hibernée côté Durable Object peut devenir "zombie" après un
+  // redéploiement du Worker qui l'héberge (ou une coupure réseau) : le navigateur la croit
+  // encore ouverte (readyState reste OPEN) alors que le serveur l'a fermée sans frame de
+  // clôture propre — aucun événement 'close'/'error' ne se déclenche alors côté client, donc
+  // rien ne relançait la reconnexion sans recharger la page. Ce ping applicatif détecte ce
+  // cas : pas de pong sous 8s → on force la fermeture pour déclencher la reconnexion normale.
+  const stopHeartbeat = () => {
+    clearInterval(heartbeatTimer)
+    clearTimeout(pongTimeoutTimer)
+    heartbeatTimer = null
+    pongTimeoutTimer = null
+  }
+  const startHeartbeat = () => {
+    stopHeartbeat()
+    heartbeatTimer = setInterval(() => {
+      if (ws?.readyState !== WebSocket.OPEN) return
+      ws.send(JSON.stringify({ type: 'ping' }))
+      clearTimeout(pongTimeoutTimer)
+      pongTimeoutTimer = setTimeout(() => { try { ws?.close() } catch { /* ignore */ } }, 8000)
+    }, 15000)
+  }
 
   const connect = () => {
     if (closed) return
@@ -127,10 +151,13 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
       setTimeout(connect, 3000)
       return
     }
+    ws.addEventListener('open', startHeartbeat)
     ws.addEventListener('message', (evt) => {
       let msg
       try { msg = JSON.parse(evt.data) } catch { return }
-      if (msg.type === 'init') {
+      if (msg.type === 'pong') {
+        clearTimeout(pongTimeoutTimer)
+      } else if (msg.type === 'init') {
         clientId = msg.id
         Y.applyUpdate(doc, new Uint8Array(msg.update), 'remote')
         onRoadmap?.(doc, { by: null })
@@ -142,7 +169,7 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
         onPresence?.((msg.peers || []).filter(p => p.id !== clientId))
       }
     })
-    ws.addEventListener('close', () => { if (!closed) setTimeout(connect, 2500) })
+    ws.addEventListener('close', () => { stopHeartbeat(); if (!closed) setTimeout(connect, 2500) })
     ws.addEventListener('error', () => { try { ws.close() } catch { /* ignore */ } })
   }
   connect()
@@ -165,6 +192,7 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
 
   const close = () => {
     closed = true
+    stopHeartbeat()
     try { ws?.close() } catch { /* ignore */ }
   }
 

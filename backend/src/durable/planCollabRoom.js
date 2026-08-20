@@ -64,7 +64,9 @@ export class PlanCollabRoom {
   handleMessage(ws, raw) {
     let msg
     try { msg = JSON.parse(raw) } catch { return }
-    if (msg.type === 'update') {
+    if (msg.type === 'ping') {
+      try { ws.send(JSON.stringify({ type: 'pong' })) } catch { /* la socket sera nettoyée au close */ }
+    } else if (msg.type === 'update') {
       try {
         Y.applyUpdate(this.doc, new Uint8Array(msg.update))
       } catch { return }
