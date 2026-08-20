@@ -372,6 +372,7 @@
 .hiw-faq {
   background: var(--color-bg-secondary);
   padding: 6rem 2rem;
+  scroll-margin-top: 90px;
 }
 
 .hiw-faq-list {

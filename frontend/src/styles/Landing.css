@@ -472,6 +472,9 @@
 .features-section {
   background: var(--color-bg-secondary);
   padding: 6rem 2rem;
+  /* Compense le header collant (position:sticky) : sans ça, scrollIntoView cale le haut de
+     la section pile sous le header, qui la recouvre alors partiellement. */
+  scroll-margin-top: 90px;
 }
 
 /* Règle globale : toute section qui utilise .section-header hérite du même
@@ -697,6 +700,7 @@
 .faq-section {
   background: var(--color-bg-secondary);
   padding: 6rem 2rem;
+  scroll-margin-top: 90px;
 }
 
 .faq-grid {

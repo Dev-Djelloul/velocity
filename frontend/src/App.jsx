@@ -552,18 +552,28 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  // Défile jusqu'à l'ancre, puis corrige une fois après 500ms : une image encore en cours de
+  // chargement au-dessus de la section (hero, témoignages...) peut décaler toute la mise en
+  // page pendant l'animation "smooth", faisant s'arrêter le scroll net avant la bonne place —
+  // le symptôme "je tombe presque au bon endroit mais jamais pile" vient de là.
+  const scrollToAnchor = (anchorId) => {
+    const scroll = () => document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    scroll()
+    setTimeout(scroll, 500)
+  }
+
   const handleNavAnchor = (anchorId) => {
     // Si la section existe déjà sur la page affichée (ex: #faq présent à la fois sur
     // l'accueil et sur "Comment ça marche"), on y scrolle sans changer de page — sinon
     // on force un retour à l'accueil, seule page à porter les autres ancres (#features...).
     if (document.getElementById(anchorId)) {
-      document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+      scrollToAnchor(anchorId)
       return
     }
     setCurrentPage('landing')
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        document.getElementById(anchorId)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        scrollToAnchor(anchorId)
       })
     })
   }
