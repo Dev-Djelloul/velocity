@@ -51,4 +51,4 @@ class_name = "PlanCollabRoom"
 
 [[migrations]]
 tag = "v1"
-new_classes = ["PlanCollabRoom"]
+new_sqlite_classes = ["PlanCollabRoom"]
