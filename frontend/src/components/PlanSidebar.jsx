@@ -457,6 +457,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
                   <div className="plan-sidebar-comment" key={i}>
                     <div className="plan-sidebar-comment-head">
                       <span className="change-section-tag">{m.role === 'user' ? (lang === 'fr' ? 'Vous' : 'You') : 'Nova'}</span>
+                      {m.createdAt && <span className="plan-sidebar-history-date">{formatFullDateTime(m.createdAt, lang)}</span>}
                     </div>
                     <p className="plan-sidebar-comment-text">{m.content}</p>
                   </div>

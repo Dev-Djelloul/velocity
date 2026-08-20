@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { copilotChat } from '../lib/serverStorage'
 import { t } from '../lib/i18n'
+import { formatDateTime } from '../lib/dateFormat'
 import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle, IconMinus } from './Icons'
 import '../styles/CopilotChat.css'
 
@@ -106,13 +107,13 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
     const value = (text ?? input).trim()
     if (!value || busy) return
     const history = messages.map(m => ({ role: m.role, content: m.content }))
-    setMessages(prev => [...prev, { role: 'user', content: value }])
+    setMessages(prev => [...prev, { role: 'user', content: value, createdAt: new Date().toISOString() }])
     setInput('')
     setBusy(true)
     try {
       const result = await copilotChat(plan, value, history, lang, userId)
       if (!result) {
-        setMessages(prev => [...prev, { role: 'assistant', content: t(lang, 'copilot.error'), error: true }])
+        setMessages(prev => [...prev, { role: 'assistant', content: t(lang, 'copilot.error'), error: true, createdAt: new Date().toISOString() }])
         return
       }
       const changesCount = result.changes?.length || 0
@@ -120,9 +121,9 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
       const note = changesCount
         ? `${changesCount} ${t(lang, 'copilot.changesApplied')}`
         : null
-      setMessages(prev => [...prev, { role: 'assistant', content: result.reply || '', note }])
+      setMessages(prev => [...prev, { role: 'assistant', content: result.reply || '', note, createdAt: new Date().toISOString() }])
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: t(lang, 'copilot.error'), error: true }])
+      setMessages(prev => [...prev, { role: 'assistant', content: t(lang, 'copilot.error'), error: true, createdAt: new Date().toISOString() }])
     } finally {
       setBusy(false)
     }
@@ -199,6 +200,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
                 <div className={`copilot-msg copilot-msg-${m.role}${m.error ? ' copilot-msg-error' : ''}`}>
                   <p>{m.content}</p>
                   {m.note && <p className="copilot-msg-note">{m.note}</p>}
+                  {m.createdAt && <span className="copilot-msg-time">{formatDateTime(m.createdAt, lang)}</span>}
                   {m.role === 'assistant' && !m.error && (
                     <button type="button" className="copilot-msg-copy" onClick={() => copyReply(m.content, i)} title={t(lang, 'copilot.copyReply')}>
                       {copiedIndex === i ? <IconCheckCircle width={12} height={12} /> : <IconCopy width={12} height={12} />}
