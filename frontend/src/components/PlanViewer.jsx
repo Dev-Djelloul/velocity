@@ -410,6 +410,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   }
 
   return (
+    <div className="plan-page-outer">
+      {plan.pageBackground && (
+        <div
+          className={`plan-page-bg${(plan.pageBackgroundBlur ?? true) ? ' page-bg-blur' : ''}`}
+          style={{ backgroundImage: `url(${plan.pageBackground})` }}
+          aria-hidden="true"
+        />
+      )}
     <div className="plan-viewer-layout">
       {readOnly && (
         <div className="readonly-banner" role="status">
@@ -445,14 +453,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         activeSection={mobileSectionId}
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
-      {plan.pageBackground && (
-        <div
-          className={`plan-viewer-bg${(plan.pageBackgroundBlur ?? true) ? ' page-bg-blur' : ''}`}
-          style={{ backgroundImage: `url(${plan.pageBackground})` }}
-          aria-hidden="true"
-        />
-      )}
-      <div className="plan-viewer-content">
       <div className="mobile-section-nav">
         <button
           className="mobile-section-nav-btn"
@@ -651,7 +651,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-tracking" className={`plan-section-anchor ${mobileSectionId === 'section-tracking' ? 'is-active' : ''}`}><PostLaunchTracking plan={plan} lang={lang} onMetricsChange={updateMetricsHistory} onLaunchDateChange={updateLaunchDate} /></div>
         <div id="section-whatif" className={`plan-section-anchor ${mobileSectionId === 'section-whatif' ? 'is-active' : ''}`}><WhatIfScenarios plan={plan} lang={lang} /></div>
       </div>
-      </div>
 
       {showCoverPicker && (
         <CoverPicker
@@ -709,6 +708,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
       {!readOnly && <CopilotChat plan={plan} lang={lang} userId={userId} onApplyChanges={applyCopilotChanges} toggleSignal={novaToggle} />}
       </div>
+    </div>
     </div>
   )
 }

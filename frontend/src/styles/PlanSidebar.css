@@ -1,4 +1,28 @@
+/* Wrapper plein largeur pour le fond de page choisi (voir plan-bg-controls) — englobe la
+   sidebar ET la zone principale, contrairement à l'ancienne version scopée à
+   .plan-viewer-main seule qui laissait la sidebar sur son fond opaque habituel. Même
+   procédé que Mon Espace/Mon compte/... : une vraie div en z-index positif, tout le layout
+   réel dans .plan-viewer-layout au z-index supérieur. */
+.plan-page-outer {
+  position: relative;
+  display: flow-root;
+}
+
+.plan-page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+}
+
+.plan-page-bg.page-bg-blur {
+  filter: blur(2px) brightness(0.55) saturate(1.1);
+}
+
 .plan-viewer-layout {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: flex-start;
   gap: 1.75rem;
@@ -7,6 +31,10 @@
   padding: 2rem 1.5rem 0;
 }
 
+/* Verre dépoli quand un fond de page est actif (voir .plan-page-outer ci-dessus) : la
+   sidebar reste lisible sans redevenir un bloc opaque qui masquerait totalement l'image
+   demandée par l'utilisateur — comportement inchangé (fond plein, opaque) en l'absence de
+   fond personnalisé. */
 .plan-sidebar {
   position: sticky;
   top: 2rem;
@@ -20,7 +48,13 @@
   display: flex;
   flex-direction: column;
   overflow: visible;
-  transition: width 0.18s ease;
+  transition: width 0.18s ease, background 0.18s ease;
+}
+
+.plan-page-outer:has(.plan-page-bg) .plan-sidebar {
+  background: color-mix(in srgb, var(--color-dashboard) 78%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 .plan-sidebar.resizing {
@@ -546,32 +580,8 @@
 }
 
 .plan-viewer-main {
-  position: relative;
   flex: 1;
   min-width: 0;
-}
-
-/* Fond de page choisi par l'utilisateur (voir plan-bg-controls dans PlanViewer.jsx). Même
-   procédé que Mon Espace/Mon compte/... : une vraie div en z-index positif plutôt qu'un
-   z-index négatif (qui échappe au contexte d'empilement local sans ancêtre positionné dédié
-   et finit peinte sous des éléments qu'on ne contrôle pas) + tout le contenu réel du plan
-   dans .plan-viewer-content, au z-index supérieur. */
-.plan-viewer-bg {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  background-size: cover;
-  background-position: center;
-  border-radius: var(--border-radius, 14px);
-}
-
-.plan-viewer-bg.page-bg-blur {
-  filter: blur(2px) brightness(0.55) saturate(1.1);
-}
-
-.plan-viewer-content {
-  position: relative;
-  z-index: 1;
 }
 
 .plan-bg-controls {
