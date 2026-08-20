@@ -10,6 +10,7 @@
     "wrangler": "^4.118.0"
   },
   "dependencies": {
-    "workers-og": "^0.0.27"
+    "workers-og": "^0.0.27",
+    "yjs": "^13.6.32"
   }
 }

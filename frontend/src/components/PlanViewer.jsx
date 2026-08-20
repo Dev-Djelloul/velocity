@@ -24,6 +24,8 @@ import ExportModal from './ExportModal'
 import InfoModal from './InfoModal'
 import CopilotChat from './CopilotChat'
 import CoverPicker from './CoverPicker'
+import PresenceBar from './PresenceBar'
+import { connectCollab, seedDocFromRoadmap, roadmapFromDoc, applyRoadmapDiff } from '../lib/collab'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { formatMoney } from '../lib/currency'
 import { savePlan as savePlanToStorage } from '../lib/planStorage'
@@ -93,6 +95,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
   const captureRef = useRef(null)
+  const [presencePeers, setPresencePeers] = useState([])
+  // Doc Yjs partagé (voir lib/collab.js) : la référence "dernière roadmap synchronisée
+  // avec le doc collab" évite de renvoyer en boucle un changement qu'on vient tout juste
+  // de recevoir d'un pair (le remote-update met à jour cette ref en même temps que plan).
+  const collabRef = useRef(null)
+  const lastSyncedRoadmapRef = useRef(plan.roadmap)
 
   const isDirty = pendingChanges.length > 0
   const mobileSectionIndex = SECTION_LIST.findIndex(s => s.id === mobileSectionId)
@@ -107,6 +115,33 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     // propre scroll-vers-la-section via l'ancre native, un window.scrollTo ici l'écraserait.
     if (window.innerWidth < 900) window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+
+  // Collaboration temps réel sur la roadmap (voir lib/collab.js + backend Durable Object) :
+  // ouvre un Y.Doc partagé par plan.id, amorcé depuis la roadmap actuelle si le doc est
+  // encore vide côté serveur. Les mises à jour reçues d'un pair remplacent directement
+  // plan.roadmap (pas via updateRoadmap : on ne veut pas que l'édition de quelqu'un
+  // d'autre déclenche "modifications non enregistrées" chez soi — cette personne est déjà
+  // responsable de sauvegarder son propre changement). Désactivé en lecture seule : un
+  // visiteur d'un lien partagé peut voir qui édite, mais ne pousse aucune mutation.
+  useEffect(() => {
+    if (!plan.id) return
+    const collab = connectCollab(plan.id, {
+      onRoadmap: (doc) => {
+        const next = roadmapFromDoc(doc, plan.roadmap)
+        lastSyncedRoadmapRef.current = next
+        setPlan(p => ({ ...p, roadmap: next }))
+      },
+      onPresence: setPresencePeers,
+      onReady: () => {
+        seedDocFromRoadmap(collab.doc, plan.roadmap)
+        const name = user?.fullName || user?.firstName || (lang === 'fr' ? 'Anonyme' : 'Anonymous')
+        collab.sendPresence(name)
+      }
+    })
+    collabRef.current = readOnly ? null : collab
+    return () => { collab.close(); collabRef.current = null }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [plan.id, readOnly])
 
   // Avertit avant de fermer/rafraîchir l'onglet s'il reste des modifications non
   // enregistrées — les navigateurs ignorent le texte personnalisé et affichent leur
@@ -178,6 +213,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       items.forEach(({ key, detail }) => markChanged(key, section, detail))
     } else {
       markChanged(section, section, lang === 'fr' ? 'Mise à jour' : 'Updated')
+    }
+    if (collabRef.current) {
+      applyRoadmapDiff(collabRef.current.doc, lastSyncedRoadmapRef.current, nextRoadmap)
+      lastSyncedRoadmapRef.current = nextRoadmap
     }
     setPlan(p => ({ ...p, roadmap: nextRoadmap }))
   }
@@ -631,6 +670,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           </div>
         </div>
         <div className="plan-actions">
+          <PresenceBar peers={presencePeers} lang={lang} />
           {plan.id && !readOnly && (
             <button
               className={`btn-secondary plan-gallery-toggle ${plan.inGallery ? 'is-in-gallery' : ''}`}

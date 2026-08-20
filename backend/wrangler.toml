@@ -41,3 +41,14 @@ queue = "velocity-agent-tasks"
 max_batch_size = 5
 max_batch_timeout = 5
 max_retries = 3
+
+# Collaboration temps réel (édition simultanée à plusieurs sur un même plan) : une
+# Durable Object par plan relaie les mises à jour Yjs entre client·es connecté·es, voir
+# src/durable/planCollabRoom.js.
+[[durable_objects.bindings]]
+name = "PLAN_COLLAB"
+class_name = "PlanCollabRoom"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["PlanCollabRoom"]

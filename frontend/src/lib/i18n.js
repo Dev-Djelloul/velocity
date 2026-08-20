@@ -690,6 +690,10 @@ export const translations = {
         progress: 'complété'
       }
     },
+    collab: {
+      presenceTitle: 'Personnes ayant ce plan ouvert en ce moment',
+      viewing: (n) => n === 1 ? '1 autre personne ici' : `${n} autres personnes ici`
+    },
     export: {
       title: 'Exporter le plan',
       json: 'Export JSON',
@@ -953,6 +957,7 @@ export const translations = {
               'Génération IA avec filet de sécurité (moteur à règles local si l\'IA échoue)',
               'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel',
               'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
+              'Collaboration en temps réel sur la roadmap et le backlog (fusion automatique des éditions concurrentes, présence de qui a le plan ouvert)',
               'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
               'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
@@ -975,7 +980,6 @@ export const translations = {
             label: 'Envisagé',
             items: [
               'API publique pour générer un plan par programmation (clé API, palier Entreprise)',
-              'Collaboration en temps réel (édition simultanée à plusieurs sur un même plan)',
               'Application mobile / PWA installable',
               'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)',
               'Bibliothèque de plans "avant/après" pour comparer plusieurs versions d\'un même lancement'
@@ -2053,6 +2057,10 @@ export const translations = {
         progress: 'complete'
       }
     },
+    collab: {
+      presenceTitle: 'People with this plan open right now',
+      viewing: (n) => n === 1 ? '1 other person here' : `${n} other people here`
+    },
     export: {
       title: 'Export plan',
       json: 'Export JSON',
@@ -2316,6 +2324,7 @@ export const translations = {
               'AI generation with a safety net (local rules engine if the AI call fails)',
               'Conversational AI copilot (Nova) to edit the plan in natural language',
               'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
+              'Real-time collaboration on the roadmap and backlog (concurrent edits merge automatically, presence shows who has the plan open)',
               'Distinct marketing budget and total launch budget, with an associated financial forecast',
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
               'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
@@ -2338,7 +2347,6 @@ export const translations = {
             label: 'Considered',
             items: [
               'Public API to generate a plan programmatically (API key, Enterprise tier)',
-              'Real-time collaboration (multiple people editing the same plan at once)',
               'Mobile app / installable PWA',
               'OCR for scanned documents (image-based business plans, not detected today)',
               'A "before/after" plan library to compare several versions of the same launch'

@@ -12,6 +12,11 @@ import { handleApi, CORS_HEADERS } from './api'
 import { sendEmail, agentDoneEmail, inactivityReminderEmail, veilleUpdateEmail, weeklyDigestEmail, extractHighlights, AGENT_TYPE_LABELS } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, inactivityReminderSlackMessage, veilleUpdateSlackMessage, weeklyDigestSlackMessage } from '../lib/slack/slackClient'
 import { triggerWebhooks } from '../lib/webhooks/webhookClient'
+import { PlanCollabRoom } from '../durable/planCollabRoom'
+
+// Réexportée pour que Wrangler trouve la classe Durable Object depuis ce module "main"
+// (un seul Worker dans ce projet — pas de script_name distinct pour la binding).
+export { PlanCollabRoom }
 
 function generateWithRules(data, lang) {
   const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
@@ -268,6 +273,20 @@ export default {
     }
 
     const url = new URL(request.url)
+
+    // Collaboration temps réel : une Durable Object par plan (adressée par nom = planId),
+    // qui relaie les mises à jour Yjs entre tous les clients connectés — voir
+    // src/durable/planCollabRoom.js. Interceptée avant handleApi() car c'est un upgrade
+    // WebSocket, pas une requête JSON classique.
+    if (url.pathname.startsWith('/collab/')) {
+      const planId = url.pathname.slice('/collab/'.length)
+      if (!planId) return new Response('planId required', { status: 400 })
+      const roomUrl = new URL(request.url)
+      roomUrl.searchParams.set('planId', planId)
+      const id = env.PLAN_COLLAB.idFromName(planId)
+      return env.PLAN_COLLAB.get(id).fetch(new Request(roomUrl, request))
+    }
+
     if (url.pathname !== '/' && url.pathname !== '') {
       const apiResponse = await handleApi(request, env, url)
       if (apiResponse) return apiResponse
