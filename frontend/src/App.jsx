@@ -960,8 +960,9 @@ export default function App() {
                 </div>
               </>
             ) : (
-              <button className="btn-header-signin" onClick={() => goToAuth('signin')} title={t(lang, 'auth.signIn')}>
-                <IconLogin width={18} height={18} />
+              <button className="btn-header-signin" onClick={() => goToAuth('signin')}>
+                <IconLogin width={16} height={16} />
+                <span>{t(lang, 'auth.signIn')}</span>
               </button>
             )}
           </div>
