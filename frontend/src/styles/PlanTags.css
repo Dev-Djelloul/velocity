@@ -1,9 +1,14 @@
 .plan-tags {
+  --tag-height: 20px;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 5px;
   margin-top: 4px;
+}
+
+.plan-tags-compact {
+  --tag-height: 18px;
 }
 
 .plan-tags button {
@@ -18,7 +23,7 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  height: 20px;
+  height: var(--tag-height);
   box-sizing: border-box;
   padding: 0 6px 0 8px;
   border-radius: 5px;
@@ -53,13 +58,16 @@
 }
 
 /* Bouton "+" icône seule — jamais de texte à faire retomber sur deux lignes, ce qui
-   transformait le bouton en gros blob rond une fois le border-radius plein appliqué. */
+   transformait le bouton en gros blob rond une fois le border-radius plein appliqué.
+   calc(-2px) plutôt que var(--tag-height) telle quelle : garantit que le bouton (avec sa
+   bordure en pointillés) ne dépasse jamais la hauteur du tag écrit à côté, quel que soit le
+   contexte de rendu (jamais plus grand, quitte à être millimétriquement plus petit). */
 .plan-tag-add {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: calc(var(--tag-height) - 2px);
+  height: calc(var(--tag-height) - 2px);
   box-sizing: border-box;
   border-radius: 5px;
   border: 1px dashed rgba(255, 255, 255, 0.22);
@@ -76,7 +84,7 @@
 }
 
 .plan-tag-input {
-  height: 20px;
+  height: var(--tag-height);
   width: 88px;
   box-sizing: border-box;
   border-radius: 5px;
@@ -90,9 +98,7 @@
 }
 
 .plan-tags-compact .plan-tag-chip,
-.plan-tags-compact .plan-tag-add,
 .plan-tags-compact .plan-tag-input {
-  height: 18px;
   font-size: 10px;
 }
 
