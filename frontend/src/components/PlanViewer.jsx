@@ -450,18 +450,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
           <IconChevronRight width={16} height={16} />
         </button>
       </div>
-      {generatedDateTime && (
-        <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
-          <span className="plan-confirmation-icon" aria-hidden="true">
-            {justGenerated ? <IconRocket width={22} height={22} /> : <img src="/assets/icons/icons8-clock.gif" width={22} height={22} alt="" />}
-          </span>
-          <div className="plan-confirmation-text">
-            <h3>{justGenerated ? t(lang, 'outputs.planReadyTitle') : t(lang, 'outputs.planLoadedTitle')}</h3>
-            <p>{justGenerated ? t(lang, 'outputs.planReadySubtitle')(generatedDateTime) : t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
-          </div>
-        </div>
-      )}
-
       {plan.id && (
         <div className={`plan-cover-banner ${plan.coverImage ? 'has-image' : ''}`}>
           {plan.coverImage && (
@@ -485,6 +473,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
               )}
             </div>
           )}
+        </div>
+      )}
+
+      {generatedDateTime && (
+        <div className={`plan-confirmation ${justGenerated ? 'just-generated' : 'loaded'}`}>
+          <span className="plan-confirmation-icon" aria-hidden="true">
+            {justGenerated ? <IconRocket width={22} height={22} /> : <img src="/assets/icons/icons8-clock.gif" width={22} height={22} alt="" />}
+          </span>
+          <div className="plan-confirmation-text">
+            <h3>{justGenerated ? t(lang, 'outputs.planReadyTitle') : t(lang, 'outputs.planLoadedTitle')}</h3>
+            <p>{justGenerated ? t(lang, 'outputs.planReadySubtitle')(generatedDateTime) : t(lang, 'outputs.planLoadedSubtitle')(generatedDateTime)}</p>
+          </div>
         </div>
       )}
 

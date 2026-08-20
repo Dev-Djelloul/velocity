@@ -457,14 +457,17 @@
   margin: 0 auto;
 }
 
+/* Le voile sombre (::before) est fixe quel que soit le thème — le texte doit donc rester
+   clair en toute circonstance plutôt que suivre var(--color-text-primary)/secondary, qui
+   devient sombre en thème clair et se fond dans le fond assombri. */
 .hiw-final-cta-content h2 {
   font-size: clamp(2rem, 5vw, 3rem);
-  color: var(--color-text-primary);
+  color: #fff;
   margin-bottom: 1rem;
 }
 
 .hiw-final-cta-content p {
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, 0.82);
   font-size: var(--font-size-lg);
   margin-bottom: 2rem;
   max-width: 560px;

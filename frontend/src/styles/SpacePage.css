@@ -82,6 +82,25 @@ img.space-page-avatar {
   color: var(--color-text-muted);
 }
 
+/* Titre/sous-titre et bouton retour posés à même le fond image (.space-page-bg) plutôt que
+   sur la couleur de fond plate — en thème clair leurs couleurs par défaut y étaient peu
+   lisibles. team-back-btn est partagé avec TeamPage (sans fond image), d'où le scope
+   .space-page-outer pour ne pas le blanchir là où il n'y a pas d'image derrière. */
+[data-theme="light"] .space-page-title h1,
+[data-theme="light"] .space-page-title p {
+  color: #fff;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="light"] .space-page-outer .team-back-btn {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="light"] .space-page-outer .team-back-btn:hover {
+  color: #fff;
+}
+
 .space-page-settings-btn {
   display: inline-flex;
   align-items: center;
