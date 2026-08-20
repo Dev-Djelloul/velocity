@@ -1,7 +1,31 @@
 .space-page {
+  position: relative;
   max-width: 960px;
   margin: 2rem auto;
   padding: 0 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Fond flouté plein viewport (pas juste la colonne de contenu de 960px) — fixed pour
+   couvrir toute la page même si son contenu défile, avec un voile sombre pour garder le
+   texte et les cartes lisibles par-dessus. z-index positif + tout le contenu réel dans
+   .space-page-inner (z-index supérieur) plutôt qu'un z-index négatif sur le fond : plus
+   fiable, un z-index négatif combiné à position:fixed provoque des bugs de peinture sur
+   certains moteurs/versions de navigateur. */
+.space-page-bg {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(18px) brightness(0.35) saturate(1.1);
+}
+
+.space-page-inner {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   gap: 1.5rem;

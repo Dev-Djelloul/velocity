@@ -9,6 +9,7 @@ import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock,
 import { teamColor } from './TeamAvatar'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
+import spaceBackground from '../../assets/img/hiw-step2-dashboard.webp'
 import '../styles/SpacePage.css'
 import '../styles/GalleryPage.css'
 
@@ -126,6 +127,8 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
 
   return (
     <div className="space-page">
+      <div className="space-page-bg" style={{ backgroundImage: `url(${spaceBackground})` }} aria-hidden="true" />
+      <div className="space-page-inner">
       <div className="space-page-header">
         <button className="team-back-btn" onClick={onBack}>
           <IconArrowLeft width={16} height={16} /> {t(lang, 'auth.backToHome')}
@@ -388,6 +391,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           </div>
         </div>
       )}
+      </div>
     </div>
   )
 }
