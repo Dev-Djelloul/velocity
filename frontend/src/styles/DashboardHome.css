@@ -60,6 +60,16 @@
   color: #fff;
 }
 
+[data-theme="light"] .dashboard-home-link-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+/* Fond net en mode clair — même logique que SpacePage.css : le flou/assombrissement du
+   fond de page est pensé pour le mode sombre, pas demandé en mode clair. */
+[data-theme="light"] .dashboard-home-bg {
+  filter: brightness(0.98) saturate(1.05);
+}
+
 .dashboard-home-header p {
   margin: 0;
   color: var(--color-text-secondary);
@@ -71,6 +81,11 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+}
+
+.dashboard-home-cta:hover {
+  transform: scale(1.04);
 }
 
 .dashboard-home-grid {
@@ -80,6 +95,7 @@
 }
 
 .dashboard-space-card {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 0.85rem;
@@ -91,12 +107,37 @@
     linear-gradient(var(--color-bg-secondary, #16161d), var(--color-bg-secondary, #16161d)) padding-box,
     linear-gradient(135deg, rgba(145, 132, 217, 0.25) 0%, rgba(99, 102, 241, 0.25) 55%, rgba(6, 182, 212, 0.25) 100%) border-box;
   cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
+  /* Rebond élastique au survol — même courbe que SpacePage (espace d'équipe), réutilisée
+     ici pour rester cohérent sur tout le parcours post-connexion. */
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
 }
 
 .dashboard-space-card:hover {
-  transform: translateY(-2px);
+  transform: scale(1.025);
   filter: brightness(1.08);
+}
+
+/* Mode clair : verre dépoli au lieu du blanc opaque, cohérent avec les cartes de
+   SpacePage.css (même technique — voir les commentaires détaillés là-bas). Repli opaque
+   pour les navigateurs sans backdrop-filter (le fond blanc de base ci-dessus suffit déjà). */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  [data-theme="light"] .dashboard-space-card {
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) padding-box,
+      linear-gradient(135deg, rgba(145, 132, 217, 0.4) 0%, rgba(99, 102, 241, 0.4) 55%, rgba(6, 182, 212, 0.4) 100%) border-box;
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+}
+
+[data-theme="light"] .dashboard-space-name,
+[data-theme="light"] .dashboard-space-meta {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .dashboard-space-meta svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
 .dashboard-space-card.is-current {
@@ -201,7 +242,7 @@
   font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
 }
 
 .dashboard-home-link-icon {
@@ -217,7 +258,7 @@
 }
 
 .dashboard-home-link:hover {
-  transform: translateY(-1px);
+  transform: scale(1.04);
   border-color: rgba(145, 132, 217, 0.5);
   background: rgba(145, 132, 217, 0.12);
   color: var(--color-text-primary);
