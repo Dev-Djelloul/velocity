@@ -209,7 +209,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             {!!plans.length && (
               <div className="members-presence-row">
                 {plans.slice(0, 6).map(p => (
-                  <span key={p.id} className="plans-preview-thumb avatar-tooltip" data-tooltip={p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}>
+                  <span key={p.id} className="plans-preview-thumb">
                     {p.coverImage
                       ? <img src={p.coverImage} alt="" />
                       : <span className="plans-preview-fallback" aria-hidden="true" />}

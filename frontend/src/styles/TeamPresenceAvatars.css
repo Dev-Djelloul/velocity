@@ -27,6 +27,9 @@
   font-size: 0.72rem;
   line-height: 1.4;
   font-weight: 400;
+  /* Contenu généré (attr()) sur un libellé en majuscules (ex. .space-dashboard-label) sinon
+     hérité tel quel, la bulle affichant "PLANS PARTAGÉS…" au lieu du texte normal. */
+  text-transform: none;
   white-space: normal;
   text-align: center;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
@@ -38,6 +41,16 @@
 }
 
 .avatar-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Cartes de l'espace équipe (voir SpacePage.jsx) : la zone de survol doit couvrir toute la
+   tuile, pas seulement le petit libellé qui porte l'infobulle (repère visuel trop précis —
+   l'utilisateur s'attendait à pouvoir survoler la carte entière, pas juste la miniature du
+   plan). L'infobulle reste ancrée au libellé (petit, en bas de la tuile — voir 73210fd) mais
+   se déclenche désormais au survol de la tuile entière. */
+.space-dashboard-tile:hover .space-dashboard-label.avatar-tooltip::after {
   opacity: 1;
   visibility: visible;
 }
