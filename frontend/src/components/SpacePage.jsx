@@ -5,6 +5,7 @@ import { getAllPlans, deletePlan, duplicatePlan, toggleFavorite } from '../lib/p
 import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
+import { budgetFromKey } from '../lib/budgetTiers'
 import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
 import { teamColor } from './TeamAvatar'
 import { MembersPresenceRow } from './TeamPresenceAvatars'
@@ -78,7 +79,15 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
       if (!candidate) return latest
       return !latest || candidate > latest ? candidate : latest
     }, null)
-    const totalBudget = plans.reduce((sum, p) => sum + (p.marketing?.totalBudget || 0), 0)
+    // Budget cumulé = budget total du lancement (resources.totalBudget, une clé de tranche
+    // — ex. 'b10k' — résolue en euros via budgetFromKey) + budget marketing (marketing.
+    // totalBudget, déjà en euros), par plan, sommés sur l'espace — la carte ne reflétait
+    // avant que le seul budget marketing, devenu incomplet depuis l'ajout du budget total
+    // distinct (voir le questionnaire, resources.totalBudget).
+    const totalBudget = plans.reduce((sum, p) => {
+      const launchBudget = p.resources?.totalBudget ? budgetFromKey(p.resources.totalBudget) : 0
+      return sum + launchBudget + (p.marketing?.totalBudget || 0)
+    }, 0)
     return {
       planCount: plans.length,
       memberCount: team.members?.length || 0,
