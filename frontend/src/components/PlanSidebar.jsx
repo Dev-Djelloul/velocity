@@ -95,7 +95,7 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers, copilotHistory, mobileIndex, mobileTotal, onPrevSection, onNextSection }) {
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers, copilotHistory, mobileIndex, mobileTotal, onPrevSection, onNextSection, onCompareVersions }) {
   // Repliée par défaut sous 900px (tablette/mobile) — sur mobile, "repliée" affiche une
   // simple barre (précédent/section active/suivant), "dépliée" ouvre le sommaire complet en
   // feuille modale plutôt qu'en colonne poussant tout le contenu vers le bas (ancien
@@ -402,9 +402,16 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
                   </div>
                 ))}
               </div>
-              <button className="plan-sidebar-history-clear" onClick={() => setConfirmClearHistory(true)}>
-                <IconTrash width={13} height={13} /> {t(lang, 'outputs.historyClear')}
-              </button>
+              <div className="plan-sidebar-history-footer-actions">
+                {onCompareVersions && (
+                  <button className="plan-sidebar-history-compare" onClick={onCompareVersions}>
+                    <IconCompass width={13} height={13} /> {t(lang, 'planVersions.compareLink')}
+                  </button>
+                )}
+                <button className="plan-sidebar-history-clear" onClick={() => setConfirmClearHistory(true)}>
+                  <IconTrash width={13} height={13} /> {t(lang, 'outputs.historyClear')}
+                </button>
+              </div>
             </div>
           )}
         </div>

@@ -140,7 +140,24 @@ export async function handleApi(request, env, url) {
         }
       }
     }
-    return json(await db.upsertPlan(env, userId, plan, teamId || null))
+    const saved = await db.upsertPlan(env, userId, plan, teamId || null)
+    // Best-effort, comme la vérification de webhooks ci-dessus : un instantané raté ne doit
+    // jamais faire échouer l'enregistrement lui-même (le chemin chaud).
+    await db.snapshotPlanVersion(env, userId, saved.id, saved).catch(() => {})
+    return json(saved)
+  }
+
+  if (pathname === '/plan-versions' && method === 'GET') {
+    const planId = searchParams.get('planId')
+    if (!planId) return json({ error: 'planId required' }, 400)
+    return json(await db.listPlanVersions(env, planId))
+  }
+
+  const planVersionMatch = pathname.match(/^\/plan-versions\/([^/]+)$/)
+  if (planVersionMatch && method === 'GET') {
+    const version = await db.getPlanVersion(env, planVersionMatch[1])
+    if (!version) return json({ error: 'not found' }, 404)
+    return json(version)
   }
 
   const planMatch = pathname.match(/^\/plans\/([^/]+)$/)

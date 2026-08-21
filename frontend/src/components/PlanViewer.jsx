@@ -67,7 +67,7 @@ const SECTION_LIST = [
   { id: 'section-whatif', labelKey: 'whatif.title' }
 ]
 
-export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly, novaToggle }) {
+export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly, novaToggle, onCompareVersions }) {
   // Choke point unique : un plan partagé (lien /s/:id) ouvert par un visiteur
   // connecté avec SON PROPRE compte ne doit jamais pouvoir écraser le plan d'un autre —
   // avant ce garde-fou, n'importe quel visiteur connecté pouvait modifier la roadmap, le
@@ -640,6 +640,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         mobileTotal={SECTION_LIST.length}
         onPrevSection={() => goToMobileSection(SECTION_LIST[mobileSectionIndex - 1].id)}
         onNextSection={() => goToMobileSection(SECTION_LIST[mobileSectionIndex + 1].id)}
+        onCompareVersions={plan.id && !readOnly ? onCompareVersions : undefined}
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {plan.id && (

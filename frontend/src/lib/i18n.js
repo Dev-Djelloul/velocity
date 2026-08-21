@@ -811,6 +811,14 @@ export const translations = {
         entries: [
           {
             date: '21 août 2026',
+            title: 'Bibliothèque de versions "avant/après"',
+            items: [
+              'Chaque enregistrement d\'un plan crée désormais un instantané complet, conservé et consultable à tout moment (jusqu\'à 20 versions par plan)',
+              'Nouvelle page de comparaison (bouton "Comparer les versions" dans le panneau Historique du plan) : choisissez deux versions, avant/après, pour voir ce qui a changé — roadmap (stories ajoutées, retirées, déplacées, statut), KPIs, budget marketing, classification et résumé exécutif'
+            ]
+          },
+          {
+            date: '21 août 2026',
             title: 'La catégorie "Préférences" de la bannière cookies pilote vraiment quelque chose',
             items: [
               'Le thème, la langue, le fuseau horaire et les réglages d\'accessibilité (taille de police, contraste, format de date, devise) ne sont désormais mémorisés d\'une visite à l\'autre que si "Préférences" est acceptée dans la bannière cookies — sans ce consentement, ils repartent sur leurs valeurs par défaut à chaque nouvelle visite au lieu d\'être enregistrés silencieusement comme avant',
@@ -1039,7 +1047,8 @@ export const translations = {
             items: [
               'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
               'Collaboration en temps réel sur la roadmap et le backlog (fusion automatique des éditions concurrentes, présence de qui a le plan ouvert)',
-              "Agents IA asynchrones (brief d'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)"
+              "Agents IA asynchrones (brief d'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)",
+              'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, budget, KPIs, résumé exécutif)'
             ]
           },
           {
@@ -1111,7 +1120,8 @@ export const translations = {
               'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph',
               'Recherche globale (⌘K), FR / EN',
               'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag',
-              'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur, premier chargement quasi instantané depuis le cache'
+              'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur, premier chargement quasi instantané depuis le cache',
+              'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, budget, KPIs, résumé exécutif)'
             ]
           },
           {
@@ -1122,8 +1132,7 @@ export const translations = {
             label: 'Envisagé',
             items: [
               'API publique pour générer un plan par programmation (clé API, palier Entreprise)',
-              'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)',
-              'Bibliothèque de plans "avant/après" pour comparer plusieurs versions d\'un même lancement'
+              'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)'
             ]
           }
         ]
@@ -1398,6 +1407,22 @@ export const translations = {
       createTeamDesc: 'Un espace partagé avec ton équipe',
       viewHistory: 'Voir tout l\'historique',
       viewGallery: 'Galerie publique'
+    },
+    planVersions: {
+      back: 'Retour au plan',
+      title: 'Comparer les versions',
+      loading: 'Chargement…',
+      none: 'Aucune version enregistrée pour ce plan pour le moment.',
+      onlyOne: 'Une seule version enregistrée pour l\'instant — repassez après un nouvel "Enregistrer" pour comparer.',
+      fromLabel: 'Avant',
+      toLabel: 'Après',
+      classification: 'Classification',
+      marketingBudget: 'Budget marketing',
+      roadmap: 'Roadmap',
+      kpis: 'KPIs',
+      executiveSummary: 'Résumé exécutif',
+      noChange: 'Aucun changement entre ces deux versions.',
+      compareLink: 'Comparer les versions'
     },
     team: {
       personalSpace: 'Personnel',
@@ -2345,6 +2370,14 @@ export const translations = {
         entries: [
           {
             date: 'August 21, 2026',
+            title: '"Before/after" version library',
+            items: [
+              'Every plan save now creates a full snapshot, kept and viewable at any time (up to 20 versions per plan)',
+              'New comparison page ("Compare versions" button in the plan\'s History panel): pick two versions, before/after, to see what changed — roadmap (added, removed, moved stories, status), KPIs, marketing budget, classification and executive summary'
+            ]
+          },
+          {
+            date: 'August 21, 2026',
             title: 'The cookie banner\'s "Preferences" category now actually does something',
             items: [
               'Theme, language, timezone and accessibility settings (font size, contrast, date format, currency) are now only remembered across visits if "Preferences" is accepted in the cookie banner — without that consent, they reset to their defaults on every new visit instead of being silently saved as before',
@@ -2573,7 +2606,8 @@ export const translations = {
             items: [
               'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
               'Real-time collaboration on the roadmap and backlog (concurrent edits merge automatically, presence shows who has the plan open)',
-              'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)'
+              'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)',
+              '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, budget, KPIs, executive summary)'
             ]
           },
           {
@@ -2645,7 +2679,8 @@ export const translations = {
               'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image',
               'Global search (⌘K), FR / EN',
               'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag',
-              'Installable app (PWA): home screen icon, full-screen launch with no browser chrome, near-instant first load from cache'
+              'Installable app (PWA): home screen icon, full-screen launch with no browser chrome, near-instant first load from cache',
+              '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, budget, KPIs, executive summary)'
             ]
           },
           {
@@ -2656,8 +2691,7 @@ export const translations = {
             label: 'Considered',
             items: [
               'Public API to generate a plan programmatically (API key, Enterprise tier)',
-              'OCR for scanned documents (image-based business plans, not detected today)',
-              'A "before/after" plan library to compare several versions of the same launch'
+              'OCR for scanned documents (image-based business plans, not detected today)'
             ]
           }
         ]
@@ -2932,6 +2966,22 @@ export const translations = {
       createTeamDesc: 'A shared space with your team',
       viewHistory: 'View full history',
       viewGallery: 'Public gallery'
+    },
+    planVersions: {
+      back: 'Back to plan',
+      title: 'Compare versions',
+      loading: 'Loading…',
+      none: 'No saved version for this plan yet.',
+      onlyOne: 'Only one saved version so far — check back after another "Save" to compare.',
+      fromLabel: 'Before',
+      toLabel: 'After',
+      classification: 'Classification',
+      marketingBudget: 'Marketing budget',
+      roadmap: 'Roadmap',
+      kpis: 'KPIs',
+      executiveSummary: 'Executive summary',
+      noChange: 'No change between these two versions.',
+      compareLink: 'Compare versions'
     },
     team: {
       personalSpace: 'Personal',

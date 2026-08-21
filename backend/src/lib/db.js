@@ -37,6 +37,55 @@ export async function upsertPlan(env, userId, plan, teamId) {
   return { ...plan, id, team_id: effectiveTeamId, savedAt: now, updatedAt: now }
 }
 
+// Nombre de versions conservées par plan (voir migration 0019) — au-delà, les plus
+// anciennes sont supprimées. Assez pour comparer plusieurs itérations d'un même lancement
+// sans laisser le volume de plan_versions grossir indéfiniment sur un plan très actif.
+const MAX_VERSIONS_PER_PLAN = 20
+
+// Instantané complet du plan tel qu'il vient d'être enregistré — appelé juste après
+// upsertPlan (voir la route POST /plans) plutôt qu'à l'intérieur, pour ne jamais faire
+// échouer l'enregistrement lui-même si la capture de version rencontre un problème.
+export async function snapshotPlanVersion(env, userId, planId, plan) {
+  const id = genId()
+  await env.DB.prepare(
+    'INSERT INTO plan_versions (id, plan_id, user_id, data, created_at) VALUES (?, ?, ?, ?, ?)'
+  ).bind(id, planId, userId, JSON.stringify(plan), new Date().toISOString()).run()
+
+  const { results } = await env.DB.prepare(
+    'SELECT id FROM plan_versions WHERE plan_id = ? ORDER BY created_at DESC'
+  ).bind(planId).all()
+  const overflow = results.slice(MAX_VERSIONS_PER_PLAN)
+  if (overflow.length) {
+    const placeholders = overflow.map(() => '?').join(',')
+    await env.DB.prepare(`DELETE FROM plan_versions WHERE id IN (${placeholders})`)
+      .bind(...overflow.map(r => r.id)).run()
+  }
+}
+
+// Liste légère (pas le JSON complet, potentiellement lourd) pour peupler les deux
+// sélecteurs de la page de comparaison — product_name et un résumé de la roadmap servent à
+// distinguer les versions entre elles sans tout charger.
+export async function listPlanVersions(env, planId) {
+  const { results } = await env.DB.prepare(
+    'SELECT id, created_at, data FROM plan_versions WHERE plan_id = ? ORDER BY created_at DESC'
+  ).bind(planId).all()
+  return results.map(row => {
+    const data = JSON.parse(row.data)
+    return {
+      id: row.id,
+      createdAt: row.created_at,
+      productName: data.product?.name || null,
+      classification: data.classification || null,
+      totalBudget: data.marketing?.totalBudget ?? null
+    }
+  })
+}
+
+export async function getPlanVersion(env, versionId) {
+  const row = await env.DB.prepare('SELECT plan_id, data FROM plan_versions WHERE id = ?').bind(versionId).first()
+  return row ? { planId: row.plan_id, data: JSON.parse(row.data) } : null
+}
+
 // Tous les plans accessibles à userId, tous espaces confondus (personnel + chaque équipe
 // listée dans teamIds) — utilisé par "Historique de tous les plans" dans Mon compte, qui
 // regroupe volontairement tout au même endroit (contrairement aux tableaux de bord
@@ -102,6 +151,9 @@ export async function deletePlan(env, userId, id, teamId) {
   } else {
     await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ? AND team_id IS NULL').bind(id, userId).run()
   }
+  // plan_versions n'a pas de contrainte FK (D1/SQLite) — nettoyage explicite pour ne pas
+  // laisser d'instantanés orphelins d'un plan supprimé.
+  await env.DB.prepare('DELETE FROM plan_versions WHERE plan_id = ?').bind(id).run()
 }
 
 // Déplace un plan existant vers un autre espace (personnel <-> équipe, ou équipe <-> équipe).

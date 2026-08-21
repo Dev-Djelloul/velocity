@@ -57,6 +57,17 @@ export function fetchAllPlans(userId, teamIds) {
   return safeFetch(`/plans/all${query}`).then(r => r || [])
 }
 
+// Bibliothèque de versions "avant/après" (voir PlanVersionsPage.jsx) : une entrée légère
+// (sans le JSON complet) par instantané enregistré à chaque sauvegarde du plan — voir
+// db.snapshotPlanVersion côté backend.
+export function fetchPlanVersions(planId) {
+  return safeFetch(`/plan-versions?planId=${encodeURIComponent(planId)}`).then(r => r || [])
+}
+
+export function fetchPlanVersion(versionId) {
+  return safeFetch(`/plan-versions/${encodeURIComponent(versionId)}`)
+}
+
 // Polling léger de notifications (voir lib/notifications.js) : userId personnel + toutes
 // les équipes dont l'utilisateur est membre, pour retrouver un commentaire posté depuis un
 // autre appareil sans avoir à ouvrir cet espace localement au préalable.

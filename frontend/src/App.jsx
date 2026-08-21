@@ -19,6 +19,7 @@ import AccountPage from './components/AccountPage'
 import NotificationsPage from './components/NotificationsPage'
 import IntegrationsPage from './components/IntegrationsPage'
 import TeamPage from './components/TeamPage'
+import PlanVersionsPage from './components/PlanVersionsPage'
 import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
 import DashboardHome from './components/DashboardHome'
@@ -62,6 +63,7 @@ const PAGE_TO_PATH = {
   howItWorks: '/comment-ca-marche',
   questionnaire: '/questionnaire',
   result: '/mon-plan',
+  'plan-versions': '/mon-plan/versions',
   account: '/mon-compte',
   team: '/mon-equipe',
   space: '/mon-espace',
@@ -78,6 +80,7 @@ const PATH_TO_PAGE = {
   '/inscription': 'auth',
   '/questionnaire': 'questionnaire',
   '/mon-plan': 'result',
+  '/mon-plan/versions': 'plan-versions',
   '/mon-compte': 'account',
   '/mon-equipe': 'team',
   '/mon-espace': 'space',
@@ -1138,6 +1141,14 @@ export default function App() {
             readOnly={isSharedView}
             onDuplicateReadOnly={handleDuplicateReadOnlyPlan}
             novaToggle={novaToggle}
+            onCompareVersions={() => { setCurrentPage('plan-versions'); window.scrollTo(0, 0) }}
+          />
+        )}
+        {currentPage === 'plan-versions' && plan && isSignedIn && (
+          <PlanVersionsPage
+            plan={plan}
+            lang={lang}
+            onBack={() => { setCurrentPage('result'); window.scrollTo(0, 0) }}
           />
         )}
         {currentPage === 'dashboard' && isSignedIn && (
