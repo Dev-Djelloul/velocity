@@ -68,6 +68,12 @@ export function fetchPlanVersion(versionId) {
   return safeFetch(`/plan-versions/${encodeURIComponent(versionId)}`)
 }
 
+// Recherche de photos Pexels pour la couverture d'un plan (voir CoverPicker.jsx) — proxy
+// serveur, la clé API n'est jamais exposée au navigateur.
+export function searchPexels(query, page = 1) {
+  return safeFetch(`/pexels/search?query=${encodeURIComponent(query)}&page=${page}`)
+}
+
 // Historique multi-fils du copilote Nova (voir CopilotChat.jsx) — un fil par conversation
 // distincte, contrairement à l'ancien plan.copilotHistory qui n'en gardait qu'une seule.
 export function fetchCopilotConversations(planId) {

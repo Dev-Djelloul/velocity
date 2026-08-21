@@ -109,6 +109,103 @@
   font-size: 0.84rem;
 }
 
+.cover-picker-pexels {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 0.5rem 0 0.25rem;
+}
+
+.cover-picker-pexels-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+  color: var(--color-text-secondary);
+}
+
+.cover-picker-pexels-search input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--color-text-primary);
+  font-size: 0.84rem;
+}
+
+.cover-picker-pexels-note {
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+  padding: 1rem 0;
+  margin: 0;
+}
+
+.cover-picker-pexels-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  max-height: 280px;
+  overflow-y: auto;
+  padding-bottom: 0.25rem;
+}
+
+.cover-picker-pexels-thumb {
+  position: relative;
+  height: 84px;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 0;
+  cursor: pointer;
+}
+
+.cover-picker-pexels-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cover-picker-pexels-thumb:hover {
+  border-color: var(--color-accent);
+}
+
+.cover-picker-pexels-credit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 0.2rem 0.4rem;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.7), transparent);
+  color: #fff;
+  font-size: 0.62rem;
+  text-align: left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.cover-picker-pexels-thumb:hover .cover-picker-pexels-credit {
+  opacity: 1;
+}
+
+.cover-picker-pexels-attribution {
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  text-align: center;
+  margin: 0;
+}
+
+.cover-picker-pexels-attribution a {
+  color: var(--color-accent);
+}
+
 .cover-picker-footer {
   display: flex;
   justify-content: space-between;

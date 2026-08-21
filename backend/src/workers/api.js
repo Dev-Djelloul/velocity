@@ -147,6 +147,38 @@ export async function handleApi(request, env, url) {
     return json(saved)
   }
 
+  // Recherche de photos libres de droit (couverture de plan, voir CoverPicker.jsx) — proxy
+  // côté serveur pour ne jamais exposer PEXELS_API_KEY au navigateur. Ne renvoie que ce dont
+  // le sélecteur a besoin (pas la réponse Pexels brute) : url d'aperçu, url pleine résolution
+  // à utiliser comme couverture, et l'attribution (nom + lien du photographe), obligatoire
+  // par les conditions d'utilisation de Pexels.
+  if (pathname === '/pexels/search' && method === 'GET') {
+    if (!env.PEXELS_API_KEY) return json({ error: 'pexels_not_configured' }, 501)
+    const query = searchParams.get('query')
+    if (!query) return json({ error: 'query required' }, 400)
+    const page = searchParams.get('page') || '1'
+    const res = await fetch(
+      `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=24&page=${page}&orientation=landscape`,
+      { headers: { Authorization: env.PEXELS_API_KEY } }
+    )
+    if (!res.ok) return json({ error: 'pexels_request_failed' }, 502)
+    const data = await res.json()
+    return json({
+      page: data.page,
+      totalResults: data.total_results,
+      photos: (data.photos || []).map(p => ({
+        id: p.id,
+        thumbUrl: p.src.medium,
+        fullUrl: p.src.large2x,
+        width: p.width,
+        height: p.height,
+        alt: p.alt || '',
+        photographer: p.photographer,
+        photographerUrl: p.photographer_url
+      }))
+    })
+  }
+
   if (pathname === '/plan-versions' && method === 'GET') {
     const planId = searchParams.get('planId')
     if (!planId) return json({ error: 'planId required' }, 400)

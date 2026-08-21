@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { resizeImageToDataUrl } from '../lib/imageResize'
-import { IconUpload, IconLink, IconTrash } from './Icons'
+import { searchPexels } from '../lib/serverStorage'
+import { IconUpload, IconLink, IconTrash, IconSearch } from './Icons'
 import '../styles/CoverPicker.css'
 
 // Sélecteur de couverture façon Notion (onglets Galerie/Charger/Lien) — remplace l'ancien
@@ -52,6 +53,10 @@ export default function CoverPicker({ lang, onChange, onClose, hasCover, title, 
   const [tab, setTab] = useState('gallery')
   const [linkInput, setLinkInput] = useState('')
   const [uploading, setUploading] = useState(false)
+  const [pexelsQuery, setPexelsQuery] = useState('')
+  const [pexelsResults, setPexelsResults] = useState(null)
+  const [pexelsLoading, setPexelsLoading] = useState(false)
+  const [pexelsError, setPexelsError] = useState(false)
 
   const pickSwatch = (css) => {
     onChange(renderSwatch(css))
@@ -83,6 +88,26 @@ export default function CoverPicker({ lang, onChange, onClose, hasCover, title, 
     onClose()
   }
 
+  // Stocke directement l'URL Pexels pleine résolution comme coverImage — même circuit que
+  // l'onglet "Lien" (une URL externe, pas un data URL téléchargé/réencodé) : Pexels sert ses
+  // images depuis son propre CDN, pas besoin de les rapatrier.
+  const pickPexelsPhoto = (photo) => {
+    onChange(photo.fullUrl)
+    onClose()
+  }
+
+  const runPexelsSearch = async (e) => {
+    e?.preventDefault()
+    const query = pexelsQuery.trim()
+    if (!query || pexelsLoading) return
+    setPexelsLoading(true)
+    setPexelsError(false)
+    const result = await searchPexels(query)
+    setPexelsLoading(false)
+    if (!result) { setPexelsError(true); return }
+    setPexelsResults(result.photos || [])
+  }
+
   return (
     <div className="modal-backdrop" onClick={onClose}>
       <div className="modal card cover-picker" onClick={e => e.stopPropagation()}>
@@ -91,6 +116,7 @@ export default function CoverPicker({ lang, onChange, onClose, hasCover, title, 
         <div className="cover-picker-tabs">
           <button className={tab === 'gallery' ? 'active' : ''} onClick={() => setTab('gallery')}>{t(lang, 'app.coverTabGallery')}</button>
           <button className={tab === 'upload' ? 'active' : ''} onClick={() => setTab('upload')}>{t(lang, 'app.coverTabUpload')}</button>
+          <button className={tab === 'pexels' ? 'active' : ''} onClick={() => setTab('pexels')}>{t(lang, 'app.coverTabPexels')}</button>
           <button className={tab === 'link' ? 'active' : ''} onClick={() => setTab('link')}>{t(lang, 'app.coverTabLink')}</button>
         </div>
 
@@ -109,6 +135,51 @@ export default function CoverPicker({ lang, onChange, onClose, hasCover, title, 
               {uploading ? <span className="cover-picker-spinner" /> : <IconUpload width={16} height={16} />}
               {t(lang, 'app.coverUploadCta')}
             </label>
+          </div>
+        )}
+
+        {tab === 'pexels' && (
+          <div className="cover-picker-pexels">
+            <form className="cover-picker-pexels-search" onSubmit={runPexelsSearch}>
+              <IconSearch width={15} height={15} />
+              <input
+                type="text"
+                placeholder={t(lang, 'app.coverPexelsPlaceholder')}
+                value={pexelsQuery}
+                onChange={e => setPexelsQuery(e.target.value)}
+                autoFocus
+              />
+              <button type="submit" className="btn-secondary" disabled={!pexelsQuery.trim() || pexelsLoading}>
+                {pexelsLoading ? <span className="cover-picker-spinner" /> : t(lang, 'app.coverPexelsSearch')}
+              </button>
+            </form>
+
+            {pexelsError && <p className="cover-picker-pexels-note">{t(lang, 'app.coverPexelsError')}</p>}
+            {!pexelsError && pexelsResults?.length === 0 && (
+              <p className="cover-picker-pexels-note">{t(lang, 'app.coverPexelsEmpty')}</p>
+            )}
+
+            {!!pexelsResults?.length && (
+              <>
+                <div className="cover-picker-pexels-grid">
+                  {pexelsResults.map(photo => (
+                    <button
+                      key={photo.id}
+                      type="button"
+                      className="cover-picker-pexels-thumb"
+                      onClick={() => pickPexelsPhoto(photo)}
+                      title={photo.alt || photo.photographer}
+                    >
+                      <img src={photo.thumbUrl} alt={photo.alt || ''} loading="lazy" />
+                      <span className="cover-picker-pexels-credit">{photo.photographer}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="cover-picker-pexels-attribution">
+                  {t(lang, 'app.coverPexelsAttribution')} <a href="https://www.pexels.com" target="_blank" rel="noreferrer">Pexels</a>
+                </p>
+              </>
+            )}
           </div>
         )}
 

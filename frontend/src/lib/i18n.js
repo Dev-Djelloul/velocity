@@ -13,8 +13,14 @@ export const translations = {
       coverImageChange: 'Modifier',
       coverTabGallery: 'Galerie',
       coverTabUpload: 'Charger',
+      coverTabPexels: 'Pexels',
       coverTabLink: 'Lien',
       coverUploadCta: 'Importer une image',
+      coverPexelsPlaceholder: 'Rechercher une photo (ex : montagne, bureau, ville…)',
+      coverPexelsSearch: 'Rechercher',
+      coverPexelsEmpty: 'Aucun résultat pour cette recherche.',
+      coverPexelsError: 'Recherche indisponible pour le moment.',
+      coverPexelsAttribution: 'Photos via',
       coverLinkSubmit: 'Utiliser ce lien',
       coverRemove: 'Supprimer la couverture',
       pageBgTitle: 'Fond de page du plan',
@@ -819,6 +825,14 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '22 août 2026',
+            title: 'Photos Pexels dans le sélecteur de couverture',
+            items: [
+              'Nouvel onglet "Pexels" dans le choix de couverture de plan : recherche par mot-clé, résultats en grille, sélection directe — même principe que Notion avec Unsplash',
+              'Recherche effectuée côté serveur (clé API jamais exposée au navigateur), attribution du photographe visible au survol de chaque photo'
+            ]
+          },
+          {
             date: '21 août 2026',
             title: 'Nova gère de vraies conversations multiples, façon Cloudflare AI',
             items: [
@@ -1597,8 +1611,14 @@ export const translations = {
       coverImageChange: 'Change cover',
       coverTabGallery: 'Gallery',
       coverTabUpload: 'Upload',
+      coverTabPexels: 'Pexels',
       coverTabLink: 'Link',
       coverUploadCta: 'Upload an image',
+      coverPexelsPlaceholder: 'Search a photo (e.g. mountain, office, city…)',
+      coverPexelsSearch: 'Search',
+      coverPexelsEmpty: 'No results for this search.',
+      coverPexelsError: 'Search unavailable right now.',
+      coverPexelsAttribution: 'Photos via',
       coverLinkSubmit: 'Use this link',
       coverRemove: 'Remove cover',
       pageBgTitle: 'Plan page background',
@@ -2397,6 +2417,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 22, 2026',
+            title: 'Pexels photos in the cover picker',
+            items: [
+              'New "Pexels" tab in the plan cover picker: keyword search, grid results, one-click select — same idea as Notion with Unsplash',
+              'Search runs server-side (API key never exposed to the browser), photographer credit shown on hover over each photo'
+            ]
+          },
           {
             date: 'August 21, 2026',
             title: 'Nova now handles real multiple conversations, Cloudflare-AI style',
