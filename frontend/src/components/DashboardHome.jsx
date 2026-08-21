@@ -8,8 +8,10 @@ import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
 import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar } from './Icons'
 import TeamAvatar from './TeamAvatar'
+import DashboardCalendar from './DashboardCalendar'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
+import { fetchDailyTip } from '../lib/serverStorage'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
 import createTeamImage from '../../assets/img/hiw-hero-tablets-purple.webp'
@@ -96,7 +98,17 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   const firstName = user?.firstName || user?.fullName?.split(' ')[0] || ''
 
-  const dailyTip = useMemo(() => getDailyTip(lang), [lang])
+  // Conseil du jour généré par IA côté serveur (voir /tip-of-the-day, régénéré toutes les
+  // 2h) — la liste statique locale (dailyTips.js) ne sert plus que de secours si le backend
+  // n'est pas configuré ou injoignable, pour ne jamais laisser le bandeau vide.
+  const [aiTip, setAiTip] = useState(null)
+  useEffect(() => {
+    let cancelled = false
+    fetchDailyTip().then(r => { if (!cancelled) setAiTip(r) })
+    return () => { cancelled = true }
+  }, [])
+  const dailyTip = aiTip ? (lang === 'en' ? aiTip.tipEn : aiTip.tipFr) : getDailyTip(lang)
+
   const deadlines = useMemo(() => getUpcomingDeadlines(allPlans || activePlans), [allPlans, activePlans])
 
   const deadlineLabel = (isoDate) => {
@@ -117,6 +129,18 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   return (
     <div className="dashboard-home-outer">
       <IconGradientDefs />
+      <div className="dashboard-tip-ticker">
+        <div className="dashboard-tip-ticker-track">
+          <span className="dashboard-tip-ticker-item">
+            {gradientIcon(<IconSparkle width={14} height={14} />)}
+            {dailyTip}
+          </span>
+          <span className="dashboard-tip-ticker-item" aria-hidden="true">
+            {gradientIcon(<IconSparkle width={14} height={14} />)}
+            {dailyTip}
+          </span>
+        </div>
+      </div>
       <div
         className="dashboard-home-bg"
         style={{
@@ -218,13 +242,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       </div>
 
       <div className="dashboard-home-widgets">
-        <div className="dashboard-widget-card dashboard-tip-card">
-          <div className="dashboard-widget-header">
-            {gradientIcon(<IconSparkle width={16} height={16} />)}
-            <h3>{t(lang, 'dashboard.tipTitle')}</h3>
-          </div>
-          <p className="dashboard-tip-text">{dailyTip}</p>
-        </div>
+        <DashboardCalendar lang={lang} deadlines={deadlines} />
 
         <div className="dashboard-widget-card dashboard-deadlines-card">
           <div className="dashboard-widget-header">

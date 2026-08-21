@@ -15,6 +15,7 @@ import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
 import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { runCopilotChat } from '../lib/ai/copilotClient'
+import { generateDailyTip } from '../lib/ai/dailyTipClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as linear from '../lib/linear/linearClient'
@@ -177,6 +178,28 @@ export async function handleApi(request, env, url) {
         photographerUrl: p.photographer_url
       }))
     })
+  }
+
+  // Conseil du jour du dashboard (voir DashboardHome.jsx) — généré par IA, mis en cache
+  // 2h dans le KV AI_USAGE (régénération "paresseuse" : au premier appel après expiration,
+  // pas de cron dédié — le dashboard n'est de toute façon consulté qu'en étant connecté).
+  // Un échec de génération renvoie le tip encore en cache (même expiré) plutôt qu'une
+  // erreur, pour ne jamais casser l'affichage du dashboard.
+  if (pathname === '/tip-of-the-day' && method === 'GET') {
+    const cacheKey = 'tip_of_the_day'
+    const cached = env.AI_USAGE ? await env.AI_USAGE.get(cacheKey, 'json') : null
+    if (cached && (Date.now() - cached.generatedAt) < 2 * 60 * 60 * 1000) {
+      return json(cached)
+    }
+    try {
+      const tip = await generateDailyTip(env)
+      const payload = { theme: tip.theme, tipFr: tip.tip_fr, tipEn: tip.tip_en, generatedAt: Date.now() }
+      if (env.AI_USAGE) await env.AI_USAGE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 3 * 60 * 60 })
+      return json(payload)
+    } catch (err) {
+      if (cached) return json(cached)
+      return json({ error: 'tip_generation_failed' }, 502)
+    }
   }
 
   if (pathname === '/plan-versions' && method === 'GET') {

@@ -6,6 +6,54 @@
   display: flow-root;
 }
 
+/* Bande défilante en continu, pleine largeur, juste sous le header — demandé explicitement
+   pour donner au conseil du jour (généré par IA, voir /tip-of-the-day) plus de présence
+   qu'une simple carte. Le texte est dupliqué une fois dans .dashboard-tip-ticker-track :
+   translateX(-50%) en boucle sur une piste deux fois plus longue que le viewport donne un
+   défilement continu sans saut visible à la reprise. */
+.dashboard-tip-ticker {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  overflow: hidden;
+  background: var(--wordmark-gradient);
+  padding: 0.5rem 0;
+}
+
+.dashboard-tip-ticker-track {
+  display: flex;
+  width: max-content;
+  animation: dashboard-tip-scroll 38s linear infinite;
+}
+
+.dashboard-tip-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0 3rem;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dashboard-tip-ticker-item svg {
+  flex-shrink: 0;
+  stroke: #fff;
+}
+
+@keyframes dashboard-tip-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-tip-ticker-track {
+    animation: none;
+  }
+}
+
 .dashboard-home-bg {
   position: absolute;
   inset: 0;
@@ -197,11 +245,100 @@
   color: var(--color-text-primary);
 }
 
-.dashboard-tip-text {
+/* Widget calendrier mensuel façon Apple Calendar — voir DashboardCalendar.jsx. */
+.dashboard-calendar-card {
+  padding: 1rem;
+}
+
+.dashboard-calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.dashboard-calendar-month {
   margin: 0;
   font-size: 0.85rem;
-  line-height: 1.5;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+}
+
+.dashboard-calendar-nav {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.dashboard-calendar-nav button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(145, 132, 217, 0.14);
   color: var(--color-text-secondary);
+  cursor: pointer;
+}
+
+.dashboard-calendar-nav button:hover {
+  background: rgba(145, 132, 217, 0.24);
+  color: var(--color-text-primary);
+}
+
+.dashboard-calendar-weekdays,
+.dashboard-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+}
+
+.dashboard-calendar-weekdays span {
+  text-align: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted, #9ca3af);
+  padding-bottom: 0.4rem;
+}
+
+.dashboard-calendar-cell {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  font-size: 0.76rem;
+  color: var(--color-text-secondary);
+}
+
+.dashboard-calendar-cell.is-blank {
+  visibility: hidden;
+}
+
+.dashboard-calendar-cell.is-today .dashboard-calendar-day-num {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: var(--wordmark-gradient);
+  color: #fff;
+  font-weight: 700;
+}
+
+.dashboard-calendar-dot {
+  position: absolute;
+  bottom: 3px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: #06b6d4;
 }
 
 .dashboard-deadlines-empty {

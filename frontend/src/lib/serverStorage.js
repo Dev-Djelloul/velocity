@@ -74,6 +74,13 @@ export function searchPexels(query, page = 1) {
   return safeFetch(`/pexels/search?query=${encodeURIComponent(query)}&page=${page}`)
 }
 
+// Conseil du jour du dashboard — généré par IA côté serveur, mis en cache 2h (voir
+// /tip-of-the-day dans api.js). null si le backend n'est pas configuré ou injoignable ;
+// DashboardHome.jsx retombe alors sur le texte statique de secours.
+export function fetchDailyTip() {
+  return safeFetch('/tip-of-the-day')
+}
+
 // Historique multi-fils du copilote Nova (voir CopilotChat.jsx) — un fil par conversation
 // distincte, contrairement à l'ancien plan.copilotHistory qui n'en gardait qu'une seule.
 export function fetchCopilotConversations(planId) {
