@@ -210,10 +210,11 @@ export default function App() {
 
   // Délai minimum d'affichage du loader : Clerk résout parfois isLoaded quasi instantanément
   // (session déjà en cache), ce qui faisait clignoter l'écran de chargement au lieu de se
-  // voir — un minimum de 3s le rend bien visible et intentionnel plutôt qu'un flash.
+  // voir — un minimum le rend bien visible et intentionnel plutôt qu'un flash. Réduit de 3s
+  // à 2s (retour utilisateur : trop long).
   const [loaderMinDelayDone, setLoaderMinDelayDone] = useState(false)
   useEffect(() => {
-    const timer = setTimeout(() => setLoaderMinDelayDone(true), 3000)
+    const timer = setTimeout(() => setLoaderMinDelayDone(true), 2000)
     return () => clearTimeout(timer)
   }, [])
 
