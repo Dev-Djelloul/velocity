@@ -3,7 +3,6 @@ import { copilotChat, fetchCopilotConversations, fetchCopilotConversation, pushC
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle, IconMinus, IconChevronDown, IconSearch, IconPlus } from './Icons'
-import VelocityLaunchLogo from './VelocityLaunchLogo'
 import '../styles/CopilotChat.css'
 
 const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
@@ -399,11 +398,9 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
           <div className="copilot-messages" ref={listRef}>
             {messages.length === 0 && (
               <div className="copilot-empty-state">
-                <div className="copilot-empty-bg" aria-hidden="true">
-                  <span className="copilot-empty-orb">
-                    <VelocityLaunchLogo width={30} height={30} variant="mono" />
-                  </span>
-                </div>
+                <span className="copilot-empty-orb">
+                  <img className="copilot-empty-orb-avatar" src={NOVA_AVATAR} alt="" />
+                </span>
                 <p className="copilot-empty-greeting">{greeting(lang)}</p>
                 <p className="copilot-empty">{t(lang, 'copilot.empty')}</p>
                 <div className="copilot-suggestions">

@@ -330,13 +330,11 @@
   gap: 10px;
 }
 
-/* État vide façon Cloudflare AI : orbe dégradé lumineux (mêmes teintes que la marque —
-   violet/indigo/cyan, voir --wordmark-gradient) sur une trame de points, plutôt qu'un simple
-   texte italique. .copilot-empty-bg déborde largement au-delà de sa boîte (inset très
-   négatif) pour que la trame/le halo couvrent toute la fenêtre du chat plutôt qu'un petit
-   carré autour du texte (retour utilisateur : l'effet paraissait "réduit"). */
+/* État vide façon Cloudflare AI : petit avatar de Nova sur un halo dégradé (mêmes teintes
+   que la marque — violet/indigo/cyan, voir --wordmark-gradient), posé en flux normal
+   au-dessus de la salutation — pas en position:absolute derrière les suggestions comme la
+   première version (retour utilisateur : le rond débordait derrière les boutons). */
 .copilot-empty-state {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -346,31 +344,24 @@
   padding: 8px 16px;
 }
 
-.copilot-empty-bg {
-  position: absolute;
-  inset: -220px -120px;
-  z-index: 0;
+.copilot-empty-orb {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-image: radial-gradient(rgba(145, 132, 217, 0.4) 1px, transparent 1px);
-  background-size: 20px 20px;
-  -webkit-mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
-  pointer-events: none;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  margin-bottom: 4px;
+  background: radial-gradient(circle at 32% 28%, #d8d3f7, #9184d9 42%, #6366f1 72%, #06b6d4 100%);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.45), 0 0 48px rgba(6, 182, 212, 0.22);
 }
 
-.copilot-empty-orb {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 132px;
-  height: 132px;
+.copilot-empty-orb-avatar {
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background: radial-gradient(circle at 32% 28%, #d8d3f7, #9184d9 42%, #6366f1 72%, #06b6d4 100%);
-  box-shadow: 0 0 60px rgba(99, 102, 241, 0.55), 0 0 130px rgba(6, 182, 212, 0.3);
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.85);
 }
 
 .copilot-empty-greeting {
