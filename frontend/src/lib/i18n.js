@@ -812,6 +812,16 @@ export const translations = {
         entries: [
           {
             date: '21 août 2026',
+            title: 'Sommaire mobile repensé et panneau Nova plein écran sur iOS',
+            items: [
+              'Sommaire mobile du plan repensé : la grille d\'icônes nues (peu lisible, flèches précédent/suivant peu pratiques) laisse place à une seule barre sticky en haut d\'écran — grands boutons précédent/suivant + section active, qui ouvre au tap le sommaire complet (liste groupée avec libellés) en feuille modale glissant depuis le bas',
+              'Bannière de consentement cookies restreinte à la page d\'accueil uniquement : elle ne s\'affiche plus dans le dashboard, les espaces, le questionnaire, Mon compte ou les autres pages de l\'application',
+              'Correction du chevauchement visuel entre la bulle du copilote Nova et la pastille cookies repliée en bas d\'écran sur mobile',
+              'Panneau du copilote Nova passé en plein écran sur mobile, avec ses dimensions recalées en continu sur le viewport visuel réel : corrige l\'écrasement de la fenêtre par le clavier virtuel sur iOS Safari'
+            ]
+          },
+          {
+            date: '21 août 2026',
             title: 'Bannière de cookies RGPD (avec vrai consentement par catégorie) et verre dépoli généralisé',
             items: [
               'Bannière de consentement cookies (RGPD) : bandeau translucide en bas de page, 4 catégories réelles (Essentiels, Préférences, Statistiques, Marketing), réouvrable à tout moment pour revenir sur son choix',
@@ -2318,6 +2328,16 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 21, 2026',
+            title: 'Redesigned mobile section nav and full-screen Nova panel on iOS',
+            items: [
+              'Redesigned the mobile plan navigator: the bare icon grid (hard to read, fiddly previous/next arrows) is replaced by a single sticky top bar — big previous/next buttons plus the active section, which opens the full section list (grouped, with labels) in a bottom sheet on tap',
+              'Cookie consent banner restricted to the landing page only: it no longer shows up on the dashboard, spaces, questionnaire, Account, or any other app page',
+              'Fixed a visual overlap between the Nova copilot bubble and the collapsed cookie pill at the bottom of the screen on mobile',
+              'Nova\'s copilot panel is now full-screen on mobile, with its size continuously tracked against the real visual viewport: fixes the window being squashed by the on-screen keyboard on iOS Safari'
+            ]
+          },
           {
             date: 'August 21, 2026',
             title: 'GDPR cookie banner (with real per-category consent) and dashboard-wide glassmorphism',
