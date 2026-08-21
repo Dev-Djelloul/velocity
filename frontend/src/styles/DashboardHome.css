@@ -28,7 +28,7 @@
   /* Marge du haut nettement augmentée : on "rabaisse" le titre et les cartes pour laisser
      voir l'image de fond sur une plus grande partie du haut de page, au lieu qu'elle soit
      immédiatement recouverte par le contenu. */
-  margin: 6.5rem auto 3rem;
+  margin: 4.5rem auto 3rem;
   padding: 0 3rem 4rem;
   display: flex;
   flex-direction: column;
