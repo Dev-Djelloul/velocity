@@ -68,6 +68,13 @@
   -webkit-backdrop-filter: blur(14px);
 }
 
+/* En thème clair, --color-dashboard est déjà blanc pur (#fff) — la même trame que sur fond
+   sombre (0.3 d'opacité) teintait tout le panneau en gris plutôt qu'un blanc net avec juste
+   une pointe de texture (retour utilisateur : "gris léger" au lieu de blanc). */
+[data-theme="light"] .plan-sidebar {
+  background-image: radial-gradient(rgba(145, 132, 217, 0.14) 1px, transparent 1px);
+}
+
 .plan-sidebar.resizing {
   transition: none;
   user-select: none;
@@ -228,7 +235,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fff;
+  /* Suit la couleur du texte de son bouton (var(--color-text-secondary) sur .plan-sidebar-
+     item) plutôt qu'un blanc fixe pensé pour le thème sombre — en clair, sur le panneau
+     désormais blanc, un blanc fixe rendait les icônes des liens non sélectionnés quasi
+     invisibles (retour utilisateur). .plan-sidebar-item.active / .plan-sidebar-new-btn /
+     .plan-sidebar-history-toggle redéfinissent déjà leur propre icône plus bas, non
+     affectés. */
+  color: currentColor;
 }
 
 .plan-sidebar-label {
