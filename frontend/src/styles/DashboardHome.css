@@ -10,6 +10,12 @@
   position: absolute;
   inset: 0;
   z-index: 0;
+  /* URL en custom property (posée en style inline dans DashboardHome.jsx) plutôt qu'en
+     background-image inline directement — permet de la faire varier par media query
+     ci-dessous, ce qu'un style inline ne peut pas faire. Sous 768px, version ~900px de
+     large (~21 Ko contre ~60 Ko) : un mobile ne l'affiche jamais qu'en 375-430px de large,
+     inutile de lui faire télécharger le plein format. */
+  background-image: var(--dashboard-bg-desktop);
   /* "cover" : l'image remplit tout le cadre sans bandeau vide sur les côtés (contain
      laissait apparaître la couleur de fond nue de chaque côté sur les écrans larges) —
      accepte un léger rognage plutôt que des bords vides. */
@@ -19,6 +25,12 @@
      mode sombre) — les cartes étant elles-mêmes translucides (verre dépoli), l'image
      mérite de rester lisible en dessous plutôt que d'être noyée sous un voile sombre. */
   filter: brightness(0.85) saturate(1.05);
+}
+
+@media (max-width: 768px) {
+  .dashboard-home-bg {
+    background-image: var(--dashboard-bg-mobile);
+  }
 }
 
 .dashboard-home {

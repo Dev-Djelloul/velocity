@@ -9,6 +9,7 @@ import { formatDateNumericShort } from '../lib/dateFormat'
 import { IconPlus, IconUser, IconUsers, IconClipboard, IconClock, IconImage } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
+import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
 import '../styles/TeamPresenceAvatars.css'
 import '../styles/DashboardHome.css'
 
@@ -103,7 +104,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   return (
     <div className="dashboard-home-outer">
       <IconGradientDefs />
-      <div className="dashboard-home-bg" style={{ backgroundImage: `url(${dashboardBackground})` }} aria-hidden="true" />
+      <div
+        className="dashboard-home-bg"
+        style={{
+          '--dashboard-bg-desktop': `url(${dashboardBackground})`,
+          '--dashboard-bg-mobile': `url(${dashboardBackgroundMobile})`
+        }}
+        aria-hidden="true"
+      />
       <div className="dashboard-home">
       <div className="dashboard-home-header">
         <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>

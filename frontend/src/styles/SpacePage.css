@@ -8,15 +8,29 @@
   display: flow-root;
 }
 
+/* L'URL de l'image passe par des custom properties (--space-bg-desktop/--space-bg-mobile,
+   posées en style inline dans SpacePage.jsx) plutôt que directement en background-image
+   inline — un style inline ne peut pas contenir de media query, alors qu'une déclaration
+   CSS normale qui LIT une custom property, si. En dessous de 768px, on charge une version
+   nettement plus légère (~900px de large, ~20-27 Ko contre ~80 Ko) : inutile de faire
+   télécharger le visuel plein format à un mobile qui ne l'affichera jamais qu'en 375-430px
+   de large. */
 .space-page-bg {
   position: absolute;
   inset: 0;
   z-index: 0;
+  background-image: var(--space-bg-desktop);
   background-size: cover;
   background-position: center;
   /* Nette dans les deux thèmes (plus de flou/assombrissement lourd réservé au mode sombre) —
      les cartes étant elles-mêmes translucides, l'image mérite de rester lisible en dessous. */
   filter: brightness(0.85) saturate(1.05);
+}
+
+@media (max-width: 768px) {
+  .space-page-bg {
+    background-image: var(--space-bg-mobile);
+  }
 }
 
 .space-page {
