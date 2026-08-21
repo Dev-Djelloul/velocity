@@ -757,47 +757,46 @@ export default function App() {
             <Wordmark size={34} animated />
           </button>
 
-          <button
-            className={`header-hamburger-btn ${mobileNavOpen ? 'active' : ''}`}
-            onClick={() => setMobileNavOpen(o => !o)}
-            title={lang === 'fr' ? 'Menu' : 'Menu'}
-            aria-label={lang === 'fr' ? 'Menu' : 'Menu'}
-            aria-expanded={mobileNavOpen}
-          >
-            {mobileNavOpen ? <IconX width={20} height={20} /> : <IconMenu width={20} height={20} />}
-          </button>
+          {/* Le hamburger ne fait qu'ouvrir/fermer .header-nav, dont tous les liens sont
+              réservés aux visiteurs non connectés (nav marketing : Fonctionnalités, Comment
+              ça marche...) — pour un utilisateur connecté, .header-nav est vide et le bouton
+              n'ouvre plus rien. Toute la navigation utile a été déplacée ailleurs dans le
+              header (cloche, bascule d'espace, menu compte) lors de la refonte. */}
+          {!isSignedIn && (
+            <button
+              className={`header-hamburger-btn ${mobileNavOpen ? 'active' : ''}`}
+              onClick={() => setMobileNavOpen(o => !o)}
+              title={lang === 'fr' ? 'Menu' : 'Menu'}
+              aria-label={lang === 'fr' ? 'Menu' : 'Menu'}
+              aria-expanded={mobileNavOpen}
+            >
+              {mobileNavOpen ? <IconX width={20} height={20} /> : <IconMenu width={20} height={20} />}
+            </button>
+          )}
 
-          <nav className={`header-nav ${mobileNavOpen ? 'is-open' : ''}`}>
-            {!isSignedIn && (
+          {!isSignedIn && (
+            <nav className={`header-nav ${mobileNavOpen ? 'is-open' : ''}`}>
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('features') }}>
                 {lang === 'fr' ? 'Fonctionnalités' : 'Features'}
               </button>
-            )}
-            {!isSignedIn && (
               <button
                 className={`header-nav-link ${currentPage === 'howItWorks' ? 'active' : ''}`}
                 onClick={() => { setMobileNavOpen(false); handleShowHowItWorks() }}
               >
                 {lang === 'fr' ? 'Comment ça marche' : 'How it works'}
               </button>
-            )}
-            {!isSignedIn && (
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); handleNavAnchor('faq') }}>
                 FAQ
               </button>
-            )}
-            {!isSignedIn && (
               <button className="header-nav-link" onClick={() => { setMobileNavOpen(false); setShowDemo(true) }}>
                 {lang === 'fr' ? 'Démo' : 'Demo'}
               </button>
-            )}
-            {!isSignedIn && (
               <button className="btn-header-cta" onClick={() => { setMobileNavOpen(false); handleStartClick() }}>
                 <IconSparkle width={14} height={14} />
                 <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
               </button>
-            )}
-          </nav>
+            </nav>
+          )}
 
           <div className="header-actions" ref={headerMenuRef}>
             {!isSignedIn && (
