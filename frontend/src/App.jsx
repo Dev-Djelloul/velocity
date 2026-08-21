@@ -713,6 +713,9 @@ export default function App() {
 
   return (
     <div className="app">
+      {/* Page d'auth en plein écran façon Cloudflare/Stripe : ni nav ni footer du site,
+          juste la carte de connexion — évite la distraction et le double branding. */}
+      {currentPage !== 'auth' && (
       <header className={`header ${currentPage === 'landing' ? 'header-locked-dark' : ''}`}>
         <div className="header-top">
           <button className="header-brand-btn" onClick={() => {
@@ -1022,6 +1025,7 @@ export default function App() {
           </InfoModal>
         )}
       </header>
+      )}
 
       {error && <div className="error-banner">{error}</div>}
 
@@ -1056,6 +1060,7 @@ export default function App() {
             theme={theme}
             onBack={() => setCurrentPage('landing')}
             onSwitchMode={() => setAuthMode(m => m === 'signup' ? 'signin' : 'signup')}
+            onOpenModal={setActiveModal}
           />
         )}
         {currentPage === 'questionnaire' && isSignedIn && (
@@ -1153,7 +1158,9 @@ export default function App() {
         )}
       </main>
 
-      <Footer lang={lang} onOpenModal={setActiveModal} onNavigateFeatures={() => handleNavAnchor('features')} />
+      {currentPage !== 'auth' && (
+        <Footer lang={lang} onOpenModal={setActiveModal} onNavigateFeatures={() => handleNavAnchor('features')} />
+      )}
 
       <ScrollToTop />
 

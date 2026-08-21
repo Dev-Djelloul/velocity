@@ -53,7 +53,7 @@ function getClerkAppearance(theme) {
   }
 }
 
-export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme }) {
+export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme, onOpenModal }) {
   const isSignUp = mode === 'signup'
   const mock = useAuthProviders()
   const clerkAppearance = getClerkAppearance(theme)
@@ -100,6 +100,15 @@ export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme }) {
           <button className="auth-switch-btn" onClick={onSwitchMode}>
             {isSignUp ? t(lang, 'auth.switchToSignIn') : t(lang, 'auth.switchToSignUp')}
           </button>
+
+          {onOpenModal && (
+            <p className="auth-legal-notice">
+              {t(lang, 'auth.byContinuing')}{' '}
+              <button type="button" className="auth-legal-link" onClick={() => onOpenModal('terms')}>{t(lang, 'modals.terms.title')}</button>,{' '}
+              {t(lang, 'auth.ourFem')} <button type="button" className="auth-legal-link" onClick={() => onOpenModal('privacy')}>{t(lang, 'modals.privacy.title')}</button>{' '}
+              {t(lang, 'auth.and')} <button type="button" className="auth-legal-link" onClick={() => onOpenModal('cookies')}>{t(lang, 'modals.cookies.title')}</button>.
+            </p>
+          )}
         </div>
       </div>
 

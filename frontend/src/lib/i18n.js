@@ -1225,7 +1225,10 @@ export const translations = {
       signInSubtitle: 'Connectez-vous pour retrouver vos plans.',
       switchToSignIn: 'Déjà un compte ? Se connecter',
       switchToSignUp: "Pas encore de compte ? S'inscrire",
-      continueWith: 'Continuer avec'
+      continueWith: 'Continuer avec',
+      byContinuing: 'En continuant, vous acceptez nos',
+      ourFem: 'notre',
+      and: 'et notre'
     },
     dashboard: {
       greeting: (name) => `Bonjour ${name}`,
@@ -2600,7 +2603,10 @@ export const translations = {
       signInSubtitle: 'Sign in to find your plans.',
       switchToSignIn: 'Already have an account? Sign in',
       switchToSignUp: 'No account yet? Sign up',
-      continueWith: 'Continue with'
+      continueWith: 'Continue with',
+      byContinuing: 'By continuing, you agree to our',
+      ourFem: '',
+      and: 'and our'
     },
     dashboard: {
       greeting: (name) => `Hi ${name}`,
