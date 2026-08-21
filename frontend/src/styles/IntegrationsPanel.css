@@ -6,7 +6,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  /* wrap plutôt que nowrap implicite : même avec .integration-info en min-width:0 et le
+     bouton en flex-shrink:0 (juste en dessous), l'icône (36px) + le nom + le badge du
+     service pouvaient encore, ensemble, ne pas laisser assez de place au bouton
+     "Déconnecter" sur une carte étroite (mobile) — sans possibilité de passer à la ligne,
+     le rendu se chevauchait visuellement avec la ligne suivante au lieu de simplement
+     déborder (confirmé par capture iPhone, persistant après le premier correctif
+     flex-shrink:0 seul). Avec wrap, le bouton descend proprement sous les infos du
+     service quand la ligne est trop étroite pour les deux. */
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
   /* Espacement généreux (contre l'effet "tout collé" de la version précédente, qui
      réutilisait .settings-row — pensée pour de simples lignes toggle, pas des lignes
      icône + badge + détail) + séparateur discret entre chaque service. */

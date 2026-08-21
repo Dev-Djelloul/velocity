@@ -280,9 +280,22 @@
 .cookie-consent-actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
   flex-shrink: 0;
   margin-left: auto;
+}
+
+/* Les deux boutons n'avaient ni flex-shrink:0 ni contrainte de taille propre — sur mobile,
+   ils se répartissaient l'espace disponible en se comprimant chacun sous leur propre
+   contenu (white-space:nowrap), tronquant "Paramètres" en "Para..." au profit de "Tout
+   accepter" (confirmé par capture iPhone). flex-wrap sur le conteneur (ci-dessus) + ce
+   flex-shrink:0 garantissent que chaque bouton garde sa taille naturelle, quitte à passer
+   à la ligne plutôt qu'à se tronquer. */
+.cookie-consent-accept,
+.cookie-consent-save,
+.cookie-consent-settings-toggle {
+  flex-shrink: 0;
 }
 
 /* Les actions partagent le même gabarit (taille, rembourrage, coins arrondis) — seule

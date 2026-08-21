@@ -25,11 +25,23 @@
   color: var(--color-text-primary);
 }
 
+/* flex-wrap:wrap (au lieu de nowrap implicite) + le bouton en flex-shrink:0 : sans ça, un
+   bouton texte au contenu non coupable (.btn-secondary, white-space:nowrap globalement)
+   se faisait comprimer sous la largeur de son propre texte sur mobile — débordant du
+   cadre de la carte au lieu de passer à la ligne (ex. "Exporter (JSON)" dans Confidentialité
+   & données, confirmé par capture iPhone — même défaut déjà corrigé ailleurs : logo du
+   header, bouton Déconnecter des intégrations). Ici, plutôt que réduire le bouton, on le
+   laisse descendre sous le texte quand la ligne est trop étroite. */
 .settings-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.6rem 1rem;
+}
+
+.settings-row > button {
+  flex-shrink: 0;
 }
 
 .settings-row-label {
