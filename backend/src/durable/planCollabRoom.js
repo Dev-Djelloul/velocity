@@ -1,5 +1,6 @@
 import * as Y from 'yjs'
 import { getPlan, getPlanOwnerAndTeam, createNotification } from '../lib/db'
+import { listOrganizationMembers } from '../lib/clerk'
 
 const PERSIST_DEBOUNCE_MS = 1500
 
@@ -21,7 +22,7 @@ export class PlanCollabRoom {
     this.ownerId = null
     this.teamId = null
     this.lang = 'fr'
-    this.pendingEditors = new Set()
+    this.pendingEditors = new Map() // userId -> name (Map, pas Set : il faut les deux)
   }
 
   async fetch(request) {
@@ -35,7 +36,7 @@ export class PlanCollabRoom {
     server.accept()
 
     const clientId = crypto.randomUUID().slice(0, 8)
-    this.sessions.set(server, { id: clientId, name: '', avatar: null, color: '', section: null })
+    this.sessions.set(server, { id: clientId, name: '', avatar: null, color: '', section: null, userId: null })
 
     server.addEventListener('message', (evt) => this.handleMessage(server, evt.data))
     const cleanup = () => this.handleClose(server)
@@ -80,12 +81,14 @@ export class PlanCollabRoom {
       try {
         Y.applyUpdate(this.doc, new Uint8Array(msg.update))
       } catch { return }
-      const editorName = msg.name || this.sessions.get(ws)?.name || null
+      const session = this.sessions.get(ws)
+      const editorName = msg.name || session?.name || null
+      const editorUserId = msg.userId || session?.userId || null
       this.relay(ws, { type: 'update', update: msg.update, name: editorName })
-      // L'auteur·e n'a pas besoin d'être notifié·e de sa propre édition — seul le
-      // propriétaire du plan compte ici (un membre d'équipe qui édite son propre plan
-      // personnel ne devrait jamais se voir notifier de ses propres changements).
-      if (editorName) this.pendingEditors.add(editorName)
+      // Un simple nom ne suffit pas à exclure l'auteur·e de la notification qu'il/elle
+      // vient de déclencher (deux personnes peuvent partager un prénom) : on garde le
+      // vrai userId Clerk, envoyé avec chaque update (voir frontend/src/lib/collab.js).
+      if (editorUserId) this.pendingEditors.set(editorUserId, editorName || editorUserId)
       this.schedulePersist()
     } else if (msg.type === 'presence') {
       const session = this.sessions.get(ws)
@@ -94,6 +97,7 @@ export class PlanCollabRoom {
         session.avatar = msg.avatar || null
         session.color = msg.color || session.color
         session.section = msg.section || null
+        session.userId = msg.userId || session.userId
       }
       this.broadcastPresence()
     }
@@ -133,26 +137,42 @@ export class PlanCollabRoom {
   }
 
   // Une seule notification groupée par rafale d'édits (pas une par update Yjs, ce qui
-  // spammerait pour une simple frappe continue). Volontairement PAS conditionné à "au
-  // moins deux sessions connectées en ce moment" : c'est justement quand le propriétaire
-  // n'est plus là pour voir l'édition en direct (donc une seule session restante, la
-  // sienne) que la notification lui est le plus utile — exiger 2 sessions le privait de
-  // toute notification dans ce cas précis.
+  // spammerait pour une simple frappe continue), envoyée à tout le monde SAUF les
+  // auteur·es identifié·es par leur vrai userId — jamais juste "le propriétaire du plan" :
+  // sur un plan d'équipe, `user_id` (colonne plans) ne désigne qu'un membre arbitraire
+  // (souvent qui a créé le plan), pas "la bonne personne à notifier" pour les autres
+  // membres qui éditent aussi ce même plan. Volontairement pas conditionné à "au moins
+  // deux sessions connectées en ce moment" : c'est justement quand le/la destinataire
+  // n'est plus là pour voir l'édition en direct que la notification lui est utile.
   async notifyOwnerOfEdits() {
-    const editors = [...this.pendingEditors]
+    const editors = [...this.pendingEditors.entries()] // [userId, name][]
     this.pendingEditors.clear()
-    if (!editors.length || !this.ownerId || !this.env.DB) return
+    if (!editors.length || !this.env.DB) return
+    const editorIds = new Set(editors.map(([id]) => id))
+    const names = editors.slice(0, 3).map(([, name]) => name).join(', ') + (editors.length > 3 ? '…' : '')
+    const title = this.lang === 'en' ? `${names} edited the roadmap` : `${names} a modifié la roadmap`
+
+    let recipients = []
+    if (this.teamId) {
+      try {
+        const members = await listOrganizationMembers(this.env, this.teamId)
+        recipients = members.map(m => m.userId).filter(id => !editorIds.has(id))
+      } catch { /* Clerk indisponible : repli sur le propriétaire ci-dessous */ }
+    }
+    if (!recipients.length && this.ownerId && !editorIds.has(this.ownerId)) {
+      recipients = [this.ownerId]
+    }
+    if (!recipients.length) return
+
     try {
-      const names = editors.slice(0, 3).join(', ') + (editors.length > 3 ? '…' : '')
-      const title = this.lang === 'en' ? `${names} edited the roadmap` : `${names} a modifié la roadmap`
-      await createNotification(this.env, {
-        userId: this.ownerId,
+      await Promise.all(recipients.map(userId => createNotification(this.env, {
+        userId,
         type: 'roadmap_collab',
         title,
         detail: null,
         planId: this.planId,
         teamId: this.teamId
-      })
+      })))
     } catch { /* best-effort */ }
   }
 }

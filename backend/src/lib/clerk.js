@@ -62,6 +62,17 @@ export async function listUserOrganizationMemberships(env, userId) {
   return data?.data || []
 }
 
+// Membres d'un espace d'équipe (id + nom d'affichage), pour notifier tout le monde sauf
+// l'auteur·e d'une édition collaborative (voir planCollabRoom.js) — un plan d'équipe n'a
+// pas de "propriétaire" unique pertinent pour ça, contrairement à un plan personnel.
+export async function listOrganizationMembers(env, organizationId) {
+  const data = await clerkRequest(env, `/organizations/${organizationId}/memberships?limit=100`)
+  return (data?.data || []).map(m => ({
+    userId: m.public_user_data?.user_id,
+    name: [m.public_user_data?.first_name, m.public_user_data?.last_name].filter(Boolean).join(' ') || m.public_user_data?.identifier
+  })).filter(m => m.userId)
+}
+
 export async function deleteOrganization(env, organizationId) {
   await clerkRequest(env, `/organizations/${organizationId}`, { method: 'DELETE' })
 }

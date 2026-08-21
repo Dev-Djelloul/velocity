@@ -118,6 +118,7 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
   let closed = false
   let clientId = null
   let myName = null
+  let myUserId = null
   let heartbeatTimer = null
   let pongTimeoutTimer = null
 
@@ -160,11 +161,11 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
       } else if (msg.type === 'init') {
         clientId = msg.id
         Y.applyUpdate(doc, new Uint8Array(msg.update), 'remote')
-        onRoadmap?.(doc, { by: null })
+        onRoadmap?.(doc, { by: null, byUserId: null })
         onReady?.()
       } else if (msg.type === 'update') {
         Y.applyUpdate(doc, new Uint8Array(msg.update), 'remote')
-        onRoadmap?.(doc, { by: msg.name || null })
+        onRoadmap?.(doc, { by: msg.name || null, byUserId: msg.userId || null })
       } else if (msg.type === 'presence') {
         onPresence?.((msg.peers || []).filter(p => p.id !== clientId))
       }
@@ -177,16 +178,20 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
   doc.on('update', (update, origin) => {
     if (origin === 'remote') return // évite de renvoyer au serveur ce qu'il vient d'envoyer
     if (ws?.readyState === WebSocket.OPEN) {
-      // `name` accompagne chaque update pour que les pairs puissent attribuer l'entrée
-      // d'historique correspondante (voir PlanViewer.jsx) sans protocole de présence séparé.
-      ws.send(JSON.stringify({ type: 'update', update: Array.from(update), name: myName }))
+      // `name` + `userId` accompagnent chaque update pour que les pairs puissent attribuer
+      // l'entrée d'historique correspondante (voir PlanViewer.jsx), et pour que le serveur
+      // sache précisément QUI exclure de la notification de la Durable Object (voir
+      // notifyOwnerOfEdits côté backend) — un simple nom affiché ne suffit pas à ça,
+      // deux personnes pouvant partager un même prénom.
+      ws.send(JSON.stringify({ type: 'update', update: Array.from(update), name: myName, userId: myUserId }))
     }
   })
 
-  const sendPresence = (name, avatar, section) => {
+  const sendPresence = (name, avatar, userId, section) => {
     myName = name
+    myUserId = userId || null
     if (ws?.readyState === WebSocket.OPEN) {
-      ws.send(JSON.stringify({ type: 'presence', name, avatar: avatar || null, color: colorFor(clientId || name), section }))
+      ws.send(JSON.stringify({ type: 'presence', name, avatar: avatar || null, userId: myUserId, color: colorFor(clientId || name), section }))
     }
   }
 

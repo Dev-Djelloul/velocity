@@ -157,7 +157,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       onReady: () => {
         seedDocFromRoadmap(collab.doc, plan.roadmap)
         const name = user?.fullName || user?.firstName || (lang === 'fr' ? 'Anonyme' : 'Anonymous')
-        collab.sendPresence(name, user?.imageUrl)
+        collab.sendPresence(name, user?.imageUrl, userId)
       }
     })
     collabRef.current = readOnly ? null : collab
