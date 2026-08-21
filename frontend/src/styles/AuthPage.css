@@ -50,14 +50,24 @@
   pointer-events: none;
 }
 
+/* flex:0 0 50% n'a de sens qu'à côté du panneau visuel (.auth-page-visual, affiché à
+   partir de 960px) — en dessous, ce panneau passe en display:none mais le figer à 50%
+   ici laissait la carte de connexion coincée dans une colonne étroite à gauche au lieu de
+   reprendre toute la largeur disponible (bug confirmé en test mobile). */
 .auth-page-content {
   position: relative;
-  flex: 0 0 50%;
+  flex: 1 1 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 3rem 1.5rem;
   overflow: hidden;
+}
+
+@media (min-width: 960px) {
+  .auth-page-content {
+    flex: 0 0 50%;
+  }
 }
 
 .auth-page-background {
