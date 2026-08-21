@@ -148,15 +148,20 @@
   max-width: 340px;
 }
 
+/* Carte en deux zones (photo | texte) façon Notion/Linear, plutôt qu'un petit avatar noyé
+   dans le texte : la photo occupe ~25% de la largeur, pleine hauteur, au ras des bords de la
+   carte (demandé explicitement) — .dashboard-space-card-media ci-dessous. overflow:hidden
+   ici suffit à faire suivre à la photo les coins arrondis de la carte, sans avoir à les
+   redéfinir séparément dessus. */
 .dashboard-space-card {
   position: relative;
   display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  padding: 1.1rem;
+  align-items: stretch;
+  padding: 0;
   text-align: left;
   border-radius: var(--border-radius, 14px);
   border: 1.5px solid transparent;
+  overflow: hidden;
   background:
     linear-gradient(var(--color-bg-secondary, #16161d), var(--color-bg-secondary, #16161d)) padding-box,
     linear-gradient(135deg, rgba(145, 132, 217, 0.25) 0%, rgba(99, 102, 241, 0.25) 55%, rgba(6, 182, 212, 0.25) 100%) border-box;
@@ -164,6 +169,22 @@
   /* Rebond élastique au survol — même courbe que SpacePage (espace d'équipe), réutilisée
      ici pour rester cohérent sur tout le parcours post-connexion. */
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+}
+
+.dashboard-space-card-media {
+  flex: 0 0 25%;
+  min-width: 76px;
+  position: relative;
+  overflow: hidden;
+  background: var(--wordmark-gradient);
+}
+
+.dashboard-space-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  padding: 1.1rem;
 }
 
 .dashboard-space-card:hover {
@@ -249,20 +270,24 @@
    (uniquement demandé pour le mode clair). Le carré de fond dégradé de l'avatar est retiré
    ICI (tous thèmes, pas juste [data-theme="light"]) : une icône dégradée sur un fond déjà
    dégradé se serait fondue dedans, illisible en mode sombre notamment. */
-.dashboard-space-card.is-current .dashboard-space-avatar-personal {
+/* Carte espace ACTUEL, quand la personne n'a pas de photo : le bandeau média reste au
+   dégradé de marque (voir .dashboard-space-card-media), l'icône dégradée s'y fondrait —
+   fond neutre uni ici pour qu'elle reste lisible. */
+.dashboard-space-card.is-current .dashboard-space-card-media {
   background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.08));
 }
 
 .dashboard-space-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
   flex-shrink: 0;
   object-fit: cover;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 1.4rem;
   color: #fff;
 }
 
@@ -270,22 +295,17 @@
    .header-space-avatar (22px, pensée pour le petit sélecteur du header) EN PLUS de
    .dashboard-space-avatar passée ici — même spécificité (une classe), donc l'ordre de
    chargement des feuilles de style décidait laquelle gagnait, et la logo d'équipe se
-   retrouvait minuscule au lieu de la même taille que l'avatar de l'espace personnel
-   (capture utilisateur). Sélecteur à deux classes pour trancher sans ambiguïté. */
+   retrouvait minuscule au lieu de remplir tout le bandeau photo. Sélecteur à deux classes
+   pour trancher sans ambiguïté. */
 .dashboard-space-card .dashboard-space-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
   padding: 0;
 }
 
 .dashboard-space-avatar-personal {
   background: var(--wordmark-gradient);
-}
-
-.dashboard-space-avatar-new {
-  background: rgba(145, 132, 217, 0.16);
-  color: #9184d9;
 }
 
 .dashboard-space-info {

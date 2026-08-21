@@ -6,10 +6,11 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
-import { IconPlus, IconUser, IconUsers, IconClipboard, IconClock, IconImage } from './Icons'
+import { IconPlus, IconUser, IconClipboard, IconClock, IconImage } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
+import createTeamImage from '../../assets/img/hiw-hero-tablets-purple.webp'
 import '../styles/TeamPresenceAvatars.css'
 import '../styles/DashboardHome.css'
 
@@ -132,15 +133,18 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
               className={`dashboard-space-card ${isCurrent ? 'is-current' : ''}`}
               onClick={() => onOpenSpace(space.id)}
             >
-              {space.isTeam ? (
-                <TeamAvatar id={space.id} name={space.name} imageUrl={space.avatar} className="dashboard-space-avatar" />
-              ) : space.avatar ? (
-                <img className="dashboard-space-avatar" src={space.avatar} alt="" />
-              ) : (
-                <span className="dashboard-space-avatar dashboard-space-avatar-personal">
-                  {isCurrent ? gradientIcon(<IconUser width={16} height={16} />) : <IconUser width={16} height={16} />}
-                </span>
-              )}
+              <div className="dashboard-space-card-media">
+                {space.isTeam ? (
+                  <TeamAvatar id={space.id} name={space.name} imageUrl={space.avatar} className="dashboard-space-avatar" />
+                ) : space.avatar ? (
+                  <img className="dashboard-space-avatar" src={space.avatar} alt="" />
+                ) : (
+                  <span className="dashboard-space-avatar dashboard-space-avatar-personal">
+                    {isCurrent ? gradientIcon(<IconUser width={22} height={22} />) : <IconUser width={22} height={22} />}
+                  </span>
+                )}
+              </div>
+              <div className="dashboard-space-card-body">
               <div className="dashboard-space-info">
                 <span className="dashboard-space-name">
                   {space.name}
@@ -180,18 +184,21 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.openSpace')}</span>
                 )}
               </div>
+              </div>
             </button>
           )
         })}
 
         {!teamLimitReached && (
           <button className="dashboard-space-card dashboard-space-card-new" onClick={onCreateTeam}>
-            <span className="dashboard-space-avatar dashboard-space-avatar-new">
-              <IconUsers width={16} height={16} />
-            </span>
+            <div className="dashboard-space-card-media">
+              <img className="dashboard-space-avatar" src={createTeamImage} alt="" />
+            </div>
+            <div className="dashboard-space-card-body">
             <div className="dashboard-space-info">
               <span className="dashboard-space-name">{t(lang, 'dashboard.createTeam')}</span>
               <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.createTeamDesc')}</span>
+            </div>
             </div>
           </button>
         )}
