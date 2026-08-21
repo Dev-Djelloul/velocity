@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { t } from '../lib/i18n'
 import { IconCookie, IconLock, IconSettings, IconBarChart, IconMegaphone } from './Icons'
 import Wordmark from './Wordmark'
+import { applyConsent } from '../lib/consentScripts'
 import cookieBannerImage from '../../assets/img/hiw-step3-export.webp'
 import '../styles/CookieConsentBanner.css'
 
@@ -61,8 +62,18 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
   const [statistics, setStatistics] = useState(saved?.statistics ?? false)
   const [marketing, setMarketing] = useState(saved?.marketing ?? false)
 
+  // Un choix déjà enregistré (visite précédente) doit charger les scripts consentis dès
+  // l'arrivée sur le site, sans attendre une nouvelle décision — sinon un utilisateur ayant
+  // déjà accepté les statistiques ne serait jamais mesuré tant qu'il ne rouvre pas la
+  // bannière. Rien n'est chargé tant qu'aucun choix n'a été fait (saved est alors null).
+  useEffect(() => {
+    if (saved) applyConsent(saved)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   const commit = (prefs) => {
     savePrefs(prefs)
+    applyConsent(prefs)
     setOpen(false)
     setShowSettings(false)
   }
