@@ -32,7 +32,7 @@ function byRecency(a, b) {
 // crédits et sert désormais d'historique complet de tous les plans de l'espace, pendant
 // que cette page ne montre que les derniers plans actifs (personnel) ou le tableau de bord
 // partagé (équipe).
-export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenHistory, onOpenGallery, onPersonalSpaceChange }) {
+export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenHistory, onOpenGallery, onPersonalSpaceChange, onCompareVersions }) {
   const team = useTeam()
   const { user } = useUser()
   const { userId } = useAuth()
@@ -45,6 +45,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [draftEditValue, setDraftEditValue] = useState('')
   const [personalSpace, setPersonalSpace] = useState(() => getPersonalSpace(userId, lang))
   const [showEditPersonal, setShowEditPersonal] = useState(false)
+  const [showVersionsPicker, setShowVersionsPicker] = useState(false)
   const [showPersonalAvatarPicker, setShowPersonalAvatarPicker] = useState(false)
   const [editName, setEditName] = useState('')
 
@@ -247,6 +248,16 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
         </div>
       )}
 
+      {isTeam && !!plans.length && (
+        <button className="space-page-section card space-page-gallery-link" onClick={() => setShowVersionsPicker(true)}>
+          <IconClock width={18} height={18} />
+          <div>
+            <h3>{t(lang, 'planVersions.title')}</h3>
+            <p>{t(lang, 'planVersions.cardDesc')}</p>
+          </div>
+        </button>
+      )}
+
       <div className="space-page-section card">
         <div className="space-page-section-head">
           <h3><IconClipboard width={16} height={16} /> {isTeam
@@ -349,6 +360,34 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             </div>
           )}
         </div>
+      )}
+
+      {showVersionsPicker && (
+        <InfoModal
+          icon={<IconClock width={22} height={22} />}
+          title={t(lang, 'planVersions.title')}
+          onClose={() => setShowVersionsPicker(false)}
+        >
+          <p className="unsaved-changes-body">{t(lang, 'planVersions.pickerBody')}</p>
+          <div className="account-list">
+            {plans.map(p => (
+              <div key={p.id} className="account-list-item">
+                <button
+                  className="account-list-item-main has-thumb"
+                  onClick={() => { setShowVersionsPicker(false); onCompareVersions?.(p) }}
+                >
+                  {p.coverImage
+                    ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
+                    : <div className="account-list-item-thumb account-list-item-thumb-placeholder" aria-hidden="true" />}
+                  <div className="account-list-item-text">
+                    <span className="account-list-item-name">{p.product?.name || t(lang, 'plans.untitled')}</span>
+                    <span className="account-list-item-meta">{p.classification}</span>
+                  </div>
+                </button>
+              </div>
+            ))}
+          </div>
+        </InfoModal>
       )}
 
       {showEditPersonal && (

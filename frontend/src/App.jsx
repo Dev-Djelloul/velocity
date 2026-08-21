@@ -561,6 +561,17 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  // Depuis la carte "Bibliothèque de versions" de l'espace d'équipe (voir SpacePage.jsx) :
+  // même chargement qu'ouvrir un plan depuis l'historique, mais on atterrit directement sur
+  // la comparaison plutôt que sur le plan lui-même.
+  const handleCompareVersions = (loadedPlan) => {
+    setPlan(loadedPlan)
+    setJustGenerated(false)
+    setIsSharedView(false)
+    setCurrentPage('plan-versions')
+    window.scrollTo(0, 0)
+  }
+
   // "Dupliquer pour modifier" depuis un plan partagé en lecture seule (voir PlanViewer
   // readOnly) — copier dans son propre compte est la seule façon d'en repartir, pas
   // d'édition en place sur le plan de quelqu'un d'autre. Sans compte, on redirige vers
@@ -1197,6 +1208,7 @@ export default function App() {
             onOpenHistory={() => setShowHistory(true)}
             onOpenGallery={() => { setCurrentPage('gallery'); window.scrollTo(0, 0) }}
             onPersonalSpaceChange={() => setDataVersion(v => v + 1)}
+            onCompareVersions={handleCompareVersions}
           />
         )}
         {currentPage === 'settings' && isSignedIn && (
