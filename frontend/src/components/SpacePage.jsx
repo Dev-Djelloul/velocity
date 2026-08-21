@@ -195,7 +195,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
 
       {isTeam && stats && (
         <div className="space-dashboard">
-          <div className="space-dashboard-tile space-dashboard-tile-violet">
+          <div
+            className="space-dashboard-tile space-dashboard-tile-violet avatar-tooltip"
+            data-tooltip={plans.length
+              ? plans.map(p => p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')).join(', ')
+              : (lang === 'fr' ? 'Aucun plan pour le moment' : 'No plans yet')}
+          >
             <span className="space-dashboard-icon"><IconClipboard width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.planCount}</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Plans partagés' : 'Shared plans'}</span>
