@@ -812,9 +812,11 @@ export const translations = {
         entries: [
           {
             date: '21 août 2026',
-            title: 'Bannière de cookies RGPD et verre dépoli généralisé sur le tableau de bord',
+            title: 'Bannière de cookies RGPD (avec vrai consentement par catégorie) et verre dépoli généralisé',
             items: [
-              'Bannière de consentement cookies (RGPD) : panneau glissant et réouvrable à tout moment, cohérent avec l\'identité visuelle sombre de la page d\'accueil',
+              'Bannière de consentement cookies (RGPD) : bandeau translucide en bas de page, 4 catégories réelles (Essentiels, Préférences, Statistiques, Marketing), réouvrable à tout moment pour revenir sur son choix',
+              'Statistiques et Marketing sont vraiment branchés : Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag ne se chargent que si la catégorie correspondante est acceptée, jamais avant',
+              'Écran de chargement plein écran (symbole VelocityLaunch animé) au premier chargement de l\'app, le temps que la session soit vérifiée',
               'Effet de verre dépoli (glassmorphism) étendu à toutes les cartes du tableau de bord, de l\'espace personnel/équipe et des pages Mon compte, Paramètres, Intégrations et Notifications, en mode clair comme en mode sombre',
               'Aperçus visuels des plans (au lieu d\'un simple compteur) et phrase de synthèse sur les cartes d\'espace de la page d\'accueil'
             ]
@@ -1050,7 +1052,8 @@ export const translations = {
             label: 'Compte & accès',
             items: [
               'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
-              'Recherche globale (⌘K), FR / EN'
+              'Recherche globale (⌘K), FR / EN',
+              'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag'
             ]
           }
         ]
@@ -1080,7 +1083,8 @@ export const translations = {
               'Notifications email (Resend) et Slack : génération terminée, rappel d\'inactivité, résumé hebdomadaire',
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in',
               'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph',
-              'Recherche globale (⌘K), FR / EN'
+              'Recherche globale (⌘K), FR / EN',
+              'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag'
             ]
           },
           {
@@ -2316,9 +2320,11 @@ export const translations = {
         entries: [
           {
             date: 'August 21, 2026',
-            title: 'GDPR cookie banner and dashboard-wide glassmorphism',
+            title: 'GDPR cookie banner (with real per-category consent) and dashboard-wide glassmorphism',
             items: [
-              'Cookie consent banner (GDPR): a sliding panel you can reopen any time, matching the landing page\'s dark visual identity',
+              'Cookie consent banner (GDPR): translucent bottom bar, 4 real categories (Essential, Preferences, Statistics, Marketing), reopenable any time to change your mind',
+              'Statistics and Marketing are actually wired up: Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag only load if their category is accepted, never before',
+              'Full-screen loading screen (animated VelocityLaunch mark) on first app load, while the session is being verified',
               'Glassmorphism extended to every card on the dashboard, personal/team space, and the Account, Settings, Integrations and Notifications pages, in both light and dark mode',
               'Visual plan previews (instead of a plain counter) and a summary sentence on the dashboard space cards'
             ]
@@ -2554,7 +2560,8 @@ export const translations = {
             label: 'Account & access',
             items: [
               '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
-              'Global search (⌘K), FR / EN'
+              'Global search (⌘K), FR / EN',
+              'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag'
             ]
           }
         ]
@@ -2584,7 +2591,8 @@ export const translations = {
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery',
               'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image',
-              'Global search (⌘K), FR / EN'
+              'Global search (⌘K), FR / EN',
+              'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag'
             ]
           },
           {
