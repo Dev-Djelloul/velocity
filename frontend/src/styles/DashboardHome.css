@@ -18,12 +18,15 @@
 .dashboard-home {
   position: relative;
   z-index: 1;
-  max-width: 960px;
+  /* Élargi (aligné sur le header/footer, max-width 1400px) pour que le titre à gauche et
+     le bouton "Créer un plan" à droite s'écartent davantage l'un de l'autre, laissant le
+     centre de la page dégagé pour la pyramide de la photo de fond. */
+  max-width: 1400px;
   /* Marge du haut nettement augmentée : on "rabaisse" le titre et les cartes pour laisser
      voir l'image de fond sur une plus grande partie du haut de page, au lieu qu'elle soit
      immédiatement recouverte par le contenu. */
   margin: 9rem auto 3rem;
-  padding: 0 1.5rem 4rem;
+  padding: 0 3rem 4rem;
   display: flex;
   flex-direction: column;
   gap: 2rem;
