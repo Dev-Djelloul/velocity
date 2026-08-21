@@ -35,6 +35,8 @@ import { getReadIds } from './lib/commentReads'
 import { getPersonalSpace } from './lib/personalSpace'
 import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib/draftStorage'
 import { getTimezone, setTimezone as persistTimezone } from './lib/dateFormat'
+import { hasPreferencesConsent } from './lib/cookieConsent'
+import { PREFERENCES_GRANTED_EVENT } from './lib/preferenceStorage'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from './lib/pricingTiers'
@@ -227,18 +229,24 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  // localStorage.setItem conditionné au consentement "Préférences" (bannière cookies) sur
+  // les 8 effets ci-dessous : sans accord, un changement de thème/langue/fuseau/accessibilité
+  // reste actif pour la session en cours (l'état React continue de piloter l'UI normalement)
+  // mais ne survit pas à un rechargement — repart sur les valeurs par défaut à la prochaine
+  // visite. Voir CookieConsentBanner.jsx (purge sur refus explicite) et l'effet plus bas
+  // (persistance immédiate sur accord, sans attendre un nouveau changement).
   useEffect(() => {
-    localStorage.setItem('plp_lang', lang)
+    if (hasPreferencesConsent()) localStorage.setItem('plp_lang', lang)
     window.dispatchEvent(new CustomEvent('plp-langchange', { detail: lang }))
   }, [lang])
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme
-    localStorage.setItem('plp_theme', theme)
+    if (hasPreferencesConsent()) localStorage.setItem('plp_theme', theme)
   }, [theme])
 
   useEffect(() => {
-    persistTimezone(timezone)
+    if (hasPreferencesConsent()) persistTimezone(timezone)
   }, [timezone])
 
   // Un changement de fuseau horaire fait dans un autre onglet (même origine) ne met à jour
@@ -257,26 +265,45 @@ export default function App() {
 
   useEffect(() => {
     document.documentElement.dataset.reduceMotion = reduceMotion ? 'true' : 'false'
-    localStorage.setItem('plp_reduce_motion', reduceMotion ? '1' : '0')
+    if (hasPreferencesConsent()) localStorage.setItem('plp_reduce_motion', reduceMotion ? '1' : '0')
   }, [reduceMotion])
 
   useEffect(() => {
     document.documentElement.dataset.fontSize = fontSize
-    localStorage.setItem('plp_font_size', fontSize)
+    if (hasPreferencesConsent()) localStorage.setItem('plp_font_size', fontSize)
   }, [fontSize])
 
   useEffect(() => {
     document.documentElement.dataset.highContrast = highContrast ? 'true' : 'false'
-    localStorage.setItem('plp_high_contrast', highContrast ? '1' : '0')
+    if (hasPreferencesConsent()) localStorage.setItem('plp_high_contrast', highContrast ? '1' : '0')
   }, [highContrast])
 
   useEffect(() => {
-    localStorage.setItem('plp_date_format', dateFormat)
+    if (hasPreferencesConsent()) localStorage.setItem('plp_date_format', dateFormat)
   }, [dateFormat])
 
   useEffect(() => {
-    localStorage.setItem('plp_currency', currency)
+    if (hasPreferencesConsent()) localStorage.setItem('plp_currency', currency)
   }, [currency])
+
+  // Consentement "Préférences" tout juste accordé (voir CookieConsentBanner.jsx) : persiste
+  // immédiatement l'état courant plutôt que d'attendre que l'utilisateur change activement
+  // un réglage après coup — sinon la session en cours au moment de l'accord ne serait jamais
+  // sauvegardée si rien n'est retouché ensuite.
+  useEffect(() => {
+    const onGranted = () => {
+      localStorage.setItem('plp_lang', lang)
+      localStorage.setItem('plp_theme', theme)
+      persistTimezone(timezone)
+      localStorage.setItem('plp_reduce_motion', reduceMotion ? '1' : '0')
+      localStorage.setItem('plp_font_size', fontSize)
+      localStorage.setItem('plp_high_contrast', highContrast ? '1' : '0')
+      localStorage.setItem('plp_date_format', dateFormat)
+      localStorage.setItem('plp_currency', currency)
+    }
+    window.addEventListener(PREFERENCES_GRANTED_EVENT, onGranted)
+    return () => window.removeEventListener(PREFERENCES_GRANTED_EVENT, onGranted)
+  }, [lang, theme, timezone, reduceMotion, fontSize, highContrast, dateFormat, currency])
 
   // Reflète currentPage/authMode dans l'URL (navigation interne -> barre d'adresse) — sauf
   // si on est arrivé sur une URL "jolie" de partage (/s/:id, /p/:id) : on la laisse telle

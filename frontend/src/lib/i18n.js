@@ -710,7 +710,7 @@ export const translations = {
       learnMore: 'En savoir plus',
       continueWithoutAgreeing: 'Continuer sans accepter',
       settingsTitle: 'Paramètres',
-      settingsBody: "Activez uniquement ce que vous voulez. Statistiques (Cloudflare Web Analytics) et Marketing (Meta Pixel, LinkedIn Insight Tag) sont réellement connectés et ne se déclenchent que si vous les acceptez ; Préférences n'est pas encore utilisée chez VelocityLaunch, mais autant vous laisser la main dès aujourd'hui.",
+      settingsBody: "Activez uniquement ce que vous voulez, tout est réellement connecté : Préférences mémorise votre thème, votre langue et vos réglages d'affichage d'une visite à l'autre (sinon ils repartent à zéro à chaque fois) ; Statistiques (Cloudflare Web Analytics) et Marketing (Meta Pixel, LinkedIn Insight Tag) ne se déclenchent que si vous les acceptez.",
       collapse: 'Réduire',
       reopen: 'Cookies & vie privée'
     },
@@ -809,6 +809,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: '21 août 2026',
+            title: 'La catégorie "Préférences" de la bannière cookies pilote vraiment quelque chose',
+            items: [
+              'Le thème, la langue, le fuseau horaire et les réglages d\'accessibilité (taille de police, contraste, format de date, devise) ne sont désormais mémorisés d\'une visite à l\'autre que si "Préférences" est acceptée dans la bannière cookies — sans ce consentement, ils repartent sur leurs valeurs par défaut à chaque nouvelle visite au lieu d\'être enregistrés silencieusement comme avant',
+              'Refuser explicitement "Préférences" efface immédiatement ce qui était déjà enregistré ; l\'accepter sauvegarde aussitôt les réglages en cours, sans attendre d\'y retoucher'
+            ]
+          },
           {
             date: '21 août 2026',
             title: 'Application installable (PWA)',
@@ -2236,7 +2244,7 @@ export const translations = {
       learnMore: 'Learn more',
       continueWithoutAgreeing: 'Continue without agreeing',
       settingsTitle: 'Settings',
-      settingsBody: "Turn on only what you want. Statistics (Cloudflare Web Analytics) and Marketing (Meta Pixel, LinkedIn Insight Tag) are genuinely connected and only fire if you accept them; Preferences isn't used yet at VelocityLaunch, but you get control from day one.",
+      settingsBody: "Turn on only what you want, everything here is genuinely connected: Preferences remembers your theme, language and display settings across visits (otherwise they reset every time); Statistics (Cloudflare Web Analytics) and Marketing (Meta Pixel, LinkedIn Insight Tag) only fire if you accept them.",
       collapse: 'Collapse',
       reopen: 'Cookies & privacy'
     },
@@ -2335,6 +2343,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 21, 2026',
+            title: 'The cookie banner\'s "Preferences" category now actually does something',
+            items: [
+              'Theme, language, timezone and accessibility settings (font size, contrast, date format, currency) are now only remembered across visits if "Preferences" is accepted in the cookie banner — without that consent, they reset to their defaults on every new visit instead of being silently saved as before',
+              'Explicitly declining "Preferences" immediately clears whatever was already saved; accepting it saves the current settings right away, without waiting for you to touch anything'
+            ]
+          },
           {
             date: 'August 21, 2026',
             title: 'Installable app (PWA)',

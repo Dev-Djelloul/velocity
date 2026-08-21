@@ -3,23 +3,15 @@ import { t } from '../lib/i18n'
 import { IconCookie, IconLock, IconSettings, IconBarChart, IconMegaphone } from './Icons'
 import Wordmark from './Wordmark'
 import { applyConsent } from '../lib/consentScripts'
+import { CONSENT_STORAGE_KEY, readCookieConsent } from '../lib/cookieConsent'
+import { PREFERENCE_STORAGE_KEYS, PREFERENCES_GRANTED_EVENT } from '../lib/preferenceStorage'
 import cookieBannerImage from '../../assets/img/hiw-step3-export.webp'
 import '../styles/CookieConsentBanner.css'
 
-const STORAGE_KEY = 'plp_cookie_consent'
-
-function readSavedPrefs() {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
+const readSavedPrefs = readCookieConsent
 
 function savePrefs(prefs) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify({ essential: true, ...prefs, decidedAt: new Date().toISOString() }))
+  localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify({ essential: true, ...prefs, decidedAt: new Date().toISOString() }))
 }
 
 function Switch({ checked, locked, label, onToggle }) {
@@ -74,6 +66,16 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
   const commit = (prefs) => {
     savePrefs(prefs)
     applyConsent(prefs)
+    // "Préférences" gouverne la mémorisation du thème, de la langue, du fuseau horaire et
+    // des réglages d'accessibilité (voir App.jsx) — sur un refus explicite, on purge ce qui
+    // était déjà enregistré (repart sur les valeurs par défaut à la prochaine visite) ; sur
+    // un accord, on notifie App.jsx pour qu'il sauvegarde tout de suite l'état en cours,
+    // sans attendre que l'utilisateur change activement un réglage après coup.
+    if (prefs.preferences) {
+      window.dispatchEvent(new Event(PREFERENCES_GRANTED_EVENT))
+    } else {
+      PREFERENCE_STORAGE_KEYS.forEach(key => localStorage.removeItem(key))
+    }
     setOpen(false)
     setShowSettings(false)
   }
