@@ -21,7 +21,9 @@
   position: relative;
   z-index: 1;
   max-width: 960px;
-  margin: 2rem auto;
+  /* Rabaissé d'un cran (même logique que DashboardHome) pour laisser voir davantage la
+     photo de fond en haut de page avant que le contenu ne démarre. */
+  margin: 4rem auto 2rem;
   padding: 0 1.5rem 4rem;
   display: flex;
   flex-direction: column;
