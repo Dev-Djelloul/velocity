@@ -181,20 +181,31 @@ img.space-page-avatar {
 }
 
 /* Une couleur de la charte par carte (violet / bleu / cyan / blanc), portée par un fond
-   légèrement teinté (pas une bordure — ça obstruait visuellement le texte) et l'icône
-   elle-même — mise en évidence demandée pour distinguer les 4 cartes du tableau de bord
-   d'un coup d'œil plutôt qu'un violet uniforme partout. Opacité faible (8%) pour que le
-   texte (valeur, libellé) reste parfaitement lisible par-dessus. */
-.space-dashboard-tile-violet { background: rgba(145, 132, 217, 0.08); }
+   teinté et l'icône elle-même — mise en évidence demandée pour distinguer les 4 cartes du
+   tableau de bord d'un coup d'œil plutôt qu'un violet uniforme partout. `background`
+   (raccourci) sur .space-dashboard-tile-* écrasait entièrement le fond opaque posé par
+   .space-dashboard-tile juste au-dessus (même spécificité, ordre du fichier qui tranche) —
+   la carte devenait quasi transparente et laissait l'image de fond de la page transparaître
+   fortement. Le calque de couleur est maintenant superposé À la couleur de fond opaque
+   plutôt que de la remplacer, à une opacité assez marquée pour rester visible dessus. */
+.space-dashboard-tile-violet {
+  background: linear-gradient(rgba(145, 132, 217, 0.22), rgba(145, 132, 217, 0.22)), var(--color-dashboard, var(--color-bg-secondary));
+}
 .space-dashboard-tile-violet .space-dashboard-icon { color: #9184d9; }
 
-.space-dashboard-tile-blue { background: rgba(99, 102, 241, 0.08); }
+.space-dashboard-tile-blue {
+  background: linear-gradient(rgba(99, 102, 241, 0.22), rgba(99, 102, 241, 0.22)), var(--color-dashboard, var(--color-bg-secondary));
+}
 .space-dashboard-tile-blue .space-dashboard-icon { color: #6366f1; }
 
-.space-dashboard-tile-cyan { background: rgba(6, 182, 212, 0.08); }
+.space-dashboard-tile-cyan {
+  background: linear-gradient(rgba(6, 182, 212, 0.22), rgba(6, 182, 212, 0.22)), var(--color-dashboard, var(--color-bg-secondary));
+}
 .space-dashboard-tile-cyan .space-dashboard-icon { color: #06b6d4; }
 
-.space-dashboard-tile-white { background: rgba(255, 255, 255, 0.06); }
+.space-dashboard-tile-white {
+  background: linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)), var(--color-dashboard, var(--color-bg-secondary));
+}
 .space-dashboard-tile-white .space-dashboard-icon { color: #fff; }
 
 .space-dashboard-value {
