@@ -695,6 +695,14 @@ export const translations = {
       empty: 'Aucune notification pour le moment.',
       markAllRead: 'Tout marquer comme lu'
     },
+    cookieBanner: {
+      title: 'Cookies & vie privée',
+      body: "On utilise le minimum de stockage nécessaire au fonctionnement du service — rien de plus, promis.",
+      accept: "J'ai compris",
+      learnMore: 'En savoir plus',
+      collapse: 'Réduire',
+      reopen: 'Cookies & vie privée'
+    },
     collab: {
       presenceTitle: 'Personnes ayant ce plan ouvert en ce moment',
       viewing: (n) => n === 1 ? '1 autre personne ici' : `${n} autres personnes ici`,
@@ -2169,6 +2177,14 @@ export const translations = {
       title: 'Notifications',
       empty: 'No notifications yet.',
       markAllRead: 'Mark all as read'
+    },
+    cookieBanner: {
+      title: 'Cookies & privacy',
+      body: "We use the minimum storage needed to run the service — nothing more, promise.",
+      accept: 'Got it',
+      learnMore: 'Learn more',
+      collapse: 'Collapse',
+      reopen: 'Cookies & privacy'
     },
     collab: {
       presenceTitle: 'People with this plan open right now',

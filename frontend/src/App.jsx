@@ -40,6 +40,7 @@ import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromSer
 import { TEAM_SPACE_LIMITS } from './lib/pricingTiers'
 import NotificationBell from './components/NotificationBell'
 import TeamPresenceAvatars from './components/TeamPresenceAvatars'
+import CookieConsentBanner from './components/CookieConsentBanner'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
@@ -1179,6 +1180,8 @@ export default function App() {
       )}
 
       <ScrollToTop />
+
+      <CookieConsentBanner lang={lang} onOpenPolicy={() => setActiveModal('cookies')} />
 
       {showHistory && isSignedIn && (
         <PlansHistory
