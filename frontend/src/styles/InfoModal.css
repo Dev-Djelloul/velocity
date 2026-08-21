@@ -100,11 +100,8 @@
   margin-bottom: 28px;
 }
 
-/* Icône laissée en blanc (currentColor plein, pas de dégradé) — seul le libellé du titre
-   reprend le dégradé du Wordmark. */
 .info-modal-icon {
   display: inline-flex;
-  color: #fff;
 }
 
 .info-modal-title-text {
