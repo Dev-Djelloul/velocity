@@ -71,6 +71,29 @@
   color: var(--color-text-muted);
 }
 
+/* Mode clair : le badge "non connecté" (fond quasi transparent, texte gris muet) et le
+   texte de détail devenaient illisibles posés sur le verre dépoli translucide de la carte
+   (voir AccountPage.css) avec la photo de fond derrière. Badge éclairci + texte blanc avec
+   ombre portée, même traitement que le reste du texte posé directement sur le verre. */
+[data-theme="light"] .integration-badge.is-disconnected {
+  background: rgba(255, 255, 255, 0.22);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="light"] .integration-detail {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* Badge "connecté" Notion : fond quasi blanc + texte blanc, illisible en mode clair sur le
+   verre translucide (contrairement aux autres services, dont le texte coloré reste assez
+   saturé pour rester lisible) — assombri au lieu de blanc pur. */
+[data-theme="light"] .integration-badge.is-connected.brand-notion {
+  background: rgba(15, 20, 25, 0.55);
+  color: #fff;
+}
+
 /* Une couleur de marque par service plutôt qu'un vert générique "connecté" — repère plus
    vite quel service est actif dans une liste de quatre lignes très proches visuellement. */
 .integration-badge.is-connected.brand-notion {

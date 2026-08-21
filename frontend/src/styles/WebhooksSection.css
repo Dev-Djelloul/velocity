@@ -73,3 +73,10 @@
   color: var(--color-text-secondary);
   cursor: pointer;
 }
+
+/* Posé directement sur le verre translucide de la carte en mode clair (voir AccountPage.css)
+   — même traitement blanc + ombre portée que le reste du texte non-boîté de la page. */
+[data-theme="light"] .webhook-event-checkbox {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
