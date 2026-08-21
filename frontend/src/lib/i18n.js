@@ -710,7 +710,7 @@ export const translations = {
       learnMore: 'En savoir plus',
       continueWithoutAgreeing: 'Continuer sans accepter',
       settingsTitle: 'Paramètres',
-      settingsBody: "Activez uniquement ce que vous voulez, tout est réellement connecté : Préférences mémorise votre thème, votre langue et vos réglages d'affichage d'une visite à l'autre (sinon ils repartent à zéro à chaque fois) ; Statistiques (Cloudflare Web Analytics) et Marketing (Meta Pixel, LinkedIn Insight Tag) ne se déclenchent que si vous les acceptez.",
+      settingsBody: "Chaque catégorie correspond à un usage précis. Préférences mémorise votre thème, votre langue et vos réglages d'affichage d'une visite à l'autre. Statistiques active Cloudflare Web Analytics pour mesurer la fréquentation du site. Marketing active Meta Pixel et LinkedIn Insight Tag pour mesurer l'efficacité de nos campagnes publicitaires. Activez uniquement ce que vous souhaitez : aucune catégorie optionnelle ne se déclenche sans votre accord.",
       collapse: 'Réduire',
       reopen: 'Cookies & vie privée'
     },
@@ -2244,7 +2244,7 @@ export const translations = {
       learnMore: 'Learn more',
       continueWithoutAgreeing: 'Continue without agreeing',
       settingsTitle: 'Settings',
-      settingsBody: "Turn on only what you want, everything here is genuinely connected: Preferences remembers your theme, language and display settings across visits (otherwise they reset every time); Statistics (Cloudflare Web Analytics) and Marketing (Meta Pixel, LinkedIn Insight Tag) only fire if you accept them.",
+      settingsBody: "Each category serves a specific purpose. Preferences remembers your theme, language and display settings across visits. Statistics enables Cloudflare Web Analytics to measure site traffic. Marketing enables Meta Pixel and LinkedIn Insight Tag to measure our ad campaign performance. Turn on only what you want: no optional category runs without your consent.",
       collapse: 'Collapse',
       reopen: 'Cookies & privacy'
     },
