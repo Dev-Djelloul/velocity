@@ -267,7 +267,22 @@ img.space-page-avatar {
 [data-theme="light"] .space-dashboard-value,
 [data-theme="light"] .space-dashboard-label {
   color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.35);
+  /* Ombre plus marquée que la première passe : sur la carte violette (la plus claire des
+     quatre teintes), un blanc avec une ombre trop légère se fondait dans le fond pastel
+     au lieu de ressortir nettement comme sur les cartes bleue/cyan, plus sombres. */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+/* Icônes en blanc uni sur les 4 cartes en mode clair — la couleur de la teinte de fond
+   suffit déjà à distinguer chaque carte, l'icône colorée en plus faisait double emploi et
+   ressortait mal sur les teintes claires (violet, blanc). */
+[data-theme="light"] .space-dashboard-icon,
+[data-theme="light"] .space-dashboard-tile-violet .space-dashboard-icon,
+[data-theme="light"] .space-dashboard-tile-blue .space-dashboard-icon,
+[data-theme="light"] .space-dashboard-tile-cyan .space-dashboard-icon,
+[data-theme="light"] .space-dashboard-tile-white .space-dashboard-icon {
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
 [data-theme="light"] .space-page-section.card {
