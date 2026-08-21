@@ -1,3 +1,23 @@
+/* Quadrillage fin (même famille de violet que la trame de points de Nova, voir
+   .copilot-empty-bg dans CopilotChat.css et le sommaire latéral dans PlanSidebar.css) sur
+   TOUTES les cartes du plan généré. Volontairement en background-image (pas un calque
+   ::before en position:absolute + z-index négatif) : ça évite de faire de chaque carte un
+   nouveau contexte d'empilement, ce qui aurait pu perturber des tooltips/menus/badges déjà
+   positionnés à l'intérieur d'une des nombreuses cartes du plan (roadmap, gantt, KPIs...).
+   .plan-header exclu : sa bordure en dégradé utilise déjà un double calque de fond
+   (padding-box/border-box, voir plus bas) auquel un troisième calque casserait la technique.
+   Seule autre contrepartie : une carte dont la propre feuille de style redéclare `background`
+   avec une spécificité égale ou supérieure à la nôtre passée APRÈS ce fichier dans l'ordre de
+   cascade n'hérite pas du quadrillage (un seul cas identifié : .executive-summary.card,
+   corrigé explicitement plus bas). */
+.plan-viewer-main .card:not(.plan-header) {
+  background-color: var(--color-dashboard);
+  background-image:
+    linear-gradient(rgba(145, 132, 217, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(145, 132, 217, 0.14) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 .plan-confirmation {
   display: flex;
   align-items: center;
@@ -535,7 +555,14 @@
   margin-bottom: 1rem;
   padding: 1.5rem 1.75rem;
   border-radius: var(--border-radius-sm);
-  background: var(--color-dashboard);
+  background-color: var(--color-dashboard);
+  /* Même quadrillage que .plan-viewer-main .card ci-dessus, répété explicitement ici : ce
+     sélecteur (spécificité égale) vient après dans la cascade et écraserait sinon le
+     background-image posé plus haut. */
+  background-image:
+    linear-gradient(rgba(145, 132, 217, 0.14) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(145, 132, 217, 0.14) 1px, transparent 1px);
+  background-size: 24px 24px;
   border: 1px solid rgba(145, 132, 217, 0.25);
   box-shadow: 0 0 40px rgba(99, 102, 241, 0.1);
 }
