@@ -249,22 +249,24 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
                 >
                   {p.isFavorite ? '⭐' : '☆'}
                 </button>
-                {(p.team_id || null) === (team.teamId || null) ? (
-                  <>
-                    {canMoveOut && moveTargets.length > 0 && (
-                      <button className="account-list-item-move" onClick={() => setMovePlanTarget(p)} title={t(lang, 'plans.move')}>
-                        {t(lang, 'plans.move')}
+                <div className="account-list-item-actions">
+                  {(p.team_id || null) === (team.teamId || null) ? (
+                    <>
+                      {canMoveOut && moveTargets.length > 0 && (
+                        <button className="account-list-item-move" onClick={() => setMovePlanTarget(p)} title={t(lang, 'plans.move')}>
+                          {t(lang, 'plans.move')}
+                        </button>
+                      )}
+                      <button className="account-list-item-delete" onClick={() => setDeletePlanTarget(p)} title="Delete">
+                        <IconTrash width={14} height={14} />
                       </button>
-                    )}
-                    <button className="account-list-item-delete" onClick={() => setDeletePlanTarget(p)} title="Delete">
-                      <IconTrash width={14} height={14} />
-                    </button>
-                  </>
-                ) : (
-                  <span className="account-list-item-hint">
-                    {lang === 'fr' ? 'Changez d\'espace pour gérer' : 'Switch space to manage'}
-                  </span>
-                )}
+                    </>
+                  ) : (
+                    <span className="account-list-item-hint">
+                      {lang === 'fr' ? 'Changez d\'espace pour gérer' : 'Switch space to manage'}
+                    </span>
+                  )}
+                </div>
               </div>
             ))}
           </div>
