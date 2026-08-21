@@ -6,6 +6,7 @@ import { formatFullDateTime } from '../lib/dateFormat'
 import { IconArrowLeft, IconClock, IconPlus, IconTrash, IconTarget, IconSparkle } from './Icons'
 import '../styles/TeamPage.css'
 import '../styles/PlanVersionsPage.css'
+import planVersionsBackground from '../../assets/img/hiw-gallery-team-table.webp'
 
 function versionLabel(version, lang) {
   const date = formatFullDateTime(version.createdAt, lang)
@@ -52,7 +53,10 @@ export default function PlanVersionsPage({ plan, lang, onBack }) {
   }, [fromData, toData, lang])
 
   return (
-    <div className="plan-versions-page">
+    <div className="plan-versions-page-outer">
+      <div className="plan-versions-page-bg" style={{ backgroundImage: `url(${planVersionsBackground})` }} aria-hidden="true" />
+      <div className="plan-versions-page-inner">
+      <div className="plan-versions-page">
       <div className="plan-versions-header">
         <button className="team-back-btn" onClick={onBack}>
           <IconArrowLeft width={16} height={16} /> {t(lang, 'planVersions.back')}
@@ -171,6 +175,8 @@ export default function PlanVersionsPage({ plan, lang, onBack }) {
           )}
         </>
       )}
+      </div>
+      </div>
     </div>
   )
 }
