@@ -18,19 +18,12 @@
 .cookie-consent-panel {
   position: relative;
   display: flex;
-  align-items: center;
-  /* flex-wrap plutôt que de compter sur le rétrécissement des enfants : au-delà d'une
-     certaine largeur de fenêtre, les deux catégories + les 3 actions dépassaient la
-     largeur max du panneau et débordaient hors du cadre arrondi (le texte "Reject
-     non-essential" sortait visuellement de la carte) — le wrap fait retomber les actions
-     à la ligne proprement au lieu de déborder. */
-  flex-wrap: wrap;
-  row-gap: 0.7rem;
-  gap: 1.5rem;
+  align-items: stretch;
   width: 100%;
   max-width: 980px;
-  padding: 1rem 1.25rem;
+  min-height: 108px;
   border-radius: 16px;
+  overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: #14171f;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(145, 132, 217, 0.08);
@@ -51,10 +44,9 @@
   }
 }
 
-/* Liseré dégradé du haut, plutôt qu'une bordure pleine sur tout le pourtour (trop chargé
-   sur un bandeau aussi large) — même esprit que les cartes de l'app sans reproduire leur
-   halo complet, pour rester discret et élégant. */
-.cookie-consent-panel::before {
+/* Liseré dégradé sur tout le pourtour — repris en ::after (et non ::before, qui sert
+   maintenant de voile de lisibilité sur la photo) pour rester au-dessus d'elle. */
+.cookie-consent-panel::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -65,35 +57,50 @@
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
+  z-index: 2;
+}
+
+/* Photo en bandeau plein bord (pas une vignette isolée) — occupe ~13% de la largeur du
+   panneau et toute sa hauteur, comme demandé. Réutilise un visuel déjà présent ailleurs
+   dans l'app (étape "Exportez" de la page Comment ça marche) plutôt qu'une image dédiée
+   aux cookies. Un voile dégradé (::after sur .cookie-consent-photo-wrap) assombrit son
+   bord droit pour fondre proprement dans le panneau plutôt qu'une coupe nette. */
+.cookie-consent-photo {
+  position: relative;
+  flex: 0 0 13%;
+  min-width: 90px;
+  align-self: stretch;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.cookie-consent-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  flex: 1;
+  gap: 1.5rem;
+  row-gap: 0.75rem;
+  padding: 1.1rem 1.4rem;
 }
 
 .cookie-consent-intro {
   display: flex;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
   flex: 1.4;
-  min-width: 200px;
+  min-width: 220px;
 }
 
-/* Photo (plutôt que la simple icône cookie) pour donner un vrai visage au bandeau, comme
-   les modales de consentement des grands sites (photo + explication) — reprend un visuel
-   déjà utilisé ailleurs dans l'app (étape "Exportez" de la page Comment ça marche) pour
-   rester dans l'identité visuelle plutôt que d'importer une image dédiée aux cookies. */
-.cookie-consent-photo {
-  width: 46px;
-  height: 46px;
-  border-radius: 11px;
-  object-fit: cover;
-  flex-shrink: 0;
-  border: 1.5px solid transparent;
-  background:
-    linear-gradient(#14171f, #14171f) padding-box,
-    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
-  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
+.cookie-consent-wordmark {
+  margin-bottom: 0.15rem;
 }
 
 .cookie-consent-panel h3 {
-  margin: 0 0 0.15rem;
+  margin: 0;
   font-size: 0.92rem;
   font-weight: 700;
   color: #fff;
@@ -102,7 +109,7 @@
 .cookie-consent-panel p {
   margin: 0;
   font-size: 0.78rem;
-  line-height: 1.4;
+  line-height: 1.45;
   color: #9a9bb0;
 }
 
@@ -250,7 +257,7 @@
 .cookie-consent-actions {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.6rem;
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -261,7 +268,7 @@
 .cookie-consent-save {
   font-size: 0.8rem;
   font-weight: 600;
-  padding: 0.55rem 1.1rem;
+  padding: 0.6rem 1.2rem;
   border-radius: var(--border-radius-sm, 8px);
   white-space: nowrap;
   cursor: pointer;
@@ -306,7 +313,7 @@
   transition: color 0.15s ease, transform 0.2s ease;
 }
 
-/* Même liseré dégradé que le bandeau déplié (.cookie-consent-panel::before) — la pastille
+/* Même liseré dégradé que le bandeau déplié (.cookie-consent-panel::after) — la pastille
    repliée garde l'identité visuelle du bandeau plutôt qu'une simple bordure unie. */
 .cookie-consent-tab::before {
   content: '';
@@ -339,6 +346,14 @@
     flex-wrap: wrap;
   }
 
+  .cookie-consent-photo {
+    display: none;
+  }
+
+  .cookie-consent-content {
+    flex-wrap: wrap;
+  }
+
   .cookie-consent-intro {
     flex: 1 1 100%;
   }
@@ -361,7 +376,7 @@
     bottom: 0.75rem;
   }
 
-  .cookie-consent-panel {
+  .cookie-consent-content {
     padding: 1rem;
   }
 

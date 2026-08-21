@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { IconCookie, IconLock, IconBarChart } from './Icons'
+import Wordmark from './Wordmark'
 import cookieBannerImage from '../../assets/img/hiw-step3-export.webp'
 import '../styles/CookieConsentBanner.css'
 
@@ -38,9 +39,11 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
     <div className={`cookie-consent ${open ? 'is-open' : 'is-collapsed'}`}>
       {open ? (
         <div className="cookie-consent-panel">
-          <div className="cookie-consent-intro">
-            <img className="cookie-consent-photo" src={cookieBannerImage} alt="" aria-hidden="true" />
-            <div>
+          <img className="cookie-consent-photo" src={cookieBannerImage} alt="" aria-hidden="true" />
+
+          <div className="cookie-consent-content">
+            <div className="cookie-consent-intro">
+              <Wordmark size={20} className="cookie-consent-wordmark" />
               <h3>{t(lang, 'cookieBanner.title')}</h3>
               <p>{t(lang, 'cookieBanner.body')}</p>
               <div className="cookie-consent-links">
@@ -53,52 +56,52 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
                 </button>
               </div>
             </div>
-          </div>
 
-          <div className="cookie-consent-categories">
-            <div className="cookie-consent-category is-locked">
-              <span className="cookie-consent-category-icon"><IconLock width={14} height={14} /></span>
-              <span className="cookie-consent-category-text">
-                <strong>{t(lang, 'cookieBanner.essentialTitle')}</strong>
-                <em>{t(lang, 'cookieBanner.essentialBody')}</em>
-              </span>
-              <span className="cookie-consent-switch is-on is-locked" aria-hidden="true">
-                <span className="cookie-consent-switch-thumb" />
-              </span>
+            <div className="cookie-consent-categories">
+              <div className="cookie-consent-category is-locked">
+                <span className="cookie-consent-category-icon"><IconLock width={14} height={14} /></span>
+                <span className="cookie-consent-category-text">
+                  <strong>{t(lang, 'cookieBanner.essentialTitle')}</strong>
+                  <em>{t(lang, 'cookieBanner.essentialBody')}</em>
+                </span>
+                <span className="cookie-consent-switch is-on is-locked" aria-hidden="true">
+                  <span className="cookie-consent-switch-thumb" />
+                </span>
+              </div>
+
+              <div className="cookie-consent-category">
+                <span className="cookie-consent-category-icon"><IconBarChart width={14} height={14} /></span>
+                <span className="cookie-consent-category-text">
+                  <strong>{t(lang, 'cookieBanner.analyticsTitle')}</strong>
+                  <em>{t(lang, 'cookieBanner.analyticsBody')}</em>
+                </span>
+                <span
+                  className={`cookie-consent-switch ${analytics ? 'is-on' : ''}`}
+                  role="switch"
+                  tabIndex={0}
+                  aria-checked={analytics}
+                  aria-label={t(lang, 'cookieBanner.analyticsTitle')}
+                  onClick={() => setAnalytics(v => !v)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault()
+                      setAnalytics(v => !v)
+                    }
+                  }}
+                >
+                  <span className="cookie-consent-switch-thumb" />
+                </span>
+              </div>
             </div>
 
-            <div className="cookie-consent-category">
-              <span className="cookie-consent-category-icon"><IconBarChart width={14} height={14} /></span>
-              <span className="cookie-consent-category-text">
-                <strong>{t(lang, 'cookieBanner.analyticsTitle')}</strong>
-                <em>{t(lang, 'cookieBanner.analyticsBody')}</em>
-              </span>
-              <span
-                className={`cookie-consent-switch ${analytics ? 'is-on' : ''}`}
-                role="switch"
-                tabIndex={0}
-                aria-checked={analytics}
-                aria-label={t(lang, 'cookieBanner.analyticsTitle')}
-                onClick={() => setAnalytics(v => !v)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault()
-                    setAnalytics(v => !v)
-                  }
-                }}
-              >
-                <span className="cookie-consent-switch-thumb" />
-              </span>
+            <div className="cookie-consent-actions">
+              <button className="btn-primary cookie-consent-accept" onClick={() => commit(true)}>
+                {t(lang, 'cookieBanner.acceptAll')}
+              </button>
+              <button className="btn-secondary cookie-consent-save" onClick={() => commit(analytics)}>
+                {t(lang, 'cookieBanner.savePrefs')}
+              </button>
             </div>
-          </div>
-
-          <div className="cookie-consent-actions">
-            <button className="btn-primary cookie-consent-accept" onClick={() => commit(true)}>
-              {t(lang, 'cookieBanner.acceptAll')}
-            </button>
-            <button className="btn-secondary cookie-consent-save" onClick={() => commit(analytics)}>
-              {t(lang, 'cookieBanner.savePrefs')}
-            </button>
           </div>
         </div>
       ) : (
