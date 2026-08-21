@@ -173,37 +173,49 @@
    légèrement assombri) plutôt qu'un simple visuel différent — même langage, état différent. */
 .cookie-consent-switch {
   flex-shrink: 0;
-  width: 34px;
-  height: 19px;
+  width: 38px;
+  height: 21px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.12);
-  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   padding: 2px;
   display: flex;
   align-items: center;
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.cookie-consent-switch:hover {
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 .cookie-consent-switch.is-on {
   background: linear-gradient(135deg, #9184d9, #6366f1);
+  border-color: transparent;
 }
 
+/* "Essentiels" est verrouillé mais reste réellement actif (pas désactivé) — pas de
+   désaturation de l'interrupteur lui-même (ça le ferait passer pour cassé/inactif), juste
+   un curseur neutre ; l'icône cadenas à côté suffit à signaler qu'il n'est pas cliquable. */
 .cookie-consent-switch.is-locked {
   cursor: default;
-  opacity: 0.6;
+}
+
+.cookie-consent-switch.is-locked:hover {
+  border-color: transparent;
 }
 
 .cookie-consent-switch-thumb {
-  width: 15px;
-  height: 15px;
+  width: 17px;
+  height: 17px;
   border-radius: 50%;
   background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   transition: transform 0.15s ease;
 }
 
 .cookie-consent-switch.is-on .cookie-consent-switch-thumb {
-  transform: translateX(15px);
+  transform: translateX(17px);
 }
 
 .cookie-consent-actions {
