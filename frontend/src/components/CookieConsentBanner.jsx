@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { IconCookie, IconLock, IconBarChart } from './Icons'
+import cookieBannerImage from '../../assets/img/hiw-step3-export.webp'
 import '../styles/CookieConsentBanner.css'
 
 const STORAGE_KEY = 'plp_cookie_consent'
@@ -38,13 +39,19 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
       {open ? (
         <div className="cookie-consent-panel">
           <div className="cookie-consent-intro">
-            <div className="cookie-consent-icon"><IconCookie width={22} height={22} /></div>
+            <img className="cookie-consent-photo" src={cookieBannerImage} alt="" aria-hidden="true" />
             <div>
               <h3>{t(lang, 'cookieBanner.title')}</h3>
               <p>{t(lang, 'cookieBanner.body')}</p>
-              <button className="cookie-consent-link" onClick={onOpenPolicy}>
-                {t(lang, 'cookieBanner.learnMore')}
-              </button>
+              <div className="cookie-consent-links">
+                <button className="cookie-consent-link" onClick={onOpenPolicy}>
+                  {t(lang, 'cookieBanner.learnMore')}
+                </button>
+                <span className="cookie-consent-links-sep">·</span>
+                <button className="cookie-consent-link cookie-consent-link-muted" onClick={() => setOpen(false)}>
+                  {t(lang, 'cookieBanner.continueWithoutAgreeing')}
+                </button>
+              </div>
             </div>
           </div>
 

@@ -696,8 +696,8 @@ export const translations = {
       markAllRead: 'Tout marquer comme lu'
     },
     cookieBanner: {
-      title: 'Cookies & vie privée',
-      body: 'Choisissez ce que VelocityLaunch peut utiliser. Vous pouvez revenir sur ce choix à tout moment.',
+      title: 'Avant de lancer votre prochain plan...',
+      body: "On garde ça aussi minimaliste qu'une bonne roadmap : de quoi vous reconnaître, retenir vos préférences et sauvegarder vos brouillons. Rien qui traîne, rien qui espionne — et vous décidez pour le reste.",
       essentialTitle: 'Essentiels',
       essentialBody: 'Toujours actifs',
       analyticsTitle: "Mesure d'audience",
@@ -705,6 +705,7 @@ export const translations = {
       acceptAll: 'Tout accepter',
       savePrefs: 'Enregistrer mes choix',
       learnMore: 'En savoir plus',
+      continueWithoutAgreeing: 'Continuer sans accepter',
       collapse: 'Réduire',
       reopen: 'Cookies & vie privée'
     },
@@ -2193,8 +2194,8 @@ export const translations = {
       markAllRead: 'Mark all as read'
     },
     cookieBanner: {
-      title: 'Cookies & privacy',
-      body: 'Choose what VelocityLaunch can use. You can change your mind at any time.',
+      title: 'Before you launch your next plan...',
+      body: "We keep this as lean as a good roadmap: enough to recognize you, remember your preferences, and save your drafts. Nothing lingering, nothing snooping — you call the rest.",
       essentialTitle: 'Essential',
       essentialBody: 'Always on',
       analyticsTitle: 'Analytics',
@@ -2202,6 +2203,7 @@ export const translations = {
       acceptAll: 'Accept all',
       savePrefs: 'Save my choices',
       learnMore: 'Learn more',
+      continueWithoutAgreeing: 'Continue without agreeing',
       collapse: 'Collapse',
       reopen: 'Cookies & privacy'
     },

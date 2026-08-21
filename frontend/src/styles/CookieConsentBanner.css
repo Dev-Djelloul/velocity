@@ -75,16 +75,20 @@
   min-width: 200px;
 }
 
-.cookie-consent-icon {
-  width: 38px;
-  height: 38px;
+/* Photo (plutôt que la simple icône cookie) pour donner un vrai visage au bandeau, comme
+   les modales de consentement des grands sites (photo + explication) — reprend un visuel
+   déjà utilisé ailleurs dans l'app (étape "Exportez" de la page Comment ça marche) pour
+   rester dans l'identité visuelle plutôt que d'importer une image dédiée aux cookies. */
+.cookie-consent-photo {
+  width: 46px;
+  height: 46px;
   border-radius: 11px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  object-fit: cover;
   flex-shrink: 0;
-  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
-  color: #fff;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(#14171f, #14171f) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
   box-shadow: 0 4px 14px rgba(99, 102, 241, 0.35);
 }
 
@@ -102,9 +106,20 @@
   color: #9a9bb0;
 }
 
+.cookie-consent-links {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.3rem;
+}
+
+.cookie-consent-links-sep {
+  color: #4a4b5c;
+  font-size: 0.7rem;
+}
+
 .cookie-consent-link {
   display: inline-block;
-  margin-top: 0.2rem;
   background: none;
   border: none;
   padding: 0;
@@ -118,6 +133,17 @@
 
 .cookie-consent-link:hover {
   color: #fff;
+}
+
+/* "Continuer sans accepter" : même endroit que "En savoir plus" mais volontairement plus
+   discret (pas de couleur d'accent) — une sortie possible sans choisir, mais pas mise en
+   avant comme une action recommandée. */
+.cookie-consent-link-muted {
+  color: #75768a;
+}
+
+.cookie-consent-link-muted:hover {
+  color: #e9e9ed;
 }
 
 .cookie-consent-categories {
