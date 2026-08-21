@@ -176,6 +176,18 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <span className="space-dashboard-icon"><IconClipboard width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.planCount}</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Plans partagés' : 'Shared plans'}</span>
+            {!!plans.length && (
+              <div className="members-presence-row">
+                {plans.slice(0, 6).map(p => (
+                  <span key={p.id} className="plans-preview-thumb avatar-tooltip" data-tooltip={p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}>
+                    {p.coverImage
+                      ? <img src={p.coverImage} alt="" />
+                      : <span className="plans-preview-fallback" aria-hidden="true" />}
+                  </span>
+                ))}
+                {plans.length > 6 && <span className="team-presence-more">+{plans.length - 6}</span>}
+              </div>
+            )}
           </div>
           <div className="space-dashboard-tile space-dashboard-tile-blue">
             <span className="space-dashboard-icon"><IconUsers width={16} height={16} /></span>

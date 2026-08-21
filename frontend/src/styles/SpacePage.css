@@ -180,19 +180,21 @@ img.space-page-avatar {
   margin-bottom: 0.15rem;
 }
 
-/* Une couleur de la charte par carte (violet / bleu / cyan / blanc), portée par une
-   bordure du haut et l'icône elle-même — mise en évidence demandée pour distinguer les 4
-   cartes du tableau de bord d'un coup d'œil plutôt qu'un violet uniforme partout. */
-.space-dashboard-tile-violet { border-top: 2px solid #9184d9; }
+/* Une couleur de la charte par carte (violet / bleu / cyan / blanc), portée par un fond
+   légèrement teinté (pas une bordure — ça obstruait visuellement le texte) et l'icône
+   elle-même — mise en évidence demandée pour distinguer les 4 cartes du tableau de bord
+   d'un coup d'œil plutôt qu'un violet uniforme partout. Opacité faible (8%) pour que le
+   texte (valeur, libellé) reste parfaitement lisible par-dessus. */
+.space-dashboard-tile-violet { background: rgba(145, 132, 217, 0.08); }
 .space-dashboard-tile-violet .space-dashboard-icon { color: #9184d9; }
 
-.space-dashboard-tile-blue { border-top: 2px solid #6366f1; }
+.space-dashboard-tile-blue { background: rgba(99, 102, 241, 0.08); }
 .space-dashboard-tile-blue .space-dashboard-icon { color: #6366f1; }
 
-.space-dashboard-tile-cyan { border-top: 2px solid #06b6d4; }
+.space-dashboard-tile-cyan { background: rgba(6, 182, 212, 0.08); }
 .space-dashboard-tile-cyan .space-dashboard-icon { color: #06b6d4; }
 
-.space-dashboard-tile-white { border-top: 2px solid #fff; }
+.space-dashboard-tile-white { background: rgba(255, 255, 255, 0.06); }
 .space-dashboard-tile-white .space-dashboard-icon { color: #fff; }
 
 .space-dashboard-value {

@@ -123,6 +123,36 @@
   display: block;
 }
 
+/* Carte "Plans partagés" du tableau de bord : un aperçu par plan, même traitement que les
+   avatars de présence (petite vignette + tooltip au survol) mais carrée à coins arrondis
+   plutôt que circulaire — les couvertures de plan sont pensées pour ce format, pas pour
+   être rognées en cercle. */
+.plans-preview-thumb {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-secondary, #1a1f2b);
+  border: 1px solid rgba(145, 132, 217, 0.25);
+}
+
+.plans-preview-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.plans-preview-fallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  opacity: 0.55;
+}
+
 .members-presence-fallback {
   width: 100%;
   height: 100%;
