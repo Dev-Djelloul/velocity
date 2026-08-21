@@ -214,41 +214,42 @@
   margin-left: auto;
 }
 
+/* Les trois actions partagent désormais le même gabarit (taille, rembourrage, coins
+   arrondis) — seule l'intensité visuelle change (plein / contour marqué / contour discret)
+   pour hiérarchiser sans casser la cohérence, plutôt qu'un simple lien texte à côté de
+   deux vrais boutons. */
 .cookie-consent-accept,
-.cookie-consent-save {
+.cookie-consent-save,
+.cookie-consent-reject {
   font-size: 0.8rem;
-  padding: 0.55rem 1rem;
+  font-weight: 600;
+  padding: 0.55rem 1.1rem;
+  border-radius: var(--border-radius-sm, 8px);
   white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
 .cookie-consent-save {
   background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   color: #e9e9ed;
-  border-radius: var(--border-radius-sm, 8px);
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .cookie-consent-save:hover {
   background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.24);
 }
 
 .cookie-consent-reject {
-  background: none;
-  border: none;
-  padding: 0.4rem 0.3rem;
-  color: #75768a;
-  font-size: 0.76rem;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #9a9bb0;
 }
 
 .cookie-consent-reject:hover {
   color: #e9e9ed;
+  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Repliée : simple pastille sur le bord, toujours accessible pour revenir sur le choix

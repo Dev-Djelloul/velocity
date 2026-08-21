@@ -208,6 +208,15 @@ export default function App() {
   const team = useTeam()
   const wasSignedIn = useRef(isSignedIn)
 
+  // Délai minimum d'affichage du loader : Clerk résout parfois isLoaded quasi instantanément
+  // (session déjà en cache), ce qui faisait clignoter l'écran de chargement au lieu de se
+  // voir — un minimum de 500ms le rend perceptible et intentionnel plutôt qu'un flash.
+  const [loaderMinDelayDone, setLoaderMinDelayDone] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => setLoaderMinDelayDone(true), 500)
+    return () => clearTimeout(timer)
+  }, [])
+
   const goToAuth = (mode, intent = null) => {
     setAuthMode(mode)
     setAuthIntent(intent)
@@ -723,7 +732,7 @@ export default function App() {
   // évite un flash (landing affichée puis remplacée par le dashboard, ou l'inverse) au
   // premier chargement. Placé après tous les hooks (aucun hook plus bas dans le composant)
   // pour rester valide vis-à-vis des règles des hooks malgré ce retour anticipé.
-  if (!isLoaded) return <AppLoader />
+  if (!isLoaded || !loaderMinDelayDone) return <AppLoader />
 
   const dismissInviteTicketAlert = () => {
     setInviteTicketDismissed(true)
