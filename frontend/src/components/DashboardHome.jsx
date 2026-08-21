@@ -6,8 +6,10 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
-import { IconPlus, IconUser, IconClipboard, IconClock, IconImage } from './Icons'
+import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar } from './Icons'
 import TeamAvatar from './TeamAvatar'
+import { getDailyTip } from '../lib/dailyTips'
+import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
 import createTeamImage from '../../assets/img/hiw-hero-tablets-purple.webp'
@@ -94,6 +96,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   const firstName = user?.firstName || user?.fullName?.split(' ')[0] || ''
 
+  const dailyTip = useMemo(() => getDailyTip(lang), [lang])
+  const deadlines = useMemo(() => getUpcomingDeadlines(allPlans || activePlans), [allPlans, activePlans])
+
+  const deadlineLabel = (isoDate) => {
+    const n = daysUntil(isoDate)
+    if (n === 0) return t(lang, 'dashboard.deadlinesToday')
+    if (n === 1) return t(lang, 'dashboard.deadlinesTomorrow')
+    return t(lang, 'dashboard.deadlinesInDays')(n)
+  }
+
   const spaces = useMemo(() => {
     const personal = { id: null, name: personalSpace.name, avatar: personalSpace.avatar, isTeam: false }
     const teams = (team.myTeams || [])
@@ -123,6 +135,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         </button>
       </div>
 
+      <div className="dashboard-home-row">
       <div className="dashboard-home-grid">
         {spaces.map(space => {
           const isCurrent = (team.teamId ?? null) === space.id
@@ -202,6 +215,36 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             </div>
           </button>
         )}
+      </div>
+
+      <div className="dashboard-home-widgets">
+        <div className="dashboard-widget-card dashboard-tip-card">
+          <div className="dashboard-widget-header">
+            {gradientIcon(<IconSparkle width={16} height={16} />)}
+            <h3>{t(lang, 'dashboard.tipTitle')}</h3>
+          </div>
+          <p className="dashboard-tip-text">{dailyTip}</p>
+        </div>
+
+        <div className="dashboard-widget-card dashboard-deadlines-card">
+          <div className="dashboard-widget-header">
+            {gradientIcon(<IconCalendar width={16} height={16} />)}
+            <h3>{t(lang, 'dashboard.deadlinesTitle')}</h3>
+          </div>
+          {deadlines.length === 0 ? (
+            <p className="dashboard-deadlines-empty">{t(lang, 'dashboard.deadlinesEmpty')}</p>
+          ) : (
+            <ul className="dashboard-deadlines-list">
+              {deadlines.map(d => (
+                <li key={d.id}>
+                  <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
+                  <span className="dashboard-deadline-when">{deadlineLabel(d.launchDate)}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
       </div>
 
       <div className="dashboard-home-links">

@@ -829,6 +829,21 @@ export const translations = {
         entries: [
           {
             date: '22 août 2026',
+            title: 'Conseil du jour et prochaines échéances sur le dashboard',
+            items: [
+              'Nouvelle carte "Conseil du jour" : un conseil lié au lancement produit/growth, différent chaque jour, calculé localement (aucune donnée envoyée)',
+              'Nouvelle carte "Prochaines échéances" : liste les dates de lancement à venir sur l\'ensemble de tes plans, triées par proximité'
+            ]
+          },
+          {
+            date: '22 août 2026',
+            title: 'Personas et Finances ajoutés à la comparaison de versions',
+            items: [
+              'La bibliothèque de versions "avant/après" détecte désormais aussi les changements de personas (ajoutés, retirés, champs modifiés) et de finances (dépenses mensuelles, trésorerie, ARPU, seuil de rentabilité, répartition des coûts)'
+            ]
+          },
+          {
+            date: '22 août 2026',
             title: 'OCR pour les documents scannés du questionnaire',
             items: [
               'L\'import de document (questionnaire) accepte désormais aussi les photos/scans (JPG, PNG, WebP), et détecte automatiquement les pages PDF sans texte sélectionnable — jusqu\'ici silencieusement ignorées ("aucun texte trouvé")',
@@ -1091,7 +1106,7 @@ export const translations = {
               'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
               'Collaboration en temps réel sur la roadmap et le backlog (fusion automatique des éditions concurrentes, présence de qui a le plan ouvert)',
               "Agents IA asynchrones (brief d'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)",
-              'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, budget, KPIs, résumé exécutif)'
+              'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, personas, finances, budget, KPIs, résumé exécutif)'
             ]
           },
           {
@@ -1108,7 +1123,8 @@ export const translations = {
             items: [
               "Espaces d'équipe (Clerk Organizations), commentaires avec @mentions, fil d'activité par plan, tags transversaux",
               'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
-              "Présence d'équipe en temps réel : qui a un plan de l'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d'espace"
+              "Présence d'équipe en temps réel : qui a un plan de l'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d'espace",
+              'Tableau de bord : conseil du jour lié au lancement produit et prochaines échéances de lancement, tous plans confondus'
             ]
           },
           {
@@ -1164,7 +1180,8 @@ export const translations = {
               'Recherche globale (⌘K), FR / EN',
               'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag',
               'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur, premier chargement quasi instantané depuis le cache',
-              'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, budget, KPIs, résumé exécutif)'
+              'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, personas, finances, budget, KPIs, résumé exécutif)',
+              'Dashboard : conseil du jour lié au lancement produit et prochaines échéances de lancement, tous plans confondus'
             ]
           },
           {
@@ -1448,7 +1465,14 @@ export const translations = {
       createTeam: 'Créer une équipe',
       createTeamDesc: 'Un espace partagé avec ton équipe',
       viewHistory: 'Voir tout l\'historique',
-      viewGallery: 'Galerie publique'
+      viewGallery: 'Galerie publique',
+      tipTitle: 'Conseil du jour',
+      deadlinesTitle: 'Prochaines échéances',
+      deadlinesEmpty: 'Aucune date de lancement à venir sur tes plans.',
+      deadlinesUntitled: 'Sans titre',
+      deadlinesToday: 'Aujourd\'hui',
+      deadlinesTomorrow: 'Demain',
+      deadlinesInDays: (n) => `Dans ${n} jours`
     },
     planVersions: {
       back: 'Retour au plan',
@@ -2434,6 +2458,21 @@ export const translations = {
         entries: [
           {
             date: 'August 22, 2026',
+            title: 'Tip of the day and upcoming deadlines on the dashboard',
+            items: [
+              'New "Tip of the day" card: a product-launch/growth tip, different every day, computed locally (no data sent)',
+              'New "Upcoming deadlines" card: lists upcoming launch dates across all your plans, sorted by proximity'
+            ]
+          },
+          {
+            date: 'August 22, 2026',
+            title: 'Personas and Financials added to version comparison',
+            items: [
+              'The "before/after" version library now also detects changes to personas (added, removed, edited fields) and financials (monthly burn, runway, ARPU, break-even, cost breakdown)'
+            ]
+          },
+          {
+            date: 'August 22, 2026',
             title: 'OCR for scanned documents in the questionnaire',
             items: [
               'Document import (questionnaire) now also accepts photos/scans (JPG, PNG, WebP), and automatically detects PDF pages with no selectable text — until now silently ignored ("no text found")',
@@ -2696,7 +2735,7 @@ export const translations = {
               'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
               'Real-time collaboration on the roadmap and backlog (concurrent edits merge automatically, presence shows who has the plan open)',
               'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)',
-              '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, budget, KPIs, executive summary)'
+              '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, personas, financials, budget, KPIs, executive summary)'
             ]
           },
           {
@@ -2713,7 +2752,8 @@ export const translations = {
             items: [
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
               'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
-              'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu'
+              'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
+              'Dashboard: product-launch tip of the day and upcoming launch deadlines across all plans'
             ]
           },
           {
@@ -2769,7 +2809,8 @@ export const translations = {
               'Global search (⌘K), FR / EN',
               'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag',
               'Installable app (PWA): home screen icon, full-screen launch with no browser chrome, near-instant first load from cache',
-              '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, budget, KPIs, executive summary)'
+              '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, personas, financials, budget, KPIs, executive summary)',
+              'Dashboard: product-launch tip of the day and upcoming launch deadlines across all plans'
             ]
           },
           {
@@ -3053,7 +3094,14 @@ export const translations = {
       createTeam: 'Create a team',
       createTeamDesc: 'A shared space with your team',
       viewHistory: 'View full history',
-      viewGallery: 'Public gallery'
+      viewGallery: 'Public gallery',
+      tipTitle: 'Tip of the day',
+      deadlinesTitle: 'Upcoming deadlines',
+      deadlinesEmpty: 'No upcoming launch dates on your plans.',
+      deadlinesUntitled: 'Untitled',
+      deadlinesToday: 'Today',
+      deadlinesTomorrow: 'Tomorrow',
+      deadlinesInDays: (n) => `In ${n} days`
     },
     planVersions: {
       back: 'Back to plan',
