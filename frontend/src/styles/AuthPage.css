@@ -313,6 +313,101 @@
   color: var(--color-accent-light);
 }
 
+.auth-forgot-trigger {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-size: var(--font-size-sm);
+  padding: 0;
+  margin-top: 1rem;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color 0.2s ease;
+}
+
+.auth-forgot-trigger:hover {
+  color: var(--color-accent);
+}
+
+.auth-forgot {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.auth-forgot-back {
+  align-self: flex-start;
+  margin-bottom: 1.5rem;
+}
+
+.auth-forgot-title {
+  font-size: var(--font-size-2xl);
+  color: var(--color-text-primary);
+  margin-bottom: 1.5rem;
+}
+
+.auth-forgot-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.auth-forgot-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  margin-bottom: 0.5rem;
+}
+
+.auth-forgot-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-size: var(--font-size-sm);
+  font-family: inherit;
+  text-align: center;
+}
+
+.auth-forgot-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.auth-forgot-error {
+  color: #ef4444;
+  font-size: var(--font-size-xs);
+  margin: 0;
+}
+
+.auth-forgot-submit {
+  background: var(--vl-gradient, #9184d9);
+  border: none;
+  color: #0a0c12;
+  font-weight: 700;
+  padding: 0.85rem 1.1rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.15s ease;
+}
+
+.auth-forgot-submit:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.auth-forgot-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 .auth-legal-notice {
   color: var(--color-text-muted);
   font-size: var(--font-size-xs);

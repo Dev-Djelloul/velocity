@@ -1228,7 +1228,20 @@ export const translations = {
       continueWith: 'Continuer avec',
       byContinuing: 'En continuant, vous acceptez nos',
       ourFem: 'notre',
-      and: 'et notre'
+      and: 'et notre',
+      forgotLink: 'Mot de passe oublié ?',
+      forgotTitle: 'Réinitialiser le mot de passe',
+      forgotSubtitle: 'Indiquez votre adresse e-mail : nous vous envoyons un code pour réinitialiser votre mot de passe.',
+      forgotCodeSent: (email) => `Un code a été envoyé à ${email}. Saisissez-le ci-dessous avec votre nouveau mot de passe.`,
+      emailPlaceholder: 'Adresse e-mail',
+      codePlaceholder: 'Code reçu par e-mail',
+      newPasswordPlaceholder: 'Nouveau mot de passe',
+      sendCode: 'Envoyer le code',
+      sending: 'Envoi...',
+      resetPassword: 'Réinitialiser',
+      forgotError: "Une erreur est survenue. Vérifiez les informations saisies et réessayez.",
+      forgotNeeds2fa: 'Une vérification supplémentaire est requise sur ce compte — connectez-vous normalement pour la compléter.',
+      backToSignIn: 'Retour à la connexion'
     },
     dashboard: {
       greeting: (name) => `Bonjour ${name}`,
@@ -2606,7 +2619,20 @@ export const translations = {
       continueWith: 'Continue with',
       byContinuing: 'By continuing, you agree to our',
       ourFem: '',
-      and: 'and our'
+      and: 'and our',
+      forgotLink: 'Forgot password?',
+      forgotTitle: 'Reset your password',
+      forgotSubtitle: "Enter your email address and we'll send you a code to reset your password.",
+      forgotCodeSent: (email) => `A code was sent to ${email}. Enter it below along with your new password.`,
+      emailPlaceholder: 'Email address',
+      codePlaceholder: 'Code from your email',
+      newPasswordPlaceholder: 'New password',
+      sendCode: 'Send code',
+      sending: 'Sending...',
+      resetPassword: 'Reset password',
+      forgotError: 'Something went wrong. Check the details you entered and try again.',
+      forgotNeeds2fa: 'This account needs extra verification — sign in normally to complete it.',
+      backToSignIn: 'Back to sign in'
     },
     dashboard: {
       greeting: (name) => `Hi ${name}`,
