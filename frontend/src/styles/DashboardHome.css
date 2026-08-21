@@ -187,17 +187,24 @@
   transform: scale(1.04);
 }
 
-/* Rangée maître : les cartes d'espace à gauche, les widgets (calendrier, échéances) à
-   droite — demandé explicitement pour occuper l'espace laissé vide par la pyramide de la
-   photo de fond sans la recouvrir complètement. En grid (colonne gauche au contenu, colonne
-   droite au reste) plutôt qu'en flex : les deux colonnes démarrent alors exactement au même
-   niveau en haut, et la colonne widgets reste plaquée contre le bord droit du conteneur au
-   lieu de flotter au milieu de l'espace disponible (retour utilisateur, capture). */
+/* Rangée maître : titre + cartes d'espace à gauche, widgets (calendrier, échéances) à
+   droite — demandé explicitement pour que la colonne widgets démarre au même niveau que le
+   titre "Bonjour" tout en haut, pas seulement au niveau des cartes d'espace en dessous (le
+   titre a donc été déplacé DANS .dashboard-home-left, voir DashboardHome.jsx, plutôt que de
+   rester un frère du row). En grid plutôt qu'en flex : les deux colonnes démarrent alors
+   exactement au même niveau en haut, et la colonne widgets reste plaquée contre le bord
+   droit du conteneur au lieu de flotter au milieu de l'espace disponible. */
 .dashboard-home-row {
   display: grid;
   grid-template-columns: auto 1fr;
   align-items: start;
   gap: 1.5rem;
+}
+
+.dashboard-home-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 /* Empilées verticalement sur la gauche (plutôt qu'en grille sur toute la largeur) pour

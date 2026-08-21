@@ -157,6 +157,8 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         aria-hidden="true"
       />
       <div className="dashboard-home">
+      <div className="dashboard-home-row">
+      <div className="dashboard-home-left">
       <div className="dashboard-home-header">
         <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
         <p>{t(lang, 'dashboard.subtitle')}</p>
@@ -166,7 +168,6 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         </button>
       </div>
 
-      <div className="dashboard-home-row">
       <div className="dashboard-home-grid">
         {spaces.map(space => {
           const isCurrent = (team.teamId ?? null) === space.id
@@ -246,6 +247,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             </div>
           </button>
         )}
+      </div>
       </div>
 
       <div className="dashboard-home-widgets">
