@@ -111,12 +111,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   const deadlines = useMemo(() => getUpcomingDeadlines(allPlans || activePlans), [allPlans, activePlans])
 
-  const deadlineLabel = (isoDate) => {
+  const deadlineWhen = (isoDate) => {
     const n = daysUntil(isoDate)
     if (n === 0) return t(lang, 'dashboard.deadlinesToday')
     if (n === 1) return t(lang, 'dashboard.deadlinesTomorrow')
     return t(lang, 'dashboard.deadlinesInDays')(n)
   }
+
+  const deadlineKind = (d) => d.kind === 'sprint'
+    ? t(lang, 'dashboard.deadlinesKindSprint')(d.sprintId)
+    : t(lang, 'dashboard.deadlinesKindLaunch')
 
   const spaces = useMemo(() => {
     const personal = { id: null, name: personalSpace.name, avatar: personalSpace.avatar, isTeam: false }
@@ -255,8 +259,11 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             <ul className="dashboard-deadlines-list">
               {deadlines.map(d => (
                 <li key={d.id}>
-                  <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
-                  <span className="dashboard-deadline-when">{deadlineLabel(d.launchDate)}</span>
+                  <span className="dashboard-deadline-info">
+                    <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
+                    <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>
+                  </span>
+                  <span className="dashboard-deadline-when">{deadlineWhen(d.date)}</span>
                 </li>
               ))}
             </ul>

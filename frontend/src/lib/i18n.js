@@ -1483,6 +1483,8 @@ export const translations = {
       deadlinesToday: 'Aujourd\'hui',
       deadlinesTomorrow: 'Demain',
       deadlinesInDays: (n) => `Dans ${n} jours`,
+      deadlinesKindLaunch: 'Lancement',
+      deadlinesKindSprint: (n) => `Fin du sprint ${n}`,
       calendarWeekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
       calendarPrev: 'Mois précédent',
       calendarNext: 'Mois suivant'
@@ -3125,6 +3127,8 @@ export const translations = {
       deadlinesToday: 'Today',
       deadlinesTomorrow: 'Tomorrow',
       deadlinesInDays: (n) => `In ${n} days`,
+      deadlinesKindLaunch: 'Launch',
+      deadlinesKindSprint: (n) => `Sprint ${n} ends`,
       calendarWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       calendarPrev: 'Previous month',
       calendarNext: 'Next month'

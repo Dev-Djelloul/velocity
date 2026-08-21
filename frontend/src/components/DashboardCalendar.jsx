@@ -28,7 +28,7 @@ export default function DashboardCalendar({ lang, deadlines }) {
   const deadlineDays = useMemo(() => {
     const set = new Set()
     for (const d of deadlines || []) {
-      set.add(isoDateOnly(new Date(d.launchDate)))
+      set.add(isoDateOnly(new Date(d.date)))
     }
     return set
   }, [deadlines])
