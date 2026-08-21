@@ -25,6 +25,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
   const listRef = useRef(null)
   const textareaRef = useRef(null)
   const suggestionRefs = useRef([])
+  const panelRef = useRef(null)
 
   useEffect(() => {
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
@@ -76,6 +77,45 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
   // Focus le champ de saisie à l'ouverture, pour pouvoir taper immédiatement après ⌘K.
   useEffect(() => {
     if (open && textareaRef.current) textareaRef.current.focus()
+  }, [open])
+
+  // Sur iOS Safari, le panneau (position:fixed, bottom:122px, hauteur calculée en vh — voir
+  // CopilotChat.css) ne réagit pas correctement à l'ouverture du clavier virtuel : vh reste
+  // basé sur le viewport de mise en page (inchangé), alors que le clavier réduit le viewport
+  // visuel réel, écrasant visiblement le panneau au lieu de simplement le pousser au-dessus
+  // du clavier (repéré par capture iPhone XS). On recale bottom/height sur le viewport
+  // visuel (window.visualViewport) uniquement quand un clavier est effectivement ouvert —
+  // sinon le CSS garde la main, comportement inchangé pour les cas sans clavier.
+  useEffect(() => {
+    if (!open) return
+    const vv = window.visualViewport
+    const panel = panelRef.current
+    if (!vv || !panel) return
+
+    const reset = () => {
+      panel.style.bottom = ''
+      panel.style.height = ''
+      panel.style.maxHeight = ''
+    }
+
+    const update = () => {
+      if (window.innerWidth > 640) { reset(); return }
+      const keyboardInset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
+      if (keyboardInset < 40) { reset(); return }
+      const margin = 12
+      panel.style.bottom = `${keyboardInset + margin}px`
+      panel.style.height = `${vv.height - margin * 2}px`
+      panel.style.maxHeight = `${vv.height - margin * 2}px`
+    }
+
+    update()
+    vv.addEventListener('resize', update)
+    vv.addEventListener('scroll', update)
+    return () => {
+      vv.removeEventListener('resize', update)
+      vv.removeEventListener('scroll', update)
+      reset()
+    }
   }, [open])
 
   const focusSuggestion = (index, total) => {
@@ -153,7 +193,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
       </button>
 
       {open && (
-        <div className="copilot-panel">
+        <div className="copilot-panel" ref={panelRef}>
           <div className="copilot-panel-header">
             <div className="copilot-panel-title">
               <img className="copilot-avatar" src={NOVA_AVATAR} alt="" />
