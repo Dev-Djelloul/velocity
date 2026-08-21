@@ -249,7 +249,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
       )}
 
       {isTeam && !!plans.length && (
-        <button className="space-page-section card space-page-gallery-link" onClick={() => setShowVersionsPicker(true)}>
+        <button className="space-page-section card space-page-gallery-link space-page-versions-link" onClick={() => setShowVersionsPicker(true)}>
           <IconClock width={18} height={18} />
           <div>
             <h3>{t(lang, 'planVersions.title')}</h3>

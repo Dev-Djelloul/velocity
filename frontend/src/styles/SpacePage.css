@@ -553,6 +553,20 @@ img.space-page-avatar {
   font-size: 1rem;
 }
 
+/* Carte "Bibliothèque de versions" (voir SpacePage.jsx) : texte et icône forcés en blanc,
+   dans les deux thèmes — demandé explicitement, contrairement aux autres cartes
+   .space-page-gallery-link ("Mes plans"/"Ma galerie") qui gardent leur icône teintée
+   accent/leur description en ton neutre. Classe dédiée pour ne pas les affecter. */
+.space-page-versions-link,
+.space-page-versions-link h3,
+.space-page-versions-link p {
+  color: #fff;
+}
+
+.space-page-versions-link svg {
+  color: #fff;
+}
+
 .space-page-gallery-link p {
   color: var(--color-text-muted);
   font-size: var(--font-size-sm);
