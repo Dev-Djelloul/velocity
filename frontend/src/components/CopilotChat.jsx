@@ -74,24 +74,25 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
     if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight
   }, [messages, open, busy])
 
-  // Persiste la conversation sur le plan à chaque échange (voir onHistoryChange dans
-  // PlanViewer.jsx) — sauf au montage, où `messages` vient déjà de plan.copilotHistory et le
-  // resauvegarder serait un aller-retour inutile, et sauf pour le vidage déclenché par
-  // closeAndReset() ci-dessous (skipHistorySync), qui doit laisser l'historique archivé
-  // intact dans la sidebar plutôt que l'effacer en même temps que la fenêtre de chat.
+  // Persiste la conversation affichée sur le plan à chaque changement (voir onHistoryChange
+  // dans PlanViewer.jsx) — sauf au montage, où `messages` vient déjà de plan.copilotHistory
+  // et le resauvegarder serait un aller-retour inutile. plan.copilotHistory n'est plus une
+  // "archive" à préserver : depuis l'historique multi-fils (copilot_conversations, voir
+  // persistConversation), le fil qu'on quitte est déjà sauvegardé et consultable depuis le
+  // panneau d'historique — ce miroir ne sert plus qu'à réafficher au rechargement LE FIL
+  // ACTUELLEMENT VISIBLE, vide ou non. Un vidage (fermeture, nouvelle conversation) doit donc
+  // se propager normalement, sans quoi le bouton "Fermer" semblait ne rien faire : à la
+  // reconnexion, l'ancienne conversation revenait quand même (retour utilisateur).
   const isFirstMessagesRender = useRef(true)
-  const skipHistorySync = useRef(false)
   useEffect(() => {
     if (isFirstMessagesRender.current) { isFirstMessagesRender.current = false; return }
-    if (skipHistorySync.current) { skipHistorySync.current = false; return }
     onHistoryChange?.(messages)
   }, [messages])
 
   // Fermer (croix) diffère désormais de Réduire (−) : ferme ET repart sur une conversation
-  // vierge à la prochaine ouverture, sans toucher à l'historique déjà archivé (visible dans
-  // la sidebar) — pense "classer cette conversation", pas "la supprimer".
+  // vierge à la prochaine ouverture — pense "classer cette conversation" (déjà archivée dans
+  // l'historique multi-fils), pas "la supprimer".
   const closeAndReset = () => {
-    skipHistorySync.current = true
     setMessages([])
     setConversationId(null)
     setOpen(false)
@@ -101,7 +102,6 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
   // persisté à chaque échange (voir persistConversation), rien à sauvegarder explicitement
   // ici — juste repartir à vide sur un nouvel id.
   const startNewConversation = () => {
-    skipHistorySync.current = true
     setMessages([])
     setConversationId(null)
     setHistoryOpen(false)
@@ -150,7 +150,6 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
   const openConversation = async (id) => {
     const conv = await fetchCopilotConversation(id)
     if (conv) {
-      skipHistorySync.current = true
       setMessages(conv.messages || [])
       setConversationId(id)
     }
@@ -162,7 +161,6 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
     deleteCopilotConversation(userId, id)
     setConversations(prev => prev.filter(c => c.id !== id))
     if (id === conversationId) {
-      skipHistorySync.current = true
       setMessages([])
       setConversationId(null)
     }
