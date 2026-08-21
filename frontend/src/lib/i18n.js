@@ -954,6 +954,65 @@ export const translations = {
           }
         ]
       },
+      features: {
+        title: 'Fonctionnalités',
+        intro: "Tout ce qui existe réellement dans VelocityLaunch aujourd'hui, par thème — voir la Roadmap pour ce qui s'en vient.",
+        groups: [
+          {
+            label: 'Génération IA',
+            items: [
+              "Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint) comme contexte IA",
+              "Génération IA avec filet de sécurité (moteur à règles local si l'IA échoue)",
+              'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel'
+            ]
+          },
+          {
+            label: 'Roadmap & exécution',
+            items: [
+              'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
+              'Collaboration en temps réel sur la roadmap et le backlog (fusion automatique des éditions concurrentes, présence de qui a le plan ouvert)',
+              "Agents IA asynchrones (brief d'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)"
+            ]
+          },
+          {
+            label: 'Marketing & finance',
+            items: [
+              'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
+              'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
+              'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
+              'Suivi post-lancement & simulateur budget/timeline en direct'
+            ]
+          },
+          {
+            label: 'Équipe & notifications',
+            items: [
+              "Espaces d'équipe (Clerk Organizations), commentaires avec @mentions, fil d'activité par plan, tags transversaux",
+              'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration'
+            ]
+          },
+          {
+            label: 'Intégrations & automatisation',
+            items: [
+              'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
+              "Notifications email (Resend) et Slack : génération terminée, rappel d'inactivité, résumé hebdomadaire",
+              'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in'
+            ]
+          },
+          {
+            label: 'Export & partage',
+            items: [
+              "Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph"
+            ]
+          },
+          {
+            label: 'Compte & accès',
+            items: [
+              'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
+              'Recherche globale (⌘K), FR / EN'
+            ]
+          }
+        ]
+      },
       roadmap: {
         title: 'Roadmap',
         intro: "Un aperçu honnête de ce qui existe déjà et de ce qui s'en vient. Cette roadmap évolue avec les retours des premiers utilisateurs.",
@@ -2341,6 +2400,65 @@ export const translations = {
               'Custom marketing strategy and KPIs',
               'PDF and CSV export, link sharing',
               'Deployed on Cloudflare Workers'
+            ]
+          }
+        ]
+      },
+      features: {
+        title: 'Features',
+        intro: "Everything that genuinely exists in VelocityLaunch today, by theme — see the Roadmap for what's coming next.",
+        groups: [
+          {
+            label: 'AI generation',
+            items: [
+              'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint) as AI context',
+              'AI generation with a safety net (local rules engine if the AI call fails)',
+              'Conversational AI copilot (Nova) to edit the plan in natural language'
+            ]
+          },
+          {
+            label: 'Roadmap & execution',
+            items: [
+              'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
+              'Real-time collaboration on the roadmap and backlog (concurrent edits merge automatically, presence shows who has the plan open)',
+              'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)'
+            ]
+          },
+          {
+            label: 'Marketing & finance',
+            items: [
+              'Distinct marketing budget and total launch budget, with an associated financial forecast',
+              'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
+              'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
+              'Post-launch tracking & live budget/timeline simulator'
+            ]
+          },
+          {
+            label: 'Team & notifications',
+            items: [
+              'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
+              'Persistent notification center (header bell) for AI agents, mentions and collaboration'
+            ]
+          },
+          {
+            label: 'Integrations & automation',
+            items: [
+              'Notion, Jira, GitHub, Linear and Google Calendar integrations',
+              'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
+              'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery'
+            ]
+          },
+          {
+            label: 'Export & sharing',
+            items: [
+              'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image'
+            ]
+          },
+          {
+            label: 'Account & access',
+            items: [
+              '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
+              'Global search (⌘K), FR / EN'
             ]
           }
         ]

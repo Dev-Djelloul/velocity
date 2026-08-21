@@ -1,7 +1,31 @@
 import InfoModal from './InfoModal'
 import PricingCards from './PricingCards'
 import { t } from '../lib/i18n'
-import { IconTag, IconFileText, IconCompass } from './Icons'
+import { IconTag, IconFileText, IconCompass, IconSparkle } from './Icons'
+
+// Liste réelle des fonctionnalités existantes (footer "Fonctionnalités") — avant, ce lien
+// scrollait vers la section marketing de la landing page, plus courte et pas forcément à
+// jour ; ce contenu-ci est tenu en phase avec ce qui est effectivement livré (même source
+// d'information que la colonne "Disponible" de la modal Roadmap, réorganisée par thème).
+export function FeaturesModal({ lang, onClose }) {
+  const groups = t(lang, 'modals.features.groups')
+
+  return (
+    <InfoModal icon={<IconSparkle width={26} height={26} />} title={t(lang, 'modals.features.title')} onClose={onClose} wide>
+      <section>
+        <p>{t(lang, 'modals.features.intro')}</p>
+      </section>
+      {groups.map((group, i) => (
+        <section key={i}>
+          <h2>{group.label}</h2>
+          <ul>
+            {group.items.map((item, j) => <li key={j}>{item}</li>)}
+          </ul>
+        </section>
+      ))}
+    </InfoModal>
+  )
+}
 
 // Modal marketing (footer "Tarification", accessible sans compte) — mêmes offres que la
 // vraie modal d'achat (Mon compte, voir PricingCards), mais les CTA renvoient vers le

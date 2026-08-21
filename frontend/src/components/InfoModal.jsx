@@ -12,7 +12,7 @@ export default function InfoModal({ icon, title, onClose, children, wide, banner
           </div>
         )}
         <div className="info-modal-content">
-          <h1>{icon}{title}</h1>
+          <h1><span className="info-modal-icon">{icon}</span><span className="info-modal-title-text">{title}</span></h1>
           {children}
         </div>
       </div>

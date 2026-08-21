@@ -25,7 +25,7 @@ import DashboardHome from './components/DashboardHome'
 import SettingsPage from './components/SettingsPage'
 import AuthPage from './components/AuthPage'
 import { AboutModal, CareersModal, ContactModal } from './components/CompanyModals'
-import { PricingModal, ChangelogModal, RoadmapModal } from './components/ProductModals'
+import { PricingModal, ChangelogModal, RoadmapModal, FeaturesModal } from './components/ProductModals'
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
@@ -1159,7 +1159,7 @@ export default function App() {
       </main>
 
       {currentPage !== 'auth' && (
-        <Footer lang={lang} onOpenModal={setActiveModal} onNavigateFeatures={() => handleNavAnchor('features')} />
+        <Footer lang={lang} onOpenModal={setActiveModal} />
       )}
 
       <ScrollToTop />
@@ -1209,6 +1209,7 @@ export default function App() {
       )}
       {activeModal === 'changelog' && <ChangelogModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'roadmap' && <RoadmapModal lang={lang} onClose={() => setActiveModal(null)} />}
+      {activeModal === 'features' && <FeaturesModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'privacy' && <PrivacyModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'terms' && <TermsModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'cookies' && <CookiesModal lang={lang} onClose={() => setActiveModal(null)} />}

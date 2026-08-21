@@ -100,6 +100,20 @@
   margin-bottom: 28px;
 }
 
+/* Icône laissée en blanc (currentColor plein, pas de dégradé) — seul le libellé du titre
+   reprend le dégradé du Wordmark. */
+.info-modal-icon {
+  display: inline-flex;
+  color: #fff;
+}
+
+.info-modal-title-text {
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 .info-modal-content section {
   margin-bottom: 28px;
 }
@@ -111,7 +125,7 @@
   font-size: 17px;
   font-weight: 600;
   margin-bottom: 12px;
-  color: var(--color-text-primary);
+  color: var(--color-primary);
 }
 
 .info-modal-content p {
