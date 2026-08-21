@@ -606,8 +606,6 @@
   margin: 3.5rem 0 1rem;
 }
 
-.plan-section-title:first-child { margin-top: 0; }
-
 /* Notification de collaboration temps réel : ce qu'un pair vient de changer, visible
    immédiatement plutôt que d'attendre que quelqu'un remarque une ligne discrète ajoutée
    dans le panneau Historique (replié par défaut). */
