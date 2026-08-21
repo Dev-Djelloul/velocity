@@ -19,6 +19,13 @@
   position: relative;
   display: flex;
   align-items: center;
+  /* flex-wrap plutôt que de compter sur le rétrécissement des enfants : au-delà d'une
+     certaine largeur de fenêtre, les deux catégories + les 3 actions dépassaient la
+     largeur max du panneau et débordaient hors du cadre arrondi (le texte "Reject
+     non-essential" sortait visuellement de la carte) — le wrap fait retomber les actions
+     à la ligne proprement au lieu de déborder. */
+  flex-wrap: wrap;
+  row-gap: 0.7rem;
   gap: 1.5rem;
   width: 100%;
   max-width: 980px;
