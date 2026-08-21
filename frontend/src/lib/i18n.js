@@ -1410,7 +1410,8 @@ export const translations = {
     },
     planVersions: {
       back: 'Retour au plan',
-      title: 'Comparer les versions',
+      title: 'Bibliothèque de versions',
+      cardDesc: 'Un instantané complet à chaque enregistrement — comparez deux versions pour voir ce qui a changé',
       loading: 'Chargement…',
       none: 'Aucune version enregistrée pour ce plan pour le moment.',
       onlyOne: 'Une seule version enregistrée pour l\'instant — repassez après un nouvel "Enregistrer" pour comparer.',
@@ -2969,7 +2970,8 @@ export const translations = {
     },
     planVersions: {
       back: 'Back to plan',
-      title: 'Compare versions',
+      title: 'Version library',
+      cardDesc: 'A full snapshot on every save — compare two versions to see what changed',
       loading: 'Loading…',
       none: 'No saved version for this plan yet.',
       onlyOne: 'Only one saved version so far — check back after another "Save" to compare.',

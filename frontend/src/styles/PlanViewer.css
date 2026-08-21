@@ -540,6 +540,79 @@
   box-shadow: 0 0 40px rgba(99, 102, 241, 0.1);
 }
 
+/* Carte d'entrée vers la bibliothèque de versions "avant/après" (voir PlanVersionsPage.jsx)
+   — remontée en tête de la section Synthèse, juste après le dashboard BI. Auparavant
+   uniquement accessible via un petit bouton dans le panneau Historique replié de la
+   sidebar, peu visible (retour utilisateur). */
+.plan-versions-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  padding: 1.1rem 1.5rem;
+  border-radius: var(--border-radius-sm);
+  background: var(--color-dashboard);
+  border: 1px solid rgba(145, 132, 217, 0.2);
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.plan-versions-card:hover {
+  border-color: rgba(145, 132, 217, 0.45);
+  background: rgba(145, 132, 217, 0.06);
+}
+
+.plan-versions-card-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(145, 132, 217, 0.14);
+  color: #9184d9;
+  flex-shrink: 0;
+}
+
+.plan-versions-card-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.plan-versions-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.plan-versions-card-desc {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+}
+
+.plan-versions-card-cta {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #9184d9;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .plan-versions-card {
+    flex-wrap: wrap;
+  }
+  .plan-versions-card-cta {
+    flex-basis: 100%;
+    padding-left: calc(34px + 1rem);
+  }
+}
+
 .executive-summary-icon {
   display: flex;
   align-items: center;

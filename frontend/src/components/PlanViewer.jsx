@@ -802,6 +802,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.synthese')}</h2>
         <div id="section-dashboard" className={`plan-section-anchor ${mobileSectionId === 'section-dashboard' ? 'is-active' : ''}`}><DashboardBI plan={plan} lang={lang} /></div>
 
+        {plan.id && !readOnly && onCompareVersions && (
+          <button className="plan-versions-card card" onClick={onCompareVersions}>
+            <span className="plan-versions-card-icon"><IconClock width={18} height={18} /></span>
+            <span className="plan-versions-card-body">
+              <span className="plan-versions-card-title">{t(lang, 'planVersions.title')}</span>
+              <span className="plan-versions-card-desc">{t(lang, 'planVersions.cardDesc')}</span>
+            </span>
+            <span className="plan-versions-card-cta">{t(lang, 'planVersions.compareLink')} →</span>
+          </button>
+        )}
+
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.market')}</h2>
         <div id="section-persona" className={`plan-section-anchor ${mobileSectionId === 'section-persona' ? 'is-active' : ''}`}>
           <div className="persona-cards-row">
