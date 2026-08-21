@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { cloneElement, useEffect, useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
 import { useTeam, useUser, useAuth } from '../lib/auth'
 import { getAllPlans, fetchAllPlansAggregated } from '../lib/planStorage'
@@ -14,6 +14,30 @@ import '../styles/DashboardHome.css'
 function byRecency(a, b) {
   const dateOf = (p) => p.updatedAt || p.savedAt || p.generatedAt || ''
   return dateOf(b).localeCompare(dateOf(a))
+}
+
+// Dégradé partagé pour les icônes de la carte d'espace ACTUEL (mode clair) — même
+// technique que InfoModal.jsx : stroke="currentColor" est posé sur la balise <svg>
+// elle-même (voir Icons.jsx, objet `base`) et hérité par tous les <path> enfants sans
+// qu'ils la redéfinissent, donc remplacer le stroke une seule fois ici colore l'icône
+// entière, quelle que soit l'icône. Un seul <defs> suffit (id fixe, pas plusieurs cartes
+// "actuelles" affichées à la fois).
+function IconGradientDefs() {
+  return (
+    <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
+      <defs>
+        <linearGradient id="dashboard-icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#9184d9" />
+          <stop offset="40%" stopColor="#6366f1" />
+          <stop offset="100%" stopColor="#06b6d4" />
+        </linearGradient>
+      </defs>
+    </svg>
+  )
+}
+
+function gradientIcon(icon) {
+  return cloneElement(icon, { stroke: 'url(#dashboard-icon-gradient)' })
 }
 
 // Accueil applicatif post-connexion : vue d'ensemble de tous les espaces (personnel +
@@ -77,6 +101,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   return (
     <div className="dashboard-home-outer">
+      <IconGradientDefs />
       <div className="dashboard-home-bg" style={{ backgroundImage: `url(${dashboardBackground})` }} aria-hidden="true" />
       <div className="dashboard-home">
       <div className="dashboard-home-header">
@@ -106,7 +131,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 <img className="dashboard-space-avatar" src={space.avatar} alt="" />
               ) : (
                 <span className="dashboard-space-avatar dashboard-space-avatar-personal">
-                  <IconUser width={16} height={16} />
+                  {isCurrent ? gradientIcon(<IconUser width={16} height={16} />) : <IconUser width={16} height={16} />}
                 </span>
               )}
               <div className="dashboard-space-info">
@@ -116,12 +141,12 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 </span>
                 {stats.known ? (
                   <span className="dashboard-space-meta">
-                    <IconClipboard width={12} height={12} />
+                    {isCurrent ? gradientIcon(<IconClipboard width={12} height={12} />) : <IconClipboard width={12} height={12} />}
                     {t(lang, 'dashboard.planCount')(stats.count)}
                     {stats.last && (
                       <>
                         <span className="dashboard-space-meta-sep">·</span>
-                        <IconClock width={12} height={12} />
+                        {isCurrent ? gradientIcon(<IconClock width={12} height={12} />) : <IconClock width={12} height={12} />}
                         {formatFullDateTime(stats.last, lang)}
                       </>
                     )}

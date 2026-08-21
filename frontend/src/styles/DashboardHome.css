@@ -146,26 +146,11 @@
     var(--wordmark-gradient) border-box;
 }
 
-/* Mode clair : la carte de l'espace ACTUEL restait en blanc opaque malgré le passage en
-   verre dépoli des autres cartes — .dashboard-space-card.is-current (même spécificité que
-   la règle de verre ci-dessus) la redéfinissait plus loin dans le fichier et gagnait par
-   ordre de cascade. Réaffirmée ici, après elle, en gardant sa bordure dégradée propre. */
-@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  [data-theme="light"] .dashboard-space-card.is-current {
-    background:
-      linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) padding-box,
-      var(--wordmark-gradient) border-box;
-    backdrop-filter: blur(20px) saturate(1.4);
-    -webkit-backdrop-filter: blur(20px) saturate(1.4);
-  }
-}
-
-/* Nom de l'espace ACTUEL en dégradé (même formule que le Wordmark) plutôt qu'en blanc uni,
-   pour le distinguer visuellement des autres cartes — demandé spécifiquement pour cette
-   carte. Le badge "ACTUEL" imbriqué a sa propre couleur de remplissage (voir
-   .dashboard-space-current-badge) : sans la réaffirmer ici, il hériterait du
-   -webkit-text-fill-color transparent du parent et deviendrait invisible. */
-[data-theme="light"] .dashboard-space-card.is-current .dashboard-space-name {
+/* Carte de l'espace ACTUEL : fond blanc opaque volontairement conservé (pas de verre
+   dépoli comme les autres cartes — demandé explicitement) ; c'est le TEXTE et les ICÔNES
+   qui portent le dégradé du Wordmark à la place, pour la distinguer visuellement. */
+[data-theme="light"] .dashboard-space-card.is-current .dashboard-space-name,
+[data-theme="light"] .dashboard-space-card.is-current .dashboard-space-meta {
   background: var(--wordmark-gradient);
   background-clip: text;
   -webkit-background-clip: text;
@@ -173,8 +158,23 @@
   text-shadow: none;
 }
 
+/* Le badge "ACTUEL" imbriqué dans .dashboard-space-name a sa propre couleur de remplissage
+   (voir .dashboard-space-current-badge) : sans la réaffirmer ici, il hériterait du
+   -webkit-text-fill-color transparent du parent et deviendrait invisible. */
 [data-theme="light"] .dashboard-space-card.is-current .dashboard-space-current-badge {
   -webkit-text-fill-color: #0b0c10;
+}
+
+/* Icônes (avatar personnel, symboles de la ligne "N plans · date") en dégradé — stroke
+   posé sur la balise <svg> elle-même (voir Icons.jsx, objet `base`) et hérité par tous les
+   <path> enfants, remplacé par l'URL du gradient côté JS (IconGradientDefs +
+   gradientIcon(), DashboardHome.jsx), même technique que InfoModal.jsx pour les icônes de
+   carte du footer — appliqué aux deux thèmes, contrairement au texte en dégradé plus haut
+   (uniquement demandé pour le mode clair). Le carré de fond dégradé de l'avatar est retiré
+   ICI (tous thèmes, pas juste [data-theme="light"]) : une icône dégradée sur un fond déjà
+   dégradé se serait fondue dedans, illisible en mode sombre notamment. */
+.dashboard-space-card.is-current .dashboard-space-avatar-personal {
+  background: var(--color-bg-tertiary, rgba(255, 255, 255, 0.08));
 }
 
 .dashboard-space-avatar {
