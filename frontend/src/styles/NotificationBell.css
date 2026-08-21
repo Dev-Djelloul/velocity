@@ -55,6 +55,20 @@
   overflow: hidden;
 }
 
+/* "right: 0" ancre le panneau au bouton cloche, pas à l'écran — la cloche n'étant pas
+   forcément collée au bord droit (avatars/hamburger à sa droite dans le header), ses 340px
+   fixes débordaient hors de l'écran côté gauche sur mobile. Ancré à l'écran avec des marges
+   fixes en dessous de 480px, comme .header-dropdown (même correctif, même raison). */
+@media (max-width: 480px) {
+  .notif-bell-panel {
+    position: fixed;
+    top: 64px;
+    left: 1rem;
+    right: 1rem;
+    width: auto;
+  }
+}
+
 .notif-bell-header {
   display: flex;
   align-items: center;

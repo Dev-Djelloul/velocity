@@ -24,6 +24,15 @@
   min-width: 0;
 }
 
+/* .btn-secondary a du texte non coupable (white-space:nowrap) sans flex-shrink:0 — sur
+   une ligne étroite (mobile), la ligne le comprimait sous la largeur de "Déconnecter", qui
+   débordait alors visuellement par-dessus le badge/nom du service juste à gauche (même
+   défaut que le logo du header, confirmé par capture iPhone). flex-shrink:0 ici, tout le
+   rétrécissement se fait sur .integration-info (déjà en min-width:0, donc déjà prévu pour). */
+.integration-row .btn-secondary {
+  flex-shrink: 0;
+}
+
 .integration-info > div {
   display: flex;
   flex-direction: column;

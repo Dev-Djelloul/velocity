@@ -296,6 +296,27 @@
   overflow-y: auto;
 }
 
+/* Sur mobile, "right: 0" positionne le menu par rapport au bouton qui l'ouvre, pas par
+   rapport à l'écran — si ce bouton n'est pas collé au bord droit (cas fréquent : cloche de
+   notifications, avatar d'espace), un menu de 200-240px de large déborde hors de l'écran
+   sur la gauche (confirmé par capture iPhone, menu de notifications tronqué). En dessous de
+   480px, on découple le menu de la position du bouton : ancré à l'écran avec des marges
+   fixes plutôt qu'au bouton, sa largeur ne peut alors plus jamais dépasser le viewport. */
+@media (max-width: 480px) {
+  .header-dropdown {
+    position: fixed;
+    top: 64px;
+    left: 1rem;
+    right: 1rem;
+    min-width: 0;
+    width: auto;
+  }
+
+  .header-dropdown-account {
+    min-width: 0;
+  }
+}
+
 @keyframes header-dropdown-in {
   from { opacity: 0; transform: translateY(-4px); }
   to { opacity: 1; transform: translateY(0); }
