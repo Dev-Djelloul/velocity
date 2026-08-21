@@ -704,7 +704,6 @@ export const translations = {
       analyticsBody: 'Optionnel',
       acceptAll: 'Tout accepter',
       savePrefs: 'Enregistrer mes choix',
-      rejectAll: 'Refuser le non-essentiel',
       learnMore: 'En savoir plus',
       collapse: 'Réduire',
       reopen: 'Cookies & vie privée'
@@ -2202,7 +2201,6 @@ export const translations = {
       analyticsBody: 'Optional',
       acceptAll: 'Accept all',
       savePrefs: 'Save my choices',
-      rejectAll: 'Reject non-essential',
       learnMore: 'Learn more',
       collapse: 'Collapse',
       reopen: 'Cookies & privacy'

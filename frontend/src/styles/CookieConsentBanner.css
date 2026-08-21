@@ -232,13 +232,10 @@
   margin-left: auto;
 }
 
-/* Les trois actions partagent désormais le même gabarit (taille, rembourrage, coins
-   arrondis) — seule l'intensité visuelle change (plein / contour marqué / contour discret)
-   pour hiérarchiser sans casser la cohérence, plutôt qu'un simple lien texte à côté de
-   deux vrais boutons. */
+/* Les deux actions partagent le même gabarit (taille, rembourrage, coins arrondis) — seule
+   l'intensité visuelle change (plein / contour) pour hiérarchiser sans casser la cohérence. */
 .cookie-consent-accept,
-.cookie-consent-save,
-.cookie-consent-reject {
+.cookie-consent-save {
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.55rem 1.1rem;
@@ -257,17 +254,6 @@
 .cookie-consent-save:hover {
   background: rgba(255, 255, 255, 0.1);
   border-color: rgba(255, 255, 255, 0.24);
-}
-
-.cookie-consent-reject {
-  background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #9a9bb0;
-}
-
-.cookie-consent-reject:hover {
-  color: #e9e9ed;
-  border-color: rgba(255, 255, 255, 0.18);
 }
 
 /* Repliée : simple pastille sur le bord, toujours accessible pour revenir sur le choix
