@@ -195,15 +195,17 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
 
       {isTeam && stats && (
         <div className="space-dashboard">
-          <div
-            className="space-dashboard-tile space-dashboard-tile-violet avatar-tooltip"
-            data-tooltip={plans.length
-              ? plans.map(p => p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')).join(', ')
-              : (lang === 'fr' ? 'Aucun plan pour le moment' : 'No plans yet')}
-          >
+          <div className="space-dashboard-tile space-dashboard-tile-violet">
             <span className="space-dashboard-icon"><IconClipboard width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.planCount}</span>
-            <span className="space-dashboard-label">{lang === 'fr' ? 'Plans partagés' : 'Shared plans'}</span>
+            <span
+              className="space-dashboard-label avatar-tooltip"
+              data-tooltip={plans.length
+                ? plans.map(p => p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')).join(', ')
+                : (lang === 'fr' ? 'Aucun plan pour le moment' : 'No plans yet')}
+            >
+              {lang === 'fr' ? 'Plans partagés' : 'Shared plans'}
+            </span>
             {!!plans.length && (
               <div className="members-presence-row">
                 {plans.slice(0, 6).map(p => (
@@ -223,15 +225,17 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <span className="space-dashboard-label">{lang === 'fr' ? 'Membres' : 'Members'}</span>
             <MembersPresenceRow teamId={team.teamId} members={team.members} lang={lang} />
           </div>
-          <div
-            className="space-dashboard-tile space-dashboard-tile-cyan avatar-tooltip"
-            data-tooltip={lang === 'fr'
-              ? `${stats.launchBudget.toLocaleString('fr-FR')} € budget total + ${stats.marketingBudget.toLocaleString('fr-FR')} € marketing`
-              : `${stats.launchBudget.toLocaleString('en-US')}€ total budget + ${stats.marketingBudget.toLocaleString('en-US')}€ marketing`}
-          >
+          <div className="space-dashboard-tile space-dashboard-tile-cyan">
             <span className="space-dashboard-icon"><IconCoin width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.totalBudget.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}€</span>
-            <span className="space-dashboard-label">{lang === 'fr' ? 'Budget cumulé' : 'Combined budget'}</span>
+            <span
+              className="space-dashboard-label avatar-tooltip"
+              data-tooltip={lang === 'fr'
+                ? `${stats.launchBudget.toLocaleString('fr-FR')} € budget total + ${stats.marketingBudget.toLocaleString('fr-FR')} € marketing`
+                : `${stats.launchBudget.toLocaleString('en-US')}€ total budget + ${stats.marketingBudget.toLocaleString('en-US')}€ marketing`}
+            >
+              {lang === 'fr' ? 'Budget cumulé' : 'Combined budget'}
+            </span>
           </div>
           <div className="space-dashboard-tile space-dashboard-tile-white">
             <span className="space-dashboard-icon"><IconClock width={16} height={16} /></span>
