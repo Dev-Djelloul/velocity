@@ -180,31 +180,80 @@ img.space-page-avatar {
   margin-bottom: 0.15rem;
 }
 
-/* Une couleur de la charte par carte (violet / bleu / cyan / blanc), portée par un fond
-   teinté et l'icône elle-même — mise en évidence demandée pour distinguer les 4 cartes du
-   tableau de bord d'un coup d'œil plutôt qu'un violet uniforme partout. `background`
-   (raccourci) sur .space-dashboard-tile-* écrasait entièrement le fond opaque posé par
-   .space-dashboard-tile juste au-dessus (même spécificité, ordre du fichier qui tranche) —
-   la carte devenait quasi transparente et laissait l'image de fond de la page transparaître
-   fortement. Le calque de couleur est maintenant superposé À la couleur de fond opaque
-   plutôt que de la remplacer, à une opacité assez marquée pour rester visible dessus. */
+/* Effet "verre dépoli" plutôt qu'un fond opaque ou une transparence brute : la carte reste
+   translucide (on devine le fond de la page derrière, cohérent avec le reste de la page)
+   mais applique SON PROPRE flou (backdrop-filter) — la photo de fond, déjà nette à cet
+   endroit, ressort comme un doux voile de couleur plutôt qu'un fragment d'image reconnaissable
+   qui distrait. Chaque carte a son highlight en haut (comme un reflet de verre) et une bordure
+   teintée assortie. Repli en fond opaque pour les navigateurs sans backdrop-filter. */
+.space-dashboard-tile-violet,
+.space-dashboard-tile-blue,
+.space-dashboard-tile-cyan,
+.space-dashboard-tile-white {
+  position: relative;
+  overflow: hidden;
+  /* Repli opaque : sans backdrop-filter, laisser passer le fond de page tel quel serait
+     illisible (pas de flou pour l'adoucir) — seul le ::before (tinté) resterait visible. */
+  background: var(--color-dashboard, var(--color-bg-secondary));
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .space-dashboard-tile-violet,
+  .space-dashboard-tile-blue,
+  .space-dashboard-tile-cyan,
+  .space-dashboard-tile-white {
+    /* Transparent ICI : c'est ce qui laisse backdrop-filter voir (et flouter) le fond de
+       page à travers la carte — un fond opaque sur l'élément lui-même annulerait l'effet
+       (rien à flouter/composer, backdrop-filter n'agit que sur ce qui est déjà transparent). */
+    background: transparent;
+    backdrop-filter: blur(22px) saturate(1.5);
+    -webkit-backdrop-filter: blur(22px) saturate(1.5);
+  }
+}
+
+.space-dashboard-tile-violet::before,
+.space-dashboard-tile-blue::before,
+.space-dashboard-tile-cyan::before,
+.space-dashboard-tile-white::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  /* Léger reflet en haut de carte (comme du verre), fond uni juste en dessous. */
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, transparent 32%), var(--tile-tint);
+}
+
+/* Le contenu de la carte doit passer au-dessus du calque ::before. */
+.space-dashboard-tile-violet > *,
+.space-dashboard-tile-blue > *,
+.space-dashboard-tile-cyan > *,
+.space-dashboard-tile-white > * {
+  position: relative;
+  z-index: 1;
+}
+
 .space-dashboard-tile-violet {
-  background: linear-gradient(rgba(145, 132, 217, 0.22), rgba(145, 132, 217, 0.22)), var(--color-dashboard, var(--color-bg-secondary));
+  --tile-tint: rgba(145, 132, 217, 0.4);
+  border-color: rgba(145, 132, 217, 0.4);
 }
 .space-dashboard-tile-violet .space-dashboard-icon { color: #9184d9; }
 
 .space-dashboard-tile-blue {
-  background: linear-gradient(rgba(99, 102, 241, 0.22), rgba(99, 102, 241, 0.22)), var(--color-dashboard, var(--color-bg-secondary));
+  --tile-tint: rgba(99, 102, 241, 0.4);
+  border-color: rgba(99, 102, 241, 0.4);
 }
 .space-dashboard-tile-blue .space-dashboard-icon { color: #6366f1; }
 
 .space-dashboard-tile-cyan {
-  background: linear-gradient(rgba(6, 182, 212, 0.22), rgba(6, 182, 212, 0.22)), var(--color-dashboard, var(--color-bg-secondary));
+  --tile-tint: rgba(6, 182, 212, 0.4);
+  border-color: rgba(6, 182, 212, 0.4);
 }
 .space-dashboard-tile-cyan .space-dashboard-icon { color: #06b6d4; }
 
 .space-dashboard-tile-white {
-  background: linear-gradient(rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0.16)), var(--color-dashboard, var(--color-bg-secondary));
+  --tile-tint: rgba(255, 255, 255, 0.3);
+  border-color: rgba(255, 255, 255, 0.35);
 }
 .space-dashboard-tile-white .space-dashboard-icon { color: #fff; }
 
