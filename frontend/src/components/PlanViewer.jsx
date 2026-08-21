@@ -96,6 +96,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [confirmLeave, setConfirmLeave] = useState(false)
   const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
   const captureRef = useRef(null)
+  const coverBannerRef = useRef(null)
+  const coverImgRef = useRef(null)
+  const coverDragRef = useRef(null)
+  const [isDraggingCover, setIsDraggingCover] = useState(false)
   const [presencePeers, setPresencePeers] = useState([])
   const [collabToast, setCollabToast] = useState(null)
   const collabToastTimerRef = useRef(null)
@@ -345,12 +349,64 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     if (plan.id) savePlan(nextPlan)
   }
 
-  const cyclePosition = { top: 'center', center: 'bottom', bottom: 'top' }
-  const cycleCoverPosition = () => {
-    const next = cyclePosition[plan.coverPosition || 'center']
-    const nextPlan = { ...plan, coverPosition: next }
-    setPlan(nextPlan)
-    if (plan.id) savePlan(nextPlan)
+  // Recadrage de la couverture par glisser directement l'image (façon Notion/Linear) plutôt
+  // qu'un bouton cyclant entre 3 réglages fixes (haut/centre/bas) — trop grossier pour la
+  // plupart des photos, retour utilisateur explicite. coverPosition devient un pourcentage
+  // (0-100, 50 = centré) au lieu d'un mot-clé ; les anciennes valeurs 'top'/'center'/'bottom'
+  // restent lues correctement via legacyCoverPositionMap pour les plans déjà enregistrés.
+  const legacyCoverPositionMap = { top: 0, center: 50, bottom: 100 }
+  const coverPositionPercent = (pos) => {
+    if (typeof pos === 'number') return Math.min(100, Math.max(0, pos))
+    if (typeof pos === 'string' && pos.endsWith('%')) return Math.min(100, Math.max(0, parseFloat(pos)))
+    return legacyCoverPositionMap[pos] ?? 50
+  }
+
+  // setPlan fonctionnel (pas de dépendance à `plan` capturé au moment du mousedown) : les
+  // écouteurs pointermove/pointerup posés sur window vivent au-delà du re-render déclenché
+  // par chaque déplacement, un plan capturé en closure y serait périmé dès le deuxième
+  // mouvement de souris.
+  const updateCoverPosition = (percent, persist) => {
+    setPlan(prev => {
+      const nextPlan = { ...prev, coverPosition: Math.round(Math.min(100, Math.max(0, percent))) }
+      if (persist && nextPlan.id) savePlan(nextPlan)
+      return nextPlan
+    })
+  }
+
+  const onCoverDrag = (e) => {
+    const drag = coverDragRef.current
+    if (!drag) return
+    const deltaPercent = ((e.clientY - drag.startY) / drag.overflow) * 100
+    // Glisser l'image vers le bas doit donner l'impression de la faire descendre (révéler
+    // le haut de la photo) : le pourcentage d'objectPosition, lui, baisse dans ce cas.
+    updateCoverPosition(drag.startPercent - deltaPercent, false)
+  }
+
+  const stopCoverDrag = () => {
+    coverDragRef.current = null
+    setIsDraggingCover(false)
+    window.removeEventListener('pointermove', onCoverDrag)
+    window.removeEventListener('pointerup', stopCoverDrag)
+    setPlan(prev => {
+      if (prev.id) savePlan(prev)
+      return prev
+    })
+  }
+
+  const startCoverDrag = (e) => {
+    if (readOnly || !plan.coverImage) return
+    const container = coverBannerRef.current
+    const img = coverImgRef.current
+    if (!container || !img?.naturalWidth) return
+    const scale = container.clientWidth / img.naturalWidth
+    const renderedHeight = img.naturalHeight * scale
+    const overflow = renderedHeight - container.clientHeight
+    if (overflow <= 0) return // image plus petite que le cadre dans ce sens : rien à recadrer
+    e.preventDefault()
+    coverDragRef.current = { startY: e.clientY, startPercent: coverPositionPercent(plan.coverPosition), overflow }
+    setIsDraggingCover(true)
+    window.addEventListener('pointermove', onCoverDrag)
+    window.addEventListener('pointerup', stopCoverDrag)
   }
 
   // Fond de page derrière tout le plan (distinct de la couverture, qui reste une bannière en
@@ -587,13 +643,17 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
       {plan.id && (
-        <div className={`plan-cover-banner ${plan.coverImage ? 'has-image' : ''}`}>
+        <div className={`plan-cover-banner ${plan.coverImage ? 'has-image' : ''}`} ref={coverBannerRef}>
           {plan.coverImage && (
             <img
+              ref={coverImgRef}
               src={plan.coverImage}
               alt=""
-              className="plan-cover-banner-img"
-              style={{ objectPosition: `center ${plan.coverPosition || 'center'}` }}
+              draggable={false}
+              className={`plan-cover-banner-img ${!readOnly ? 'is-draggable' : ''} ${isDraggingCover ? 'is-dragging' : ''}`}
+              style={{ objectPosition: `center ${coverPositionPercent(plan.coverPosition)}%` }}
+              onPointerDown={startCoverDrag}
+              title={!readOnly ? (lang === 'fr' ? 'Glisser pour repositionner' : 'Drag to reposition') : undefined}
             />
           )}
           {!readOnly && (
@@ -602,11 +662,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                 <IconImage width={14} height={14} />
                 {plan.coverImage ? t(lang, 'app.coverImageChange') : t(lang, 'app.coverImageAdd')}
               </button>
-              {plan.coverImage && (
-                <button className="plan-cover-banner-btn" onClick={cycleCoverPosition}>
-                  {t(lang, 'app.coverReposition')}
-                </button>
-              )}
             </div>
           )}
         </div>

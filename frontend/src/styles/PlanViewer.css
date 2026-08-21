@@ -114,6 +114,18 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* Recadrage direct par glisser (voir PlanViewer.jsx) au lieu du bouton "3 réglages fixes"
+     précédent — touch-action:none pour que le drag prenne la main sur le défilement tactile
+     plutôt que de le déclencher par erreur. */
+  touch-action: none;
+}
+
+.plan-cover-banner-img.is-draggable {
+  cursor: grab;
+}
+
+.plan-cover-banner-img.is-dragging {
+  cursor: grabbing;
 }
 
 .plan-cover-banner-actions {
