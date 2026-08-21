@@ -540,41 +540,28 @@
   white-space: nowrap;
 }
 
-/* Regroupe les actions secondaires (déplacer/dupliquer/supprimer, ou l'indice "changez
-   d'espace") pour pouvoir les faire passer ensemble sur leur propre ligne en dessous de
-   0.5rem — voir le média mobile plus bas. Sans effet en desktop : mêmes boutons, alignés
-   dans la même rangée que le reste. */
-.account-list-item-actions {
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-}
-
 /* Sur mobile, la ligne (vignette + nom + méta + étoile + [renommer/déplacer/supprimer OU
    indice "changez d'espace"]) ne tenait plus dans la largeur — chaque élément, en
    flex-shrink:0 ou nowrap, refusait de rétrécir, et le texte finissait par se chevaucher
    visuellement au lieu de déborder proprement (capture iPhone : l'étoile de favori
-   recouvrait le nom de l'espace d'origine). L'étoile reste sur la première ligne, à côté
-   de la vignette et du nom (juste après une capture supplémentaire, l'utilisateur l'a
-   demandé explicitement) ; seules les actions secondaires (déplacer/dupliquer/supprimer,
-   ou l'indice lecture seule — regroupées dans .account-list-item-actions, voir
-   AccountPage.jsx/SpacePage.jsx) passent sur une deuxième ligne dédiée en dessous. */
+   recouvrait le nom de l'espace d'origine). On empile désormais deux lignes : la carte
+   (vignette + nom + méta) pleine largeur en haut, puis les actions (favori, déplacer,
+   supprimer, ou l'indice lecture seule) sur une deuxième ligne dédiée en dessous. */
 @media (max-width: 640px) {
   .account-list-item {
     flex-wrap: wrap;
-    align-items: center;
+    align-items: stretch;
   }
 
   .account-list-item-main {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex-basis: 100%;
   }
 
-  .account-list-item-actions {
-    flex-basis: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+  .account-list-item-favorite,
+  .account-list-item-delete,
+  .account-list-item-move,
+  .account-list-item-hint {
+    padding: 0.4rem 0.85rem 0.65rem;
   }
 
   .account-list-item-hint {

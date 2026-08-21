@@ -259,14 +259,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                 >
                   {p.isFavorite ? '⭐' : '☆'}
                 </button>
-                <div className="account-list-item-actions">
-                  <button className="account-list-item-move" onClick={() => handleDuplicate(p)} title={t(lang, 'plans.duplicate')}>
-                    <IconCopy width={14} height={14} />
-                  </button>
-                  <button className="account-list-item-delete" onClick={() => setDeleteTarget(p)} title="Delete">
-                    <IconTrash width={14} height={14} />
-                  </button>
-                </div>
+                <button className="account-list-item-move" onClick={() => handleDuplicate(p)} title={t(lang, 'plans.duplicate')}>
+                  <IconCopy width={14} height={14} />
+                </button>
+                <button className="account-list-item-delete" onClick={() => setDeleteTarget(p)} title="Delete">
+                  <IconTrash width={14} height={14} />
+                </button>
               </div>
             ))}
           </div>
