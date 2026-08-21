@@ -138,9 +138,6 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
                 <button className="btn-secondary cookie-consent-save" onClick={saveSelection}>
                   {t(lang, 'cookieBanner.savePrefs')}
                 </button>
-                <button className="btn-primary cookie-consent-accept" onClick={acceptAll}>
-                  {t(lang, 'cookieBanner.acceptAll')}
-                </button>
               </div>
             </div>
           )}
