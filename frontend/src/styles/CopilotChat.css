@@ -343,7 +343,11 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-image: radial-gradient(rgba(145, 132, 217, 0.35) 1px, transparent 1px);
+  /* Opacité relevée (0.35 -> 0.55) et point plus épais (1px -> 1.5px) : la version
+     précédente était à peine visible sur le fond sombre du panneau, surtout hors de la
+     petite zone centrale déjà occupée par l'orbe/le texte (retour utilisateur : "les
+     points lumineux" ne se voyaient pas). */
+  background-image: radial-gradient(rgba(180, 168, 240, 0.55) 1.5px, transparent 1.5px);
   background-size: 20px 20px;
   pointer-events: none;
 }
