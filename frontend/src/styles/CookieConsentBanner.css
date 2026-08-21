@@ -1,43 +1,46 @@
 /* Bannière RGPD volontairement sombre dans les deux thèmes (comme la landing page,
    voir .header-locked-dark) plutôt que de suivre le thème clair/sombre de l'app — un
    bandeau de conformité reste cohérent visuellement quel que soit le thème choisi par
-   l'utilisateur, comme un composant "système" plutôt qu'un élément de l'interface produit. */
+   l'utilisateur, comme un composant "système" plutôt qu'un élément de l'interface produit.
+   Décalée au-dessus du bouton rond "scroll-to-top" (bottom 1.5rem, 36px de haut, voir
+   ScrollToTop.css) pour ne jamais le chevaucher, même repliée en pastille. */
 .cookie-consent {
   position: fixed;
   right: 1.25rem;
-  bottom: 1.25rem;
+  bottom: 5.5rem;
   z-index: 500;
-  max-width: min(320px, calc(100vw - 2.5rem));
+  max-width: min(360px, calc(100vw - 2.5rem));
 }
 
 .cookie-consent-panel {
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 0.65rem;
-  padding: 1.25rem 1.35rem 1.1rem;
-  border-radius: 16px;
+  gap: 0.8rem;
+  padding: 1.4rem 1.5rem 1.3rem;
+  border-radius: 18px;
   border: 1.5px solid transparent;
   background:
     linear-gradient(#141922, #141922) padding-box,
     linear-gradient(135deg, #9184d9 0%, #6366f1 40%, #06b6d4 100%) border-box;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   color: #e9e9ed;
-  /* Glisse depuis le bord droit — repliable ("on peut la rentrer") plutôt qu'un bandeau fixe
-     imposé, tout en restant réouvrable à tout moment via la pastille (voir .cookie-consent-tab),
-     ce que le RGPD impose (pouvoir revenir sur son choix). */
+  /* Glisse depuis le bord droit — pas de croix pour l'ignorer sans choisir : c'est un
+     moment de décision (accepter/refuser/personnaliser), pas un toast qu'on balaie. Reste
+     réouvrable à tout moment une fois un choix fait (voir .cookie-consent-tab), ce que le
+     RGPD impose (pouvoir revenir sur son consentement). */
   animation: cookieConsentSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes cookieConsentSlideIn {
-  from { transform: translateX(24px); opacity: 0; }
+  from { transform: translateX(28px); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
   .cookie-consent-panel {
     background:
-      linear-gradient(rgba(20, 25, 34, 0.82), rgba(20, 25, 34, 0.82)) padding-box,
+      linear-gradient(rgba(20, 25, 34, 0.88), rgba(20, 25, 34, 0.88)) padding-box,
       linear-gradient(135deg, #9184d9 0%, #6366f1 40%, #06b6d4 100%) border-box;
     backdrop-filter: blur(16px) saturate(1.3);
     -webkit-backdrop-filter: blur(16px) saturate(1.3);
@@ -45,8 +48,8 @@
 }
 
 .cookie-consent-icon {
-  width: 34px;
-  height: 34px;
+  width: 36px;
+  height: 36px;
   border-radius: 10px;
   display: flex;
   align-items: center;
@@ -57,7 +60,7 @@
 
 .cookie-consent-panel h3 {
   margin: 0;
-  font-size: 0.98rem;
+  font-size: 1.02rem;
   font-weight: 700;
   color: #fff;
 }
@@ -69,25 +72,101 @@
   color: #c2c3c9;
 }
 
-.cookie-consent-actions {
+.cookie-consent-categories {
   display: flex;
-  align-items: center;
-  gap: 0.9rem;
-  margin-top: 0.3rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.2rem;
 }
 
-.cookie-consent-accept {
+.cookie-consent-category {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  padding: 0.6rem 0.7rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+}
+
+.cookie-consent-category.is-locked {
+  cursor: default;
+  opacity: 0.85;
+}
+
+.cookie-consent-category input {
+  margin-top: 0.2rem;
+  accent-color: #9184d9;
+  flex-shrink: 0;
+  cursor: inherit;
+}
+
+.cookie-consent-category-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #a89fe8;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+.cookie-consent-category-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.cookie-consent-category-text strong {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.cookie-consent-category-text em {
+  font-style: normal;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: #a1a1a6;
+}
+
+.cookie-consent-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 0.3rem;
+}
+
+.cookie-consent-accept,
+.cookie-consent-save {
+  width: 100%;
   font-size: 0.85rem;
-  padding: 0.55rem 1.1rem;
+  padding: 0.6rem 1rem;
+}
+
+.cookie-consent-reject {
+  background: none;
+  border: none;
+  padding: 0.3rem;
+  color: #c2c3c9;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+}
+
+.cookie-consent-reject:hover {
+  color: #fff;
 }
 
 .cookie-consent-link {
+  align-self: center;
   background: none;
   border: none;
   padding: 0;
   color: #a89fe8;
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 600;
   text-decoration: underline;
   cursor: pointer;
@@ -97,38 +176,16 @@
   color: #fff;
 }
 
-.cookie-consent-close {
-  position: absolute;
-  top: 0.6rem;
-  right: 0.6rem;
-  width: 24px;
-  height: 24px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.08);
-  color: #c2c3c9;
-  cursor: pointer;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.cookie-consent-close:hover {
-  background: rgba(255, 255, 255, 0.16);
-  color: #fff;
-}
-
 /* Repliée : simple pastille sur le bord, toujours accessible pour revenir sur le choix
    (rouvre le panneau complet). */
 .cookie-consent-tab {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
-  padding: 0.55rem 0.7rem 0.55rem 0.5rem;
-  border-radius: 999px 0 0 999px;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   border: 1.5px solid rgba(145, 132, 217, 0.4);
-  border-right: none;
   background: rgba(20, 25, 34, 0.9);
   color: #c2c3c9;
   cursor: pointer;
@@ -138,17 +195,13 @@
 
 .cookie-consent-tab:hover {
   color: #fff;
-  transform: translateX(-3px);
-}
-
-.cookie-consent.is-collapsed {
-  right: 0;
+  transform: scale(1.08);
 }
 
 @media (max-width: 480px) {
   .cookie-consent {
     right: 0.75rem;
-    bottom: 0.75rem;
+    bottom: 5rem;
     left: 0.75rem;
     max-width: none;
   }

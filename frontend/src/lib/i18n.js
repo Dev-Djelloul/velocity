@@ -697,8 +697,14 @@ export const translations = {
     },
     cookieBanner: {
       title: 'Cookies & vie privée',
-      body: "On utilise le minimum de stockage nécessaire au fonctionnement du service — rien de plus, promis.",
-      accept: "J'ai compris",
+      body: 'Choisissez ce que VelocityLaunch peut utiliser. Vous pouvez revenir sur ce choix à tout moment.',
+      essentialTitle: 'Essentiels',
+      essentialBody: 'Connexion, préférences de langue et thème, brouillons. Toujours actifs — le service ne fonctionne pas sans eux.',
+      analyticsTitle: "Mesure d'audience",
+      analyticsBody: "Comprendre l'usage global du service (pages visitées, provenance). Aucune donnée de vos plans n'y est associée.",
+      acceptAll: 'Tout accepter',
+      savePrefs: 'Enregistrer mes choix',
+      rejectAll: 'Refuser le non-essentiel',
       learnMore: 'En savoir plus',
       collapse: 'Réduire',
       reopen: 'Cookies & vie privée'
@@ -2189,8 +2195,14 @@ export const translations = {
     },
     cookieBanner: {
       title: 'Cookies & privacy',
-      body: "We use the minimum storage needed to run the service — nothing more, promise.",
-      accept: 'Got it',
+      body: 'Choose what VelocityLaunch can use. You can change your mind at any time.',
+      essentialTitle: 'Essential',
+      essentialBody: 'Sign-in, language/theme preferences, drafts. Always on — the service can\'t run without them.',
+      analyticsTitle: 'Analytics',
+      analyticsBody: 'Understand overall service usage (pages visited, referrers). No data from your plans is ever attached to it.',
+      acceptAll: 'Accept all',
+      savePrefs: 'Save my choices',
+      rejectAll: 'Reject non-essential',
       learnMore: 'Learn more',
       collapse: 'Collapse',
       reopen: 'Cookies & privacy'
