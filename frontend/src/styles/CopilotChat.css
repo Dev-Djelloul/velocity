@@ -330,11 +330,13 @@
   gap: 10px;
 }
 
-/* État vide façon Cloudflare AI : petit avatar de Nova sur un halo dégradé (mêmes teintes
-   que la marque — violet/indigo/cyan, voir --wordmark-gradient), posé en flux normal
-   au-dessus de la salutation — pas en position:absolute derrière les suggestions comme la
-   première version (retour utilisateur : le rond débordait derrière les boutons). */
+/* État vide façon Cloudflare AI : trame de points sur toute la fenêtre du chat (.copilot-
+   empty-bg, en position:absolute derrière tout le reste — z-index:0) + petit avatar de Nova
+   sur un halo dégradé, lui posé en flux normal au-dessus de la salutation, pas dans la
+   trame elle-même (retour utilisateur : la première version, orbe ET trame confondus en un
+   seul bloc absolu, faisait déborder le rond derrière les boutons de suggestion). */
 .copilot-empty-state {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -344,7 +346,20 @@
   padding: 8px 16px;
 }
 
+.copilot-empty-bg {
+  position: absolute;
+  inset: -220px -120px;
+  z-index: 0;
+  background-image: radial-gradient(rgba(145, 132, 217, 0.4) 1px, transparent 1px);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
+  pointer-events: none;
+}
+
 .copilot-empty-orb {
+  position: relative;
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
