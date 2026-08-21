@@ -791,6 +791,18 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '21 août 2026',
+            title: 'Collaboration temps réel, centre de notifications et refonte de la connexion',
+            items: [
+              'Collaboration en temps réel sur la roadmap et le backlog : fusion automatique des éditions concurrentes (CRDT), présence de qui a le plan ouvert, notification immédiate de ce qui vient de changer',
+              'Deux nouveaux agents IA asynchrones : auto-scheduling dynamique de la roadmap et priorisation du backlog par signaux externes',
+              'Rapport de conformité exportable pour investisseurs (synthèse RGPD + financier en un document PDF)',
+              'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration : contenu détaillé, fuseau horaire corrigé, clic pour naviguer directement vers la section concernée',
+              'Présence d\'équipe visible dans le tableau de bord (un avatar par membre, anneau dégradé et lueur verte pour qui est connecté) et le menu de bascule d\'espace',
+              'Page de connexion refondue en plein écran (nav et footer masqués, mention légale ajoutée), et vrai lien "Mot de passe oublié ?" toujours visible au lieu de n\'apparaître qu\'après avoir commencé à taper un mot de passe'
+            ]
+          },
+          {
             date: '20 août 2026',
             title: 'Budget total, import de document et corrections de fond',
             items: [
@@ -987,7 +999,8 @@ export const translations = {
             label: 'Équipe & notifications',
             items: [
               "Espaces d'équipe (Clerk Organizations), commentaires avec @mentions, fil d'activité par plan, tags transversaux",
-              'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration'
+              'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
+              "Présence d'équipe en temps réel : qui a un plan de l'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d'espace"
             ]
           },
           {
@@ -1031,6 +1044,8 @@ export const translations = {
               'Suivi post-lancement & simulateur budget/timeline en direct',
               'Agents IA asynchrones (brief d\'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)',
               'Espaces d\'équipe (Clerk Organizations), commentaires avec @mentions, fil d\'activité par plan, tags transversaux',
+              'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
+              'Présence d\'équipe en temps réel : qui a un plan de l\'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d\'espace',
               'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
               'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
               'Notifications email (Resend) et Slack : génération terminée, rappel d\'inactivité, résumé hebdomadaire',
@@ -2241,6 +2256,18 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: 'August 21, 2026',
+            title: 'Real-time collaboration, notification center and sign-in redesign',
+            items: [
+              'Real-time collaboration on the roadmap and backlog: concurrent edits merge automatically (CRDT), presence shows who has the plan open, instant notification of what just changed',
+              'Two new asynchronous AI agents: dynamic roadmap auto-scheduling and backlog prioritization from external signals',
+              'Exportable compliance report for investors (GDPR + financial summary in one PDF)',
+              'Persistent notification center (header bell) for AI agents, mentions and collaboration: detailed content, fixed timezone display, click to navigate straight to the relevant section',
+              'Team presence visible in the dashboard (one avatar per member, gradient ring and green glow for whoever is online) and the space switcher menu',
+              'Sign-in page redesigned full-screen (site nav and footer hidden, legal notice added), and a real "Forgot password?" link that\'s always visible instead of only appearing after you start typing a password'
+            ]
+          },
+          {
             date: 'August 20, 2026',
             title: 'Total budget, document import and core fixes',
             items: [
@@ -2437,7 +2464,8 @@ export const translations = {
             label: 'Team & notifications',
             items: [
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
-              'Persistent notification center (header bell) for AI agents, mentions and collaboration'
+              'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
+              'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu'
             ]
           },
           {
@@ -2481,6 +2509,8 @@ export const translations = {
               'Post-launch tracking & live budget/timeline simulator',
               'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)',
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
+              'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
+              'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
               '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
               'Notion, Jira, GitHub, Linear and Google Calendar integrations',
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
