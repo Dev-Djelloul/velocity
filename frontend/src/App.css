@@ -300,12 +300,6 @@
   margin-bottom: 0.4rem;
 }
 
-.header-dropdown-item-primary:hover {
-  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
-  filter: brightness(1.1);
-  color: #fff;
-}
-
 .header-dropdown-item.is-current {
   color: var(--color-primary);
   background: rgba(145, 132, 217, 0.1);
@@ -340,6 +334,17 @@
 .header-dropdown-item:hover {
   background: rgba(145, 132, 217, 0.12);
   color: var(--color-primary);
+}
+
+/* Sans effet hover demandé sur "Créer un plan" : cette règle vient après
+   .header-dropdown-item:hover ci-dessus (même spécificité que
+   .header-dropdown-item-primary:hover — sans repositionnement, cette dernière perdait le
+   conflit de cascade et le survol affichait un fond mauve pâle avec un texte presque
+   invisible). Ici, on réaffirme explicitement l'apparence non survolée pour neutraliser
+   l'effet plutôt que de la laisser gagner par accident. */
+.header-dropdown-item-primary:hover {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #fff;
 }
 
 .header-dropdown-item-danger:hover {

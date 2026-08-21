@@ -289,11 +289,23 @@ img.space-page-avatar {
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
 
-/* Grande carte "Plans partagés" (verre gris clair, voir plus haut) : verrouille le texte
-   en sombre malgré la transparence — sans ça il reste théoriquement hérité de
-   --color-text-primary (déjà sombre en mode clair), mais un oubli ici passerait inaperçu
-   tant que le fond de page derrière la carte reste clair à cet endroit précis. */
-[data-theme="light"] .space-page-section.card .space-page-section-head h3,
+/* Grande carte "Plans partagés" (verre gris clair, voir plus haut). Le TITRE de section
+   ("Plans partagés" + son icône) est posé directement sur le verre teinté (fond variable
+   selon ce qui est flouté derrière) — oublié dans la première passe, forcé en blanc avec
+   ombre portée comme les 4 cartes du dashboard. Le CONTENU de la liste (nom du plan,
+   métadonnées) reste sombre : chaque ligne a sa propre boîte à fond clair quasi opaque
+   (.account-list-item), pas le verre translucide de la carte englobante — du blanc y
+   serait illisible. */
+[data-theme="light"] .space-page-section.card .space-page-section-head h3 {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme="light"] .space-page-section.card .space-page-section-head h3 svg {
+  color: #fff;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
 [data-theme="light"] .space-page-section.card .account-list-item-name,
 [data-theme="light"] .space-page-section.card .account-empty {
   color: #16171d;
