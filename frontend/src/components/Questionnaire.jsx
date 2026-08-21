@@ -20,6 +20,7 @@ const DOCUMENT_ERROR_KEYS = {
   'file-too-large': 'priorities.contextDocumentErrorTooLarge',
   'unsupported-format': 'priorities.contextDocumentErrorFormat',
   'empty-text': 'priorities.contextDocumentErrorEmpty',
+  'empty-text-scanned': 'priorities.contextDocumentErrorScanned',
   'extraction-failed': 'priorities.contextDocumentErrorGeneric'
 }
 
@@ -142,6 +143,14 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
   const [docLoading, setDocLoading] = useState(false)
   const [docError, setDocError] = useState(null)
   const [docTruncated, setDocTruncated] = useState(false)
+  // >0 si tout ou partie du texte vient de l'OCR (page scannée/photo) plutôt que d'une
+  // couche de texte native — affiche un rappel de relire le résultat, l'OCR n'étant jamais
+  // parfait (mise en page complexe, écriture manuscrite, mauvaise qualité de scan...).
+  const [docOcrUsed, setDocOcrUsed] = useState(0)
+  // Statut OCR en cours ({ page, total }) — distinct de docLoading (spinner générique) : une
+  // page scannée prend plusieurs secondes à analyser, un simple spinner sans indication de
+  // progression donnerait l'impression que l'import est bloqué.
+  const [docOcrStatus, setDocOcrStatus] = useState(null)
   const fileInputRef = useRef(null)
 
   useEffect(() => {
@@ -178,15 +187,21 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
 
     setDocError(null)
     setDocTruncated(false)
+    setDocOcrStatus(null)
+    setDocOcrUsed(0)
     setDocLoading(true)
     try {
-      const { text, truncated } = await extractText(file)
+      const { text, truncated, ocrPageCount } = await extractText(file, lang, (status) => {
+        if (status.status === 'ocr-page') setDocOcrStatus({ page: status.page, total: status.total })
+      })
       setFormData(prev => ({ ...prev, contextDocument: text, contextDocumentName: file.name }))
       setDocTruncated(truncated)
+      setDocOcrUsed(ocrPageCount || 0)
     } catch (err) {
       setDocError(DOCUMENT_ERROR_KEYS[err.code] || 'priorities.contextDocumentErrorGeneric')
     } finally {
       setDocLoading(false)
+      setDocOcrStatus(null)
     }
   }
 
@@ -194,6 +209,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
     setFormData(prev => ({ ...prev, contextDocument: '', contextDocumentName: '' }))
     setDocError(null)
     setDocTruncated(false)
+    setDocOcrUsed(0)
   }
 
   const toggleRole = (role) => {
@@ -338,7 +354,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
               <input
                 ref={fileInputRef}
                 type="file"
-                accept=".pdf,.docx,.xlsx,.xlsm,.pptx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation"
+                accept=".pdf,.docx,.xlsx,.xlsm,.pptx,.jpg,.jpeg,.png,.webp,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.openxmlformats-officedocument.presentationml.presentation,image/jpeg,image/png,image/webp"
                 onChange={handleDocumentSelect}
                 style={{ display: 'none' }}
               />
@@ -355,7 +371,10 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
 
               {docLoading && (
                 <p className="field-hint document-reading">
-                  <span className="btn-spinner" aria-hidden="true" /> {t(lang, 'priorities.contextDocumentReading')}
+                  <span className="btn-spinner" aria-hidden="true" />
+                  {docOcrStatus
+                    ? t(lang, 'priorities.contextDocumentOcrProgress')(docOcrStatus.page, docOcrStatus.total)
+                    : t(lang, 'priorities.contextDocumentReading')}
                 </p>
               )}
 
@@ -377,6 +396,7 @@ export default function Questionnaire({ onSubmit, loading, lang, onShowDrafts, i
                     </div>
                   </div>
                   {docTruncated && <p className="field-hint">{t(lang, 'priorities.contextDocumentTruncated')}</p>}
+                  {docOcrUsed > 0 && <p className="field-hint">{t(lang, 'priorities.contextDocumentOcrUsed')}</p>}
                   <textarea
                     rows={5}
                     value={formData.contextDocument || ''}

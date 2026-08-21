@@ -232,16 +232,19 @@ export const translations = {
       contextPh: 'Contraintes spécifiques, particularités du marché, éléments que le questionnaire ne couvre pas...',
       contextHelp: 'Tout ce qui n\'est pas couvert par les questions précédentes : contraintes légales, partenariats déjà en place, particularités locales...',
       contextDocument: 'Importer un document (optionnel)',
-      contextDocumentHelp: 'Business plan, notes, deck existant... Le texte est extrait automatiquement et ajouté au contexte envoyé à l\'IA. Tu peux le relire et le corriger avant de générer le plan. Formats acceptés : PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), 10 Mo max.',
+      contextDocumentHelp: 'Business plan, notes, deck existant... Le texte est extrait automatiquement et ajouté au contexte envoyé à l\'IA. Tu peux le relire et le corriger avant de générer le plan. Formats acceptés : PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), photo/scan (JPG, PNG, WebP), 10 Mo max. Une page ou une photo sans texte sélectionnable (document scanné) passe automatiquement par une reconnaissance de caractères (OCR).',
       contextDocumentButton: 'Importer un document',
-      contextDocumentAccepted: 'PDF, Word, Excel, PowerPoint · 10 Mo max',
+      contextDocumentAccepted: 'PDF, Word, Excel, PowerPoint, photo/scan · 10 Mo max',
       contextDocumentReading: 'Lecture du fichier…',
+      contextDocumentOcrProgress: (page, total) => total > 1 ? `Analyse OCR — page ${page}/${total}…` : 'Analyse OCR de l\'image…',
+      contextDocumentOcrUsed: 'Une partie du texte vient d\'une reconnaissance de caractères (OCR) sur des pages scannées — relis-le avant de générer le plan, l\'OCR n\'est jamais parfait.',
       contextDocumentRemove: 'Retirer',
       contextDocumentReplace: 'Remplacer',
       contextDocumentTruncated: 'Le document est long : seul le début a été conservé.',
       contextDocumentErrorTooLarge: 'Fichier trop volumineux (10 Mo maximum).',
-      contextDocumentErrorFormat: 'Format non pris en charge. Utilise un PDF, Word, Excel ou PowerPoint.',
-      contextDocumentErrorEmpty: 'Aucun texte trouvé dans ce fichier (document scanné, protégé par mot de passe, ou vide).',
+      contextDocumentErrorFormat: 'Format non pris en charge. Utilise un PDF, Word, Excel, PowerPoint ou une photo/scan (JPG, PNG, WebP).',
+      contextDocumentErrorEmpty: 'Aucun texte trouvé dans ce fichier (protégé par mot de passe, ou vide).',
+      contextDocumentErrorScanned: 'La reconnaissance de caractères (OCR) n\'a rien pu lire dans ce document — essaie un scan de meilleure qualité, ou colle le contenu directement ci-dessus.',
       contextDocumentErrorGeneric: 'Impossible de lire ce fichier. Réessaie ou colle le contenu directement ci-dessus.'
     },
     gantt: {
@@ -826,6 +829,14 @@ export const translations = {
         entries: [
           {
             date: '22 août 2026',
+            title: 'OCR pour les documents scannés du questionnaire',
+            items: [
+              'L\'import de document (questionnaire) accepte désormais aussi les photos/scans (JPG, PNG, WebP), et détecte automatiquement les pages PDF sans texte sélectionnable — jusqu\'ici silencieusement ignorées ("aucun texte trouvé")',
+              'Reconnaissance de caractères (OCR) déclenchée uniquement sur les pages/images qui en ont besoin, 100% dans le navigateur (rien n\'est envoyé à un service tiers) — indicateur de progression "page X/Y" pendant l\'analyse, et rappel de relire le texte extrait avant de générer le plan'
+            ]
+          },
+          {
+            date: '22 août 2026',
             title: 'Photos Pexels dans le sélecteur de couverture',
             items: [
               'Nouvel onglet "Pexels" dans le choix de couverture de plan : recherche par mot-clé, résultats en grille, sélection directe — même principe que Notion avec Unsplash',
@@ -1069,7 +1080,7 @@ export const translations = {
           {
             label: 'Génération IA',
             items: [
-              "Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint) comme contexte IA",
+              "Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint, photo/scan) comme contexte IA, avec OCR automatique sur les pages scannées",
               "Génération IA avec filet de sécurité (moteur à règles local si l'IA échoue)",
               'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel, avec historique multi-conversations (recherche, groupé par récence)'
             ]
@@ -1132,7 +1143,7 @@ export const translations = {
           {
             label: 'Disponible',
             items: [
-              'Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint) comme contexte IA',
+              'Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint, photo/scan) comme contexte IA, avec OCR automatique sur les pages scannées',
               'Génération IA avec filet de sécurité (moteur à règles local si l\'IA échoue)',
               'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel, avec historique multi-conversations (recherche, groupé par récence)',
               'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
@@ -1163,8 +1174,7 @@ export const translations = {
           {
             label: 'Envisagé',
             items: [
-              'API publique pour générer un plan par programmation (clé API, palier Entreprise)',
-              'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)'
+              'API publique pour générer un plan par programmation (clé API, palier Entreprise)'
             ]
           }
         ]
@@ -1830,16 +1840,19 @@ export const translations = {
       contextPh: "Specific constraints, market particularities, anything the questionnaire doesn't cover...",
       contextHelp: "Anything the previous questions don't cover: legal constraints, existing partnerships, local particularities...",
       contextDocument: 'Import a document (optional)',
-      contextDocumentHelp: "Business plan, notes, existing deck... The text is extracted automatically and added to the context sent to the AI. You can review and edit it before generating the plan. Accepted formats: PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), 10 MB max.",
+      contextDocumentHelp: "Business plan, notes, existing deck... The text is extracted automatically and added to the context sent to the AI. You can review and edit it before generating the plan. Accepted formats: PDF, Word (.docx), Excel (.xlsx), PowerPoint (.pptx), photo/scan (JPG, PNG, WebP), 10 MB max. A page or photo with no selectable text (scanned document) automatically goes through optical character recognition (OCR).",
       contextDocumentButton: 'Import a document',
-      contextDocumentAccepted: 'PDF, Word, Excel, PowerPoint · 10 MB max',
+      contextDocumentAccepted: 'PDF, Word, Excel, PowerPoint, photo/scan · 10 MB max',
       contextDocumentReading: 'Reading the file…',
+      contextDocumentOcrProgress: (page, total) => total > 1 ? `Running OCR — page ${page}/${total}…` : 'Running OCR on the image…',
+      contextDocumentOcrUsed: 'Part of this text comes from optical character recognition (OCR) on scanned pages — review it before generating the plan, OCR is never perfect.',
       contextDocumentRemove: 'Remove',
       contextDocumentReplace: 'Replace',
       contextDocumentTruncated: 'This document is long: only the beginning was kept.',
       contextDocumentErrorTooLarge: 'File too large (10 MB maximum).',
-      contextDocumentErrorFormat: 'Unsupported format. Use a PDF, Word, Excel or PowerPoint file.',
-      contextDocumentErrorEmpty: 'No text found in this file (scanned document, password-protected, or empty).',
+      contextDocumentErrorFormat: 'Unsupported format. Use a PDF, Word, Excel, PowerPoint file, or a photo/scan (JPG, PNG, WebP).',
+      contextDocumentErrorEmpty: 'No text found in this file (password-protected, or empty).',
+      contextDocumentErrorScanned: 'Optical character recognition (OCR) could not read anything in this document — try a higher-quality scan, or paste the content directly above.',
       contextDocumentErrorGeneric: 'Could not read this file. Try again or paste the content directly above.'
     },
     gantt: {
@@ -2419,6 +2432,14 @@ export const translations = {
         entries: [
           {
             date: 'August 22, 2026',
+            title: 'OCR for scanned documents in the questionnaire',
+            items: [
+              'Document import (questionnaire) now also accepts photos/scans (JPG, PNG, WebP), and automatically detects PDF pages with no selectable text — until now silently ignored ("no text found")',
+              'Optical character recognition (OCR) only runs on the pages/images that need it, 100% in the browser (nothing sent to a third-party service) — a "page X/Y" progress indicator during analysis, and a reminder to review the extracted text before generating the plan'
+            ]
+          },
+          {
+            date: 'August 22, 2026',
             title: 'Pexels photos in the cover picker',
             items: [
               'New "Pexels" tab in the plan cover picker: keyword search, grid results, one-click select — same idea as Notion with Unsplash',
@@ -2662,7 +2683,7 @@ export const translations = {
           {
             label: 'AI generation',
             items: [
-              'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint) as AI context',
+              'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint, photo/scan) as AI context, with automatic OCR on scanned pages',
               'AI generation with a safety net (local rules engine if the AI call fails)',
               'Conversational AI copilot (Nova) to edit the plan in natural language, with multi-conversation history (search, grouped by recency)'
             ]
@@ -2725,7 +2746,7 @@ export const translations = {
           {
             label: 'Available',
             items: [
-              'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint) as AI context',
+              'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint, photo/scan) as AI context, with automatic OCR on scanned pages',
               'AI generation with a safety net (local rules engine if the AI call fails)',
               'Conversational AI copilot (Nova) to edit the plan in natural language, with multi-conversation history (search, grouped by recency)',
               'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
@@ -2756,8 +2777,7 @@ export const translations = {
           {
             label: 'Considered',
             items: [
-              'Public API to generate a plan programmatically (API key, Enterprise tier)',
-              'OCR for scanned documents (image-based business plans, not detected today)'
+              'Public API to generate a plan programmatically (API key, Enterprise tier)'
             ]
           }
         ]
