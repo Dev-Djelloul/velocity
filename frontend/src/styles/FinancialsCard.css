@@ -121,7 +121,7 @@
   height: 76px;
   display: flex;
   align-items: flex-end;
-  background: rgba(145, 132, 217, 0.06);
+  background: color-mix(in srgb, var(--color-bg-primary) 94%, #9184d9 6%);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -185,7 +185,7 @@
 
 .bridge-bar-track {
   height: 16px;
-  background: rgba(145, 132, 217, 0.08);
+  background: color-mix(in srgb, var(--color-bg-primary) 92%, #9184d9 8%);
   border-radius: 999px;
   overflow: hidden;
 }
@@ -216,7 +216,7 @@
   font-size: var(--font-size-sm);
   margin: 0 0 1.1rem;
   padding: 0.7rem 0.9rem;
-  background: rgba(145, 132, 217, 0.06);
+  background: color-mix(in srgb, var(--color-bg-primary) 94%, #9184d9 6%);
   border-radius: var(--radius-sm);
 }
 

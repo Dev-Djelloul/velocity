@@ -138,7 +138,7 @@
 
 .sim-channel-track {
   height: 10px;
-  background: rgba(145, 132, 217, 0.08);
+  background: color-mix(in srgb, var(--color-bg-primary) 92%, #9184d9 8%);
   border-radius: 999px;
   overflow: hidden;
 }

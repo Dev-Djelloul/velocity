@@ -36,7 +36,7 @@
   color: var(--color-text-secondary);
   font-size: var(--font-size-sm);
   line-height: 1.6;
-  background: rgba(145, 132, 217, 0.06);
+  background: color-mix(in srgb, var(--color-bg-primary) 94%, #9184d9 6%);
   border: 1px dashed rgba(145, 132, 217, 0.25);
   border-radius: var(--radius-md);
   padding: 1rem 1.15rem;
@@ -74,7 +74,7 @@
 .verdict-row-above td:first-child { border-left-color: #22c55e; }
 
 .verdict-row-below { background: rgba(245, 158, 11, 0.05); }
-.verdict-row-onpar { background: rgba(6, 182, 212, 0.05); }
+.verdict-row-onpar { background: color-mix(in srgb, var(--color-bg-primary) 95%, #06b6d4 5%); }
 .verdict-row-above { background: rgba(34, 197, 94, 0.05); }
 
 .benchmarks-table th {
@@ -176,7 +176,7 @@
   display: flex;
   align-items: flex-start;
   gap: 0.5rem;
-  background: rgba(145, 132, 217, 0.08);
+  background: color-mix(in srgb, var(--color-bg-primary) 92%, #9184d9 8%);
   border-left: 3px solid var(--color-primary);
   border-radius: var(--radius-md);
   padding: 0.75rem 1rem;

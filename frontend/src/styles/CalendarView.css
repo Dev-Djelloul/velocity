@@ -110,13 +110,21 @@
   transition: background 0.15s ease;
 }
 
-.calendar-cell:hover { background: rgba(145, 132, 217, 0.08); }
+.calendar-cell:hover { background: color-mix(in srgb, var(--color-bg-primary) 92%, #9184d9 8%); }
 
-.calendar-cell-empty { background: rgba(15, 20, 25, 0.3); cursor: default; }
-.calendar-cell-empty:hover { background: rgba(15, 20, 25, 0.3); }
+/* Opaque comme .calendar-cell (var(--color-bg-primary)), pas translucide (rgba(...0.3)) :
+   sinon le quadrillage de .calendar-view.card (voir PlanViewer.css) transparaît à travers,
+   contraire au principe "les sous-cartes masquent le quadrillage" suivi partout ailleurs
+   (repéré par capture utilisateur). color-mix entre deux couleurs pleines (jamais
+   "transparent") pour rester assombri sans jamais laisser rien passer derrière. */
+.calendar-cell-empty {
+  background: color-mix(in srgb, var(--color-bg-primary) 70%, black 30%);
+  cursor: default;
+}
+.calendar-cell-empty:hover { background: color-mix(in srgb, var(--color-bg-primary) 70%, black 30%); }
 
 .calendar-cell-today {
-  background: rgba(145, 132, 217, 0.12);
+  background: color-mix(in srgb, var(--color-bg-primary) 88%, #9184d9 12%);
   box-shadow: inset 0 0 0 1px var(--color-accent);
 }
 

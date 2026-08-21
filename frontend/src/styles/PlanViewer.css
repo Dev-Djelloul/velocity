@@ -1,22 +1,24 @@
 /* Quadrillage fin (même famille de violet que la trame de points de Nova, voir
    .copilot-empty-bg dans CopilotChat.css et le sommaire latéral dans PlanSidebar.css) sur
-   TOUTES les cartes du plan généré. Volontairement en background-image (pas un calque
-   ::before en position:absolute + z-index négatif) : ça évite de faire de chaque carte un
-   nouveau contexte d'empilement, ce qui aurait pu perturber des tooltips/menus/badges déjà
-   positionnés à l'intérieur d'une des nombreuses cartes du plan (roadmap, gantt, KPIs...).
-   Opacité volontairement basse (0.07, pas 0.14 comme dans la première version) : à 0.14 le
-   quadrillage transparaissait à travers les nombreux éléments semi-transparents du plan
-   (badges, survols, cellules vides...), les rendant visiblement "sales" au lieu de rester
-   discrets (retour utilisateur, surtout marqué en thème sombre).
-   Exclusions : .plan-header (sa bordure en dégradé utilise déjà un double calque de fond
-   padding-box/border-box, incompatible avec un troisième calque) ; .calendar-view et
-   .gtm-card (calendriers avec leur propre grille de jours/semaines dense — un quadrillage
-   par-dessus double le motif au lieu de l'habiller, repéré par capture utilisateur).
+   TOUTES les cartes du plan généré, calendriers inclus. Volontairement en background-image
+   (pas un calque ::before en position:absolute + z-index négatif) : ça évite de faire de
+   chaque carte un nouveau contexte d'empilement, ce qui aurait pu perturber des tooltips/
+   menus/badges déjà positionnés à l'intérieur d'une des nombreuses cartes du plan (roadmap,
+   gantt, KPIs...).
+   Principe retenu (repéré sur le dashboard KPI, où chaque tuile a son propre fond opaque
+   var(--color-bg-primary) et masque naturellement le quadrillage de la carte qui l'englobe,
+   sans rien de spécial à faire ici) : cette règle pose le quadrillage sur CHAQUE carte sans
+   exception, à charge pour les éléments internes destinés à ressembler à des sous-cartes
+   distinctes (tuiles, cellules de calendrier, lignes...) d'avoir un fond opaque plutôt que
+   translucide pour rester nets par-dessus — corrigé au cas par cas dans les feuilles de
+   style de chaque composant plutôt que d'exclure la carte entière.
+   Exclusion restante : .plan-header (sa bordure en dégradé utilise déjà un double calque de
+   fond padding-box/border-box, incompatible avec un troisième calque).
    Contrepartie inchangée : une carte dont la propre feuille de style redéclare `background`
    avec une spécificité égale ou supérieure à la nôtre, passée APRÈS ce fichier dans l'ordre
    de cascade, n'hérite pas du quadrillage (un seul cas identifié : .executive-summary.card,
    corrigé explicitement plus bas). */
-.plan-viewer-main .card:not(.plan-header):not(.calendar-view):not(.gtm-card) {
+.plan-viewer-main .card:not(.plan-header) {
   background-color: var(--color-dashboard);
   background-image:
     linear-gradient(rgba(145, 132, 217, 0.07) 1px, transparent 1px),
