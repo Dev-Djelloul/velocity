@@ -162,6 +162,40 @@ export default function PlanVersionsPage({ plan, lang, onBack }) {
                 )}
               </div>
 
+              <div className="plan-versions-section card">
+                <h3>{t(lang, 'planVersions.personas')}</h3>
+                {!diff.personas.added.length && !diff.personas.removed.length && !diff.personas.changed.length ? (
+                  <p className="plan-versions-no-change">{t(lang, 'planVersions.noChange')}</p>
+                ) : (
+                  <ul className="plan-versions-change-list">
+                    {diff.personas.added.map(p => (
+                      <li key={`add-${p.name}`} className="is-added">
+                        <IconPlus width={12} height={12} /> {p.name}
+                      </li>
+                    ))}
+                    {diff.personas.removed.map(p => (
+                      <li key={`rm-${p.name}`} className="is-removed">
+                        <IconTrash width={12} height={12} /> {p.name}
+                      </li>
+                    ))}
+                    {diff.personas.changed.map(item => (
+                      <li key={item.key}>{item.detail}</li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="plan-versions-section card">
+                <h3>{t(lang, 'planVersions.financials')}</h3>
+                {!diff.financials.length ? (
+                  <p className="plan-versions-no-change">{t(lang, 'planVersions.noChange')}</p>
+                ) : (
+                  <ul className="plan-versions-change-list">
+                    {diff.financials.map(item => <li key={item.key}>{item.detail}</li>)}
+                  </ul>
+                )}
+              </div>
+
               {diff.executiveSummary.old !== diff.executiveSummary.new && (diff.executiveSummary.old || diff.executiveSummary.new) && (
                 <div className="plan-versions-section card">
                   <h3><IconSparkle width={16} height={16} /> {t(lang, 'planVersions.executiveSummary')}</h3>

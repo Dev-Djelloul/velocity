@@ -1464,6 +1464,8 @@ export const translations = {
       marketingBudget: 'Budget marketing',
       roadmap: 'Roadmap',
       kpis: 'KPIs',
+      personas: 'Personas',
+      financials: 'Finances',
       executiveSummary: 'Résumé exécutif',
       noChange: 'Aucun changement entre ces deux versions.',
       compareLink: 'Comparer les versions'
@@ -3067,6 +3069,8 @@ export const translations = {
       marketingBudget: 'Marketing budget',
       roadmap: 'Roadmap',
       kpis: 'KPIs',
+      personas: 'Personas',
+      financials: 'Financials',
       executiveSummary: 'Executive summary',
       noChange: 'No change between these two versions.',
       compareLink: 'Compare versions'
