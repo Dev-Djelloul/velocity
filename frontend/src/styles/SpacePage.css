@@ -366,16 +366,46 @@ img.space-page-avatar {
   color: #464852;
 }
 
+/* Mode sombre : même verre dépoli que le mode clair ci-dessus, tinte sombre plutôt que
+   grise (la photo de fond est déjà assombrie/floutée derrière en mode sombre, contrairement
+   au mode clair où elle reste nette). Le texte par défaut (--color-text-primary) est déjà
+   clair en mode sombre — une ombre portée légère est ajoutée plus bas pour garder le
+   contraste quelle que soit la zone de la photo qui transparaît (accessibilité). */
+.space-page-section.card {
+  background: rgba(15, 20, 28, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 [data-theme="light"] .space-page-section.card {
   background: rgba(120, 120, 135, 0.16);
   border-color: rgba(255, 255, 255, 0.35);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .space-page-section.card {
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  }
+
   [data-theme="light"] .space-page-section.card {
     backdrop-filter: blur(20px) saturate(1.3);
     -webkit-backdrop-filter: blur(20px) saturate(1.3);
   }
+}
+
+.space-page-section.card .space-page-section-head h3,
+.space-page-gallery-link h3,
+.space-page-gallery-link p,
+.space-page-section.card > p,
+.account-empty,
+.space-page-plain-note {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.space-page-section.card .space-page-section-head h3 svg,
+.space-page-gallery-link svg,
+.space-page-icon-accent svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 [data-theme="light"] .space-page-bg {

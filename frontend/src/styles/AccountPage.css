@@ -64,20 +64,25 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
 }
 
-/* Verre dépoli en mode clair pour toutes les cartes (.card) des pages Mon compte,
+/* Verre dépoli dans les deux thèmes pour toutes les cartes (.card) des pages Mon compte,
    Paramètres, Intégrations et Notifications — les quatre partagent le même wrapper
    .account-page et posent leurs cartes sur une photo de fond floutée (voir *-page-bg dans
    chaque feuille de style dédiée), même technique et mêmes réglages que .space-page-section
-   .card dans SpacePage.css (fond gris translucide + backdrop-filter, repli opaque sans
-   support). Le fond de page redevient net en mode clair (pas de flou/assombrissement),
-   comme partout ailleurs où ce traitement a été appliqué. */
+   .card dans SpacePage.css (fond translucide + backdrop-filter, repli opaque sans support).
+   Tinte sombre par défaut (mode sombre, photo déjà assombrie/floutée derrière), tinte grise
+   en mode clair (photo nette, fond de page brightness(0.98) plus bas). */
+.account-page .card {
+  background: rgba(15, 20, 28, 0.45);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
 [data-theme="light"] .account-page .card {
   background: rgba(120, 120, 135, 0.16);
   border-color: rgba(255, 255, 255, 0.35);
 }
 
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
-  [data-theme="light"] .account-page .card {
+  .account-page .card {
     backdrop-filter: blur(20px) saturate(1.3);
     -webkit-backdrop-filter: blur(20px) saturate(1.3);
   }
@@ -91,10 +96,35 @@
 }
 
 /* Texte posé directement sur le verre translucide (pas dans sa propre boîte opaque comme
-   .account-list-item ou .credits-pro-badge, qui restent inchangés et déjà lisibles) — forcé
-   en blanc avec ombre portée, même logique que le titre de page plus haut. Les icônes SVG
-   des titres suivent automatiquement (stroke="currentColor" hérité, voir Icons.jsx) ; seule
-   une ombre portée leur est ajoutée en plus (text-shadow ne les affecte pas). */
+   .account-list-item ou .credits-pro-badge, qui restent inchangés et déjà lisibles). En
+   mode sombre, la couleur par défaut (--color-text-primary) est déjà claire — une ombre
+   portée légère suffit pour garder le contraste quelle que soit la zone de la photo qui
+   transparaît (accessibilité). En mode clair, le texte sombre par défaut serait illisible
+   sur la photo : forcé en blanc avec une ombre plus marquée, même logique que le titre de
+   page plus haut. Les icônes SVG des titres suivent automatiquement (stroke="currentColor"
+   hérité, voir Icons.jsx) ; seule une ombre portée leur est ajoutée en plus (text-shadow ne
+   les affecte pas). */
+.account-page .card h2,
+.account-page .card h3,
+.account-page .card .account-email,
+.account-page .card .account-security-note,
+.account-page .card .settings-row-label,
+.account-page .card .account-empty,
+.account-page .card .account-clear-btn,
+.account-page .card .credits-gauge,
+.account-page .card .account-notif-head,
+.account-page .card .account-notif-head strong,
+.account-page .card .account-notif-space,
+.account-page .card .account-notif-text,
+.account-page .card .account-notif-date {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.account-page .card h2 svg,
+.account-page .card h3 svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
 [data-theme="light"] .account-page .card h2,
 [data-theme="light"] .account-page .card h3,
 [data-theme="light"] .account-page .card .account-email,

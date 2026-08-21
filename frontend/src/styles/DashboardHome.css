@@ -131,10 +131,18 @@
   filter: brightness(1.08);
 }
 
-/* Mode clair : verre dépoli au lieu du blanc opaque, cohérent avec les cartes de
-   SpacePage.css (même technique — voir les commentaires détaillés là-bas). Repli opaque
-   pour les navigateurs sans backdrop-filter (le fond blanc de base ci-dessus suffit déjà). */
+/* Verre dépoli dans les deux thèmes désormais — tinte sombre par défaut (mode sombre,
+   photo déjà assombrie/floutée derrière), tinte claire en mode clair (photo nette). Repli
+   opaque pour les navigateurs sans backdrop-filter (le fond de base ci-dessus suffit déjà). */
 @supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .dashboard-space-card {
+    background:
+      linear-gradient(rgba(20, 24, 33, 0.5), rgba(20, 24, 33, 0.5)) padding-box,
+      linear-gradient(135deg, rgba(145, 132, 217, 0.35) 0%, rgba(99, 102, 241, 0.35) 55%, rgba(6, 182, 212, 0.35) 100%) border-box;
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  }
+
   [data-theme="light"] .dashboard-space-card {
     background:
       linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) padding-box,
@@ -142,6 +150,20 @@
     backdrop-filter: blur(20px) saturate(1.4);
     -webkit-backdrop-filter: blur(20px) saturate(1.4);
   }
+}
+
+/* Le texte du dégradé de base (--color-text-primary) est déjà clair en mode sombre, mais la
+   carte est désormais translucide (la photo de fond peut ressortir derrière) — une ombre
+   portée légère garde le contraste quelle que soit la zone de la photo qui transparaît,
+   pour l'accessibilité. Renforcée en blanc pur + ombre plus marquée en mode clair, où le
+   texte sombre par défaut serait sinon illisible sur la photo. */
+.dashboard-space-name,
+.dashboard-space-meta {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.dashboard-space-meta svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 [data-theme="light"] .dashboard-space-name,
@@ -272,6 +294,7 @@
   font-size: 0.74rem;
   line-height: 1.35;
   color: var(--color-text-muted, #9ca3af);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
   white-space: normal;
 }
 
@@ -296,6 +319,24 @@
   background:
     linear-gradient(var(--color-bg-secondary, #16161d), var(--color-bg-secondary, #16161d)) padding-box,
     linear-gradient(135deg, rgba(145, 132, 217, 0.4) 0%, rgba(99, 102, 241, 0.4) 55%, rgba(6, 182, 212, 0.4) 100%) border-box;
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .dashboard-space-card-new {
+    background:
+      linear-gradient(rgba(20, 24, 33, 0.5), rgba(20, 24, 33, 0.5)) padding-box,
+      linear-gradient(135deg, rgba(145, 132, 217, 0.4) 0%, rgba(99, 102, 241, 0.4) 55%, rgba(6, 182, 212, 0.4) 100%) border-box;
+    backdrop-filter: blur(20px) saturate(1.3);
+    -webkit-backdrop-filter: blur(20px) saturate(1.3);
+  }
+
+  [data-theme="light"] .dashboard-space-card-new {
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) padding-box,
+      linear-gradient(135deg, rgba(145, 132, 217, 0.4) 0%, rgba(99, 102, 241, 0.4) 55%, rgba(6, 182, 212, 0.4) 100%) border-box;
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
 }
 
 .dashboard-home-links {
