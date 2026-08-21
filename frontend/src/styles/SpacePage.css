@@ -97,6 +97,13 @@ img.space-page-avatar {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
+/* text-shadow ne s'applique qu'aux glyphes de texte, pas à la flèche SVG (IconArrowLeft) —
+   même limitation que les icônes des cartes du dashboard plus bas, corrigée pareil via
+   drop-shadow sur le svg lui-même. */
+[data-theme="light"] .space-page-outer .team-back-btn svg {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
+}
+
 [data-theme="light"] .space-page-outer .team-back-btn:hover {
   color: #fff;
 }
@@ -163,6 +170,21 @@ img.space-page-avatar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 0.85rem;
+}
+
+/* Effet "rebond" au survol de toutes les cartes de l'espace d'équipe — même courbe
+   d'accélération élastique (léger dépassement puis retour) que .auth-page-card
+   (authCardIn, AuthPage.css), réutilisée ici pour rester cohérente avec le reste de l'app. */
+.space-dashboard-tile,
+.space-page-section.card,
+.space-page .account-list-item {
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.space-dashboard-tile:hover,
+.space-page-section.card:hover,
+.space-page .account-list-item:hover {
+  transform: scale(1.025);
 }
 
 .space-dashboard-tile {
