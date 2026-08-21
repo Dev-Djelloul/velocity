@@ -79,6 +79,24 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+/* "Agrandir" façon Cloudflare AI (voir IconExpand dans CopilotChat.jsx) : le panneau
+   flottant devient une grande fenêtre quasi plein écran plutôt que la petite carte de
+   620x640px — un choix explicite de l'utilisateur sur desktop (indépendant du plein écran
+   forcé sur mobile par le clavier virtuel, voir l'effet visualViewport dans le composant). */
+.copilot-panel.is-expanded {
+  right: 24px;
+  bottom: 24px;
+  width: min(1100px, calc(100vw - 48px));
+  height: calc(100vh - 132px);
+  max-height: calc(100vh - 132px);
+}
+
+/* Sans ce plafond, les bulles de message (max-width: 92% du panneau) deviendraient
+   inconfortablement larges — quasi 1000px — sur un panneau agrandi. */
+.copilot-panel.is-expanded .copilot-msg-row {
+  max-width: min(92%, 640px);
+}
+
 /* En-tête compacté (une seule ligne, plus de sous-titre séparé) : le texte d'explication
    vit désormais dans l'état vide de la conversation (.copilot-empty), pas de le répéter
    deux fois dans un panneau qui, agrandi, gagne à laisser plus de place aux messages. */

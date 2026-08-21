@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react'
 import { copilotChat, fetchCopilotConversations, fetchCopilotConversation, pushCopilotConversation, deleteCopilotConversation } from '../lib/serverStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
-import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle, IconMinus, IconChevronDown, IconSearch, IconPlus } from './Icons'
+import { IconX, IconSend, IconTrash, IconCopy, IconCheckCircle, IconMinus, IconChevronDown, IconSearch, IconPlus, IconExpand, IconShrink } from './Icons'
 import '../styles/CopilotChat.css'
 
 const NOVA_AVATAR = '/assets/icons/icons8-woman-32.png'
@@ -46,6 +46,10 @@ function greeting(lang) {
 // enregistré silencieusement, l'utilisateur garde la main via le bouton "Enregistrer".
 export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHistoryChange, toggleSignal }) {
   const [open, setOpen] = useState(false)
+  // Agrandir façon Cloudflare AI : bascule le panneau flottant en plein écran, en plus du
+  // plein écran déjà forcé sur mobile (voir l'effet visualViewport plus bas) — ici un choix
+  // explicite de l'utilisateur sur desktop, pas une contrainte d'écran.
+  const [expanded, setExpanded] = useState(false)
   // Repris depuis plan.copilotHistory (voir updateCopilotHistory dans PlanViewer.jsx) —
   // survit à un rechargement de page ou à un changement de plan, contrairement à un simple
   // état local. Lazy init : ne lit plan.copilotHistory qu'au montage, pas à chaque re-render.
@@ -319,7 +323,7 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
       </button>
 
       {open && (
-        <div className="copilot-panel" ref={panelRef}>
+        <div className={`copilot-panel ${expanded ? 'is-expanded' : ''}`} ref={panelRef}>
           <div className="copilot-panel-header" ref={historyRef}>
             <button
               type="button"
@@ -336,6 +340,9 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
                   <IconPlus width={14} height={14} />
                 </button>
               )}
+              <button type="button" className="copilot-panel-icon-btn" onClick={() => setExpanded(v => !v)} title={t(lang, expanded ? 'copilot.shrink' : 'copilot.expand')} aria-label={t(lang, expanded ? 'copilot.shrink' : 'copilot.expand')}>
+                {expanded ? <IconShrink width={14} height={14} /> : <IconExpand width={14} height={14} />}
+              </button>
               <button type="button" className="copilot-panel-icon-btn" onClick={() => setOpen(false)} title={t(lang, 'copilot.minimize')} aria-label={t(lang, 'copilot.minimize')}>
                 <IconMinus width={14} height={14} />
               </button>
