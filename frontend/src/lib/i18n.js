@@ -463,7 +463,7 @@ export const translations = {
         'Résume les principaux risques',
         'Propose une story prioritaire'
       ],
-      greeting: { morning: 'Bonjour.', afternoon: 'Bon après-midi.', evening: 'Bonsoir.' },
+      greeting: { morning: 'Bonjour', afternoon: 'Bon après-midi', evening: 'Bonsoir' },
       historySearchPlaceholder: 'Rechercher une conversation…',
       historyEmpty: 'Aucune conversation enregistrée pour ce plan.',
       historyToday: "Aujourd'hui",
@@ -2045,7 +2045,7 @@ export const translations = {
         'Summarize the main risks',
         'Suggest a priority story'
       ],
-      greeting: { morning: 'Good morning.', afternoon: 'Good afternoon.', evening: 'Good evening.' },
+      greeting: { morning: 'Good morning', afternoon: 'Good afternoon', evening: 'Good evening' },
       historySearchPlaceholder: 'Search a conversation…',
       historyEmpty: 'No saved conversation for this plan.',
       historyToday: 'Today',

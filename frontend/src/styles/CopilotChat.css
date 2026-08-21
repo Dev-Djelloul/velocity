@@ -363,7 +363,9 @@
 .copilot-empty-orb {
   position: relative;
   z-index: 1;
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 132px;
   height: 132px;
   border-radius: 50%;
