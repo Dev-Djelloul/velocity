@@ -35,7 +35,7 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconChevronLeft, IconChevronRight, IconImage, IconPlus, IconDroplet, IconX } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconImage, IconPlus, IconDroplet, IconX } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -580,30 +580,12 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         currentUserId={userId}
         onSectionSelect={goToMobileSection}
         activeSection={mobileSectionId}
+        mobileIndex={mobileSectionIndex}
+        mobileTotal={SECTION_LIST.length}
+        onPrevSection={() => goToMobileSection(SECTION_LIST[mobileSectionIndex - 1].id)}
+        onNextSection={() => goToMobileSection(SECTION_LIST[mobileSectionIndex + 1].id)}
       />
       <div className="plan-viewer plan-viewer-main" ref={captureRef}>
-      <div className="mobile-section-nav">
-        <button
-          className="mobile-section-nav-btn"
-          disabled={mobileSectionIndex <= 0}
-          onClick={() => goToMobileSection(SECTION_LIST[mobileSectionIndex - 1].id)}
-          aria-label={lang === 'fr' ? 'Section précédente' : 'Previous section'}
-        >
-          <IconChevronLeft width={16} height={16} />
-        </button>
-        <span className="mobile-section-nav-label">
-          <span className="mobile-section-nav-index">{mobileSectionIndex + 1}/{SECTION_LIST.length}</span>
-          {t(lang, SECTION_LIST[mobileSectionIndex].labelKey)}
-        </span>
-        <button
-          className="mobile-section-nav-btn"
-          disabled={mobileSectionIndex >= SECTION_LIST.length - 1}
-          onClick={() => goToMobileSection(SECTION_LIST[mobileSectionIndex + 1].id)}
-          aria-label={lang === 'fr' ? 'Section suivante' : 'Next section'}
-        >
-          <IconChevronRight width={16} height={16} />
-        </button>
-      </div>
       {plan.id && (
         <div className={`plan-cover-banner ${plan.coverImage ? 'has-image' : ''}`}>
           {plan.coverImage && (

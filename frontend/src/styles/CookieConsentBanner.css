@@ -390,6 +390,16 @@
   justify-content: flex-end;
 }
 
+/* Sous 640px, la bulle Nova (copilot-fab) descend à bottom:70px et devient plus haute
+   (padding 14px, voir CopilotChat.css) : à bottom:5.5rem (88px) la pastille cookies
+   repliée chevauchait son coin bas, les deux ronds se superposant visuellement (repéré
+   par capture iPhone). On la remonte au-dessus de Nova, avec une marge propre. */
+@media (max-width: 640px) {
+  .cookie-consent.is-collapsed {
+    bottom: 8.25rem;
+  }
+}
+
 .cookie-consent-tab {
   position: relative;
   display: flex;

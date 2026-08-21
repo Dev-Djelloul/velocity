@@ -641,124 +641,192 @@
   .plan-viewer-layout {
     flex-direction: column;
   }
-  .plan-sidebar {
+  .plan-sidebar:not(.is-mobile) {
     position: static;
     width: 100% !important;
     height: auto;
     max-height: none;
   }
-  .plan-sidebar-nav {
-    height: auto;
-    max-height: 50vh;
-  }
-  .plan-sidebar-resize-handle { display: none; }
-
-  /* Repliée par défaut sur mobile (voir PlanSidebar.jsx) : la liste plate d'icônes se
-     présente en grille compacte plutôt qu'en colonne pleine hauteur. Dépliée (choix
-     explicite de l'utilisateur), les groupes restent en colonne — un flex-wrap y casserait
-     la mise en page des en-têtes de groupe. */
-  .plan-sidebar.collapsed .plan-sidebar-nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-content: flex-start;
-  }
-  .plan-sidebar.collapsed .plan-sidebar-item {
-    width: 44px;
-    flex: 0 0 auto;
-  }
 
   .plan-viewer-main { width: 100%; }
 
-  /* Le petit tiret de 8px positionné à cheval sur le bord droit (pensé pour un pointeur de
-     souris entre sidebar et contenu sur desktop) est illisible et quasi impossible à taper
-     au doigt une fois la sidebar en pleine largeur — on le transforme en vrai bouton visible
-     dans le coin de la sidebar. */
-  .plan-sidebar-collapse-handle {
-    position: absolute;
-    top: 0.6rem;
-    right: 0.6rem;
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
-    opacity: 1;
-    mask-size: 14px;
-    -webkit-mask-size: 14px;
-    mask-position: center;
-    -webkit-mask-position: center;
-    mask-repeat: no-repeat;
-    -webkit-mask-repeat: no-repeat;
-  }
-
   /* Navigation pas-à-pas : le long défilement continu ne fonctionne pas correctement sur
      mobile (Safari iOS notamment revient en haut de page de façon erratique) — on affiche
-     donc une seule section à la fois, sélectionnée depuis la grille d'icônes du sommaire
-     replié ou via les boutons précédent/suivant. Le HTML de chaque section reste monté
-     (juste masqué) : aucune donnée n'est perdue en changeant de section. */
+     donc une seule section à la fois, choisie via la barre précédent/suivant ou le sommaire
+     complet (feuille modale, voir plus bas). Le HTML de chaque section reste monté (juste
+     masqué) : aucune donnée n'est perdue en changeant de section. */
   .plan-section-title { display: none; }
 
   .plan-section-anchor { display: none; }
   .plan-section-anchor.is-active { display: block; }
 
-  .mobile-section-nav {
+  /* Barre compacte "repliée" (remplace l'ancienne grille d'icônes nues, peu lisible et peu
+     pratique) : deux grands boutons précédent/suivant (faciles à taper au doigt) encadrent
+     la section active, elle-même un bouton qui ouvre le sommaire complet — groupé, avec
+     libellés — en feuille modale. */
+  .plan-sidebar-mobile-bar {
     display: flex;
+    flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    gap: 0.75rem;
+    gap: 0.5rem;
+    width: 100%;
     background: var(--color-dashboard, var(--color-bg-secondary));
     border: 1px solid rgba(145, 132, 217, 0.15);
     border-radius: 12px;
-    padding: 0.5rem 0.65rem;
+    padding: 0.4rem;
     margin-bottom: 1.25rem;
+    /* .plan-sidebar-mobile-bar porte aussi la classe .plan-sidebar (position:sticky,
+       top:2rem, height:calc(100vh - 4rem) en base) — sans ces resets, la barre héritait
+       de cette hauteur quasi pleine écran au lieu de son contenu naturel. */
     position: sticky;
     top: 0.5rem;
+    height: auto;
+    max-height: none;
     z-index: 20;
   }
 
-  .mobile-section-nav-btn {
+  .plan-sidebar-mobile-nav-btn {
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
-    width: 36px;
-    height: 36px;
+    width: 40px;
+    height: 40px;
     min-width: 0;
     min-height: 0;
-    border-radius: 8px;
+    border-radius: 9px;
     background: var(--color-bg-tertiary);
     border: 1px solid rgba(145, 132, 217, 0.2);
     color: var(--color-text-primary);
     cursor: pointer;
   }
 
-  .mobile-section-nav-btn:disabled {
+  .plan-sidebar-mobile-nav-btn:disabled {
     opacity: 0.35;
     cursor: default;
   }
 
-  .mobile-section-nav-label {
+  .plan-sidebar-mobile-current {
     flex: 1;
     min-width: 0;
     display: flex;
-    align-items: baseline;
+    align-items: center;
     justify-content: center;
     gap: 0.4rem;
-    font-size: var(--font-size-sm);
-    font-weight: 600;
+    height: 40px;
+    padding: 0 0.5rem;
+    border-radius: 9px;
+    border: 1px solid rgba(145, 132, 217, 0.2);
+    background: rgba(145, 132, 217, 0.08);
     color: var(--color-text-primary);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+    cursor: pointer;
+    font-family: inherit;
   }
 
-  .mobile-section-nav-index {
+  .plan-sidebar-mobile-current-icon {
+    flex-shrink: 0;
+    color: #9184d9;
+  }
+
+  .plan-sidebar-mobile-current-text {
+    min-width: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    overflow: hidden;
+  }
+
+  .plan-sidebar-mobile-index {
     flex-shrink: 0;
     font-size: 0.7rem;
     font-weight: 700;
     color: var(--color-text-muted);
   }
+
+  .plan-sidebar-mobile-label {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .plan-sidebar-mobile-chevron {
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  /* Sommaire complet en feuille modale : même liste groupée avec libellés que la sidebar
+     dépliée sur desktop (aucun changement de rendu là — voir renderItem dans
+     PlanSidebar.jsx), juste habillée en panneau qui glisse depuis le bas plutôt qu'en
+     colonne poussant le contenu. */
+  .plan-sidebar-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 8, 20, 0.55);
+    z-index: 590;
+  }
+
+  .plan-sidebar.plan-sidebar-mobile-sheet {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: auto;
+    width: 100% !important;
+    max-height: 82vh;
+    height: auto;
+    z-index: 591;
+    border-radius: 16px 16px 0 0;
+    border-bottom: none;
+    padding: 0.75rem 0.75rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    box-shadow: 0 -12px 32px rgba(0, 0, 0, 0.35);
+    background: var(--color-dashboard);
+    overflow-y: auto;
+    animation: plan-sidebar-sheet-in 0.22s ease-out;
+  }
+
+  @keyframes plan-sidebar-sheet-in {
+    from { transform: translateY(16px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  .plan-sidebar.plan-sidebar-mobile-sheet .plan-sidebar-nav {
+    height: auto;
+    max-height: 48vh;
+  }
+
+  .plan-sidebar.plan-sidebar-mobile-sheet .plan-sidebar-top {
+    padding-right: 2.5rem;
+  }
+
+  .plan-sidebar.plan-sidebar-mobile-sheet .plan-sidebar-item {
+    height: 42px;
+    font-size: 0.85rem;
+  }
+
+  .plan-sidebar-mobile-close {
+    position: absolute;
+    top: 0.6rem;
+    right: 0.6rem;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 0;
+    min-height: 0;
+    border-radius: 8px;
+    border: 1px solid rgba(145, 132, 217, 0.2);
+    background: var(--color-bg-tertiary);
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
 }
 
 @media (min-width: 901px) {
-  .mobile-section-nav { display: none; }
+  .plan-sidebar-mobile-bar,
+  .plan-sidebar-mobile-backdrop,
+  .plan-sidebar-mobile-close { display: none; }
 }

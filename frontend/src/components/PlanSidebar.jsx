@@ -6,7 +6,7 @@ import { sectionLabel } from '../lib/changeDescriptions'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getReadIds, markCommentsRead } from '../lib/commentReads'
 import {
-  IconChevronDown, IconBarChart, IconUser, IconClipboard,
+  IconChevronDown, IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
   IconTarget, IconCoin, IconShield, IconSparkle, IconSave, IconPlus, IconCompass, IconRadar, IconGauge, IconMegaphone, IconLock,
   IconClock as IconHistory, IconTrash, IconAlertTriangle, IconMessageCircle, IconX
@@ -95,11 +95,20 @@ const MIN_WIDTH = 180
 const MAX_WIDTH = 340
 const DEFAULT_WIDTH = 244
 
-export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers, copilotHistory }) {
-  // Repliée par défaut sous 900px (tablette/mobile) — en pleine largeur forcée par le CSS
-  // responsive, la version dépliée (groupes + libellés) occupe toute la hauteur de l'écran
-  // et masque le contenu du plan tant qu'on n'a pas scrollé plusieurs écrans plus bas.
+export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory, comments, onAddComment, onDeleteComment, currentUserId, onSectionSelect, activeSection, teamMembers, copilotHistory, mobileIndex, mobileTotal, onPrevSection, onNextSection }) {
+  // Repliée par défaut sous 900px (tablette/mobile) — sur mobile, "repliée" affiche une
+  // simple barre (précédent/section active/suivant), "dépliée" ouvre le sommaire complet en
+  // feuille modale plutôt qu'en colonne poussant tout le contenu vers le bas (ancien
+  // comportement : une grille d'icônes nues, illisible et peu pratique — remplacée ici par
+  // une liste groupée avec libellés, identique à la version desktop dépliée).
   const [collapsed, setCollapsed] = useState(() => typeof window !== 'undefined' && window.innerWidth < 900)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 900)
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 900)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(FIRST_ID)
   const [resizing, setResizing] = useState(false)
@@ -119,6 +128,10 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
   const goTo = (id) => {
     setActiveId(id)
     onSectionSelect?.(id)
+    // Choisir une section dans la feuille modale doit la refermer aussitôt (sinon elle
+    // recouvre le contenu qu'on vient justement de demander à voir) — sans effet sur
+    // desktop, où la sidebar reste dépliée en continu.
+    if (isMobile) setCollapsed(true)
   }
   const toggleGroup = (key) => setCollapsedGroups(prev => ({ ...prev, [key]: !prev[key] }))
 
@@ -284,11 +297,55 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
     </a>
   )
 
+  // Sur mobile, la sidebar repliée n'affiche plus une grille d'icônes nues : une barre
+  // unique avec précédent/suivant (grands boutons, faciles à taper) + la section active,
+  // qui elle-même ouvre le sommaire complet (feuille modale) au tap — voir currentSection.
+  const flatSections = GROUPS.flatMap(g => g.sections)
+  const currentSection = flatSections.find(s => s.id === activeId) || flatSections[0]
+
+  if (isMobile && collapsed) {
+    return (
+      <div className="plan-sidebar plan-sidebar-mobile-bar is-mobile collapsed">
+        <button
+          className="plan-sidebar-mobile-nav-btn"
+          disabled={!mobileIndex || mobileIndex <= 0}
+          onClick={onPrevSection}
+          aria-label={lang === 'fr' ? 'Section précédente' : 'Previous section'}
+        >
+          <IconChevronLeft width={18} height={18} />
+        </button>
+        <button className="plan-sidebar-mobile-current" onClick={() => setCollapsed(false)}>
+          {currentSection?.Icon && <currentSection.Icon width={15} height={15} className="plan-sidebar-mobile-current-icon" />}
+          <span className="plan-sidebar-mobile-current-text">
+            <span className="plan-sidebar-mobile-index">{(mobileIndex ?? 0) + 1}/{mobileTotal ?? flatSections.length}</span>
+            <span className="plan-sidebar-mobile-label">{t(lang, currentSection?.labelKey)}</span>
+          </span>
+          <IconChevronDown width={13} height={13} className="plan-sidebar-mobile-chevron" />
+        </button>
+        <button
+          className="plan-sidebar-mobile-nav-btn"
+          disabled={mobileIndex == null || mobileTotal == null || mobileIndex >= mobileTotal - 1}
+          onClick={onNextSection}
+          aria-label={lang === 'fr' ? 'Section suivante' : 'Next section'}
+        >
+          <IconChevronRight width={18} height={18} />
+        </button>
+      </div>
+    )
+  }
+
   return (
-    <div
-      className={`plan-sidebar ${collapsed ? 'collapsed' : ''} ${resizing ? 'resizing' : ''}`}
-      style={{ width: currentWidth }}
-    >
+    <>
+      {isMobile && <div className="plan-sidebar-mobile-backdrop" onClick={() => setCollapsed(true)} />}
+      <div
+        className={`plan-sidebar ${collapsed ? 'collapsed' : ''} ${resizing ? 'resizing' : ''} ${isMobile ? 'is-mobile plan-sidebar-mobile-sheet' : ''}`}
+        style={isMobile ? undefined : { width: currentWidth }}
+      >
+      {isMobile && (
+        <button className="plan-sidebar-mobile-close" onClick={() => setCollapsed(true)} aria-label={lang === 'fr' ? 'Fermer le sommaire' : 'Close section list'}>
+          <IconX width={16} height={16} />
+        </button>
+      )}
       <div className="plan-sidebar-top">
         <VelocityLaunchLogo width={22} height={22} variant="gradient" />
         {!collapsed && <span className="plan-sidebar-title">{t(lang, 'sidebar.title')}</span>}
@@ -496,16 +553,18 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
         <VelocityLaunchLogo width={collapsed ? 32 : 40} height={collapsed ? 32 : 40} variant="gradient" />
       </div>
 
-      {!collapsed && (
+      {!isMobile && !collapsed && (
         <div className="plan-sidebar-resize-handle" onMouseDown={startResize} />
       )}
 
-      <button
-        className={`plan-sidebar-collapse-handle ${collapsed ? 'is-collapsed' : ''}`}
-        onClick={() => setCollapsed(c => !c)}
-        onMouseDown={e => e.stopPropagation()}
-        title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
-      />
+      {!isMobile && (
+        <button
+          className={`plan-sidebar-collapse-handle ${collapsed ? 'is-collapsed' : ''}`}
+          onClick={() => setCollapsed(c => !c)}
+          onMouseDown={e => e.stopPropagation()}
+          title={t(lang, collapsed ? 'sidebar.expand' : 'sidebar.collapse')}
+        />
+      )}
 
       {confirmClearHistory && (
         <InfoModal
@@ -527,6 +586,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
           </div>
         </InfoModal>
       )}
-    </div>
+      </div>
+    </>
   )
 }
