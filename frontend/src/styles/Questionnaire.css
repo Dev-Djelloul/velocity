@@ -561,29 +561,53 @@
 /* Responsive */
 @media (max-width: 768px) {
   .questionnaire-container {
-    margin: 1rem;
-    padding: 1.5rem;
+    margin: 0.75rem;
+    padding: 1.1rem;
   }
 
   .form-section {
-    padding: 1.5rem;
+    padding: 1.1rem;
   }
 
   .progress-bar {
     flex-wrap: wrap;
     gap: 0.5rem;
+    margin-bottom: 1.75rem;
   }
 
   .step::after {
     top: 24px;
   }
 
+  .step-num {
+    width: 38px;
+    height: 38px;
+  }
+
+  .form-section {
+    margin-bottom: 1.25rem;
+  }
+
+  .form-section h2 {
+    margin-bottom: 1.25rem;
+    font-size: var(--font-size-xl);
+  }
+
+  .field {
+    margin-bottom: 1.25rem;
+  }
+
   .button-group {
     flex-direction: column;
+    gap: 0.7rem;
+    margin-top: 1.5rem;
   }
 
   .button-group-row {
     flex-direction: column;
+    align-items: stretch;
+    gap: 0.6rem;
+    width: 100%;
   }
 
   .progress-steps {
@@ -594,12 +618,20 @@
     white-space: normal;
   }
 
-  .button-group-row .btn-secondary {
-    min-width: 0;
-  }
-
+  /* .button-group-row .btn-secondary (desktop) fixe flex:1 + min-width:220px, une
+     spécificité plus élevée que le simple ".btn-secondary" ci-dessous — sans ce sélecteur
+     tout aussi précis pour le réinitialiser, min-width:220px pouvait forcer un bouton à
+     rester plus large que les autres sur un écran étroit, d'où les 3 boutons "Précédent /
+     Continuer plus tard / Mes brouillons" désalignés malgré width:100% (confirmé par
+     capture iPhone). box-sizing:border-box (déjà global) garantit que ce 100% inclut le
+     padding, donc une largeur strictement identique pour les trois. */
+  .button-group-row .btn-secondary,
   .btn-primary,
   .btn-secondary {
     width: 100%;
+    min-width: 0;
+    flex: none;
+    box-sizing: border-box;
+    padding: 0.85rem 1.25rem;
   }
 }
