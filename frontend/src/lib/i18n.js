@@ -1325,6 +1325,16 @@ export const translations = {
       current: 'Actuel',
       openSpace: 'Ouvrir',
       planCount: (n) => `${n} plan${n > 1 ? 's' : ''}`,
+      planSummaryTeam: (n) => n === 0
+        ? "Aucun plan pour l'instant — le champ est libre pour la première fusée 🚀"
+        : n === 1
+          ? "1 plan en chantier dans cette équipe — un bon début !"
+          : `${n} plans en chantier dans cette équipe — ça carbure 🚀`,
+      planSummaryPersonal: (n) => n === 0
+        ? 'Aucun plan pour le moment — à toi de lancer le premier.'
+        : n === 1
+          ? '1 plan personnel en cours — bien lancé.'
+          : `${n} plans personnels en cours — de quoi voir grand.`,
       createTeam: 'Créer une équipe',
       createTeamDesc: 'Un espace partagé avec ton équipe',
       viewHistory: 'Voir tout l\'historique',
@@ -2790,6 +2800,16 @@ export const translations = {
       current: 'Current',
       openSpace: 'Open',
       planCount: (n) => `${n} plan${n > 1 ? 's' : ''}`,
+      planSummaryTeam: (n) => n === 0
+        ? 'No plans yet — the launchpad is wide open for the first one 🚀'
+        : n === 1
+          ? '1 plan in the works for this team — great start!'
+          : `${n} plans in the works for this team — full steam ahead 🚀`,
+      planSummaryPersonal: (n) => n === 0
+        ? 'No plans yet — time to launch your first one.'
+        : n === 1
+          ? '1 personal plan in progress — nicely underway.'
+          : `${n} personal plans in progress — thinking big.`,
       createTeam: 'Create a team',
       createTeamDesc: 'A shared space with your team',
       viewHistory: 'View full history',

@@ -76,3 +76,13 @@ export function formatDateNumeric(iso, lang) {
   if (Number.isNaN(date.getTime())) return ''
   return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: 'numeric', ...tzOption() })
 }
+
+// Variante compacte (année sur 2 chiffres, ex: 21/08/26) — cartes et listes où la date
+// complète en toutes lettres (formatFullDateTime) prend trop de place.
+export function formatDateNumericShort(iso, lang) {
+  if (!iso) return ''
+  const locale = resolveLocale(lang)
+  const date = new Date(iso)
+  if (Number.isNaN(date.getTime())) return ''
+  return date.toLocaleDateString(locale, { day: '2-digit', month: '2-digit', year: '2-digit', ...tzOption() })
+}

@@ -248,6 +248,35 @@
   opacity: 0.75;
 }
 
+.dashboard-space-plans-row {
+  margin-top: 0.35rem;
+  margin-bottom: 0;
+}
+
+.dashboard-space-summary {
+  margin: 0.4rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.35;
+  color: var(--color-text-muted, #9ca3af);
+  white-space: normal;
+}
+
+[data-theme="light"] .dashboard-space-summary {
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* Carte ACTUELLE : la phrase-résumé rejoint le dégradé du nom/de la ligne "date" plutôt
+   que le blanc uni des autres cartes — cohérent avec .dashboard-space-name/.dashboard-space-meta
+   ci-dessus (fond blanc conservé, seul le texte porte le dégradé). */
+[data-theme="light"] .dashboard-space-card.is-current .dashboard-space-summary {
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
 .dashboard-space-card-new {
   border-style: dashed;
   background:

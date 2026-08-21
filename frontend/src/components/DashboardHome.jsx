@@ -5,10 +5,11 @@ import { getAllPlans, fetchAllPlansAggregated } from '../lib/planStorage'
 import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
-import { formatFullDateTime } from '../lib/dateFormat'
+import { formatDateNumericShort } from '../lib/dateFormat'
 import { IconPlus, IconUser, IconUsers, IconClipboard, IconClock, IconImage } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
+import '../styles/TeamPresenceAvatars.css'
 import '../styles/DashboardHome.css'
 
 function byRecency(a, b) {
@@ -74,16 +75,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         const candidate = p.updatedAt || p.savedAt || p.generatedAt
         return !latest || (candidate && candidate > latest) ? candidate : latest
       }, null)
-      return { count: plans.length, last, known: true }
+      return { count: plans.length, last, known: true, plans }
     }
     if (spaceId === (team.teamId ?? null)) {
       const last = activePlans.reduce((latest, p) => {
         const candidate = p.updatedAt || p.savedAt || p.generatedAt
         return !latest || (candidate && candidate > latest) ? candidate : latest
       }, null)
-      return { count: activePlans.length, last, known: true }
+      return { count: activePlans.length, last, known: true, plans: activePlans }
     }
-    return { count: 0, last: null, known: false }
+    return { count: 0, last: null, known: false, plans: [] }
   }
 
   const teamLimit = pro ? TEAM_SPACE_LIMITS.pro : TEAM_SPACE_LIMITS.free
@@ -140,17 +141,35 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   {isCurrent && <span className="dashboard-space-current-badge">{t(lang, 'dashboard.current')}</span>}
                 </span>
                 {stats.known ? (
-                  <span className="dashboard-space-meta">
-                    {isCurrent ? gradientIcon(<IconClipboard width={12} height={12} />) : <IconClipboard width={12} height={12} />}
-                    {t(lang, 'dashboard.planCount')(stats.count)}
-                    {stats.last && (
-                      <>
-                        <span className="dashboard-space-meta-sep">·</span>
-                        {isCurrent ? gradientIcon(<IconClock width={12} height={12} />) : <IconClock width={12} height={12} />}
-                        {formatFullDateTime(stats.last, lang)}
-                      </>
+                  <>
+                    <span className="dashboard-space-meta">
+                      {stats.last && (
+                        <>
+                          {isCurrent ? gradientIcon(<IconClock width={12} height={12} />) : <IconClock width={12} height={12} />}
+                          {formatDateNumericShort(stats.last, lang)}
+                        </>
+                      )}
+                    </span>
+                    {!!stats.plans.length && (
+                      <div className="members-presence-row dashboard-space-plans-row">
+                        {stats.plans.slice(0, 6).map(p => (
+                          <span
+                            key={p.id}
+                            className="plans-preview-thumb avatar-tooltip"
+                            data-tooltip={`Plan : ${p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}`}
+                          >
+                            {p.coverImage
+                              ? <img src={p.coverImage} alt="" />
+                              : <span className="plans-preview-fallback" aria-hidden="true" />}
+                          </span>
+                        ))}
+                        {stats.plans.length > 6 && <span className="team-presence-more">+{stats.plans.length - 6}</span>}
+                      </div>
                     )}
-                  </span>
+                    <p className="dashboard-space-summary">
+                      {t(lang, space.isTeam ? 'dashboard.planSummaryTeam' : 'dashboard.planSummaryPersonal')(stats.count)}
+                    </p>
+                  </>
                 ) : (
                   <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.openSpace')}</span>
                 )}
