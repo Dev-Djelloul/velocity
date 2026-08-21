@@ -49,27 +49,34 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
           </div>
 
           <div className="cookie-consent-categories">
-            <label className="cookie-consent-category is-locked">
-              <input type="checkbox" checked disabled readOnly />
-              <span className="cookie-consent-category-icon"><IconLock width={15} height={15} /></span>
+            <div className="cookie-consent-category is-locked">
+              <span className="cookie-consent-category-icon"><IconLock width={14} height={14} /></span>
               <span className="cookie-consent-category-text">
                 <strong>{t(lang, 'cookieBanner.essentialTitle')}</strong>
                 <em>{t(lang, 'cookieBanner.essentialBody')}</em>
               </span>
-            </label>
+              <span className="cookie-consent-switch is-on is-locked" aria-hidden="true">
+                <span className="cookie-consent-switch-thumb" />
+              </span>
+            </div>
 
-            <label className="cookie-consent-category">
-              <input
-                type="checkbox"
-                checked={analytics}
-                onChange={(e) => setAnalytics(e.target.checked)}
-              />
-              <span className="cookie-consent-category-icon"><IconBarChart width={15} height={15} /></span>
+            <div className="cookie-consent-category">
+              <span className="cookie-consent-category-icon"><IconBarChart width={14} height={14} /></span>
               <span className="cookie-consent-category-text">
                 <strong>{t(lang, 'cookieBanner.analyticsTitle')}</strong>
                 <em>{t(lang, 'cookieBanner.analyticsBody')}</em>
               </span>
-            </label>
+              <button
+                type="button"
+                className={`cookie-consent-switch ${analytics ? 'is-on' : ''}`}
+                role="switch"
+                aria-checked={analytics}
+                aria-label={t(lang, 'cookieBanner.analyticsTitle')}
+                onClick={() => setAnalytics(v => !v)}
+              >
+                <span className="cookie-consent-switch-thumb" />
+              </button>
+            </div>
           </div>
 
           <div className="cookie-consent-actions">
