@@ -13,7 +13,10 @@
   padding: 12px 18px;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, var(--color-accent-dark), var(--color-accent));
+  /* Dégradé de marque complet (violet -> indigo -> cyan, voir --wordmark-gradient) plutôt
+     que les deux seuls tons violet de l'accent — demandé explicitement pour que le bouton
+     reprenne les mêmes couleurs que le reste de l'habillage Nova (orbe, trame, sommaire). */
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
   color: #fff;
   font-weight: 600;
   font-size: 14px;
