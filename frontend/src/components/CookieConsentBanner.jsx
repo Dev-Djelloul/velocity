@@ -37,9 +37,16 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
     <div className={`cookie-consent ${open ? 'is-open' : 'is-collapsed'}`}>
       {open ? (
         <div className="cookie-consent-panel">
-          <div className="cookie-consent-icon"><IconCookie width={22} height={22} /></div>
-          <h3>{t(lang, 'cookieBanner.title')}</h3>
-          <p>{t(lang, 'cookieBanner.body')}</p>
+          <div className="cookie-consent-intro">
+            <div className="cookie-consent-icon"><IconCookie width={22} height={22} /></div>
+            <div>
+              <h3>{t(lang, 'cookieBanner.title')}</h3>
+              <p>{t(lang, 'cookieBanner.body')}</p>
+              <button className="cookie-consent-link" onClick={onOpenPolicy}>
+                {t(lang, 'cookieBanner.learnMore')}
+              </button>
+            </div>
+          </div>
 
           <div className="cookie-consent-categories">
             <label className="cookie-consent-category is-locked">
@@ -76,10 +83,6 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
               {t(lang, 'cookieBanner.rejectAll')}
             </button>
           </div>
-
-          <button className="cookie-consent-link" onClick={onOpenPolicy}>
-            {t(lang, 'cookieBanner.learnMore')}
-          </button>
         </div>
       ) : (
         <button
