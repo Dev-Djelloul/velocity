@@ -439,7 +439,6 @@ img.space-page-avatar {
 .space-dashboard-value {
   font-size: 1.4rem;
   font-weight: 700;
-  color: var(--color-text-primary);
 }
 
 .space-dashboard-value-sm {
@@ -449,7 +448,6 @@ img.space-page-avatar {
 
 .space-dashboard-label {
   font-size: 0.72rem;
-  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.03em;
 }
