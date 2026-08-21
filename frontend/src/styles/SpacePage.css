@@ -308,15 +308,16 @@ img.space-page-avatar {
 }
 .space-dashboard-tile-white .space-dashboard-icon { color: #fff; }
 
-/* Mode clair : les cartes verre dépoli gardent leurs teintes vives (voir plus haut), donc
-   le texte sombre par défaut du thème clair devient illisible dessus — forcé en blanc avec
-   une ombre portée douce pour rester lisible même sur la carte "blanche" (tile-white), la
-   plus claire des quatre. La grande carte "Plans partagés" en dessous passe en verre gris
-   clair plutôt que blanc opaque, et le fond de page redevient net (pas de flou/assombrissement,
-   demandés spécifiquement nets en mode clair, contrairement au mode sombre où l'image est
-   volontairement adoucie pour ne pas distraire). */
-[data-theme="light"] .space-dashboard-value,
-[data-theme="light"] .space-dashboard-label {
+/* Les 4 cartes verre dépoli gardent leurs teintes vives dans les deux thèmes (voir plus
+   haut) — le texte par défaut (--color-text-primary/muted) y devient illisible, forcé en
+   blanc avec une ombre portée douce pour rester lisible même sur la carte "blanche"
+   (tile-white), la plus claire des quatre. Anciennement réservé au mode clair : la photo de
+   fond du mode sombre étant désormais nette elle aussi (plus de flou/assombrissement lourd),
+   les mêmes teintes vives et pastel y ressortent tout autant et posaient le même problème
+   de contraste. La grande carte "Plans partagés" en dessous passe en verre gris clair
+   plutôt que blanc opaque en mode clair, et le fond de page y redevient net. */
+.space-dashboard-value,
+.space-dashboard-label {
   color: #fff;
   /* Ombre plus marquée que la première passe : sur la carte violette (la plus claire des
      quatre teintes), un blanc avec une ombre trop légère se fondait dans le fond pastel
@@ -324,14 +325,14 @@ img.space-page-avatar {
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 8px rgba(0, 0, 0, 0.35);
 }
 
-/* Icônes en blanc uni sur les 4 cartes en mode clair — la couleur de la teinte de fond
-   suffit déjà à distinguer chaque carte, l'icône colorée en plus faisait double emploi et
-   ressortait mal sur les teintes claires (violet, blanc). */
-[data-theme="light"] .space-dashboard-icon,
-[data-theme="light"] .space-dashboard-tile-violet .space-dashboard-icon,
-[data-theme="light"] .space-dashboard-tile-blue .space-dashboard-icon,
-[data-theme="light"] .space-dashboard-tile-cyan .space-dashboard-icon,
-[data-theme="light"] .space-dashboard-tile-white .space-dashboard-icon {
+/* Icônes en blanc uni sur les 4 cartes dans les deux thèmes — la couleur de la teinte de
+   fond suffit déjà à distinguer chaque carte, l'icône colorée en plus faisait double emploi
+   et ressortait mal sur les teintes claires (violet, blanc). */
+.space-dashboard-icon,
+.space-dashboard-tile-violet .space-dashboard-icon,
+.space-dashboard-tile-blue .space-dashboard-icon,
+.space-dashboard-tile-cyan .space-dashboard-icon,
+.space-dashboard-tile-white .space-dashboard-icon {
   color: #fff;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
 }
@@ -485,9 +486,13 @@ img.space-page-avatar {
   align-items: center;
   gap: 0.4rem;
   flex-shrink: 0;
-  /* .btn-primary utilise du texte sombre (--color-bg-primary) par défaut — sur la carte en
-     verre dépoli de cette page, le blanc reste plus lisible et cohérent avec le reste du
-     texte posé sur le verre. */
+}
+
+/* .btn-primary utilise du texte sombre (--color-bg-primary) par défaut — sur la carte en
+   verre dépoli de cette page, le blanc reste plus lisible et cohérent avec le reste du
+   texte posé sur le verre. Spécificité renforcée (.btn-primary.space-page-new-btn) pour
+   l'emporter à coup sûr sur la règle générique. */
+.btn-primary.space-page-new-btn {
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }

@@ -110,12 +110,17 @@
   align-items: center;
   gap: 0.5rem;
   flex-shrink: 0;
-  /* .btn-primary utilise du texte sombre (--color-bg-primary) par défaut, pensé pour un
-     dégradé clair sur fond de page uni — sur cette page posée sur une photo, le blanc reste
-     plus lisible et cohérent avec le reste des textes de la carte. */
+  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
+}
+
+/* .btn-primary utilise du texte sombre (--color-bg-primary) par défaut, pensé pour un
+   dégradé clair sur fond de page uni — sur cette page posée sur une photo, le blanc reste
+   plus lisible et cohérent avec le reste des textes de la carte. Spécificité renforcée
+   (.btn-primary.dashboard-home-cta) pour l'emporter à coup sûr sur la règle générique,
+   quel que soit l'ordre de chargement des feuilles de style. */
+.btn-primary.dashboard-home-cta {
   color: #fff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
 }
 
 .dashboard-home-cta:hover {
