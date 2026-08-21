@@ -156,12 +156,18 @@ export class PlanCollabRoom {
     if (this.teamId) {
       try {
         const members = await listOrganizationMembers(this.env, this.teamId)
+        console.log(`[collab-notify] planId=${this.planId} teamId=${this.teamId} editorIds=${JSON.stringify([...editorIds])} members=${JSON.stringify(members)}`)
         recipients = members.map(m => m.userId).filter(id => !editorIds.has(id))
-      } catch { /* Clerk indisponible : repli sur le propriétaire ci-dessous */ }
+      } catch (e) {
+        console.log(`[collab-notify] listOrganizationMembers failed: ${e.message}`)
+      }
+    } else {
+      console.log(`[collab-notify] planId=${this.planId} has no teamId (ownerId=${this.ownerId})`)
     }
     if (!recipients.length && this.ownerId && !editorIds.has(this.ownerId)) {
       recipients = [this.ownerId]
     }
+    console.log(`[collab-notify] recipients=${JSON.stringify(recipients)}`)
     if (!recipients.length) return
 
     try {
@@ -173,7 +179,7 @@ export class PlanCollabRoom {
         planId: this.planId,
         teamId: this.teamId
       })))
-    } catch { /* best-effort */ }
+    } catch (e) { console.log(`[collab-notify] createNotification failed: ${e.message}`) }
   }
 }
 
