@@ -15,12 +15,20 @@
   justify-content: center;
 }
 
+/* Enveloppe commune au bandeau et au panneau "Paramètres", qui s'ouvre au-dessus de lui
+   (position absolute, ancré à ce wrapper) plutôt que dans le bandeau lui-même — trop de
+   place pour 4 catégories détaillées dans une barre aussi compacte. */
+.cookie-consent-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 980px;
+}
+
 .cookie-consent-panel {
   position: relative;
   display: flex;
   align-items: stretch;
   width: 100%;
-  max-width: 980px;
   min-height: 108px;
   border-radius: 16px;
   overflow: hidden;
@@ -67,8 +75,8 @@
    bord droit pour fondre proprement dans le panneau plutôt qu'une coupe nette. */
 .cookie-consent-photo {
   position: relative;
-  flex: 0 0 13%;
-  min-width: 90px;
+  flex: 0 0 30%;
+  min-width: 120px;
   align-self: stretch;
   object-fit: cover;
   z-index: 0;
@@ -153,30 +161,34 @@
   color: #e9e9ed;
 }
 
-.cookie-consent-categories {
+/* Carte de catégorie du panneau "Paramètres" — icône + libellé en haut, description, puis
+   l'interrupteur en bas, comme les 4 colonnes Nécessaires/Préférences/Statistiques/Marketing
+   des bannières de consentement de référence, plutôt que la puce horizontale compacte de la
+   première version (qui n'aurait pas laissé assez de place à 4 catégories détaillées). */
+.cookie-consent-category {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0.6rem;
-  flex-shrink: 0;
+  padding: 0.85rem 0.9rem;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.cookie-consent-category {
+.cookie-consent-category-head {
   display: flex;
   align-items: center;
   gap: 0.55rem;
-  padding: 0.5rem 0.75rem;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  white-space: nowrap;
 }
 
 .cookie-consent-category-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border-radius: 7px;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
   background: rgba(145, 132, 217, 0.14);
   color: #a89fe8;
   flex-shrink: 0;
@@ -185,18 +197,19 @@
 .cookie-consent-category-text {
   display: flex;
   flex-direction: column;
-  line-height: 1.25;
+  gap: 0.1rem;
+  line-height: 1.3;
 }
 
 .cookie-consent-category-text strong {
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: #fff;
 }
 
 .cookie-consent-category-text em {
   font-style: normal;
-  font-size: 0.68rem;
+  font-size: 0.7rem;
   color: #75768a;
 }
 
@@ -262,10 +275,11 @@
   margin-left: auto;
 }
 
-/* Les deux actions partagent le même gabarit (taille, rembourrage, coins arrondis) — seule
+/* Les actions partagent le même gabarit (taille, rembourrage, coins arrondis) — seule
    l'intensité visuelle change (plein / contour) pour hiérarchiser sans casser la cohérence. */
 .cookie-consent-accept,
-.cookie-consent-save {
+.cookie-consent-save,
+.cookie-consent-settings-toggle {
   font-size: 0.8rem;
   font-weight: 600;
   padding: 0.6rem 1.2rem;
@@ -273,6 +287,77 @@
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.cookie-consent-settings-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  color: #e9e9ed;
+}
+
+.cookie-consent-settings-toggle:hover,
+.cookie-consent-settings-toggle.is-active {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.24);
+}
+
+/* Panneau "Paramètres" : s'ouvre AU-DESSUS du bandeau (position absolute ancrée à
+   .cookie-consent-wrap) plutôt que de s'insérer dedans — laisse la place aux 4 catégories
+   détaillées sans agrandir démesurément la barre compacte du dessous. */
+.cookie-consent-settings {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(100% + 0.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1.3rem 1.4rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #14171f;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(145, 132, 217, 0.08);
+  color: #e9e9ed;
+  animation: cookieConsentSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .cookie-consent-settings {
+    background: rgba(20, 23, 31, 0.94);
+    backdrop-filter: blur(18px) saturate(1.3);
+    -webkit-backdrop-filter: blur(18px) saturate(1.3);
+  }
+}
+
+.cookie-consent-settings-head h4 {
+  margin: 0 0 0.25rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cookie-consent-settings-head p {
+  margin: 0;
+  font-size: 0.76rem;
+  line-height: 1.45;
+  color: #9a9bb0;
+  max-width: 640px;
+}
+
+.cookie-consent-settings-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.7rem;
+}
+
+.cookie-consent-settings-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.6rem;
 }
 
 .cookie-consent-save {
@@ -358,14 +443,19 @@
     flex: 1 1 100%;
   }
 
-  .cookie-consent-categories {
-    flex-wrap: wrap;
-  }
-
   .cookie-consent-actions {
     margin-left: 0;
     width: 100%;
     justify-content: flex-start;
+  }
+
+  .cookie-consent-settings-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .cookie-consent-settings {
+    max-height: calc(100vh - 12rem);
+    overflow-y: auto;
   }
 }
 
@@ -380,7 +470,16 @@
     padding: 1rem;
   }
 
-  .cookie-consent-category {
-    flex: 1 1 auto;
+  .cookie-consent-settings {
+    padding: 1.1rem;
+  }
+
+  .cookie-consent-settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cookie-consent-settings-actions {
+    flex-direction: column-reverse;
+    align-items: stretch;
   }
 }
