@@ -168,16 +168,13 @@
 }
 
 /* Interrupteur compact, même formule visuelle que .settings-switch (SettingsPage.css) pour
-   rester cohérent avec le reste de l'app plutôt que des cases à cocher natives. La case
-   "Essentiels" utilise le même composant à l'état "on" mais verrouillé (non cliquable,
-   légèrement assombri) plutôt qu'un simple visuel différent — même langage, état différent. */
+   rester cohérent avec le reste de l'app plutôt que des cases à cocher natives. "Essentiels"
+   et "Mesure d'audience" sont désormais tous deux des <span role="switch">, pas des
+   <button> — un <button> ajoutait sa propre apparence native selon le navigateur (fond
+   arrondi "carré" qui écrasait le border-radius:999px), un simple span stylé à la main
+   garantit un rendu identique aux deux, seul le second étant réellement cliquable
+   (onClick + gestion clavier Entrée/Espace, l'autre restant verrouillé/inerte). */
 .cookie-consent-switch {
-  /* Reset de l'apparence native <button> (Safari/Chrome dessinent leur propre fond arrondi
-     "rectangulaire" par défaut, qui écrasait visuellement le border-radius:999px et faisait
-     paraître ce toggle carré à côté de la pastille "Essentiels", un <span> sans ce problème). */
-  appearance: none;
-  -webkit-appearance: none;
-  font: inherit;
   flex-shrink: 0;
   width: 38px;
   height: 21px;

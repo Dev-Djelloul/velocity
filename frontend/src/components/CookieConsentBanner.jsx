@@ -66,16 +66,22 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
                 <strong>{t(lang, 'cookieBanner.analyticsTitle')}</strong>
                 <em>{t(lang, 'cookieBanner.analyticsBody')}</em>
               </span>
-              <button
-                type="button"
+              <span
                 className={`cookie-consent-switch ${analytics ? 'is-on' : ''}`}
                 role="switch"
+                tabIndex={0}
                 aria-checked={analytics}
                 aria-label={t(lang, 'cookieBanner.analyticsTitle')}
                 onClick={() => setAnalytics(v => !v)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault()
+                    setAnalytics(v => !v)
+                  }
+                }}
               >
                 <span className="cookie-consent-switch-thumb" />
-              </button>
+              </span>
             </div>
           </div>
 
