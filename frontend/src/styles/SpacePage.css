@@ -94,11 +94,17 @@ img.space-page-avatar {
    il n'y a pas d'image derrière. */
 .space-page-title h1,
 .space-page-title p {
+  color: #fff;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
 .space-page-outer .team-back-btn {
+  color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.space-page-outer .team-back-btn:hover {
+  color: #fff;
 }
 
 /* text-shadow ne s'applique qu'aux glyphes de texte, pas à la flèche SVG (IconArrowLeft) —
@@ -479,6 +485,11 @@ img.space-page-avatar {
   align-items: center;
   gap: 0.4rem;
   flex-shrink: 0;
+  /* .btn-primary utilise du texte sombre (--color-bg-primary) par défaut — sur la carte en
+     verre dépoli de cette page, le blanc reste plus lisible et cohérent avec le reste du
+     texte posé sur le verre. */
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
 }
 
 .space-page-see-all {
