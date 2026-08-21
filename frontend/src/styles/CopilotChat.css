@@ -320,7 +320,10 @@
 .copilot-messages {
   /* flex: 1 maintenant que le panneau a une hauteur fixe (voir .copilot-panel) : la zone de
      messages occupe tout l'espace restant entre l'en-tête et le champ de saisie, plutôt que
-     de se limiter à la hauteur de son contenu. */
+     de se limiter à la hauteur de son contenu. position:relative : ancre .copilot-empty-bg
+     directement sur tout le panneau (voir plus bas), pas seulement sur la petite boîte de
+     texte de l'état vide. */
+  position: relative;
   flex: 1;
   min-height: 0;
   overflow-y: auto;
@@ -330,13 +333,25 @@
   gap: 10px;
 }
 
-/* État vide façon Cloudflare AI : trame de points sur toute la fenêtre du chat (.copilot-
-   empty-bg, en position:absolute derrière tout le reste — z-index:0) + petit avatar de Nova
-   sur un halo dégradé, lui posé en flux normal au-dessus de la salutation, pas dans la
-   trame elle-même (retour utilisateur : la première version, orbe ET trame confondus en un
-   seul bloc absolu, faisait déborder le rond derrière les boutons de suggestion). */
+/* Trame de points uniforme, sans masque en dégradé, posée sur tout .copilot-messages
+   (jusque dans les coins — retour utilisateur : le masque radial précédent faisait
+   disparaître les points vers les bords, façon halo/orbe, ce qui n'était pas voulu). */
+.copilot-empty-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-image: radial-gradient(rgba(145, 132, 217, 0.35) 1px, transparent 1px);
+  background-size: 20px 20px;
+  pointer-events: none;
+}
+
+/* État vide façon Cloudflare AI : petit avatar de Nova sur un halo dégradé, posé en flux
+   normal au-dessus de la salutation, indépendant de la trame de points ci-dessus (pas
+   confondus en un seul bloc absolu — retour utilisateur : ça faisait déborder le rond
+   derrière les boutons de suggestion dans une version précédente). */
 .copilot-empty-state {
   position: relative;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -344,17 +359,6 @@
   gap: 6px;
   margin: auto 0;
   padding: 8px 16px;
-}
-
-.copilot-empty-bg {
-  position: absolute;
-  inset: -220px -120px;
-  z-index: 0;
-  background-image: radial-gradient(rgba(145, 132, 217, 0.4) 1px, transparent 1px);
-  background-size: 20px 20px;
-  -webkit-mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
-  pointer-events: none;
 }
 
 .copilot-empty-orb {

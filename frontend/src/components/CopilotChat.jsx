@@ -396,9 +396,9 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
           </div>
 
           <div className="copilot-messages" ref={listRef}>
+            {messages.length === 0 && <div className="copilot-empty-bg" aria-hidden="true" />}
             {messages.length === 0 && (
               <div className="copilot-empty-state">
-                <div className="copilot-empty-bg" aria-hidden="true" />
                 <span className="copilot-empty-orb">
                   <img className="copilot-empty-orb-avatar" src={NOVA_AVATAR} alt="" />
                 </span>
