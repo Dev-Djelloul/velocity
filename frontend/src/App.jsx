@@ -41,6 +41,7 @@ import { TEAM_SPACE_LIMITS } from './lib/pricingTiers'
 import NotificationBell from './components/NotificationBell'
 import TeamPresenceAvatars from './components/TeamPresenceAvatars'
 import CookieConsentBanner from './components/CookieConsentBanner'
+import AppLoader from './components/AppLoader'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
@@ -717,6 +718,12 @@ export default function App() {
   // au lieu de laisser l'utilisateur atterrir sans explication sur l'app déjà connectée.
   const showInviteTicketAlert = isSignedIn && !inviteTicketDismissed
     && new URLSearchParams(location.search).has('__clerk_ticket')
+
+  // Écran de chargement plein écran tant que Clerk n'a pas déterminé l'état de session —
+  // évite un flash (landing affichée puis remplacée par le dashboard, ou l'inverse) au
+  // premier chargement. Placé après tous les hooks (aucun hook plus bas dans le composant)
+  // pour rester valide vis-à-vis des règles des hooks malgré ce retour anticipé.
+  if (!isLoaded) return <AppLoader />
 
   const dismissInviteTicketAlert = () => {
     setInviteTicketDismissed(true)
