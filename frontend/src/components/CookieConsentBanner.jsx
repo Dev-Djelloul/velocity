@@ -158,7 +158,7 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
 
             <div className="cookie-consent-content">
               <div className="cookie-consent-intro">
-                <Wordmark size={20} className="cookie-consent-wordmark" />
+                <Wordmark size={30} className="cookie-consent-wordmark" />
                 <h3>{t(lang, 'cookieBanner.title')}</h3>
                 <p>{t(lang, 'cookieBanner.body')}</p>
                 <div className="cookie-consent-links">

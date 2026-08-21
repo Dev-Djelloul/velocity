@@ -710,7 +710,7 @@ export const translations = {
       learnMore: 'En savoir plus',
       continueWithoutAgreeing: 'Continuer sans accepter',
       settingsTitle: 'Paramètres',
-      settingsBody: "Activez uniquement ce que vous voulez — aucune de ces catégories optionnelles n'est utilisée pour l'instant chez VelocityLaunch, mais autant vous laisser la main dès aujourd'hui.",
+      settingsBody: "Activez uniquement ce que vous voulez. Statistiques (Cloudflare Web Analytics) et Marketing (Meta Pixel, LinkedIn Insight Tag) sont réellement connectés et ne se déclenchent que si vous les acceptez ; Préférences n'est pas encore utilisée chez VelocityLaunch, mais autant vous laisser la main dès aujourd'hui.",
       collapse: 'Réduire',
       reopen: 'Cookies & vie privée'
     },
@@ -2236,7 +2236,7 @@ export const translations = {
       learnMore: 'Learn more',
       continueWithoutAgreeing: 'Continue without agreeing',
       settingsTitle: 'Settings',
-      settingsBody: "Turn on only what you want — none of these optional categories are actually used yet at VelocityLaunch, but you get control from day one.",
+      settingsBody: "Turn on only what you want. Statistics (Cloudflare Web Analytics) and Marketing (Meta Pixel, LinkedIn Insight Tag) are genuinely connected and only fire if you accept them; Preferences isn't used yet at VelocityLaunch, but you get control from day one.",
       collapse: 'Collapse',
       reopen: 'Cookies & privacy'
     },
