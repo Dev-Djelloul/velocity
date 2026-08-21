@@ -266,6 +266,19 @@
   color: #fff;
 }
 
+/* TeamAvatar (voir components/TeamAvatar.jsx) applique toujours sa propre classe de base
+   .header-space-avatar (22px, pensée pour le petit sélecteur du header) EN PLUS de
+   .dashboard-space-avatar passée ici — même spécificité (une classe), donc l'ordre de
+   chargement des feuilles de style décidait laquelle gagnait, et la logo d'équipe se
+   retrouvait minuscule au lieu de la même taille que l'avatar de l'espace personnel
+   (capture utilisateur). Sélecteur à deux classes pour trancher sans ambiguïté. */
+.dashboard-space-card .dashboard-space-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  padding: 0;
+}
+
 .dashboard-space-avatar-personal {
   background: var(--wordmark-gradient);
 }
