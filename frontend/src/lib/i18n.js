@@ -800,6 +800,15 @@ export const translations = {
         entries: [
           {
             date: '21 août 2026',
+            title: 'Bannière de cookies RGPD et verre dépoli généralisé sur le tableau de bord',
+            items: [
+              'Bannière de consentement cookies (RGPD) : panneau glissant et réouvrable à tout moment, cohérent avec l\'identité visuelle sombre de la page d\'accueil',
+              'Effet de verre dépoli (glassmorphism) étendu à toutes les cartes du tableau de bord, de l\'espace personnel/équipe et des pages Mon compte, Paramètres, Intégrations et Notifications, en mode clair comme en mode sombre',
+              'Aperçus visuels des plans (au lieu d\'un simple compteur) et phrase de synthèse sur les cartes d\'espace de la page d\'accueil'
+            ]
+          },
+          {
+            date: '21 août 2026',
             title: 'Collaboration temps réel, centre de notifications et refonte de la connexion',
             items: [
               'Collaboration en temps réel sur la roadmap et le backlog : fusion automatique des éditions concurrentes (CRDT), présence de qui a le plan ouvert, notification immédiate de ce qui vient de changer',
@@ -2281,6 +2290,15 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 21, 2026',
+            title: 'GDPR cookie banner and dashboard-wide glassmorphism',
+            items: [
+              'Cookie consent banner (GDPR): a sliding panel you can reopen any time, matching the landing page\'s dark visual identity',
+              'Glassmorphism extended to every card on the dashboard, personal/team space, and the Account, Settings, Integrations and Notifications pages, in both light and dark mode',
+              'Visual plan previews (instead of a plain counter) and a summary sentence on the dashboard space cards'
+            ]
+          },
           {
             date: 'August 21, 2026',
             title: 'Real-time collaboration, notification center and sign-in redesign',
