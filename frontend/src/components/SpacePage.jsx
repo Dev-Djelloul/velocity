@@ -172,23 +172,23 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
 
       {isTeam && stats && (
         <div className="space-dashboard">
-          <div className="space-dashboard-tile">
+          <div className="space-dashboard-tile space-dashboard-tile-violet">
             <span className="space-dashboard-icon"><IconClipboard width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.planCount}</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Plans partagés' : 'Shared plans'}</span>
           </div>
-          <div className="space-dashboard-tile">
+          <div className="space-dashboard-tile space-dashboard-tile-blue">
             <span className="space-dashboard-icon"><IconUsers width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.memberCount}</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Membres' : 'Members'}</span>
             <MembersPresenceRow teamId={team.teamId} members={team.members} lang={lang} />
           </div>
-          <div className="space-dashboard-tile">
+          <div className="space-dashboard-tile space-dashboard-tile-cyan">
             <span className="space-dashboard-icon"><IconCoin width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.totalBudget.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}€</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Budget cumulé' : 'Combined budget'}</span>
           </div>
-          <div className="space-dashboard-tile">
+          <div className="space-dashboard-tile space-dashboard-tile-white">
             <span className="space-dashboard-icon"><IconClock width={16} height={16} /></span>
             <span className="space-dashboard-value space-dashboard-value-sm">
               {stats.lastActivity ? formatFullDateTime(stats.lastActivity, lang) : (lang === 'fr' ? 'Aucune' : 'None')}

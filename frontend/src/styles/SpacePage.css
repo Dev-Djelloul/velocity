@@ -180,6 +180,21 @@ img.space-page-avatar {
   margin-bottom: 0.15rem;
 }
 
+/* Une couleur de la charte par carte (violet / bleu / cyan / blanc), portée par une
+   bordure du haut et l'icône elle-même — mise en évidence demandée pour distinguer les 4
+   cartes du tableau de bord d'un coup d'œil plutôt qu'un violet uniforme partout. */
+.space-dashboard-tile-violet { border-top: 2px solid #9184d9; }
+.space-dashboard-tile-violet .space-dashboard-icon { color: #9184d9; }
+
+.space-dashboard-tile-blue { border-top: 2px solid #6366f1; }
+.space-dashboard-tile-blue .space-dashboard-icon { color: #6366f1; }
+
+.space-dashboard-tile-cyan { border-top: 2px solid #06b6d4; }
+.space-dashboard-tile-cyan .space-dashboard-icon { color: #06b6d4; }
+
+.space-dashboard-tile-white { border-top: 2px solid #fff; }
+.space-dashboard-tile-white .space-dashboard-icon { color: #fff; }
+
 .space-dashboard-value {
   font-size: 1.4rem;
   font-weight: 700;

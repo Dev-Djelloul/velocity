@@ -3,6 +3,45 @@
   align-items: center;
 }
 
+/* Tooltip visuel (même famille que .plan-stat-tooltip, PlanViewer.css) plutôt que le
+   `title` natif du navigateur — lent à apparaître et sans habillage cohérent avec le reste
+   de l'app. Réutilisée par les avatars de présence (header) et la carte Membres. */
+.avatar-tooltip {
+  position: relative;
+  cursor: default;
+}
+
+.avatar-tooltip::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: max-content;
+  max-width: 220px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary, #16161d);
+  color: var(--color-text-secondary, #d1d5db);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-weight: 400;
+  white-space: normal;
+  text-align: center;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.avatar-tooltip:hover::after {
+  opacity: 1;
+  visibility: visible;
+}
+
 .team-presence-avatar-ring {
   width: 28px;
   height: 28px;

@@ -39,7 +39,7 @@ export default function TeamPresenceAvatars({ teamId, lang, excludeUserId }) {
   return (
     <div className="team-presence-avatars" title={t(lang, 'collab.presenceTitle')}>
       {peers.slice(0, 5).map(p => (
-        <span key={p.userId} className="team-presence-avatar-ring" title={p.name}>
+        <span key={p.userId} className="team-presence-avatar-ring avatar-tooltip" data-tooltip={p.name}>
           {p.avatar
             ? <img src={p.avatar} alt="" />
             : <span className="team-presence-avatar-fallback">{initials(p.name)}</span>}
@@ -70,8 +70,8 @@ export function MembersPresenceRow({ teamId, members, lang }) {
         return (
           <span
             key={m.id}
-            className={`members-presence-avatar ${online ? 'is-online' : ''}`}
-            title={online ? `${m.name} · ${t(lang, 'collab.onlineSuffix')}` : m.name}
+            className={`members-presence-avatar avatar-tooltip ${online ? 'is-online' : ''}`}
+            data-tooltip={online ? `${m.name} · ${t(lang, 'collab.onlineSuffix')}` : m.name}
           >
             {m.imageUrl
               ? <img src={m.imageUrl} alt="" />
