@@ -331,8 +331,10 @@
 }
 
 /* État vide façon Cloudflare AI : orbe dégradé lumineux (mêmes teintes que la marque —
-   violet/indigo/cyan, voir --wordmark-gradient) sur une trame de points, plutôt qu'un
-   simple texte italique. */
+   violet/indigo/cyan, voir --wordmark-gradient) sur une trame de points, plutôt qu'un simple
+   texte italique. .copilot-empty-bg déborde largement au-delà de sa boîte (inset très
+   négatif) pour que la trame/le halo couvrent toute la fenêtre du chat plutôt qu'un petit
+   carré autour du texte (retour utilisateur : l'effet paraissait "réduit"). */
 .copilot-empty-state {
   position: relative;
   display: flex;
@@ -341,17 +343,20 @@
   text-align: center;
   gap: 6px;
   margin: auto 0;
-  padding: 28px 16px 8px;
+  padding: 8px 16px;
 }
 
 .copilot-empty-bg {
   position: absolute;
-  inset: -32px;
+  inset: -220px -120px;
   z-index: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background-image: radial-gradient(rgba(145, 132, 217, 0.4) 1px, transparent 1px);
-  background-size: 18px 18px;
-  -webkit-mask-image: radial-gradient(ellipse 60% 55% at center, black 0%, transparent 75%);
-  mask-image: radial-gradient(ellipse 60% 55% at center, black 0%, transparent 75%);
+  background-size: 20px 20px;
+  -webkit-mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
+  mask-image: radial-gradient(ellipse 55% 50% at center, black 0%, transparent 75%);
   pointer-events: none;
 }
 
@@ -359,12 +364,11 @@
   position: relative;
   z-index: 1;
   display: block;
-  width: 60px;
-  height: 60px;
+  width: 132px;
+  height: 132px;
   border-radius: 50%;
-  margin-bottom: 6px;
   background: radial-gradient(circle at 32% 28%, #d8d3f7, #9184d9 42%, #6366f1 72%, #06b6d4 100%);
-  box-shadow: 0 0 36px rgba(99, 102, 241, 0.5), 0 0 72px rgba(6, 182, 212, 0.28);
+  box-shadow: 0 0 60px rgba(99, 102, 241, 0.55), 0 0 130px rgba(6, 182, 212, 0.3);
 }
 
 .copilot-empty-greeting {
