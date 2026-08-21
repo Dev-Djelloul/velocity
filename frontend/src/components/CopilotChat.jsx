@@ -79,13 +79,15 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
     if (open && textareaRef.current) textareaRef.current.focus()
   }, [open])
 
-  // Sur iOS Safari, le panneau (position:fixed, bottom:122px, hauteur calculée en vh — voir
-  // CopilotChat.css) ne réagit pas correctement à l'ouverture du clavier virtuel : vh reste
-  // basé sur le viewport de mise en page (inchangé), alors que le clavier réduit le viewport
-  // visuel réel, écrasant visiblement le panneau au lieu de simplement le pousser au-dessus
-  // du clavier (repéré par capture iPhone XS). On recale bottom/height sur le viewport
-  // visuel (window.visualViewport) uniquement quand un clavier est effectivement ouvert —
-  // sinon le CSS garde la main, comportement inchangé pour les cas sans clavier.
+  // Sur iOS Safari, un panneau position:fixed dimensionné en vh (voir CopilotChat.css) ne
+  // suit pas correctement le clavier virtuel : vh reste basé sur le viewport de mise en page
+  // (inchangé par le clavier), donc le panneau se retrouve visuellement écrasé/coupé au lieu
+  // d'être repoussé proprement au-dessus (constaté, persiste même après un correctif ciblé
+  // sur bottom/height uniquement quand un clavier est détecté — abandonné). Solution plus
+  // radicale et fiable : sur mobile, le panneau devient plein écran (voir .copilot-panel en
+  // media query) et ses coordonnées (top/left/width/height) sont recalées EN PERMANENCE,
+  // tant qu'il est ouvert, sur window.visualViewport — la seule source qui reflète l'espace
+  // réellement visible à tout instant (avec ou sans clavier), contrairement à vh/dvh.
   useEffect(() => {
     if (!open) return
     const vv = window.visualViewport
@@ -93,19 +95,20 @@ export default function CopilotChat({ plan, lang, userId, onApplyChanges, onHist
     if (!vv || !panel) return
 
     const reset = () => {
-      panel.style.bottom = ''
+      panel.style.top = ''
+      panel.style.left = ''
+      panel.style.width = ''
       panel.style.height = ''
       panel.style.maxHeight = ''
     }
 
     const update = () => {
       if (window.innerWidth > 640) { reset(); return }
-      const keyboardInset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop)
-      if (keyboardInset < 40) { reset(); return }
-      const margin = 12
-      panel.style.bottom = `${keyboardInset + margin}px`
-      panel.style.height = `${vv.height - margin * 2}px`
-      panel.style.maxHeight = `${vv.height - margin * 2}px`
+      panel.style.top = `${vv.offsetTop}px`
+      panel.style.left = `${vv.offsetLeft}px`
+      panel.style.width = `${vv.width}px`
+      panel.style.height = `${vv.height}px`
+      panel.style.maxHeight = `${vv.height}px`
     }
 
     update()

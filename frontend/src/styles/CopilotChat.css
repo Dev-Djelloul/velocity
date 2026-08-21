@@ -363,12 +363,21 @@
 @media (max-width: 640px) {
   .copilot-fab span { display: none; }
   .copilot-fab { padding: 14px; bottom: 70px; }
+
+  /* Plein écran plutôt qu'une carte flottante en bas à droite : les coordonnées exactes
+     (top/left/width/height) sont posées en inline style par CopilotChat.jsx, recalées en
+     continu sur window.visualViewport — seule source fiable de l'espace réellement visible
+     sur iOS Safari une fois le clavier ouvert (vh/dvh ne suivent pas le clavier). Les
+     valeurs ci-dessous ne sont qu'un filet de sécurité avant que le JS ne s'exécute. */
   .copilot-panel {
-    right: 12px;
-    left: 12px;
-    width: auto;
-    bottom: 122px;
-    max-height: min(560px, calc(100vh - 212px));
-    height: min(560px, calc(100vh - 212px));
+    top: 0;
+    left: 0;
+    right: auto;
+    bottom: auto;
+    width: 100vw;
+    max-height: 100vh;
+    height: 100vh;
+    border-radius: 0;
+    border-width: 0;
   }
 }
