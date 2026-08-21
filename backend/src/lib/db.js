@@ -86,6 +86,37 @@ export async function getPlanVersion(env, versionId) {
   return row ? { planId: row.plan_id, data: JSON.parse(row.data) } : null
 }
 
+// Historique multi-fils du copilote Nova (voir migration 0020) — id fourni par le client
+// (généré au premier message d'un nouveau fil, voir CopilotChat.jsx) pour pouvoir upsert la
+// même ligne à chaque échange sans aller-retour supplémentaire pour connaître l'id créé.
+export async function upsertCopilotConversation(env, userId, planId, conversation) {
+  const now = new Date().toISOString()
+  await env.DB.prepare(
+    `INSERT INTO copilot_conversations (id, plan_id, user_id, title, messages, created_at, updated_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(id) DO UPDATE SET title = excluded.title, messages = excluded.messages, updated_at = excluded.updated_at`
+  ).bind(conversation.id, planId, userId, conversation.title || null, JSON.stringify(conversation.messages || []), now, now).run()
+  return { id: conversation.id, updatedAt: now }
+}
+
+// Liste légère (pas les messages complets) pour peupler le panneau d'historique — titre et
+// date de dernière activité suffisent à identifier un fil avant de l'ouvrir.
+export async function listCopilotConversations(env, planId) {
+  const { results } = await env.DB.prepare(
+    'SELECT id, title, created_at, updated_at FROM copilot_conversations WHERE plan_id = ? ORDER BY updated_at DESC'
+  ).bind(planId).all()
+  return results.map(row => ({ id: row.id, title: row.title, createdAt: row.created_at, updatedAt: row.updated_at }))
+}
+
+export async function getCopilotConversation(env, id) {
+  const row = await env.DB.prepare('SELECT plan_id, title, messages FROM copilot_conversations WHERE id = ?').bind(id).first()
+  return row ? { planId: row.plan_id, title: row.title, messages: JSON.parse(row.messages) } : null
+}
+
+export async function deleteCopilotConversation(env, userId, id) {
+  await env.DB.prepare('DELETE FROM copilot_conversations WHERE id = ? AND user_id = ?').bind(id, userId).run()
+}
+
 // Tous les plans accessibles à userId, tous espaces confondus (personnel + chaque équipe
 // listée dans teamIds) — utilisé par "Historique de tous les plans" dans Mon compte, qui
 // regroupe volontairement tout au même endroit (contrairement aux tableaux de bord
@@ -151,9 +182,10 @@ export async function deletePlan(env, userId, id, teamId) {
   } else {
     await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ? AND team_id IS NULL').bind(id, userId).run()
   }
-  // plan_versions n'a pas de contrainte FK (D1/SQLite) — nettoyage explicite pour ne pas
-  // laisser d'instantanés orphelins d'un plan supprimé.
+  // plan_versions et copilot_conversations n'ont pas de contrainte FK (D1/SQLite) —
+  // nettoyage explicite pour ne pas laisser d'instantanés/fils orphelins d'un plan supprimé.
   await env.DB.prepare('DELETE FROM plan_versions WHERE plan_id = ?').bind(id).run()
+  await env.DB.prepare('DELETE FROM copilot_conversations WHERE plan_id = ?').bind(id).run()
 }
 
 // Déplace un plan existant vers un autre espace (personnel <-> équipe, ou équipe <-> équipe).

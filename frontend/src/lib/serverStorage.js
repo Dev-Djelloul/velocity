@@ -68,6 +68,28 @@ export function fetchPlanVersion(versionId) {
   return safeFetch(`/plan-versions/${encodeURIComponent(versionId)}`)
 }
 
+// Historique multi-fils du copilote Nova (voir CopilotChat.jsx) — un fil par conversation
+// distincte, contrairement à l'ancien plan.copilotHistory qui n'en gardait qu'une seule.
+export function fetchCopilotConversations(planId) {
+  return safeFetch(`/copilot/conversations?planId=${encodeURIComponent(planId)}`).then(r => r || [])
+}
+
+export function fetchCopilotConversation(id) {
+  return safeFetch(`/copilot/conversations/${encodeURIComponent(id)}`)
+}
+
+export function pushCopilotConversation(userId, planId, conversation) {
+  return safeFetch('/copilot/conversations', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, planId, conversation })
+  })
+}
+
+export function deleteCopilotConversation(userId, id) {
+  return safeFetch(`/copilot/conversations/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+}
+
 // Polling léger de notifications (voir lib/notifications.js) : userId personnel + toutes
 // les équipes dont l'utilisateur est membre, pour retrouver un commentaire posté depuis un
 // autre appareil sans avoir à ouvrir cet espace localement au préalable.

@@ -462,7 +462,14 @@ export const translations = {
         'Ajoute un persona B2C',
         'Résume les principaux risques',
         'Propose une story prioritaire'
-      ]
+      ],
+      greeting: { morning: 'Bonjour.', afternoon: 'Bon après-midi.', evening: 'Bonsoir.' },
+      historySearchPlaceholder: 'Rechercher une conversation…',
+      historyEmpty: 'Aucune conversation enregistrée pour ce plan.',
+      historyToday: "Aujourd'hui",
+      historyWeek: '7 derniers jours',
+      historyOlder: 'Plus ancien',
+      historyDelete: 'Supprimer cette conversation'
     },
     agents: {
       title: 'Agents IA',
@@ -811,6 +818,15 @@ export const translations = {
         entries: [
           {
             date: '21 août 2026',
+            title: 'Nova gère de vraies conversations multiples, façon Cloudflare AI',
+            items: [
+              'Nova ne se limitait qu\'à un seul fil de discussion par plan, écrasé à chaque nouvelle conversation — passe désormais par un véritable historique multi-fils, sauvegardé côté serveur à chaque échange',
+              'Nouveau panneau déroulant (clic sur le titre du fil courant) : recherche, fils groupés par récence (Aujourd\'hui / 7 derniers jours / Plus ancien), suppression individuelle, "+ Nouvelle conversation"',
+              'Écran d\'accueil de Nova repensé : salutation selon l\'heure, orbe lumineux en dégradé de marque sur une trame de points, au lieu d\'un simple texte'
+            ]
+          },
+          {
+            date: '21 août 2026',
             title: 'Bibliothèque de versions "avant/après"',
             items: [
               'Chaque enregistrement d\'un plan crée désormais un instantané complet, conservé et consultable à tout moment (jusqu\'à 20 versions par plan)',
@@ -1039,7 +1055,7 @@ export const translations = {
             items: [
               "Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint) comme contexte IA",
               "Génération IA avec filet de sécurité (moteur à règles local si l'IA échoue)",
-              'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel'
+              'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel, avec historique multi-conversations (recherche, groupé par récence)'
             ]
           },
           {
@@ -1102,7 +1118,7 @@ export const translations = {
             items: [
               'Questionnaire guidé multi-phases avec import de document (PDF, Word, Excel, PowerPoint) comme contexte IA',
               'Génération IA avec filet de sécurité (moteur à règles local si l\'IA échoue)',
-              'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel',
+              'Copilote IA conversationnel (Nova) pour éditer le plan en langage naturel, avec historique multi-conversations (recherche, groupé par récence)',
               'Roadmap Agile, sprints, backlog priorisé, Gantt interactif en swim-lanes, burndown à dates réelles',
               'Collaboration en temps réel sur la roadmap et le backlog (fusion automatique des éditions concurrentes, présence de qui a le plan ouvert)',
               'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
@@ -2028,7 +2044,14 @@ export const translations = {
         'Add a B2C persona',
         'Summarize the main risks',
         'Suggest a priority story'
-      ]
+      ],
+      greeting: { morning: 'Good morning.', afternoon: 'Good afternoon.', evening: 'Good evening.' },
+      historySearchPlaceholder: 'Search a conversation…',
+      historyEmpty: 'No saved conversation for this plan.',
+      historyToday: 'Today',
+      historyWeek: 'Past 7 days',
+      historyOlder: 'Older',
+      historyDelete: 'Delete this conversation'
     },
     agents: {
       title: 'AI Agents',
@@ -2372,6 +2395,15 @@ export const translations = {
         entries: [
           {
             date: 'August 21, 2026',
+            title: 'Nova now handles real multiple conversations, Cloudflare-AI style',
+            items: [
+              'Nova used to keep a single thread per plan, overwritten by every new conversation — now backed by a real multi-thread history, saved server-side on every exchange',
+              'New dropdown panel (click the current thread\'s title): search, threads grouped by recency (Today / Past 7 days / Older), per-thread delete, "+ New conversation"',
+              'Redesigned Nova home screen: time-of-day greeting, a glowing brand-gradient orb over a dotted backdrop, instead of plain text'
+            ]
+          },
+          {
+            date: 'August 21, 2026',
             title: '"Before/after" version library',
             items: [
               'Every plan save now creates a full snapshot, kept and viewable at any time (up to 20 versions per plan)',
@@ -2600,7 +2632,7 @@ export const translations = {
             items: [
               'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint) as AI context',
               'AI generation with a safety net (local rules engine if the AI call fails)',
-              'Conversational AI copilot (Nova) to edit the plan in natural language'
+              'Conversational AI copilot (Nova) to edit the plan in natural language, with multi-conversation history (search, grouped by recency)'
             ]
           },
           {
@@ -2663,7 +2695,7 @@ export const translations = {
             items: [
               'Guided multi-phase questionnaire with document import (PDF, Word, Excel, PowerPoint) as AI context',
               'AI generation with a safety net (local rules engine if the AI call fails)',
-              'Conversational AI copilot (Nova) to edit the plan in natural language',
+              'Conversational AI copilot (Nova) to edit the plan in natural language, with multi-conversation history (search, grouped by recency)',
               'Agile roadmap, sprints, prioritized backlog, interactive swim-lane Gantt, real-date burndown',
               'Real-time collaboration on the roadmap and backlog (concurrent edits merge automatically, presence shows who has the plan open)',
               'Distinct marketing budget and total launch budget, with an associated financial forecast',

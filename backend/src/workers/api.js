@@ -160,6 +160,32 @@ export async function handleApi(request, env, url) {
     return json(version)
   }
 
+  // Historique multi-fils du copilote Nova — voir CopilotChat.jsx.
+  if (pathname === '/copilot/conversations' && method === 'GET') {
+    const planId = searchParams.get('planId')
+    if (!planId) return json({ error: 'planId required' }, 400)
+    return json(await db.listCopilotConversations(env, planId))
+  }
+
+  if (pathname === '/copilot/conversations' && method === 'POST') {
+    const { userId, planId, conversation } = await request.json()
+    if (!userId || !planId || !conversation?.id) return json({ error: 'userId, planId and conversation.id required' }, 400)
+    return json(await db.upsertCopilotConversation(env, userId, planId, conversation))
+  }
+
+  const copilotConversationMatch = pathname.match(/^\/copilot\/conversations\/([^/]+)$/)
+  if (copilotConversationMatch && method === 'GET') {
+    const conversation = await db.getCopilotConversation(env, copilotConversationMatch[1])
+    if (!conversation) return json({ error: 'not found' }, 404)
+    return json(conversation)
+  }
+  if (copilotConversationMatch && method === 'DELETE') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteCopilotConversation(env, userId, copilotConversationMatch[1])
+    return json({ ok: true })
+  }
+
   const planMatch = pathname.match(/^\/plans\/([^/]+)$/)
   if (planMatch && method === 'DELETE') {
     const userId = searchParams.get('userId')
