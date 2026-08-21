@@ -17,10 +17,51 @@
   border: none;
   cursor: pointer;
   padding: 0;
+  /* Seul élément du header sans flex-shrink:0 (hamburger, bouton connexion, icônes en ont
+     tous un) — sur mobile, l'espace manquant le comprimait sous la largeur de son propre
+     texte (white-space:nowrap), qui débordait alors par-dessus les boutons voisins au lieu
+     d'être clippé proprement. min-width:0 + overflow:hidden empêchent ce débordement visuel;
+     la vraie place est regagnée ci-dessous (logo/texte réduits, bouton connexion en icône
+     seule sous 480px) plutôt que de simplement couper le texte. */
+  min-width: 0;
+  overflow: hidden;
 }
 
 .header-brand-btn .wordmark {
   font-size: 1.15rem;
+}
+
+@media (max-width: 480px) {
+  .header-brand-btn .brand-lockup {
+    gap: 0.4rem;
+  }
+
+  .header-brand-btn .wordmark {
+    font-size: 0.85rem;
+  }
+
+  .header-brand-btn svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .btn-header-signin span {
+    display: none;
+  }
+
+  .btn-header-signin {
+    padding: 0;
+    width: 34px;
+    justify-content: center;
+  }
+
+  .header-top {
+    gap: 0.6rem;
+  }
+
+  .header-actions {
+    gap: 0.35rem;
+  }
 }
 
 .header-brand-btn:hover .wordmark-elocity {
