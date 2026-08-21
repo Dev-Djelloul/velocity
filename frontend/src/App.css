@@ -235,7 +235,28 @@
 
 @media (max-width: 700px) {
   .header-space-btn-label { display: none; }
-  .header-space-btn { padding: 0; width: 34px; justify-content: center; }
+
+  /* Élargi (auto au lieu d'un 34px fixe) et agrandi : l'ancienne largeur fixe était trop
+     étroite pour contenir l'avatar (22px) + le chevron (13px) + le gap, qui se faisaient
+     donc rogner/quasi invisibles une fois le libellé caché — repéré en testant au format
+     iPhone via les DevTools. */
+  .header-space-btn {
+    width: auto;
+    height: 40px;
+    padding: 0 0.55rem;
+    gap: 0.35rem;
+    justify-content: center;
+  }
+
+  .header-space-btn .header-space-btn-avatar {
+    width: 26px;
+    height: 26px;
+  }
+
+  .header-space-btn .header-avatar-caret {
+    width: 15px;
+    height: 15px;
+  }
 }
 
 .header-avatar-caret {
