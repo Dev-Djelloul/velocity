@@ -1196,7 +1196,9 @@ export default function App() {
 
       <ScrollToTop />
 
-      <CookieConsentBanner lang={lang} onOpenPolicy={() => setActiveModal('cookies')} />
+      {currentPage === 'landing' && (
+        <CookieConsentBanner lang={lang} onOpenPolicy={() => setActiveModal('cookies')} />
+      )}
 
       {showHistory && isSignedIn && (
         <PlansHistory
