@@ -146,6 +146,37 @@
     var(--wordmark-gradient) border-box;
 }
 
+/* Mode clair : la carte de l'espace ACTUEL restait en blanc opaque malgré le passage en
+   verre dépoli des autres cartes — .dashboard-space-card.is-current (même spécificité que
+   la règle de verre ci-dessus) la redéfinissait plus loin dans le fichier et gagnait par
+   ordre de cascade. Réaffirmée ici, après elle, en gardant sa bordure dégradée propre. */
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  [data-theme="light"] .dashboard-space-card.is-current {
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) padding-box,
+      var(--wordmark-gradient) border-box;
+    backdrop-filter: blur(20px) saturate(1.4);
+    -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  }
+}
+
+/* Nom de l'espace ACTUEL en dégradé (même formule que le Wordmark) plutôt qu'en blanc uni,
+   pour le distinguer visuellement des autres cartes — demandé spécifiquement pour cette
+   carte. Le badge "ACTUEL" imbriqué a sa propre couleur de remplissage (voir
+   .dashboard-space-current-badge) : sans la réaffirmer ici, il hériterait du
+   -webkit-text-fill-color transparent du parent et deviendrait invisible. */
+[data-theme="light"] .dashboard-space-card.is-current .dashboard-space-name {
+  background: var(--wordmark-gradient);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: none;
+}
+
+[data-theme="light"] .dashboard-space-card.is-current .dashboard-space-current-badge {
+  -webkit-text-fill-color: #0b0c10;
+}
+
 .dashboard-space-avatar {
   width: 40px;
   height: 40px;
