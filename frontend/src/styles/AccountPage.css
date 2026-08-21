@@ -540,6 +540,37 @@
   white-space: nowrap;
 }
 
+/* Sur mobile, la ligne (vignette + nom + méta + étoile + [renommer/déplacer/supprimer OU
+   indice "changez d'espace"]) ne tenait plus dans la largeur — chaque élément, en
+   flex-shrink:0 ou nowrap, refusait de rétrécir, et le texte finissait par se chevaucher
+   visuellement au lieu de déborder proprement (capture iPhone : l'étoile de favori
+   recouvrait le nom de l'espace d'origine). On empile désormais deux lignes : la carte
+   (vignette + nom + méta) pleine largeur en haut, puis les actions (favori, déplacer,
+   supprimer, ou l'indice lecture seule) sur une deuxième ligne dédiée en dessous. */
+@media (max-width: 640px) {
+  .account-list-item {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .account-list-item-main {
+    flex-basis: 100%;
+  }
+
+  .account-list-item-favorite,
+  .account-list-item-delete,
+  .account-list-item-move,
+  .account-list-item-hint {
+    padding: 0.4rem 0.85rem 0.65rem;
+  }
+
+  .account-list-item-hint {
+    flex: 1;
+    white-space: normal;
+    text-align: right;
+  }
+}
+
 .move-target-list {
   display: flex;
   flex-direction: column;
