@@ -8,6 +8,16 @@
   <link rel="canonical" href="https://velocity.digitalblueskye.com/">
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 
+  <!-- PWA installable (voir vite-plugin-pwa dans vite.config.js, qui génère et injecte le
+       lien vers le manifest lui-même) : theme-color pour la barre de statut Android/Chrome,
+       apple-touch-icon + meta dédiées pour l'écran d'accueil et la barre de statut iOS
+       (Safari ne lit pas le manifest web pour ces deux-là). -->
+  <meta name="theme-color" content="#0b0c10">
+  <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="VelocityLaunch">
+
   <!-- Open Graph / réseaux sociaux (LinkedIn, Facebook...) -->
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="VelocityLaunch">

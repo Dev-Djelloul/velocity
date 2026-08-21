@@ -811,6 +811,14 @@ export const translations = {
         entries: [
           {
             date: '21 août 2026',
+            title: 'Application installable (PWA)',
+            items: [
+              'VelocityLaunch peut désormais s\'installer comme une vraie application, depuis le navigateur (icône "Installer" dans la barre d\'adresse sur desktop, "Ajouter à l\'écran d\'accueil" sur mobile) — plein écran sans barre de navigateur, icône dédiée, chargement quasi instantané au réouvertures grâce au cache local des fichiers de l\'application',
+              'Les appels au serveur (connexion, plans, Copilote IA...) ne sont jamais mis en cache : seuls les fichiers de l\'application elle-même le sont, les données restent toujours à jour'
+            ]
+          },
+          {
+            date: '21 août 2026',
             title: 'Sommaire mobile repensé et panneau Nova plein écran sur iOS',
             items: [
               'Sommaire mobile du plan repensé : la grille d\'icônes nues (peu lisible, flèches précédent/suivant peu pratiques) laisse place à une seule barre sticky en haut d\'écran — grands boutons précédent/suivant + section active, qui ouvre au tap le sommaire complet (liste groupée avec libellés) en feuille modale glissant depuis le bas',
@@ -1062,7 +1070,8 @@ export const translations = {
             items: [
               'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
               'Recherche globale (⌘K), FR / EN',
-              'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag'
+              'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag',
+              'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur'
             ]
           }
         ]
@@ -1093,7 +1102,8 @@ export const translations = {
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in',
               'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph',
               'Recherche globale (⌘K), FR / EN',
-              'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag'
+              'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag',
+              'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur, premier chargement quasi instantané depuis le cache'
             ]
           },
           {
@@ -1104,7 +1114,6 @@ export const translations = {
             label: 'Envisagé',
             items: [
               'API publique pour générer un plan par programmation (clé API, palier Entreprise)',
-              'Application mobile / PWA installable',
               'OCR pour les documents scannés (business plans en image, non détectés aujourd\'hui)',
               'Bibliothèque de plans "avant/après" pour comparer plusieurs versions d\'un même lancement'
             ]
@@ -2328,6 +2337,14 @@ export const translations = {
         entries: [
           {
             date: 'August 21, 2026',
+            title: 'Installable app (PWA)',
+            items: [
+              'VelocityLaunch can now be installed as a real app, straight from the browser (an "Install" icon in the desktop address bar, "Add to Home Screen" on mobile) — full-screen with no browser chrome, a dedicated icon, and near-instant reloads thanks to the app files being cached locally',
+              'Server calls (sign-in, plans, the Nova copilot...) are never cached: only the app\'s own files are, so your data always stays current'
+            ]
+          },
+          {
+            date: 'August 21, 2026',
             title: 'Redesigned mobile section nav and full-screen Nova panel on iOS',
             items: [
               'Redesigned the mobile plan navigator: the bare icon grid (hard to read, fiddly previous/next arrows) is replaced by a single sticky top bar — big previous/next buttons plus the active section, which opens the full section list (grouped, with labels) in a bottom sheet on tap',
@@ -2579,7 +2596,8 @@ export const translations = {
             items: [
               '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
               'Global search (⌘K), FR / EN',
-              'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag'
+              'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag',
+              'Installable app (PWA): home screen icon, full-screen launch with no browser chrome'
             ]
           }
         ]
@@ -2610,7 +2628,8 @@ export const translations = {
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery',
               'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image',
               'Global search (⌘K), FR / EN',
-              'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag'
+              'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag',
+              'Installable app (PWA): home screen icon, full-screen launch with no browser chrome, near-instant first load from cache'
             ]
           },
           {
@@ -2621,7 +2640,6 @@ export const translations = {
             label: 'Considered',
             items: [
               'Public API to generate a plan programmatically (API key, Enterprise tier)',
-              'Mobile app / installable PWA',
               'OCR for scanned documents (image-based business plans, not detected today)',
               'A "before/after" plan library to compare several versions of the same launch'
             ]
