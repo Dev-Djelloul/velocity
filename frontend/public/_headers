@@ -1,0 +1,6 @@
+# Netlify ne connaît pas l'extension .webmanifest et la sert par défaut en
+# application/octet-stream — Chrome rejette alors silencieusement le manifest PWA (aucune
+# erreur visible, l'icône "Installer" n'apparaît simplement jamais), même une fois le fichier
+# lui-même correct et à jour. Force le bon type MIME pour que le manifest soit reconnu.
+/manifest.webmanifest
+  Content-Type: application/manifest+json
