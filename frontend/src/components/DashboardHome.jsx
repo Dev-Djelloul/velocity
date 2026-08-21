@@ -99,13 +99,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   const firstName = user?.firstName || user?.fullName?.split(' ')[0] || ''
 
   // Conseil du jour généré par IA côté serveur (voir /tip-of-the-day, régénéré toutes les
-  // 2h) — la liste statique locale (dailyTips.js) ne sert plus que de secours si le backend
-  // n'est pas configuré ou injoignable, pour ne jamais laisser le bandeau vide.
+  // 15 minutes) — la liste statique locale (dailyTips.js) ne sert plus que de secours si le
+  // backend n'est pas configuré ou injoignable, pour ne jamais laisser le bandeau vide. Le
+  // ré-appel périodique permet au bandeau de se mettre à jour sans recharger la page.
   const [aiTip, setAiTip] = useState(null)
   useEffect(() => {
     let cancelled = false
-    fetchDailyTip().then(r => { if (!cancelled) setAiTip(r) })
-    return () => { cancelled = true }
+    const load = () => fetchDailyTip().then(r => { if (!cancelled) setAiTip(r) })
+    load()
+    const interval = setInterval(load, 15 * 60 * 1000)
+    return () => { cancelled = true; clearInterval(interval) }
   }, [])
   const dailyTip = aiTip ? (lang === 'en' ? aiTip.tipEn : aiTip.tipFr) : getDailyTip(lang)
 

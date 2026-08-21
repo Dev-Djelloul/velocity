@@ -187,14 +187,17 @@
   transform: scale(1.04);
 }
 
-/* Rangée maître : les cartes d'espace à gauche, les widgets (conseil du jour, échéances) à
+/* Rangée maître : les cartes d'espace à gauche, les widgets (calendrier, échéances) à
    droite — demandé explicitement pour occuper l'espace laissé vide par la pyramide de la
-   photo de fond sans la recouvrir complètement. */
+   photo de fond sans la recouvrir complètement. En grid (colonne gauche au contenu, colonne
+   droite au reste) plutôt qu'en flex : les deux colonnes démarrent alors exactement au même
+   niveau en haut, et la colonne widgets reste plaquée contre le bord droit du conteneur au
+   lieu de flotter au milieu de l'espace disponible (retour utilisateur, capture). */
 .dashboard-home-row {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
   gap: 1.5rem;
-  flex-wrap: wrap;
 }
 
 /* Empilées verticalement sur la gauche (plutôt qu'en grille sur toute la largeur) pour
@@ -210,10 +213,8 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  flex: 1;
-  min-width: 280px;
-  max-width: 380px;
-  margin-left: auto;
+  width: 280px;
+  justify-self: end;
 }
 
 .dashboard-widget-card {
@@ -413,9 +414,14 @@
 }
 
 @media (max-width: 860px) {
+  .dashboard-home-row {
+    grid-template-columns: 1fr;
+  }
+
   .dashboard-home-widgets {
-    margin-left: 0;
+    width: 100%;
     max-width: 340px;
+    justify-self: start;
   }
 }
 

@@ -831,7 +831,7 @@ export const translations = {
             date: '22 août 2026',
             title: 'Bandeau de conseils IA et calendrier sur le dashboard',
             items: [
-              'Le "Conseil du jour" est désormais généré par IA côté serveur (thèmes tech : positionnement, pricing, onboarding, rétention, acquisition, légal, organisation d\'équipe), renouvelé toutes les 2 heures, affiché en bandeau défilant pleine largeur sous le header',
+              'Le "Conseil du jour" est désormais généré par IA côté serveur (thèmes tech : positionnement, pricing, onboarding, rétention, acquisition, légal, organisation d\'équipe), renouvelé toutes les 15 minutes, affiché en bandeau défilant pleine largeur sous le header',
               'Nouveau widget calendrier mensuel façon Apple Calendar : jour courant repéré, points sous les dates de lancement de tes plans, navigation mois précédent/suivant',
               'La carte "Prochaines échéances" passe sous le calendrier plutôt qu\'à côté'
             ]
@@ -1133,7 +1133,7 @@ export const translations = {
               "Espaces d'équipe (Clerk Organizations), commentaires avec @mentions, fil d'activité par plan, tags transversaux",
               'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
               "Présence d'équipe en temps réel : qui a un plan de l'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d'espace",
-              'Tableau de bord : bandeau défilant de conseils générés par IA (renouvelés toutes les 2h), calendrier du mois avec échéances de lancement, prochaines échéances tous plans confondus'
+              'Tableau de bord : bandeau défilant de conseils générés par IA (renouvelés toutes les 15 min), calendrier du mois avec échéances de lancement, prochaines échéances tous plans confondus'
             ]
           },
           {
@@ -1190,7 +1190,7 @@ export const translations = {
               'Bannière de consentement cookies RGPD avec 4 catégories réelles, connectée à Cloudflare Web Analytics, Meta Pixel et LinkedIn Insight Tag',
               'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur, premier chargement quasi instantané depuis le cache',
               'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, personas, finances, budget, KPIs, résumé exécutif)',
-              'Dashboard : bandeau défilant de conseils générés par IA (renouvelés toutes les 2h), calendrier du mois avec échéances de lancement, prochaines échéances tous plans confondus'
+              'Dashboard : bandeau défilant de conseils générés par IA (renouvelés toutes les 15 min), calendrier du mois avec échéances de lancement, prochaines échéances tous plans confondus'
             ]
           },
           {
@@ -2475,7 +2475,7 @@ export const translations = {
             date: 'August 22, 2026',
             title: 'AI tip ticker and calendar on the dashboard',
             items: [
-              '"Tip of the day" is now AI-generated server-side (tech themes: positioning, pricing, onboarding, retention, acquisition, legal, team org), refreshed every 2 hours, shown as a full-width scrolling ticker below the header',
+              '"Tip of the day" is now AI-generated server-side (tech themes: positioning, pricing, onboarding, retention, acquisition, legal, team org), refreshed every 15 minutes, shown as a full-width scrolling ticker below the header',
               'New monthly calendar widget, Apple Calendar-style: current day highlighted, dots under your plans\' launch dates, previous/next month navigation',
               'The "Upcoming deadlines" card now sits below the calendar instead of beside it'
             ]
@@ -2777,7 +2777,7 @@ export const translations = {
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
               'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
               'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
-              'Dashboard: scrolling AI-generated tip ticker (refreshed every 2h), monthly calendar with launch deadlines, upcoming deadlines across all plans'
+              'Dashboard: scrolling AI-generated tip ticker (refreshed every 15 min), monthly calendar with launch deadlines, upcoming deadlines across all plans'
             ]
           },
           {
@@ -2834,7 +2834,7 @@ export const translations = {
               'GDPR cookie consent banner with 4 real categories, wired to Cloudflare Web Analytics, Meta Pixel and LinkedIn Insight Tag',
               'Installable app (PWA): home screen icon, full-screen launch with no browser chrome, near-instant first load from cache',
               '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, personas, financials, budget, KPIs, executive summary)',
-              'Dashboard: scrolling AI-generated tip ticker (refreshed every 2h), monthly calendar with launch deadlines, upcoming deadlines across all plans'
+              'Dashboard: scrolling AI-generated tip ticker (refreshed every 15 min), monthly calendar with launch deadlines, upcoming deadlines across all plans'
             ]
           },
           {

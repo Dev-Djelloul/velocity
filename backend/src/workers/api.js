@@ -181,20 +181,21 @@ export async function handleApi(request, env, url) {
   }
 
   // Conseil du jour du dashboard (voir DashboardHome.jsx) — généré par IA, mis en cache
-  // 2h dans le KV AI_USAGE (régénération "paresseuse" : au premier appel après expiration,
-  // pas de cron dédié — le dashboard n'est de toute façon consulté qu'en étant connecté).
-  // Un échec de génération renvoie le tip encore en cache (même expiré) plutôt qu'une
-  // erreur, pour ne jamais casser l'affichage du dashboard.
+  // 15 minutes dans le KV AI_USAGE (régénération "paresseuse" : au premier appel après
+  // expiration, pas de cron dédié — le dashboard n'est de toute façon consulté qu'en étant
+  // connecté). Un échec de génération renvoie le tip encore en cache (même expiré) plutôt
+  // qu'une erreur, pour ne jamais casser l'affichage du dashboard.
   if (pathname === '/tip-of-the-day' && method === 'GET') {
     const cacheKey = 'tip_of_the_day'
+    const TTL_MS = 15 * 60 * 1000
     const cached = env.AI_USAGE ? await env.AI_USAGE.get(cacheKey, 'json') : null
-    if (cached && (Date.now() - cached.generatedAt) < 2 * 60 * 60 * 1000) {
+    if (cached && (Date.now() - cached.generatedAt) < TTL_MS) {
       return json(cached)
     }
     try {
       const tip = await generateDailyTip(env)
       const payload = { theme: tip.theme, tipFr: tip.tip_fr, tipEn: tip.tip_en, generatedAt: Date.now() }
-      if (env.AI_USAGE) await env.AI_USAGE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 3 * 60 * 60 })
+      if (env.AI_USAGE) await env.AI_USAGE.put(cacheKey, JSON.stringify(payload), { expirationTtl: 20 * 60 })
       return json(payload)
     } catch (err) {
       if (cached) return json(cached)
