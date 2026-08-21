@@ -6,14 +6,10 @@
   display: flow-root;
 }
 
-/* Fixe par rapport à la fenêtre (pas seulement à .dashboard-home-outer) pour s'étendre
-   derrière le header ET le footer, tous deux passés en verre transparent sur cette page
-   (voir .header-dashboard-transparent / .footer-transparent, design-system.css) — l'image
-   est ainsi visible sur toute la hauteur de la page, pas juste entre les deux. */
 .dashboard-home-bg {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   background-size: cover;
   background-position: center;
   filter: blur(2px) brightness(0.55) saturate(1.1);

@@ -731,7 +731,7 @@ export default function App() {
       {/* Page d'auth en plein écran façon Cloudflare/Stripe : ni nav ni footer du site,
           juste la carte de connexion — évite la distraction et le double branding. */}
       {currentPage !== 'auth' && (
-      <header className={`header ${currentPage === 'landing' ? 'header-locked-dark' : ''} ${currentPage === 'dashboard' ? 'header-dashboard-transparent' : ''}`}>
+      <header className={`header ${currentPage === 'landing' ? 'header-locked-dark' : ''}`}>
         <div className="header-top">
           <button className="header-brand-btn" onClick={() => {
             setCurrentPage(isSignedIn ? 'dashboard' : 'landing')
@@ -1175,7 +1175,7 @@ export default function App() {
       </main>
 
       {currentPage !== 'auth' && (
-        <Footer lang={lang} onOpenModal={setActiveModal} transparent={currentPage === 'dashboard'} />
+        <Footer lang={lang} onOpenModal={setActiveModal} />
       )}
 
       <ScrollToTop />

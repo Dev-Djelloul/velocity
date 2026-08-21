@@ -8,11 +8,11 @@ const TWITTER_URL = 'https://twitter.com/digitalblueskye'
 const LINKEDIN_URL = 'https://www.linkedin.com/in/yellowblueskye/'
 const GITHUB_URL = 'https://github.com/Dev-Djelloul'
 
-export default function Footer({ lang, onOpenModal, transparent = false }) {
+export default function Footer({ lang, onOpenModal }) {
   const currentYear = new Date().getFullYear()
 
   return (
-    <footer className={`footer ${transparent ? 'footer-transparent' : ''}`}>
+    <footer className="footer">
       <div className="footer-content">
         <div className="footer-section">
           <Wordmark size={38} />
