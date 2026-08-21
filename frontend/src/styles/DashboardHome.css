@@ -10,8 +10,13 @@
   position: absolute;
   inset: 0;
   z-index: 0;
-  background-size: cover;
+  /* "contain" plutôt que "cover" : l'image entière (pyramide comprise) reste visible sans
+     être rognée sur les bords, quitte à laisser un léger bandeau de la couleur de fond de
+     chaque côté plutôt que de zoomer/couper l'image pour remplir tout le cadre. */
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
+  background-color: var(--color-bg-primary);
   filter: blur(2px) brightness(0.55) saturate(1.1);
 }
 
