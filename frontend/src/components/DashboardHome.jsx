@@ -106,10 +106,8 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       <div className="dashboard-home-bg" style={{ backgroundImage: `url(${dashboardBackground})` }} aria-hidden="true" />
       <div className="dashboard-home">
       <div className="dashboard-home-header">
-        <div>
-          <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
-          <p>{t(lang, 'dashboard.subtitle')}</p>
-        </div>
+        <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
+        <p>{t(lang, 'dashboard.subtitle')}</p>
         <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
           <IconPlus width={16} height={16} />
           {t(lang, 'dashboard.createPlan')}
