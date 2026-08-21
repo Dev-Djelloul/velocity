@@ -83,16 +83,21 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     // — ex. 'b10k' — résolue en euros via budgetFromKey) + budget marketing (marketing.
     // totalBudget, déjà en euros), par plan, sommés sur l'espace — la carte ne reflétait
     // avant que le seul budget marketing, devenu incomplet depuis l'ajout du budget total
-    // distinct (voir le questionnaire, resources.totalBudget).
-    const totalBudget = plans.reduce((sum, p) => {
-      const launchBudget = p.resources?.totalBudget ? budgetFromKey(p.resources.totalBudget) : 0
-      return sum + launchBudget + (p.marketing?.totalBudget || 0)
-    }, 0)
+    // distinct (voir le questionnaire, resources.totalBudget). Les deux composantes restent
+    // détaillées séparément (launchBudget/marketingBudget) pour l'infobulle de la carte.
+    let launchBudget = 0
+    let marketingBudget = 0
+    plans.forEach(p => {
+      launchBudget += p.resources?.totalBudget ? budgetFromKey(p.resources.totalBudget) : 0
+      marketingBudget += p.marketing?.totalBudget || 0
+    })
     return {
       planCount: plans.length,
       memberCount: team.members?.length || 0,
       lastActivity,
-      totalBudget
+      launchBudget,
+      marketingBudget,
+      totalBudget: launchBudget + marketingBudget
     }
   }, [isTeam, plans, team.members])
 
@@ -213,7 +218,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <span className="space-dashboard-label">{lang === 'fr' ? 'Membres' : 'Members'}</span>
             <MembersPresenceRow teamId={team.teamId} members={team.members} lang={lang} />
           </div>
-          <div className="space-dashboard-tile space-dashboard-tile-cyan">
+          <div
+            className="space-dashboard-tile space-dashboard-tile-cyan avatar-tooltip"
+            data-tooltip={lang === 'fr'
+              ? `${stats.launchBudget.toLocaleString('fr-FR')} € budget total + ${stats.marketingBudget.toLocaleString('fr-FR')} € marketing`
+              : `${stats.launchBudget.toLocaleString('en-US')}€ total budget + ${stats.marketingBudget.toLocaleString('en-US')}€ marketing`}
+          >
             <span className="space-dashboard-icon"><IconCoin width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.totalBudget.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}€</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Budget cumulé' : 'Combined budget'}</span>
