@@ -172,7 +172,7 @@
 }
 
 .dashboard-space-card-media {
-  flex: 0 0 25%;
+  flex: 0 0 30%;
   min-width: 76px;
   position: relative;
   overflow: hidden;
