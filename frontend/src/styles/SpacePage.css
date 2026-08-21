@@ -191,7 +191,10 @@ img.space-page-avatar {
 .space-dashboard-tile-cyan,
 .space-dashboard-tile-white {
   position: relative;
-  overflow: hidden;
+  /* PAS overflow:hidden ici : ça coupait aussi le tooltip des avatars de présence (voir
+     .avatar-tooltip::after, positionné en absolute au-dessus de la carte). Le calque de
+     verre (::before) porte son propre border-radius juste en dessous pour rester arrondi
+     sans avoir besoin de faire clipper toute la carte. */
   /* Repli opaque : sans backdrop-filter, laisser passer le fond de page tel quel serait
      illisible (pas de flou pour l'adoucir) — seul le ::before (tinté) resterait visible. */
   background: var(--color-dashboard, var(--color-bg-secondary));
@@ -220,6 +223,7 @@ img.space-page-avatar {
   inset: 0;
   z-index: 0;
   pointer-events: none;
+  border-radius: inherit;
   /* Léger reflet en haut de carte (comme du verre), fond uni juste en dessous. */
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, transparent 32%), var(--tile-tint);
 }
@@ -283,6 +287,20 @@ img.space-page-avatar {
 [data-theme="light"] .space-dashboard-tile-white .space-dashboard-icon {
   color: #fff;
   filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.35));
+}
+
+/* Grande carte "Plans partagés" (verre gris clair, voir plus haut) : verrouille le texte
+   en sombre malgré la transparence — sans ça il reste théoriquement hérité de
+   --color-text-primary (déjà sombre en mode clair), mais un oubli ici passerait inaperçu
+   tant que le fond de page derrière la carte reste clair à cet endroit précis. */
+[data-theme="light"] .space-page-section.card .space-page-section-head h3,
+[data-theme="light"] .space-page-section.card .account-list-item-name,
+[data-theme="light"] .space-page-section.card .account-empty {
+  color: #16171d;
+}
+
+[data-theme="light"] .space-page-section.card .account-list-item-meta {
+  color: #464852;
 }
 
 [data-theme="light"] .space-page-section.card {
