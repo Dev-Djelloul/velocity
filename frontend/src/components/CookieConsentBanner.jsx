@@ -80,6 +80,18 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
     setShowSettings(false)
   }
 
+  // "Continuer sans accepter" se contentait de fermer le bandeau (setOpen(false)) sans
+  // jamais appeler commit() : aucun choix n'était enregistré, les interrupteurs gardaient
+  // l'état d'une décision précédente (ou restaient à leur valeur par défaut) au lieu de
+  // refléter un vrai refus (retour utilisateur). Traité maintenant comme "Tout accepter",
+  // mais avec les 3 catégories optionnelles explicitement désactivées.
+  const continueWithoutAccepting = () => {
+    setPreferences(false)
+    setStatistics(false)
+    setMarketing(false)
+    commit({ preferences: false, statistics: false, marketing: false })
+  }
+
   const acceptAll = () => {
     setPreferences(true)
     setStatistics(true)
@@ -168,7 +180,7 @@ export default function CookieConsentBanner({ lang, onOpenPolicy }) {
                     {t(lang, 'cookieBanner.learnMore')}
                   </button>
                   <span className="cookie-consent-links-sep">·</span>
-                  <button className="cookie-consent-link cookie-consent-link-muted" onClick={() => setOpen(false)}>
+                  <button className="cookie-consent-link cookie-consent-link-muted" onClick={continueWithoutAccepting}>
                     {t(lang, 'cookieBanner.continueWithoutAgreeing')}
                   </button>
                 </div>
