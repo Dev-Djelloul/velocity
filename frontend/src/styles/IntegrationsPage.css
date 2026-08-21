@@ -13,7 +13,7 @@
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(2px) brightness(0.55) saturate(1.1);
+  filter: brightness(0.85) saturate(1.05);
 }
 
 .integrations-page-inner {

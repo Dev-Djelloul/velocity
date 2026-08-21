@@ -15,7 +15,10 @@
      accepte un léger rognage plutôt que des bords vides. */
   background-size: cover;
   background-position: center;
-  filter: blur(2px) brightness(0.55) saturate(1.1);
+  /* Nette dans les deux thèmes désormais (plus de flou/assombrissement lourd réservé au
+     mode sombre) — les cartes étant elles-mêmes translucides (verre dépoli), l'image
+     mérite de rester lisible en dessous plutôt que d'être noyée sous un voile sombre. */
+  filter: brightness(0.85) saturate(1.05);
 }
 
 .dashboard-home {
@@ -52,10 +55,23 @@
 }
 
 /* Le titre/sous-titre et les puces Historique/Galerie reposent sur la photo de fond
-   (.dashboard-home-bg), toujours assombrie quel que soit le thème (voir filter ci-dessus) —
-   en thème clair, leur couleur de texte suit pourtant la palette claire par défaut et
-   devient illisible sur cette image. Même correctif que .space-page-title dans
-   SpacePage.css : forcé en blanc avec une ombre portée, peu importe le thème. */
+   (.dashboard-home-bg), désormais nette dans les deux thèmes (voir filter ci-dessus) — une
+   ombre portée légère garde le contraste quelle que soit la zone de la photo en dessous. En
+   mode sombre le texte par défaut est déjà clair, l'ombre suffit ; en mode clair, il faut
+   aussi le forcer en blanc (sa couleur par défaut, sombre, y serait sinon illisible). */
+.dashboard-home-header h1,
+.dashboard-home-header p {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.dashboard-home-link {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+.dashboard-home-link-icon {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
 [data-theme="light"] .dashboard-home-header h1,
 [data-theme="light"] .dashboard-home-header p {
   color: #fff;
@@ -69,10 +85,6 @@
 
 [data-theme="light"] .dashboard-home-link:hover {
   color: #fff;
-}
-
-[data-theme="light"] .dashboard-home-link-icon {
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
 }
 
 /* Fond net en mode clair — même logique que SpacePage.css : le flou/assombrissement du

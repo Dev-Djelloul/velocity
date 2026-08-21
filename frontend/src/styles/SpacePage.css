@@ -14,7 +14,9 @@
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(2px) brightness(0.55) saturate(1.1);
+  /* Nette dans les deux thèmes (plus de flou/assombrissement lourd réservé au mode sombre) —
+     les cartes étant elles-mêmes translucides, l'image mérite de rester lisible en dessous. */
+  filter: brightness(0.85) saturate(1.05);
 }
 
 .space-page {
@@ -84,10 +86,28 @@ img.space-page-avatar {
   color: var(--color-text-muted);
 }
 
-/* Titre/sous-titre et bouton retour posés à même le fond image (.space-page-bg) plutôt que
-   sur la couleur de fond plate — en thème clair leurs couleurs par défaut y étaient peu
-   lisibles. team-back-btn est partagé avec TeamPage (sans fond image), d'où le scope
-   .space-page-outer pour ne pas le blanchir là où il n'y a pas d'image derrière. */
+/* Titre/sous-titre et bouton retour posés à même le fond image (.space-page-bg), désormais
+   nette dans les deux thèmes — une ombre portée légère garde le contraste en mode sombre
+   (texte déjà clair par défaut) ; en mode clair, la couleur par défaut (sombre) doit aussi
+   être forcée en blanc, sinon illisible sur la photo. team-back-btn est partagé avec
+   TeamPage (sans fond image), d'où le scope .space-page-outer pour ne pas l'affecter là où
+   il n'y a pas d'image derrière. */
+.space-page-title h1,
+.space-page-title p {
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.space-page-outer .team-back-btn {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+/* text-shadow ne s'applique qu'aux glyphes de texte, pas à la flèche SVG (IconArrowLeft) —
+   même limitation que les icônes des cartes du dashboard plus bas, corrigée pareil via
+   drop-shadow sur le svg lui-même. */
+.space-page-outer .team-back-btn svg {
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.45));
+}
+
 [data-theme="light"] .space-page-title h1,
 [data-theme="light"] .space-page-title p {
   color: #fff;
@@ -99,9 +119,6 @@ img.space-page-avatar {
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* text-shadow ne s'applique qu'aux glyphes de texte, pas à la flèche SVG (IconArrowLeft) —
-   même limitation que les icônes des cartes du dashboard plus bas, corrigée pareil via
-   drop-shadow sur le svg lui-même. */
 [data-theme="light"] .space-page-outer .team-back-btn svg {
   filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.5));
 }

@@ -12,7 +12,9 @@
   z-index: 0;
   background-size: cover;
   background-position: center;
-  filter: blur(2px) brightness(0.55) saturate(1.1);
+  /* Nette dans les deux thèmes (plus de flou/assombrissement lourd réservé au mode sombre) —
+     les cartes étant elles-mêmes translucides, l'image mérite de rester lisible en dessous. */
+  filter: brightness(0.85) saturate(1.05);
 }
 
 .account-page-inner {
@@ -46,10 +48,15 @@
 
 /* Le bouton retour et le titre de page (h2.settings-page-title) sont posés à même le fond
    image (Mon compte/Paramètres/Notifications/Intégrations, voir *-page-bg dans chaque
-   feuille de style dédiée) plutôt que sur la couleur de fond plate — en thème clair, leurs
-   couleurs par défaut (gris/texte sombre, pensées pour un fond clair uni) devenaient
-   illisibles sur une photo. On les fixe en clair avec ombre portée, indépendamment du thème,
-   comme un titre de hero classique sur image. */
+   feuille de style dédiée), désormais nette dans les deux thèmes — une ombre portée légère
+   garde le contraste en mode sombre (texte déjà clair par défaut) ; en mode clair, la
+   couleur par défaut (gris/texte sombre, pensée pour un fond clair uni) doit aussi être
+   forcée en blanc, comme un titre de hero classique sur image. */
+.account-back-btn,
+.settings-page-title {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
 [data-theme="light"] .account-back-btn {
   color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
