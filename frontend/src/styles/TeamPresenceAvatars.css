@@ -46,3 +46,53 @@
   font-size: 0.75rem;
   color: var(--color-text-muted, #9ca3af);
 }
+
+/* Carte "Membres" du tableau de bord : un avatar par membre de l'équipe, en ligne ou pas —
+   voir MembersPresenceRow dans TeamPresenceAvatars.jsx. */
+.members-presence-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.members-presence-avatar {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.08);
+  transition: box-shadow 0.2s ease;
+}
+
+/* En ligne : anneau dégradé (même formule que le Wordmark) + lueur verte autour — les deux
+   signaux demandés, pour rester lisible même pour une personne daltonienne au vert/rouge
+   (le dégradé à lui seul suffit déjà à distinguer "connecté" de "hors ligne"). */
+.members-presence-avatar.is-online {
+  background: var(--wordmark-gradient);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.45), 0 0 10px 2px rgba(74, 222, 128, 0.35);
+}
+
+.members-presence-avatar img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+}
+
+.members-presence-fallback {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--color-bg-secondary, #1a1f2b);
+  color: var(--color-text-primary, #fff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.58rem;
+  font-weight: 700;
+}

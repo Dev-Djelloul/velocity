@@ -7,7 +7,7 @@ import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
 import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
 import { teamColor } from './TeamAvatar'
-import TeamPresenceAvatars from './TeamPresenceAvatars'
+import { MembersPresenceRow } from './TeamPresenceAvatars'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
 import teamSpaceBackground from '../../assets/img/hiw-step2-dashboard.webp'
@@ -163,7 +163,6 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             </button>
           )}
         </div>
-        {isTeam && <TeamPresenceAvatars teamId={team.teamId} lang={lang} excludeUserId={userId} />}
         {isTeam && (
           <button className="btn-secondary space-page-settings-btn" onClick={onOpenTeamSettings}>
             <IconSettings width={14} height={14} /> {t(lang, 'team.membersTitle')}
@@ -182,6 +181,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <span className="space-dashboard-icon"><IconUsers width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.memberCount}</span>
             <span className="space-dashboard-label">{lang === 'fr' ? 'Membres' : 'Members'}</span>
+            <MembersPresenceRow teamId={team.teamId} members={team.members} lang={lang} />
           </div>
           <div className="space-dashboard-tile">
             <span className="space-dashboard-icon"><IconCoin width={16} height={16} /></span>

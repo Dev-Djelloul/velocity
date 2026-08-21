@@ -230,6 +230,7 @@ export function useTeam() {
   const members = (memberships?.data || []).map(m => ({
     id: m.publicUserData?.userId,
     name: [m.publicUserData?.firstName, m.publicUserData?.lastName].filter(Boolean).join(' ') || m.publicUserData?.identifier || 'Membre',
+    imageUrl: m.publicUserData?.hasImage ? m.publicUserData?.imageUrl : null,
     role: m.role
   }))
   return {
