@@ -74,7 +74,12 @@ function findSprintMap(doc, sprintId) {
 // BacklogCard, RoadmapCard, GanttChart, AgentActivity) en opérations Yjs ciblées, plutôt
 // que de remplacer tout le document — remplacer tout annulerait l'intérêt du CRDT (deux
 // remplacements concurrents s'écrasent exactement comme le JSON brut le fait déjà).
-export function applyRoadmapDiff(doc, prevRoadmap, nextRoadmap) {
+// `detail` (texte déjà calculé par diffRoadmapItems côté appelant, celui affiché dans le
+// panneau Historique) transite via l'origin de la transaction Yjs jusqu'au handler
+// doc.on('update') plus bas, qui le renvoie au serveur — pour que la notification
+// persistante (cloche) porte le même texte précis que l'historique local, au lieu d'un
+// générique "X a modifié la roadmap".
+export function applyRoadmapDiff(doc, prevRoadmap, nextRoadmap, detail) {
   if (!nextRoadmap?.sprints) return
   const prevById = new Map()
   ;(prevRoadmap?.sprints || []).forEach(sp => (sp.stories || []).forEach(s => prevById.set(s.id, { ...s, sprintId: sp.sprintId })))
@@ -104,7 +109,7 @@ export function applyRoadmapDiff(doc, prevRoadmap, nextRoadmap) {
         if (JSON.stringify(current) !== JSON.stringify(v)) found.storyMap.set(k, v)
       })
     }
-  })
+  }, detail ? { summary: detail } : undefined)
 }
 
 // Ouvre la connexion WebSocket vers la Durable Object du plan (voir
@@ -183,7 +188,8 @@ export function connectCollab(planId, { onRoadmap, onPresence, onReady } = {}) {
       // sache précisément QUI exclure de la notification de la Durable Object (voir
       // notifyOwnerOfEdits côté backend) — un simple nom affiché ne suffit pas à ça,
       // deux personnes pouvant partager un même prénom.
-      ws.send(JSON.stringify({ type: 'update', update: Array.from(update), name: myName, userId: myUserId }))
+      const detail = origin && typeof origin === 'object' ? origin.summary : undefined
+      ws.send(JSON.stringify({ type: 'update', update: Array.from(update), name: myName, userId: myUserId, detail }))
     }
   })
 

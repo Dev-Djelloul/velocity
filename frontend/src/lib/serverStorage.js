@@ -425,6 +425,25 @@ export function removeAgentTask(userId, id) {
   return safeFetch(`/agents/tasks/${encodeURIComponent(id)}?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
 }
 
+// Présence d'équipe (dashboard + menu de bascule d'espace) — heartbeat léger par polling,
+// distinct de la présence par plan (WebSocket, voir lib/collab.js) qui n'a de sens que sur
+// un plan précis ouvert.
+export function sendTeamPresenceHeartbeat(teamId, userId, name, avatar) {
+  return safeFetch('/team-presence/heartbeat', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ teamId, userId, name, avatar })
+  })
+}
+
+export function fetchTeamPresence(teamId) {
+  return safeFetch(`/team-presence?teamId=${encodeURIComponent(teamId)}`).then(r => r || [])
+}
+
+export function clearTeamPresence(teamId, userId) {
+  return safeFetch(`/team-presence?teamId=${encodeURIComponent(teamId)}&userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+}
+
 export function createCheckoutSession(userId, email, interval) {
   return safeFetch('/checkout', {
     method: 'POST',

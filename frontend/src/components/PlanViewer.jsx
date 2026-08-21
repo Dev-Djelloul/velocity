@@ -26,6 +26,7 @@ import CopilotChat from './CopilotChat'
 import CoverPicker from './CoverPicker'
 import PresenceBar from './PresenceBar'
 import { connectCollab, seedDocFromRoadmap, roadmapFromDoc, applyRoadmapDiff } from '../lib/collab'
+import { sendTeamPresenceHeartbeat, clearTeamPresence } from '../lib/serverStorage'
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { formatMoney } from '../lib/currency'
 import { savePlan as savePlanToStorage } from '../lib/planStorage'
@@ -165,6 +166,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [plan.id, readOnly])
 
+  // Présence d'équipe (dashboard + menu de bascule d'espace) : heartbeat tant qu'un plan de
+  // cette équipe reste ouvert — n'a pas de sens pour un plan personnel (team.teamId absent).
+  useEffect(() => {
+    if (!team.teamId || readOnly) return
+    const name = user?.fullName || user?.firstName || (lang === 'fr' ? 'Anonyme' : 'Anonymous')
+    const beat = () => sendTeamPresenceHeartbeat(team.teamId, userId, name, user?.imageUrl)
+    beat()
+    const timer = setInterval(beat, 15000)
+    return () => { clearInterval(timer); clearTeamPresence(team.teamId, userId) }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [team.teamId, userId, readOnly])
+
   // Avertit avant de fermer/rafraîchir l'onglet s'il reste des modifications non
   // enregistrées — les navigateurs ignorent le texte personnalisé et affichent leur
   // propre message, mais le blocage lui-même fonctionne partout.
@@ -237,7 +250,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       markChanged(section, section, lang === 'fr' ? 'Mise à jour' : 'Updated')
     }
     if (collabRef.current) {
-      applyRoadmapDiff(collabRef.current.doc, lastSyncedRoadmapRef.current, nextRoadmap)
+      const detail = items.length ? items.map(i => i.detail).join(' · ') : null
+      applyRoadmapDiff(collabRef.current.doc, lastSyncedRoadmapRef.current, nextRoadmap, detail)
       lastSyncedRoadmapRef.current = nextRoadmap
     }
     setPlan(p => ({ ...p, roadmap: nextRoadmap }))

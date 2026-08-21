@@ -883,6 +883,29 @@ export async function handleApi(request, env, url) {
     return json({ ok: true })
   }
 
+  // Présence d'équipe (dashboard + menu de bascule d'espace) — heartbeat périodique côté
+  // client tant qu'un plan de l'équipe est ouvert, voir PlanViewer.jsx.
+  if (pathname === '/team-presence/heartbeat' && method === 'POST') {
+    const { teamId, userId, name, avatar } = await request.json()
+    if (!teamId || !userId) return json({ error: 'teamId and userId required' }, 400)
+    await db.heartbeatTeamPresence(env, { teamId, userId, name, avatar })
+    return json({ ok: true })
+  }
+
+  if (pathname === '/team-presence' && method === 'GET') {
+    const teamId = searchParams.get('teamId')
+    if (!teamId) return json({ error: 'teamId required' }, 400)
+    return json(await db.listTeamPresence(env, teamId))
+  }
+
+  if (pathname === '/team-presence' && method === 'DELETE') {
+    const teamId = searchParams.get('teamId')
+    const userId = searchParams.get('userId')
+    if (!teamId || !userId) return json({ error: 'teamId and userId required' }, 400)
+    await db.clearTeamPresence(env, teamId, userId)
+    return json({ ok: true })
+  }
+
   if (pathname === '/checkout' && method === 'POST') {
     const { userId, email, successUrl, cancelUrl, interval } = await request.json()
     if (!userId || !successUrl || !cancelUrl) {

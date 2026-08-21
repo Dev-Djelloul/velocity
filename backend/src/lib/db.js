@@ -452,11 +452,19 @@ export async function createNotification(env, { userId, type, title, detail, pla
   return { id, userId, type, title, detail: detail || null, planId: planId || null, teamId: teamId || null, read: false }
 }
 
+// SQLite's datetime('now') renvoie "YYYY-MM-DD HH:MM:SS" en UTC mais SANS suffixe "Z" —
+// new Date(...) côté client traite alors cette chaîne comme une heure LOCALE (pas UTC),
+// d'où le décalage observé (ex: 05:26 affiché au lieu de 07:26 pour un fuseau UTC+2).
+// Convertie ici en ISO 8601 non ambigu avant de quitter le serveur.
+function toIsoUtc(sqliteDatetime) {
+  return sqliteDatetime ? sqliteDatetime.replace(' ', 'T') + 'Z' : sqliteDatetime
+}
+
 export async function listNotifications(env, userId, limit = 30) {
   const { results } = await env.DB.prepare(
     'SELECT * FROM notification_feed WHERE user_id = ? ORDER BY created_at DESC LIMIT ?'
   ).bind(userId, limit).all()
-  return results.map(r => ({ id: r.id, type: r.type, title: r.title, detail: r.detail, planId: r.plan_id, spaceId: r.team_id, read: !!r.read, createdAt: r.created_at }))
+  return results.map(r => ({ id: r.id, type: r.type, title: r.title, detail: r.detail, planId: r.plan_id, spaceId: r.team_id, read: !!r.read, createdAt: toIsoUtc(r.created_at) }))
 }
 
 export async function countUnreadNotifications(env, userId) {
@@ -470,6 +478,35 @@ export async function markNotificationRead(env, userId, id) {
 
 export async function markAllNotificationsRead(env, userId) {
   await env.DB.prepare('UPDATE notification_feed SET read = 1 WHERE user_id = ? AND read = 0').bind(userId).run()
+}
+
+// --- Présence d'équipe (dashboard + menu de bascule d'espace, voir migration 0018) ---
+
+const TEAM_PRESENCE_WINDOW_SECONDS = 40
+
+export async function heartbeatTeamPresence(env, { teamId, userId, name, avatar }) {
+  if (!teamId || !userId) return
+  await env.DB.prepare(
+    `INSERT INTO team_presence (team_id, user_id, name, avatar, last_seen)
+     VALUES (?, ?, ?, ?, datetime('now'))
+     ON CONFLICT(team_id, user_id) DO UPDATE SET name = excluded.name, avatar = excluded.avatar, last_seen = excluded.last_seen`
+  ).bind(teamId, userId, name || null, avatar || null).run()
+}
+
+export async function clearTeamPresence(env, teamId, userId) {
+  if (!teamId || !userId) return
+  await env.DB.prepare('DELETE FROM team_presence WHERE team_id = ? AND user_id = ?').bind(teamId, userId).run()
+}
+
+// Fenêtre glissante plutôt qu'un simple flag "en ligne" : pas d'événement de déconnexion
+// fiable pour un onglet fermé brutalement (crash, perte réseau) — une entrée trop vieille
+// est juste ignorée, sans jamais avoir besoin d'être nettoyée activement.
+export async function listTeamPresence(env, teamId) {
+  const { results } = await env.DB.prepare(
+    `SELECT user_id, name, avatar FROM team_presence
+     WHERE team_id = ? AND last_seen >= datetime('now', '-${TEAM_PRESENCE_WINDOW_SECONDS} seconds')`
+  ).bind(teamId).all()
+  return results.map(r => ({ userId: r.user_id, name: r.name, avatar: r.avatar }))
 }
 
 // --- Préférences de notification par email ---

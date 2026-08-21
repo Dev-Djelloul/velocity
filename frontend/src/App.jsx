@@ -39,6 +39,7 @@ import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from './lib/pricingTiers'
 import NotificationBell from './components/NotificationBell'
+import TeamPresenceAvatars from './components/TeamPresenceAvatars'
 import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
@@ -165,6 +166,7 @@ export default function App() {
   const [switchingSpace, setSwitchingSpace] = useState(false)
   const [creatingTeam, setCreatingTeam] = useState(false)
   const [pendingNotificationPlanId, setPendingNotificationPlanId] = useState(null)
+  const [pendingNotificationAnchor, setPendingNotificationAnchor] = useState(null)
   const [newTeamName, setNewTeamName] = useState('')
   const headerMenuRef = useRef(null)
 
@@ -535,13 +537,24 @@ export default function App() {
   // commentaire peut venir d'une équipe différente de celle affichée) — le changement est
   // asynchrone côté Clerk, donc on mémorise l'id à ouvrir et l'effet ci-dessous prend le
   // relais dès que le nouvel espace est chargé et ses plans resynchronisés.
+  // Certains types de notification pointent vers une section précise du plan plutôt que
+  // sa première page (ex: une édition collaborative concerne la roadmap, pas le résumé
+  // exécutif) — sinon "cliquer la notif" et "ouvrir le plan depuis l'historique" reviennent
+  // au même, alors que la notif promet d'amener directement à l'endroit concerné.
+  const sectionAnchorForNotification = (item) => (item.type === 'roadmap_collab' ? 'section-roadmap' : null)
+
   const handleOpenNotification = (item) => {
+    const anchor = sectionAnchorForNotification(item)
     if (item.spaceId === team.teamId) {
       const found = getAllPlans().find(p => p.id === item.planId)
-      if (found) handleLoadFromHistory(found)
+      if (found) {
+        handleLoadFromHistory(found)
+        if (anchor) requestAnimationFrame(() => requestAnimationFrame(() => scrollToAnchor(anchor)))
+      }
       return
     }
     setPendingNotificationPlanId(item.planId)
+    setPendingNotificationAnchor(anchor)
     team.setActiveTeamId(item.spaceId)
   }
 
@@ -550,7 +563,9 @@ export default function App() {
     const found = getAllPlans().find(p => p.id === pendingNotificationPlanId)
     if (found) {
       handleLoadFromHistory(found)
+      if (pendingNotificationAnchor) requestAnimationFrame(() => requestAnimationFrame(() => scrollToAnchor(pendingNotificationAnchor)))
       setPendingNotificationPlanId(null)
+      setPendingNotificationAnchor(null)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pendingNotificationPlanId, team.teamId, team.isLoaded, dataVersion])
@@ -843,6 +858,7 @@ export default function App() {
                             <span className="header-space-row header-space-row-static">
                               <TeamAvatar id={team.teamId} name={team.teamName} imageUrl={team.teamImageUrl} />
                               <span className="header-space-name">{team.teamName}</span>
+                              <TeamPresenceAvatars teamId={team.teamId} lang={lang} excludeUserId={userId} />
                               <IconCheckCircle width={14} height={14} className="header-space-check" />
                             </span>
                           </div>
