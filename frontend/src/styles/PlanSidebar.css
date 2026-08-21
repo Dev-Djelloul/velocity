@@ -37,13 +37,14 @@
   padding: 2rem 1.5rem 4rem;
 }
 
-/* Verre dépoli quand un fond de page est actif (voir .plan-page-outer ci-dessus) : la
-   sidebar reste lisible sans redevenir un bloc opaque qui masquerait totalement l'image
-   demandée par l'utilisateur — comportement inchangé (fond plein, opaque) en l'absence de
-   fond personnalisé. */
 /* Trame de points façon Nova (voir .copilot-empty-bg, CopilotChat.css) reprise ici pour la
    cohérence visuelle — même formule (dégradé radial répété), sur tout le panneau plutôt
-   qu'un fond plat uni, demandé explicitement pour donner du style à la sidebar. */
+   qu'un fond plat uni, demandé explicitement pour donner du style à la sidebar. Fond plein
+   et opaque (--color-dashboard) en permanence, y compris quand un fond de page personnalisé
+   est actif : l'ancien verre dépoli semi-transparent (color-mix + blur) faisait paraître la
+   sidebar teintée d'une autre couleur que les cartes du plan, qui elles restent toujours
+   pleinement opaques — demandé explicitement, la sidebar doit matcher exactement leur
+   couleur. */
 .plan-sidebar {
   position: sticky;
   top: 2rem;
@@ -60,12 +61,6 @@
   flex-direction: column;
   overflow: visible;
   transition: width 0.18s ease, background-color 0.18s ease;
-}
-
-.plan-page-outer:has(.plan-page-bg) .plan-sidebar {
-  background-color: color-mix(in srgb, var(--color-dashboard) 78%, transparent);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
 }
 
 /* En thème clair, --color-dashboard est déjà blanc pur (#fff) — la même trame que sur fond
