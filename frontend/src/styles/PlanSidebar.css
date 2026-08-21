@@ -300,6 +300,21 @@
   border-radius: 9px;
 }
 
+/* Historique/Commentaires/Conversation Nova partagent .plan-sidebar-history-toggle, qui
+   garde son cadre en dégradé (pleine largeur) même repliée — seul son contenu était centré
+   (justify-content, via la règle .plan-sidebar-item générale), pas le bouton lui-même,
+   contrairement à .plan-sidebar-new-btn ci-dessus : les trois cadres restaient donc plus
+   larges et légèrement décalés par rapport aux icônes nues en dessous (retour utilisateur).
+   Même traitement ici : carré 34px centré. */
+.plan-sidebar.collapsed .plan-sidebar-history-toggle {
+  width: 34px;
+  height: 34px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0 auto;
+  border-radius: 9px;
+}
+
 .plan-sidebar-icon-gradient {
   color: #9184d9;
 }
