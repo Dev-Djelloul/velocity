@@ -21,6 +21,32 @@ export const landingTranslations = {
       title: 'Une carte de contrôle pour votre lancement',
       subtitle: 'Roadmap, sprints et pilotage exécutif se rejoignent dans une seule vue cohérente.'
     },
+    positioning: {
+      title: 'Trois catégories d\'outils. Une seule vous couvre entièrement.',
+      subtitle: 'Le marché des générateurs de plan par IA existe déjà — mais chaque catégorie ne couvre qu\'un tiers du travail réel de lancement.',
+      categories: [
+        {
+          label: 'Générateurs de business plan',
+          examples: 'LivePlan, Upmetrics, Bizplan',
+          covers: 'Prévisionnel financier, pitch deck investisseur',
+          missing: 'Aucune roadmap agile, aucun sprint, aucun suivi d\'exécution'
+        },
+        {
+          label: 'Générateurs de plan marketing / GTM',
+          examples: 'Junia AI, ClickUp Brain, Copy.ai',
+          covers: 'Positionnement, canaux, budget, calendrier, KPIs',
+          missing: 'Rien côté développement produit : pas de backlog, pas de sprints'
+        },
+        {
+          label: 'Espaces de planification de lancement',
+          examples: 'Storyflow',
+          covers: 'Positionnement, message, audience, timeline GTM',
+          missing: 'Pas d\'exécution agile structurée ni de prévisionnel financier chiffré'
+        }
+      ],
+      velocityLabel: 'VelocityLaunch',
+      velocityDesc: 'Le seul à combiner roadmap agile d\'exécution (sprints, backlog, Gantt), stratégie marketing chiffrée et prévisionnel financier — généré par IA à partir d\'un seul questionnaire, dans un seul outil.'
+    },
     features: {
       title: 'Planifier un lancement comme un pro',
       subtitle: 'Un seul système pour passer de l\'idée à un plan pilotable, partageable et prêt à exécuter.',
@@ -137,6 +163,32 @@ export const landingTranslations = {
     controlCard: {
       title: 'A control card for your launch',
       subtitle: 'Roadmap, sprints and executive oversight come together in one coherent view.'
+    },
+    positioning: {
+      title: 'Three categories of tools. One that covers you entirely.',
+      subtitle: 'The market for AI-generated launch plans already exists — but each category only covers a third of the real launch work.',
+      categories: [
+        {
+          label: 'Business plan generators',
+          examples: 'LivePlan, Upmetrics, Bizplan',
+          covers: 'Financial forecasting, investor pitch deck',
+          missing: 'No agile roadmap, no sprints, no execution tracking'
+        },
+        {
+          label: 'Marketing / GTM plan generators',
+          examples: 'Junia AI, ClickUp Brain, Copy.ai',
+          covers: 'Positioning, channels, budget, calendar, KPIs',
+          missing: 'Nothing on the product-development side: no backlog, no sprints'
+        },
+        {
+          label: 'Launch planning workspaces',
+          examples: 'Storyflow',
+          covers: 'Positioning, messaging, audience, GTM timeline',
+          missing: 'No structured agile execution, no costed financial forecast'
+        }
+      ],
+      velocityLabel: 'VelocityLaunch',
+      velocityDesc: 'The only one combining an agile execution roadmap (sprints, backlog, Gantt), a costed marketing strategy and a financial forecast — AI-generated from a single questionnaire, in a single tool.'
     },
     features: {
       title: 'Plan a launch like a pro',

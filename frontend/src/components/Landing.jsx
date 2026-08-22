@@ -184,6 +184,30 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
         </div>
       </section>
 
+      {/* Positioning - benchmark marché, pourquoi VelocityLaunch couvre plus que les 3
+          catégories existantes (générateurs de business plan / GTM / workspaces de lancement) */}
+      <section className="positioning-section" id="positioning">
+        <div className="section-header">
+          <h2>{tLanding(lang, 'positioning.title')}</h2>
+          <p>{tLanding(lang, 'positioning.subtitle')}</p>
+        </div>
+
+        <div className="positioning-grid">
+          {tLanding(lang, 'positioning.categories').map((cat, i) => (
+            <div key={i} className="positioning-card">
+              <h3>{cat.label}</h3>
+              <p className="positioning-examples">{cat.examples}</p>
+              <p className="positioning-covers"><strong>✓</strong> {cat.covers}</p>
+              <p className="positioning-missing"><strong>✕</strong> {cat.missing}</p>
+            </div>
+          ))}
+          <div className="positioning-card positioning-card-velocity">
+            <h3>{tLanding(lang, 'positioning.velocityLabel')}</h3>
+            <p>{tLanding(lang, 'positioning.velocityDesc')}</p>
+          </div>
+        </div>
+      </section>
+
       {/* How It Works */}
       <section className="how-it-works" id="how-it-works">
         <div className="section-header">
