@@ -275,6 +275,23 @@
 
 .plan-stat svg { color: var(--color-accent); flex-shrink: 0; }
 
+.plan-stat-progress { gap: 0.5rem; }
+
+.plan-progress-track {
+  width: 46px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(145, 132, 217, 0.18);
+  overflow: hidden;
+}
+
+.plan-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--color-accent);
+}
+
 .plan-stat-tooltip {
   position: relative;
   cursor: help;

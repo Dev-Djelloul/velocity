@@ -72,6 +72,18 @@ const SECTION_LIST = [
   { id: 'section-whatif', labelKey: 'whatif.title' }
 ]
 
+// Avancement calendaire du plan : position d'aujourd'hui entre la date de début et la date
+// de lancement, en pourcentage — pas un avancement des tâches (ça, c'est le burndown), juste
+// où on en est dans le temps par rapport au calendrier prévu.
+function scheduleProgress(startIso, launchIso) {
+  const start = new Date(startIso).getTime()
+  const launch = new Date(launchIso).getTime()
+  if (Number.isNaN(start) || Number.isNaN(launch) || launch <= start) return null
+  const now = Date.now()
+  const pct = ((now - start) / (launch - start)) * 100
+  return Math.max(0, Math.min(100, Math.round(pct)))
+}
+
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly, novaToggle, onCompareVersions }) {
   // Choke point unique : un plan partagé (lien /s/:id) ouvert par un visiteur
   // connecté avec SON PROPRE compte ne doit jamais pouvoir écraser le plan d'un autre —
@@ -682,6 +694,9 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   }
 
   const generatedDateTime = formatFullDateTime(plan.generatedAt || plan.savedAt || plan.updatedAt, lang)
+  const schedulePct = (plan.planStartDate || plan.generatedAt) && plan.launchDate
+    ? scheduleProgress(plan.planStartDate || plan.generatedAt, plan.launchDate)
+    : null
 
   // Une ligne de changement : compatible avec les entrées enregistrées avant l'ajout du
   // préfixe de section (simples chaînes).
@@ -869,6 +884,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                 <IconCalendar width={13} height={13} />
                 {formatDateNumeric(plan.planStartDate || plan.generatedAt, lang)} → {formatDateNumeric(plan.launchDate, lang)}
                 {plan.resources?.timelineWeeks && ` (${t(lang, 'resources.timelineOptions')[plan.resources.timelineWeeks] || plan.resources.timelineWeeks})`}
+              </span>
+            )}
+            {schedulePct !== null && (
+              <span className="plan-stat plan-stat-tooltip plan-stat-progress" data-tooltip={t(lang, 'resources.scheduleProgressHelp')}>
+                <span className="plan-progress-track">
+                  <span className="plan-progress-fill" style={{ width: `${schedulePct}%` }} />
+                </span>
+                {schedulePct}%
               </span>
             )}
             {!(plan.planStartDate || plan.generatedAt) && !plan.launchDate && plan.resources?.timelineWeeks && (
