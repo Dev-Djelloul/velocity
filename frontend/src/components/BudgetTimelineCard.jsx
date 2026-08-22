@@ -21,8 +21,16 @@ export default function BudgetTimelineCard({ lang, totalBudget, onTotalBudgetCha
         <label>
           <IconCreditCard width={14} height={14} /> {t(lang, 'outputs.budgetTimeline.budgetLabel')}: <strong>{formatMoney(totalBudget)}</strong>
         </label>
-        <input type="range" min="2000" max="100000" step="500" value={totalBudget}
-          onChange={e => onTotalBudgetChange(Number(e.target.value))} />
+        <div className="budget-timeline-budget-row">
+          {/* Le slider couvre les montants courants (0 à 200 000€) pour un ajustement
+              rapide ; le champ numérique à côté permet de saisir n'importe quel montant
+              au-delà, sans plafond — demandé explicitement après que le slider seul
+              écrasait silencieusement tout montant saisi au-delà de sa borne haute. */}
+          <input type="range" min="2000" max="200000" step="500" value={Math.min(totalBudget, 200000)}
+            onChange={e => onTotalBudgetChange(Number(e.target.value))} />
+          <input type="number" min="0" step="500" className="budget-timeline-budget-number" value={totalBudget}
+            onChange={e => onTotalBudgetChange(Math.max(0, Number(e.target.value) || 0))} />
+        </div>
       </div>
 
       <div className="budget-timeline-control">

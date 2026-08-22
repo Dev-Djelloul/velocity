@@ -1,7 +1,7 @@
 // Miroir frontend de backend/src/lib/generator/extendedGenerator.js — utilisé quand
 // l'application génère un plan hors-ligne / sans backend (repli local).
 
-import { BUDGET } from './budgetTiers'
+import { resolveBudgetAmount } from './budgetTiers'
 import { TIMELINE_WEEKS } from './timelineTiers'
 
 const ARPU_BY_MODEL = { b2b: 99, b2c: 15, hybrid: 40 }
@@ -28,7 +28,7 @@ export function generateFinancials(resources, market, lang, marketingBudget) {
   // totalBudget (enveloppe globale du lancement) pilote le prévisionnel financier — pas
   // budgetEur, qui n'est que la part marketing. Repli sur budgetEur pour les plans/brouillons
   // générés avant l'introduction de ce champ distinct.
-  const budget = BUDGET[resources?.totalBudget] ?? BUDGET[resources?.budgetEur] ?? 5000
+  const budget = resources?.totalBudget != null ? resolveBudgetAmount(resources.totalBudget) : resolveBudgetAmount(resources?.budgetEur)
   const weeks = TIMELINE_WEEKS[resources?.timelineWeeks] ?? 8
   const months = Math.max(1, weeks / 4.33)
 
@@ -129,7 +129,7 @@ export function generateStrategyToolkit(product, market, lang) {
 }
 
 export function generateExecutiveSummary(product, classification, resources, lang) {
-  const budget = BUDGET[resources?.totalBudget] ?? BUDGET[resources?.budgetEur] ?? 5000
+  const budget = resources?.totalBudget != null ? resolveBudgetAmount(resources.totalBudget) : resolveBudgetAmount(resources?.budgetEur)
   const weeks = TIMELINE_WEEKS[resources?.timelineWeeks] ?? 8
 
   return lang === 'en'

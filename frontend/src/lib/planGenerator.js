@@ -3,7 +3,7 @@ import { costFor } from './costMatrix'
 import { generatePersona } from './personaGenerator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
 import { c } from './contentI18n'
-import { BUDGET, budgetFromKey } from './budgetTiers'
+import { budgetFromKey, resolveBudgetAmount } from './budgetTiers'
 import { weeksFromKey } from './timelineTiers'
 
 const STORY_TEMPLATES = [
@@ -93,8 +93,8 @@ export function generateRoadmap(resources, product, priorities, lang) {
   // proportions relatives entre stories, juste ramenées au vrai budget disponible.
   const allStories = sprints.flatMap(sp => sp.stories)
   const rawTotal = allStories.reduce((s, x) => s + x.cost, 0)
-  const totalBudget = BUDGET[resources?.totalBudget]
-  const marketingBudget = BUDGET[resources?.budgetEur] ?? 0
+  const totalBudget = resources?.totalBudget != null ? resolveBudgetAmount(resources.totalBudget) : null
+  const marketingBudget = resolveBudgetAmount(resources?.budgetEur, 0)
   const devOpsBudget = totalBudget != null ? Math.max(0, totalBudget - marketingBudget) : null
   if (devOpsBudget != null && rawTotal > 0) {
     const scale = devOpsBudget / rawTotal

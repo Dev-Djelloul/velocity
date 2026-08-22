@@ -5,7 +5,7 @@ import { getAllPlans, deletePlan, duplicatePlan, toggleFavorite } from '../lib/p
 import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
-import { budgetFromKey } from '../lib/budgetTiers'
+import { resolveBudgetAmount } from '../lib/budgetTiers'
 import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
 import { teamColor } from './TeamAvatar'
 import { MembersPresenceRow } from './TeamPresenceAvatars'
@@ -80,16 +80,17 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
       if (!candidate) return latest
       return !latest || candidate > latest ? candidate : latest
     }, null)
-    // Budget cumulé = budget total du lancement (resources.totalBudget, une clé de tranche
-    // — ex. 'b10k' — résolue en euros via budgetFromKey) + budget marketing (marketing.
-    // totalBudget, déjà en euros), par plan, sommés sur l'espace — la carte ne reflétait
-    // avant que le seul budget marketing, devenu incomplet depuis l'ajout du budget total
-    // distinct (voir le questionnaire, resources.totalBudget). Les deux composantes restent
-    // détaillées séparément (launchBudget/marketingBudget) pour l'infobulle de la carte.
+    // Budget cumulé = budget total du lancement (resources.totalBudget — une clé de
+    // tranche pour un plan jamais retouché depuis le questionnaire, ou un montant brut en
+    // euros depuis que la carte Budget & Délai permet de l'éditer sans plafond ; les deux
+    // formes sont résolues via resolveBudgetAmount) + budget marketing (marketing.
+    // totalBudget, déjà en euros), par plan, sommés sur l'espace. Les deux composantes
+    // restent détaillées séparément (launchBudget/marketingBudget) pour l'infobulle de la
+    // carte.
     let launchBudget = 0
     let marketingBudget = 0
     plans.forEach(p => {
-      launchBudget += p.resources?.totalBudget ? budgetFromKey(p.resources.totalBudget) : 0
+      launchBudget += p.resources?.totalBudget ? resolveBudgetAmount(p.resources.totalBudget) : 0
       marketingBudget += p.marketing?.totalBudget || 0
     })
     return {

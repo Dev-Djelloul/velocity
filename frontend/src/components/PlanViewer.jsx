@@ -29,7 +29,7 @@ import { connectCollab, seedDocFromRoadmap, roadmapFromDoc, applyRoadmapDiff } f
 import { sendTeamPresenceHeartbeat, clearTeamPresence } from '../lib/serverStorage'
 import { generateMarketingStrategy, generateRoadmap } from '../lib/planGenerator'
 import { generateFinancials } from '../lib/extendedGenerator'
-import { budgetFromKey } from '../lib/budgetTiers'
+import { resolveBudgetAmount } from '../lib/budgetTiers'
 import { weeksFromKey, weeksKeyFor } from '../lib/timelineTiers'
 import BudgetTimelineCard from './BudgetTimelineCard'
 import { formatMoney } from '../lib/currency'
@@ -94,7 +94,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [showCoverPicker, setShowCoverPicker] = useState(false)
   const [showBgPicker, setShowBgPicker] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
-  const [totalBudget, setTotalBudget] = useState(budgetFromKey(plan.resources?.totalBudget))
+  const [totalBudget, setTotalBudget] = useState(resolveBudgetAmount(plan.resources?.totalBudget))
   const [timelineWeeks, setTimelineWeeks] = useState(weeksFromKey(plan.resources?.timelineWeeks))
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
@@ -213,7 +213,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // stocké sous forme de tranche (resources.totalBudget, ex. "b25k") — converti en valeur
   // numérique pour le slider, reconverti en tranche à l'enregistrement (voir handleSave).
   useEffect(() => {
-    setTotalBudget(budgetFromKey(plan.resources?.totalBudget))
+    setTotalBudget(resolveBudgetAmount(plan.resources?.totalBudget))
   }, [plan.resources?.totalBudget])
 
   useEffect(() => {
@@ -266,13 +266,16 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // Prévisionnel financier (carte "Prévisionnel financier") : recalculé en direct à partir
   // du budget TOTAL du lancement (pas du budget marketing, qui n'en est qu'une part — voir
   // discussion produit) ET du délai visé (weeks détermine le dénominateur "mois" de la
-  // dépense mensuelle dans generateFinancials). Les deux attendent une tranche (ex. "b25k",
-  // "w12"), pas une valeur brute : reconversion via budgetKeyFor/weeksKeyFor. Le 4e argument
-  // (`budget`, le vrai budget marketing éditable dans Stratégie marketing) garantit que la
-  // ligne "Marketing" de la Répartition du budget correspond exactement à ce budget réel,
-  // au lieu d'une part fixe de 35% inventée indépendamment (retour utilisateur, capture).
+  // dépense mensuelle dans generateFinancials). totalBudget est passé tel quel, en euros —
+  // PAS via budgetKeyFor, dont les tranches plafonnaient silencieusement tout montant
+  // au-delà de 100 000€ à 50 000€ (retour utilisateur, capture à l'appui) ; generateFinancials
+  // accepte maintenant un montant brut aussi bien qu'une tranche (voir resolveBudgetAmount).
+  // Le délai, lui, reste sur tranche (weeksKeyFor) — pas de plafond signalé sur ce champ.
+  // Le 4e argument (`budget`, le vrai budget marketing éditable dans Stratégie marketing)
+  // garantit que la ligne "Marketing" de la Répartition du budget correspond exactement à
+  // ce budget réel, au lieu d'une part fixe de 35% inventée indépendamment.
   const liveFinancials = generateFinancials(
-    { ...plan.resources, totalBudget: budgetKeyFor(totalBudget), timelineWeeks: weeksKeyFor(timelineWeeks) },
+    { ...plan.resources, totalBudget, timelineWeeks: weeksKeyFor(timelineWeeks) },
     plan.market,
     plan.language || lang,
     budget
@@ -301,8 +304,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const handleTotalBudgetChange = (nextTotal) => {
     setTotalBudget(nextTotal)
     markChanged('totalBudget', 'totalBudget', lang === 'fr'
-      ? `Budget total : ${budgetFromKey(plan.resources?.totalBudget)}€ → ${nextTotal}€`
-      : `Total budget: €${budgetFromKey(plan.resources?.totalBudget)} → €${nextTotal}`)
+      ? `Budget total : ${resolveBudgetAmount(plan.resources?.totalBudget)}€ → ${nextTotal}€`
+      : `Total budget: €${resolveBudgetAmount(plan.resources?.totalBudget)} → €${nextTotal}`)
     // Rabaisse aussi le budget marketing s'il dépassait désormais le nouveau total — clamp
     // direct sur nextTotal plutôt que via handleBudgetChange, dont le plafond lirait encore
     // l'ancienne valeur de `totalBudget` (mise à jour asynchrone de l'état React ci-dessus).
@@ -605,7 +608,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       // rechargement) — les persister effacerait définitivement des canaux que
       // l'utilisateur n'a fait que masquer temporairement à l'affichage.
       marketing: { ...plan.marketing, totalBudget: budget },
-      resources: { ...plan.resources, totalBudget: budgetKeyFor(totalBudget), timelineWeeks: weeksKeyFor(timelineWeeks) },
+      resources: { ...plan.resources, totalBudget, timelineWeeks: weeksKeyFor(timelineWeeks) },
       financials: liveFinancials,
       changeLog: nextChangeLog
     })
@@ -842,7 +845,9 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             {plan.resources?.totalBudget && (
               <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.totalBudgetHelp')}>
                 <IconCreditCard width={13} height={13} />
-                {t(lang, 'resources.budgetOptions')[plan.resources.totalBudget] || plan.resources.totalBudget}
+                {typeof plan.resources.totalBudget === 'number'
+                  ? formatMoney(plan.resources.totalBudget)
+                  : (t(lang, 'resources.budgetOptions')[plan.resources.totalBudget] || plan.resources.totalBudget)}
               </span>
             )}
             {(plan.marketing?.totalBudget != null || plan.resources?.budgetEur) && (
