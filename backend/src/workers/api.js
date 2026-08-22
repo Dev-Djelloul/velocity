@@ -203,6 +203,19 @@ export async function handleApi(request, env, url) {
     }
   }
 
+  // Octroi manuel du Pro — pour les testeurs beta qui donnent du feedback en échange d'un
+  // accès gratuit (voir le plan de lancement), en attendant un vrai mécanisme de coupon
+  // Stripe. Protégé par un secret partagé (env.ADMIN_SECRET) plutôt qu'une authentification
+  // complète : usage occasionnel, à la main, pas une surface d'admin exposée dans l'UI.
+  if (pathname === '/admin/grant-pro' && method === 'POST') {
+    if (!env.ADMIN_SECRET) return json({ error: 'admin_not_configured' }, 501)
+    const body = await request.json().catch(() => ({}))
+    if (body.secret !== env.ADMIN_SECRET) return json({ error: 'unauthorized' }, 401)
+    if (!body.userId) return json({ error: 'userId required' }, 400)
+    await db.setPro(env, body.userId, body.isPro !== false, null)
+    return json({ ok: true, userId: body.userId, isPro: body.isPro !== false })
+  }
+
   if (pathname === '/plan-versions' && method === 'GET') {
     const planId = searchParams.get('planId')
     if (!planId) return json({ error: 'planId required' }, 400)

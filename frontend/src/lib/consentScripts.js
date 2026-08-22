@@ -8,6 +8,7 @@ const VITE = import.meta.env
 let cfLoaded = false
 let fbLoaded = false
 let linkedinLoaded = false
+let googleAdsLoaded = false
 
 function loadCloudflareAnalytics() {
   if (cfLoaded) return
@@ -61,6 +62,24 @@ function loadLinkedInInsight() {
   document.head.appendChild(script)
 }
 
+function loadGoogleAdsTag() {
+  if (googleAdsLoaded) return
+  const conversionId = VITE.VITE_GOOGLE_ADS_ID
+  if (!conversionId) {
+    if (import.meta.env.DEV) console.info('[consent] Marketing accepté mais VITE_GOOGLE_ADS_ID absent — Google Ads non chargé.')
+    return
+  }
+  googleAdsLoaded = true
+  const script = document.createElement('script')
+  script.async = true
+  script.src = `https://www.googletagmanager.com/gtag/js?id=${conversionId}`
+  document.head.appendChild(script)
+  window.dataLayer = window.dataLayer || []
+  window.gtag = function gtag() { window.dataLayer.push(arguments) }
+  window.gtag('js', new Date())
+  window.gtag('config', conversionId)
+}
+
 // prefs: { statistics: boolean, marketing: boolean } — preferences n'a aucun script
 // associé pour l'instant (rien au-delà de langue/thème, déjà couvert par "Essentiels").
 export function applyConsent(prefs) {
@@ -69,5 +88,6 @@ export function applyConsent(prefs) {
   if (prefs.marketing) {
     loadFacebookPixel()
     loadLinkedInInsight()
+    loadGoogleAdsTag()
   }
 }
