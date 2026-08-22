@@ -847,7 +847,8 @@ export const translations = {
             items: [
               'Nouvelle carte dans l\'onglet Go-to-market avec deux sliders — budget total du lancement et délai visé — qui pilotent le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan',
               'Le budget marketing ne peut plus dépasser le budget total : il se rabaisse automatiquement si le total redescend en dessous',
-              'Le délai déplace la date de lancement cible partout où elle est affichée, sans reconstruire la roadmap déjà planifiée (sprints, statuts, déplacements de stories) pour ne jamais écraser du travail déjà fait'
+              'Le délai déplace la date de lancement cible partout où elle est affichée, sans reconstruire la roadmap déjà planifiée (sprints, statuts, déplacements de stories) pour ne jamais écraser du travail déjà fait',
+              'Nouveau bouton "Reconstruire la roadmap à partir du délai actuel" pour ceux qui veulent repartir sur de nouvelles bases — avertissement explicite avant confirmation : ça remplace entièrement sprints, stories, statuts et déplacements déjà en place'
             ]
           },
           {
@@ -1145,7 +1146,7 @@ export const translations = {
             label: 'Marketing & finance',
             items: [
               'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
-              'Carte "Budget & Délai" : budget total et délai de lancement éditables, source unique qui pilote le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan',
+              'Carte "Budget & Délai" : budget total et délai de lancement éditables, source unique qui pilote le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan, avec reconstruction possible de la roadmap depuis le nouveau délai',
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
               'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
               'Suivi post-lancement & simulateur budget/timeline en direct'
@@ -1215,7 +1216,7 @@ export const translations = {
               'Application installable (PWA) : icône sur l\'écran d\'accueil, ouverture en plein écran sans barre de navigateur, premier chargement quasi instantané depuis le cache',
               'Bibliothèque de versions "avant/après" : un instantané complet du plan à chaque enregistrement, comparable à tout moment (roadmap, personas, finances, budget, KPIs, résumé exécutif)',
               'Dashboard : bandeau défilant de conseils générés par IA (renouvelés toutes les 15 min), calendrier du mois avec échéances de lancement, prochaines échéances tous plans confondus',
-              'Carte "Budget & Délai" (Go-to-market) : budget total et délai de lancement éditables, pilotent le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan'
+              'Carte "Budget & Délai" (Go-to-market) : budget total et délai de lancement éditables, pilotent le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan, avec reconstruction possible de la roadmap depuis le nouveau délai'
             ]
           },
           {
@@ -2536,7 +2537,8 @@ export const translations = {
             items: [
               'New card in the Go-to-market tab with two sliders — total launch budget and target timeline — that now drive the financial forecast, the marketing budget cap and the plan\'s identity card',
               'The marketing budget can no longer exceed the total budget: it automatically scales down if the total drops below it',
-              'The timeline moves the target launch date everywhere it\'s shown, without rebuilding the already-planned roadmap (sprints, statuses, story moves) so existing work is never overwritten'
+              'The timeline moves the target launch date everywhere it\'s shown, without rebuilding the already-planned roadmap (sprints, statuses, story moves) so existing work is never overwritten',
+              'New "Rebuild the roadmap from the current timeline" button for a fresh start — explicit warning before confirmation: this entirely replaces existing sprints, stories, statuses and story moves'
             ]
           },
           {
@@ -2834,7 +2836,7 @@ export const translations = {
             label: 'Marketing & finance',
             items: [
               'Distinct marketing budget and total launch budget, with an associated financial forecast',
-              '"Budget & Timeline" card: editable total budget and launch timeline, single source driving the financial forecast, the marketing budget cap and the plan\'s identity card',
+              '"Budget & Timeline" card: editable total budget and launch timeline, single source driving the financial forecast, the marketing budget cap and the plan\'s identity card, with an option to rebuild the roadmap from the new timeline',
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
               'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
               'Post-launch tracking & live budget/timeline simulator'
@@ -2904,7 +2906,7 @@ export const translations = {
               'Installable app (PWA): home screen icon, full-screen launch with no browser chrome, near-instant first load from cache',
               '"Before/after" version library: a full snapshot of the plan on every save, comparable at any time (roadmap, personas, financials, budget, KPIs, executive summary)',
               'Dashboard: scrolling AI-generated tip ticker (refreshed every 15 min), monthly calendar with launch deadlines, upcoming deadlines across all plans',
-              '"Budget & Timeline" card (Go-to-market): editable total budget and launch timeline, driving the financial forecast, the marketing budget cap and the plan\'s identity card'
+              '"Budget & Timeline" card (Go-to-market): editable total budget and launch timeline, driving the financial forecast, the marketing budget cap and the plan\'s identity card, with an option to rebuild the roadmap from the new timeline'
             ]
           },
           {
