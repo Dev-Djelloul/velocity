@@ -46,6 +46,9 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
   if (!roadmap) return null
 
   const startDateStr = (planStartDate || todayStr()).split('T')[0]
+  // Affiché en lettres (comme "Lancement visé"), pas en chiffres bruts — le format ISO ne
+  // revient que dans le <input type="date"> pendant l'édition, qui l'exige nativement.
+  const formattedStartDate = new Date(startDateStr).toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
 
   const saveStartDate = () => {
     if (tempStartDate && onPlanStartDateChange) onPlanStartDateChange(tempStartDate)
@@ -103,7 +106,7 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
           <h3>{t(lang, 'outputs.roadmap')}</h3>
           <p className="roadmap-subtitle">{t(lang, 'outputs.roadmapSubtitle')}</p>
         </div>
-        <div className="roadmap-start-date" title={t(lang, 'outputs.prepStartHint')}>
+        <div className="roadmap-start-date">
           {isEditingStartDate ? (
             <div className="roadmap-start-date-edit">
               <input type="date" value={tempStartDate} onChange={e => setTempStartDate(e.target.value)} />
@@ -114,7 +117,7 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
             <>
               <div className="roadmap-start-date-display">
                 <span className="roadmap-start-date-label">{t(lang, 'outputs.prepStartLabel')}</span>
-                <span className="roadmap-start-date-value">{startDateStr}</span>
+                <span className="roadmap-start-date-value">{formattedStartDate}</span>
                 <button className="roadmap-start-date-edit-btn" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>
                   <IconPencil width={12} height={12} />
                 </button>
