@@ -259,12 +259,19 @@ export async function handleApi(request, env, url) {
   if (planMatch && method === 'DELETE') {
     const userId = searchParams.get('userId')
     const teamId = searchParams.get('teamId') || null
-    const role = searchParams.get('role') || null
     if (!userId) return json({ error: 'userId required' }, 400)
     // Un plan d'équipe ne peut être supprimé que par un admin — un membre simple peut
-    // créer/éditer mais pas supprimer. Le rôle vient du client (voir la note de confiance
-    // en tête de db.js) : suffisant pour ce produit, à durcir avec la vérification JWT.
-    if (teamId && role !== 'org:admin') return json({ error: 'forbidden' }, 403)
+    // créer/éditer mais pas supprimer. Vérifié ici directement auprès de Clerk (pas via un
+    // paramètre `role` fourni par le client) : ce dernier pouvait renvoyer 403 pour de
+    // mauvaises raisons (rôle non encore chargé côté client au moment du clic, valeur
+    // absente...) et rejeter des suppressions parfaitement légitimes — retour utilisateur,
+    // capture à l'appui : l'admin réel de son unique équipe se voyait refuser la suppression
+    // de son propre plan.
+    if (teamId) {
+      const memberships = await listUserOrganizationMemberships(env, userId).catch(() => [])
+      const isAdmin = memberships.some(m => m.organization?.id === teamId && m.role === 'org:admin')
+      if (!isAdmin) return json({ error: 'forbidden' }, 403)
+    }
     const deleted = await db.deletePlan(env, userId, planMatch[1], teamId)
     if (!deleted) return json({ error: 'not_found' }, 404)
     return json({ ok: true })
