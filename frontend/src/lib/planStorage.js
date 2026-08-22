@@ -123,12 +123,27 @@ export function getPlanById(id) {
   return plans.find(p => p.id === id)
 }
 
-export function deletePlan(id) {
+// `teamId`/`role` optionnels : par défaut, on suppose que le plan appartient à l'espace
+// actuellement actif (cas de SpacePage "Plans partagés", qui ne liste jamais que l'espace
+// actif — sûr sans ces paramètres). Mais "Historique de tous les plans" (Mon compte) liste
+// des plans de PLUSIEURS espaces à la fois : y supprimer un plan d'un espace différent de
+// l'espace actif écrivait dans le mauvais cache localStorage et envoyait le mauvais teamId
+// au serveur — la suppression semblait réussir dans l'UI mais ne touchait ni le bon cache
+// local ni la bonne ligne côté serveur (WHERE id=? AND team_id=? ne matchait rien), donc le
+// plan revenait après rechargement (retour utilisateur, bug critique). D'où ces deux
+// paramètres explicites, à fournir dès que le plan peut venir d'un espace non actif.
+export function deletePlan(id, teamId, role) {
   if (!activeUserId) return
-  const plans = getAllPlans()
+  const scopeTeamId = teamId !== undefined ? (teamId || null) : activeTeamId
+  const scopeRole = teamId !== undefined ? (role || null) : activeRole
+  const key = plansKey(activeUserId, scopeTeamId)
+  let plans = []
+  try {
+    plans = JSON.parse(localStorage.getItem(key) || '[]')
+  } catch { /* clé corrompue, on repart d'une liste vide */ }
   const filtered = plans.filter(p => p.id !== id)
-  localStorage.setItem(plansKey(activeUserId, activeTeamId), JSON.stringify(filtered))
-  removePlan(activeUserId, id, activeTeamId, activeRole)
+  localStorage.setItem(key, JSON.stringify(filtered))
+  removePlan(activeUserId, id, scopeTeamId, scopeRole)
 }
 
 // Déplace un plan de l'espace actif vers un autre espace (personnel ou une autre équipe).

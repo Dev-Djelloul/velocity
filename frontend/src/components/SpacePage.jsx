@@ -105,7 +105,11 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   }, [isTeam, plans, team.members])
 
   const confirmDelete = () => {
-    deletePlan(deleteTarget.id)
+    // Cette page ne liste que les plans de l'espace ACTUELLEMENT actif, donc team.teamId
+    // correspond toujours bien à deleteTarget — explicite quand même (au lieu de compter
+    // sur le repli implicite de deletePlan) pour rester correct si cette page listait un
+    // jour des plans d'un autre espace.
+    deletePlan(deleteTarget.id, team.teamId ?? null, team.role)
     setPlans(getAllPlans())
     setDeleteTarget(null)
   }

@@ -209,7 +209,7 @@ export function useTeam() {
       role: active ? 'org:admin' : null,
       isAdmin: !!active,
       members: active?.members ?? [],
-      myTeams: team ? [team] : [],
+      myTeams: team ? [{ ...team, role: 'org:admin' }] : [],
       setActiveTeamId,
       createTeam,
       isMock: true
@@ -218,13 +218,17 @@ export function useTeam() {
   const { organization, membership, isLoaded, memberships } = useOrganization({ memberships: { infinite: true } })
   const { userMemberships, setActive, createOrganization, isLoaded: listLoaded } = useOrganizationList({ userMemberships: { infinite: true } })
   const seenTeamIds = new Set()
+  // `role` ajouté ici (pas seulement sur l'organisation ACTIVE via `membership` plus bas) :
+  // nécessaire pour supprimer un plan d'équipe depuis une vue qui liste des plans de
+  // PLUSIEURS espaces à la fois (Historique de tous les plans) sans avoir à basculer
+  // d'espace actif avant chaque suppression — voir deletePlan() dans planStorage.js.
   const myTeams = (userMemberships?.data || [])
-    .map(m => m.organization)
-    .filter(org => {
-      if (!org || seenTeamIds.has(org.id)) return false
-      seenTeamIds.add(org.id)
+    .filter(m => {
+      if (!m.organization || seenTeamIds.has(m.organization.id)) return false
+      seenTeamIds.add(m.organization.id)
       return true
     })
+    .map(m => ({ ...m.organization, role: m.role }))
   // Liste des membres de l'équipe active — nécessaire pour l'assignation de tâches
   // (BacklogCard). publicUserData est ce que Clerk expose sans permission particulière.
   const members = (memberships?.data || []).map(m => ({

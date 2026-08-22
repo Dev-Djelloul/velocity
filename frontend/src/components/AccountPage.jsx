@@ -117,7 +117,14 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
   const remaining = remainingCredits(userId)
 
   const confirmRemovePlan = () => {
-    deletePlan(deletePlanTarget.id)
+    // deletePlanTarget peut venir de n'importe quel espace (cette page liste tous les plans,
+    // tous espaces confondus) — jamais supposer que c'est l'espace actuellement actif, voir
+    // le commentaire de deletePlan() dans planStorage.js pour le bug que ça causait.
+    const planTeamId = deletePlanTarget.team_id ?? null
+    const role = planTeamId === (team.teamId ?? null)
+      ? team.role
+      : team.myTeams?.find(tm => tm.id === planTeamId)?.role
+    deletePlan(deletePlanTarget.id, planTeamId, role)
     refreshPlans()
     setDeletePlanTarget(null)
   }
