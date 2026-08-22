@@ -1,5 +1,6 @@
 import { costFor, sprintCapacity, sprintCount, resolveAssignee } from '../engine'
 import { c } from '../contentI18n'
+import { BUDGET } from './budgetTiers'
 
 const STORY_TEMPLATES = [
   { key: 'onboarding', category: 'product', type: 'frontend', effort: 8, assignee: 'Dev' },
@@ -55,9 +56,31 @@ export function generateRoadmap(resources, product, priorities, lang) {
       sprintId: i + 1,
       duration: '2 weeks',
       stories,
-      estimatedCost: stories.reduce((s, x) => s + x.cost, 0),
       risks: i === 0 && risk ? [risk] : []
     })
+  }
+
+  // Coûts bruts (costFor) mis à l'échelle du vrai budget produit/ops du plan (budget total
+  // moins le budget marketing, déjà géré séparément) — sinon "coût estimé" reste toujours
+  // proche du même montant peu importe le budget déclaré. Voir le miroir frontend
+  // (planGenerator.js) pour le contexte complet.
+  const allStories = sprints.flatMap(sp => sp.stories)
+  const rawTotal = allStories.reduce((s, x) => s + x.cost, 0)
+  const totalBudget = BUDGET[resources?.totalBudget]
+  const marketingBudget = BUDGET[resources?.budgetEur] ?? 0
+  const devOpsBudget = totalBudget != null ? Math.max(0, totalBudget - marketingBudget) : null
+  if (devOpsBudget != null && rawTotal > 0) {
+    const scale = devOpsBudget / rawTotal
+    let allocated = 0
+    allStories.forEach((story, idx) => {
+      const isLast = idx === allStories.length - 1
+      story.cost = isLast ? Math.max(0, devOpsBudget - allocated) : Math.max(0, Math.round(story.cost * scale))
+      allocated += story.cost
+    })
+  }
+
+  for (const sp of sprints) {
+    sp.estimatedCost = sp.stories.reduce((s, x) => s + x.cost, 0)
   }
 
   return {
@@ -65,4 +88,29 @@ export function generateRoadmap(resources, product, priorities, lang) {
     totalDuration: weeks,
     estimatedCost: sprints.reduce((s, sp) => s + sp.estimatedCost, 0)
   }
+}
+
+// Filet de sécurité pour la roadmap générée par IA (planSchema.js demande déjà à l'IA de
+// garder le coût des stories cohérent avec le budget déclaré, mais une instruction de
+// prompt reste indicative) — remet à l'échelle tous les coûts de stories après coup pour
+// que leur somme corresponde exactement au budget produit/ops réel (budget total moins
+// budget marketing), en conservant les proportions relatives déjà proposées par le modèle.
+export function reconcileRoadmapCosts(roadmap, resources) {
+  if (!roadmap?.sprints?.length) return roadmap
+  const totalBudget = BUDGET[resources?.totalBudget]
+  const marketingBudget = BUDGET[resources?.budgetEur] ?? 0
+  if (totalBudget == null) return roadmap
+  const devOpsBudget = Math.max(0, totalBudget - marketingBudget)
+  const allStories = roadmap.sprints.flatMap(sp => sp.stories || [])
+  const rawTotal = allStories.reduce((s, x) => s + (x.cost || 0), 0)
+  if (!rawTotal) return roadmap
+  const scale = devOpsBudget / rawTotal
+  let allocated = 0
+  allStories.forEach((story, idx) => {
+    const isLast = idx === allStories.length - 1
+    story.cost = isLast ? Math.max(0, devOpsBudget - allocated) : Math.max(0, Math.round(story.cost * scale))
+    allocated += story.cost
+  })
+  const nextSprints = roadmap.sprints.map(sp => ({ ...sp, estimatedCost: (sp.stories || []).reduce((s, x) => s + x.cost, 0) }))
+  return { ...roadmap, sprints: nextSprints, estimatedCost: nextSprints.reduce((s, sp) => s + sp.estimatedCost, 0) }
 }

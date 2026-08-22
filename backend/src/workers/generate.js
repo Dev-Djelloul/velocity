@@ -1,4 +1,4 @@
-import { generateRoadmap } from '../lib/generator/roadmapGenerator'
+import { generateRoadmap, reconcileRoadmapCosts } from '../lib/generator/roadmapGenerator'
 import { generateMarketingStrategy } from '../lib/generator/marketingStrategyGenerator'
 import { calculateKPIs } from '../lib/generator/kpiCalculator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary, reconcileFinancialsWithMarketing } from '../lib/generator/extendedGenerator'
@@ -320,10 +320,13 @@ export default {
         generated = await generatePlanWithAI(data, env)
         source = 'ai'
         // Le prompt (planSchema.js) demande déjà à l'IA de garder la ligne "Marketing" du
-        // prévisionnel cohérente avec marketing.totalBudget, mais une instruction de prompt
-        // n'est jamais une garantie — recalé après coup pour que ce soit toujours vrai.
+        // prévisionnel et le coût des stories cohérents avec le budget déclaré, mais une
+        // instruction de prompt n'est jamais une garantie — recalés après coup.
         if (generated.financials && generated.marketing?.totalBudget != null) {
           generated = { ...generated, financials: reconcileFinancialsWithMarketing(generated.financials, generated.marketing.totalBudget) }
+        }
+        if (generated.roadmap) {
+          generated = { ...generated, roadmap: reconcileRoadmapCosts(generated.roadmap, data.resources) }
         }
       } catch (aiError) {
         generated = generateWithRules(data, lang)

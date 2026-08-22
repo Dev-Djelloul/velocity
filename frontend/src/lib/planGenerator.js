@@ -3,7 +3,7 @@ import { costFor } from './costMatrix'
 import { generatePersona } from './personaGenerator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
 import { c } from './contentI18n'
-import { budgetFromKey } from './budgetTiers'
+import { BUDGET, budgetFromKey } from './budgetTiers'
 import { weeksFromKey } from './timelineTiers'
 
 const STORY_TEMPLATES = [
@@ -80,9 +80,37 @@ export function generateRoadmap(resources, product, priorities, lang) {
       sprintId: i + 1,
       duration: '2 weeks',
       stories,
-      estimatedCost: stories.reduce((s, x) => s + x.cost, 0),
       risks: i === 0 && risk ? [risk] : []
     })
+  }
+
+  // Les coûts bruts (costFor, costMatrix.js) sont des tarifs fixes par type de story,
+  // totalement indépendants du budget réel du plan — reconstruire la roadmap avec un
+  // nouveau budget total redonnait donc toujours à peu près le même "coût estimé", sans
+  // rapport avec ce budget (retour utilisateur). Les coûts sont ici mis à l'échelle pour
+  // que la somme corresponde à la part du budget total qui revient au produit/ops (le
+  // budget marketing, lui, est déjà géré séparément par generateMarketingStrategy) — même
+  // proportions relatives entre stories, juste ramenées au vrai budget disponible.
+  const allStories = sprints.flatMap(sp => sp.stories)
+  const rawTotal = allStories.reduce((s, x) => s + x.cost, 0)
+  const totalBudget = BUDGET[resources?.totalBudget]
+  const marketingBudget = BUDGET[resources?.budgetEur] ?? 0
+  const devOpsBudget = totalBudget != null ? Math.max(0, totalBudget - marketingBudget) : null
+  if (devOpsBudget != null && rawTotal > 0) {
+    const scale = devOpsBudget / rawTotal
+    let allocated = 0
+    allStories.forEach((story, idx) => {
+      const isLast = idx === allStories.length - 1
+      // Le dernier lot absorbe l'arrondi pour que la somme corresponde exactement au
+      // budget cible, plutôt que de dériver de quelques euros à force d'arrondis story par
+      // story.
+      story.cost = isLast ? Math.max(0, devOpsBudget - allocated) : Math.max(0, Math.round(story.cost * scale))
+      allocated += story.cost
+    })
+  }
+
+  for (const sp of sprints) {
+    sp.estimatedCost = sp.stories.reduce((s, x) => s + x.cost, 0)
   }
 
   return {

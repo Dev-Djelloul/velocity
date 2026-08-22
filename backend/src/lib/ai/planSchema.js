@@ -11,7 +11,7 @@ const STORY_SCHEMA = {
     acceptanceCriteria: { type: 'array', items: { type: 'string' }, description: '2 critères concrets et vérifiables pour considérer la story terminée' },
     assignee: { type: 'string', description: 'Rôle responsable, ex: Dev, Marketing, Design, Product' },
     effort: { type: 'integer', description: 'Points d\'effort (story points)' },
-    cost: { type: 'integer', description: 'Coût estimé en euros' },
+    cost: { type: 'integer', description: 'Coût estimé en euros — la somme des coûts de toutes les stories de la roadmap doit rester cohérente avec le budget total du lancement (moins la part déjà réservée au budget marketing), pas une estimation déconnectée du budget déclaré' },
     dependsOn: { type: 'array', items: { type: 'string' }, description: 'IDs des stories dont celle-ci dépend' }
   },
   required: ['id', 'title', 'description', 'acceptanceCriteria', 'assignee', 'effort', 'cost', 'dependsOn']
