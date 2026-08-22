@@ -83,8 +83,28 @@ export function TermsModal({ lang, onClose }) {
       </section>
 
       <section>
+        <h2>{t(lang, 'modals.terms.aiHeading')}</h2>
+        <p>{t(lang, 'modals.terms.aiText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.terms.teamHeading')}</h2>
+        <p>{t(lang, 'modals.terms.teamText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.terms.subscriptionHeading')}</h2>
+        <p>{t(lang, 'modals.terms.subscriptionText')}</p>
+      </section>
+
+      <section>
         <h2>{t(lang, 'modals.terms.availabilityHeading')}</h2>
         <p>{t(lang, 'modals.terms.availabilityText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.terms.terminationHeading')}</h2>
+        <p>{t(lang, 'modals.terms.terminationText')}</p>
       </section>
 
       <section>
