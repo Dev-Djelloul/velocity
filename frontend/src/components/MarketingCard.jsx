@@ -22,6 +22,7 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
       <div className="marketing-header">
         <h3>{t(lang, 'outputs.marketing')}</h3>
         <p className="marketing-subtitle">{t(lang, 'outputs.strategyLabel')}: {strategy}</p>
+        <p className="marketing-scope-note">{t(lang, 'outputs.marketingScopeNote')}</p>
       </div>
 
       {onBudgetChange && (

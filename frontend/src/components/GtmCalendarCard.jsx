@@ -157,6 +157,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
         <div>
           <h3><IconCalendar width={18} height={18} /> {t(lang, 'gtm.title')}</h3>
           <p className="gtm-subtitle">{t(lang, 'gtm.subtitle')}</p>
+          <p className="gtm-scope-note">{t(lang, 'gtm.scopeNote')}</p>
         </div>
         <button className="btn-ai-generate gtm-generate-btn" onClick={generateAll} disabled={loading}>
           <IconSparkle width={14} height={14} />

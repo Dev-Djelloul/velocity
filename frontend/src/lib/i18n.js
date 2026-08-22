@@ -397,6 +397,7 @@ export const translations = {
     gtm: {
       title: 'Calendrier de contenu & publicité',
       subtitle: 'Contenu organique et campagnes payantes, semaine par semaine, générés par IA',
+      scopeNote: 'Ce calendrier détaille l\'exécution concrète (quoi publier, sur quel format, pour quelle audience) de la répartition budgétaire définie dans Stratégie marketing — les mêmes canaux y apparaissent volontairement, à un niveau tactique plutôt que financier.',
       generateAll: 'Générer le calendrier complet',
       generating: 'Génération...',
       empty: 'Générez le calendrier de contenu et de publicité : ce qui sort chaque semaine, sur quel canal, et ce que vous y investissez en média payant.',
@@ -627,6 +628,7 @@ export const translations = {
       viewAssets: 'Voir les contenus prêts à l\'emploi',
       executiveSummaryTitle: 'Résumé exécutif',
       strategyLabel: 'Stratégie',
+      marketingScopeNote: 'Cette carte définit la répartition budgétaire par canal (combien et où) — le détail d\'exécution semaine par semaine (quoi publier, sur quel format) se trouve dans le Calendrier de contenu & publicité, qui reprend volontairement les mêmes canaux à un niveau tactique.',
       risksLabel: 'Risques',
       budgetAvailable: (amount) => `Budget disponible : ${amount}`,
       effort: 'Effort',
@@ -2097,6 +2099,7 @@ export const translations = {
     gtm: {
       title: 'Content & advertising calendar',
       subtitle: 'Organic content and paid campaigns, week by week, AI-generated',
+      scopeNote: 'This calendar details the concrete execution (what to publish, in which format, for which audience) of the budget allocation set in Marketing strategy — the same channels appear here deliberately, at a tactical rather than financial level.',
       generateAll: 'Generate full calendar',
       generating: 'Generating...',
       empty: 'Generate the content and advertising calendar: what goes out each week, on which channel, and what you spend on paid media.',
@@ -2327,6 +2330,7 @@ export const translations = {
       viewAssets: 'View ready-to-use content',
       executiveSummaryTitle: 'Executive summary',
       strategyLabel: 'Strategy',
+      marketingScopeNote: 'This card sets the budget allocation per channel (how much and where) — the week-by-week execution detail (what to publish, in which format) lives in the Content & advertising calendar, which deliberately reuses the same channels at a tactical level.',
       risksLabel: 'Risks',
       budgetAvailable: (amount) => `Available budget: ${amount}`,
       effort: 'Effort',

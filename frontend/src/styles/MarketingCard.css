@@ -15,6 +15,14 @@
   font-weight: var(--font-weight-semibold);
 }
 
+.marketing-scope-note {
+  margin-top: 0.35rem;
+  color: var(--color-text-muted, #9ca3af);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  max-width: 62ch;
+}
+
 .marketing-budget-control {
   display: flex;
   flex-direction: column;

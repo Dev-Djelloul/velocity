@@ -25,6 +25,14 @@
   margin-top: 0.25rem;
 }
 
+.gtm-scope-note {
+  color: var(--color-text-muted, #9ca3af);
+  font-size: var(--font-size-xs);
+  line-height: 1.5;
+  margin-top: 0.35rem;
+  max-width: 62ch;
+}
+
 .gtm-generate-btn {
   display: inline-flex;
   align-items: center;
