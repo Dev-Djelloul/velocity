@@ -1,7 +1,7 @@
 import { generateRoadmap } from '../lib/generator/roadmapGenerator'
 import { generateMarketingStrategy } from '../lib/generator/marketingStrategyGenerator'
 import { calculateKPIs } from '../lib/generator/kpiCalculator'
-import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from '../lib/generator/extendedGenerator'
+import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary, reconcileFinancialsWithMarketing } from '../lib/generator/extendedGenerator'
 import { generatePersona, classifyProduct, classificationLabel } from '../lib/engine'
 import { generatePlanWithAI } from '../lib/ai/client'
 import { recordUsage } from '../lib/ai/usageTracker'
@@ -20,13 +20,18 @@ export { PlanCollabRoom }
 
 function generateWithRules(data, lang) {
   const classification = classificationLabel(classifyProduct(data.product, data.market), lang)
+  const marketing = generateMarketingStrategy(data.market, data.priorities, data.resources?.budgetEur, lang)
   return {
     persona: generatePersona(data.market, data.product, data.priorities, lang),
     classification,
     roadmap: generateRoadmap(data.resources, data.product, data.priorities, lang),
-    marketing: generateMarketingStrategy(data.market, data.priorities, data.resources?.budgetEur, lang),
+    marketing,
     kpis: calculateKPIs(data.priorities, data.resources, data.market, lang),
-    financials: generateFinancials(data.resources, data.market, lang),
+    // 4e argument : le vrai budget marketing (déjà calculé juste au-dessus), pour que la
+    // ligne "Marketing" de la Répartition du budget corresponde exactement à ce budget réel
+    // plutôt qu'une part fixe de 35% du budget total calculée indépendamment (même bug que
+    // côté frontend, voir extendedGenerator.js).
+    financials: generateFinancials(data.resources, data.market, lang, marketing.totalBudget),
     strategyToolkit: generateStrategyToolkit(data.product, data.market, lang),
     executiveSummary: generateExecutiveSummary(data.product, classification, data.resources, lang)
   }
@@ -314,6 +319,12 @@ export default {
       try {
         generated = await generatePlanWithAI(data, env)
         source = 'ai'
+        // Le prompt (planSchema.js) demande déjà à l'IA de garder la ligne "Marketing" du
+        // prévisionnel cohérente avec marketing.totalBudget, mais une instruction de prompt
+        // n'est jamais une garantie — recalé après coup pour que ce soit toujours vrai.
+        if (generated.financials && generated.marketing?.totalBudget != null) {
+          generated = { ...generated, financials: reconcileFinancialsWithMarketing(generated.financials, generated.marketing.totalBudget) }
+        }
       } catch (aiError) {
         generated = generateWithRules(data, lang)
       }

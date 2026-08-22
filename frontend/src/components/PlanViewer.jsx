@@ -267,11 +267,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   // du budget TOTAL du lancement (pas du budget marketing, qui n'en est qu'une part — voir
   // discussion produit) ET du délai visé (weeks détermine le dénominateur "mois" de la
   // dépense mensuelle dans generateFinancials). Les deux attendent une tranche (ex. "b25k",
-  // "w12"), pas une valeur brute : reconversion via budgetKeyFor/weeksKeyFor.
+  // "w12"), pas une valeur brute : reconversion via budgetKeyFor/weeksKeyFor. Le 4e argument
+  // (`budget`, le vrai budget marketing éditable dans Stratégie marketing) garantit que la
+  // ligne "Marketing" de la Répartition du budget correspond exactement à ce budget réel,
+  // au lieu d'une part fixe de 35% inventée indépendamment (retour utilisateur, capture).
   const liveFinancials = generateFinancials(
     { ...plan.resources, totalBudget: budgetKeyFor(totalBudget), timelineWeeks: weeksKeyFor(timelineWeeks) },
     plan.market,
-    plan.language || lang
+    plan.language || lang,
+    budget
   )
 
   // Le délai jusqu'au lancement ne redimensionne PAS automatiquement la roadmap (nombre de

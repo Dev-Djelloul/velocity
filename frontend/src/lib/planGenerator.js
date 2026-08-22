@@ -185,7 +185,7 @@ export function generatePlan(formData) {
   const roadmap = generateRoadmap(resources, product, priorities, lang)
   const marketing = generateMarketingStrategy(market, priorities, resources.budgetEur, lang, product?.category)
   const kpis = calculateKPIs(priorities, resources, market, lang, product?.category)
-  const financials = generateFinancials(resources, market, lang)
+  const financials = generateFinancials(resources, market, lang, marketing.totalBudget)
   const strategyToolkit = generateStrategyToolkit(product, market, lang)
   const executiveSummary = generateExecutiveSummary(product, classification, resources, lang)
 

@@ -24,7 +24,7 @@ function arpuRationaleFor(model, arpu, lang) {
     : `${arpu} €/mois correspond à un ARPU typique pour un modèle ${label} à ce stade — à ajuster une fois le prix réel validé.`
 }
 
-export function generateFinancials(resources, market, lang) {
+export function generateFinancials(resources, market, lang, marketingBudget) {
   // totalBudget (enveloppe globale du lancement) pilote le prévisionnel financier — pas
   // budgetEur, qui n'est que la part marketing. Repli sur budgetEur pour les plans/brouillons
   // générés avant l'introduction de ce champ distinct.
@@ -39,11 +39,20 @@ export function generateFinancials(resources, market, lang) {
   const breakEvenMonthlyRevenue = breakEvenUsers * assumedArpu
 
   const labels = COST_CATEGORY_LABELS[lang] || COST_CATEGORY_LABELS.fr
-  const split = { product: 0.5, marketing: 0.35, ops: 0.15 }
+  // Le marketing de la "Répartition du budget" doit être LE MÊME chiffre que le budget
+  // marketing réel (slider Stratégie marketing / carte Budget & Délai), pas une part fixe
+  // de 35% inventée indépendamment — sinon les deux budgets marketing affichés dans le
+  // plan divergent (retour utilisateur, capture à l'appui). Le reste (dev + ops) se
+  // répartit sur ce qu'il reste du budget total, dans le même ratio relatif qu'avant
+  // (50/15, soit environ 77%/23% de ce qui reste une fois le marketing retiré).
+  const marketing = Math.min(marketingBudget ?? Math.round(budget * 0.35), budget)
+  const remainder = Math.max(0, budget - marketing)
+  const product = Math.round(remainder * (0.5 / 0.65))
+  const ops = Math.max(0, remainder - product)
   const costBreakdown = [
-    { category: labels.product, amount: Math.round(budget * split.product), pct: Math.round(split.product * 100) },
-    { category: labels.marketing, amount: Math.round(budget * split.marketing), pct: Math.round(split.marketing * 100) },
-    { category: labels.ops, amount: Math.round(budget * split.ops), pct: Math.round(split.ops * 100) }
+    { category: labels.product, amount: product, pct: budget ? Math.round((product / budget) * 100) : 0 },
+    { category: labels.marketing, amount: marketing, pct: budget ? Math.round((marketing / budget) * 100) : 0 },
+    { category: labels.ops, amount: ops, pct: budget ? Math.round((ops / budget) * 100) : 0 }
   ]
 
   const arpuRationale = arpuRationaleFor(market?.b2bVsB2c, assumedArpu, lang)

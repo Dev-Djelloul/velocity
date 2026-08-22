@@ -20,7 +20,7 @@ function arpuRationaleFor(model, arpu, lang) {
     : `${arpu} €/mois correspond à un ARPU typique pour un modèle ${label} à ce stade — à ajuster une fois le prix réel validé.`
 }
 
-export function generateFinancials(resources, market, lang = 'fr') {
+export function generateFinancials(resources, market, lang = 'fr', marketingBudget) {
   // totalBudget (enveloppe globale) pilote le prévisionnel — pas budgetEur, qui n'est que la
   // part marketing. Repli sur budgetEur pour les plans générés avant ce champ distinct.
   const budget = BUDGET[resources?.totalBudget] ?? BUDGET[resources?.budgetEur] ?? 5000
@@ -33,16 +33,47 @@ export function generateFinancials(resources, market, lang = 'fr') {
   const breakEvenUsers = Math.ceil(monthlyBurn / assumedArpu)
   const breakEvenMonthlyRevenue = breakEvenUsers * assumedArpu
 
-  const split = { product: 0.5, marketing: 0.35, ops: 0.15 }
+  // Le marketing de la Répartition du budget doit correspondre exactement au budget
+  // marketing réel (passé par l'appelant), pas à une part fixe de 35% du budget total
+  // calculée indépendamment — sinon les deux budgets marketing affichés divergent.
+  const marketing = Math.min(marketingBudget ?? Math.round(budget * 0.35), budget)
+  const remainder = Math.max(0, budget - marketing)
+  const product = Math.round(remainder * (0.5 / 0.65))
+  const ops = Math.max(0, remainder - product)
   const costBreakdown = [
-    { category: 'Développement', amount: Math.round(budget * split.product), pct: Math.round(split.product * 100) },
-    { category: 'Marketing', amount: Math.round(budget * split.marketing), pct: Math.round(split.marketing * 100) },
-    { category: 'Opérations', amount: Math.round(budget * split.ops), pct: Math.round(split.ops * 100) }
+    { category: 'Développement', amount: product, pct: budget ? Math.round((product / budget) * 100) : 0 },
+    { category: 'Marketing', amount: marketing, pct: budget ? Math.round((marketing / budget) * 100) : 0 },
+    { category: 'Opérations', amount: ops, pct: budget ? Math.round((ops / budget) * 100) : 0 }
   ]
 
   const arpuRationale = arpuRationaleFor(market?.b2bVsB2c, assumedArpu, lang)
 
   return { monthlyBurn, runwayMonths, assumedArpu, arpuRationale, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown }
+}
+
+// Filet de sécurité pour le plan généré par IA (planSchema.js demande déjà explicitement à
+// l'IA de garder la ligne "Marketing" cohérente avec marketing.totalBudget, mais une
+// instruction de prompt reste indicative, pas garantie) — recale costBreakdown après coup
+// pour que la ligne Marketing corresponde À COUP SÛR au budget marketing réel, quelle que
+// soit la sortie du modèle. Le reste (dev/ops) est redistribué au prorata de ce qu'il
+// avait déjà proposé, pour rester proche de sa répartition plutôt que de l'écraser.
+export function reconcileFinancialsWithMarketing(financials, marketingBudget) {
+  if (!financials?.costBreakdown?.length || marketingBudget == null) return financials
+  const total = financials.costBreakdown.reduce((s, l) => s + (l.amount || 0), 0)
+  const marketingLine = financials.costBreakdown.find(l => /marketing/i.test(l.category))
+  if (!marketingLine || !total) return financials
+  const marketing = Math.min(marketingBudget, total)
+  const others = financials.costBreakdown.filter(l => l !== marketingLine)
+  const othersTotal = others.reduce((s, l) => s + (l.amount || 0), 0) || 1
+  const remainder = Math.max(0, total - marketing)
+  const nextCostBreakdown = financials.costBreakdown.map(line => {
+    if (line === marketingLine) {
+      return { ...line, amount: marketing, pct: total ? Math.round((marketing / total) * 100) : 0 }
+    }
+    const amount = Math.round(remainder * ((line.amount || 0) / othersTotal))
+    return { ...line, amount, pct: total ? Math.round((amount / total) * 100) : 0 }
+  })
+  return { ...financials, costBreakdown: nextCostBreakdown }
 }
 
 const SWOT_FR = {
