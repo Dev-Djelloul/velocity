@@ -61,10 +61,10 @@ const SECTION_LIST = [
   { id: 'section-budget-timeline', labelKey: 'outputs.budgetTimeline.title' },
   { id: 'section-marketing', labelKey: 'outputs.marketing' },
   { id: 'section-gtm-calendar', labelKey: 'gtm.title' },
+  { id: 'section-financials', labelKey: 'outputs.financials.title' },
   { id: 'section-kpis', labelKey: 'outputs.kpis' },
   { id: 'section-abtest', labelKey: 'outputs.abTest' },
   { id: 'section-benchmarks', labelKey: 'benchmarks.title' },
-  { id: 'section-financials', labelKey: 'outputs.financials.title' },
   { id: 'section-rgpd', labelKey: 'rgpd.title' },
   { id: 'section-table', labelKey: 'genTable.title' },
   { id: 'section-agents', labelKey: 'agents.title' },
@@ -943,10 +943,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-gtm-calendar" className={`plan-section-anchor ${mobileSectionId === 'section-gtm-calendar' ? 'is-active' : ''}`}><GtmCalendarCard plan={{ ...plan, marketing: liveMarketing }} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} userId={userId} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.performance')}</h2>
+        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={liveFinancials} lang={lang} /></div>
         <div id="section-kpis" className={`plan-section-anchor ${mobileSectionId === 'section-kpis' ? 'is-active' : ''}`}><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-abtest" className={`plan-section-anchor ${mobileSectionId === 'section-abtest' ? 'is-active' : ''}`}><ABTestCalculatorCard lang={lang} /></div>
         <div id="section-benchmarks" className={`plan-section-anchor ${mobileSectionId === 'section-benchmarks' ? 'is-active' : ''}`}><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} userId={userId} /></div>
-        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={liveFinancials} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.compliance')}</h2>
         <div id="section-rgpd" className={`plan-section-anchor ${mobileSectionId === 'section-rgpd' ? 'is-active' : ''}`}><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} userId={userId} /></div>

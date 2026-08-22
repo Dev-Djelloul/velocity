@@ -49,10 +49,10 @@ const GROUPS = [
   {
     key: 'performance',
     sections: [
+      { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin },
       { id: 'section-kpis', labelKey: 'outputs.kpis', Icon: IconTarget },
       { id: 'section-abtest', labelKey: 'outputs.abTest', Icon: IconGauge },
-      { id: 'section-benchmarks', labelKey: 'benchmarks.title', Icon: IconGauge },
-      { id: 'section-financials', labelKey: 'outputs.financials.title', Icon: IconCoin }
+      { id: 'section-benchmarks', labelKey: 'benchmarks.title', Icon: IconGauge }
     ]
   },
   {
