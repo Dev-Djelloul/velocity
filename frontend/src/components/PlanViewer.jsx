@@ -602,12 +602,18 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     ].slice(0, 50)
     const savedPlan = savePlan({
       ...plan,
-      // Seul totalBudget est persisté ici, pas liveMarketing.channels : ce dernier exclut
-      // les canaux désactivés via le toggle de MarketingCard (disabledChannels), un
-      // réglage volontairement éphémère (jamais suivi par markChanged, remis à zéro au
-      // rechargement) — les persister effacerait définitivement des canaux que
-      // l'utilisateur n'a fait que masquer temporairement à l'affichage.
-      marketing: { ...plan.marketing, totalBudget: budget },
+      // totalBudget seul ne suffit pas : sans remettre à l'échelle chaque canal, leurs
+      // montants restaient figés à leur valeur de génération (ex. sommant à 4 000€) pendant
+      // que totalBudget affichait 41 000€ — un agent IA (Optimisation budgétaire) a fini par
+      // le repérer et le signaler tout seul (retour utilisateur, capture à l'appui). Recalé
+      // ici via le pct de chaque canal (stable, indépendant du budget), sans passer par
+      // liveMarketing.channels qui EXCLUT les canaux désactivés (disabledChannels, un
+      // réglage volontairement éphémère) — les persister les effacerait définitivement.
+      marketing: {
+        ...plan.marketing,
+        totalBudget: budget,
+        channels: (plan.marketing.channels || []).map(c => ({ ...c, budget: Math.round((c.pct / 100) * budget) }))
+      },
       resources: { ...plan.resources, totalBudget, timelineWeeks: weeksKeyFor(timelineWeeks) },
       financials: liveFinancials,
       changeLog: nextChangeLog
