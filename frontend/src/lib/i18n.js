@@ -35,6 +35,7 @@ export const translations = {
       unsavedChangesBody: 'Tu as des modifications non enregistrées sur ce plan. Si tu continues sans les enregistrer, elles seront perdues.',
       discardChanges: 'Continuer sans enregistrer',
       saveAndContinue: 'Enregistrer et continuer',
+      ok: 'OK',
       pendingChangesTitle: (count) => count > 1 ? `${count} modifications en attente` : '1 modification en attente',
       discardPendingChanges: 'Annuler les modifications'
     },
@@ -1425,6 +1426,7 @@ export const translations = {
       shareExpiry: 'Ce lien expire dans 30 jours',
       deleteConfirmTitle: 'Supprimer ce plan ?',
       deleteConfirmSuffix: 'sera définitivement supprimé. Cette action est irréversible.',
+      deleteFailedTitle: 'Suppression impossible',
       deleteFailed: 'La suppression a échoué (droits insuffisants sur ce plan d\'équipe, ou plan déjà supprimé ailleurs) — le plan a été restauré.',
       cancel: 'Annuler',
       defaultPlanName: 'Ce plan',
@@ -1738,6 +1740,7 @@ export const translations = {
       unsavedChangesBody: 'This plan has unsaved changes. If you continue without saving, they will be lost.',
       discardChanges: 'Continue without saving',
       saveAndContinue: 'Save and continue',
+      ok: 'OK',
       pendingChangesTitle: (count) => count > 1 ? `${count} pending changes` : '1 pending change',
       discardPendingChanges: 'Discard changes'
     },
@@ -3123,6 +3126,7 @@ export const translations = {
       shareExpiry: 'This link expires in 30 days',
       deleteConfirmTitle: 'Delete this plan?',
       deleteConfirmSuffix: 'will be permanently deleted. This action cannot be undone.',
+      deleteFailedTitle: 'Deletion failed',
       deleteFailed: 'Deletion failed (insufficient rights on this team plan, or it was already deleted elsewhere) — the plan has been restored.',
       cancel: 'Cancel',
       defaultPlanName: 'This plan',

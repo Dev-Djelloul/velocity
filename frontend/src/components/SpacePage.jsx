@@ -40,6 +40,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [plans, setPlans] = useState(getAllPlans)
   const [drafts, setDrafts] = useState(isTeam ? [] : getAllDrafts)
   const [deleteTarget, setDeleteTarget] = useState(null)
+  const [deleteFailed, setDeleteFailed] = useState(false)
   const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
   const [renameDraftTarget, setRenameDraftTarget] = useState(null)
   const [draftEditValue, setDraftEditValue] = useState('')
@@ -119,7 +120,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     // avoir vraiment été supprimé côté serveur, réapparaissant ailleurs (dashboard, retour
     // utilisateur, bug critique).
     const ok = await deletePlan(target.id, team.teamId ?? null, team.role)
-    if (!ok) alert(t(lang, 'plans.deleteFailed'))
+    if (!ok) setDeleteFailed(true)
     setPlans(getAllPlans())
   }
 
@@ -433,6 +434,19 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                 </div>
               )
             })}
+          </div>
+        </InfoModal>
+      )}
+
+      {deleteFailed && (
+        <InfoModal
+          icon={<IconAlertTriangle width={22} height={22} />}
+          title={t(lang, 'plans.deleteFailedTitle')}
+          onClose={() => setDeleteFailed(false)}
+        >
+          <p className="unsaved-changes-body">{t(lang, 'plans.deleteFailed')}</p>
+          <div className="unsaved-changes-actions">
+            <button className="btn-primary" onClick={() => setDeleteFailed(false)}>{t(lang, 'app.ok') || 'OK'}</button>
           </div>
         </InfoModal>
       )}

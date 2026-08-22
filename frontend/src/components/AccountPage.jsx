@@ -18,6 +18,7 @@ import PricingCards from './PricingCards'
 import { ContactModal } from './CompanyModals'
 import ExportBrandingSection from './ExportBrandingSection'
 import PrivacySection from './PrivacySection'
+import InfoModal from './InfoModal'
 import '../styles/AccountPage.css'
 import '../styles/SettingsPage.css'
 import '../styles/SpacePage.css'
@@ -40,6 +41,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState(false)
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
+  const [deletePlanFailed, setDeletePlanFailed] = useState(false)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
 
   const pro = isPro(userId)
@@ -133,7 +135,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
     // de cette page sans jamais avoir vraiment été supprimé côté serveur, réapparaissant
     // ailleurs (dashboard, retour utilisateur, bug critique).
     const ok = await deletePlan(target.id, planTeamId, role)
-    if (!ok) alert(t(lang, 'plans.deleteFailed'))
+    if (!ok) setDeletePlanFailed(true)
     refreshPlans()
   }
 
@@ -322,6 +324,19 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
       )}
 
       {showContact && <ContactModal lang={lang} onClose={() => setShowContact(false)} />}
+
+      {deletePlanFailed && (
+        <InfoModal
+          icon={<IconAlertTriangle width={22} height={22} />}
+          title={t(lang, 'plans.deleteFailedTitle')}
+          onClose={() => setDeletePlanFailed(false)}
+        >
+          <p className="unsaved-changes-body">{t(lang, 'plans.deleteFailed')}</p>
+          <div className="unsaved-changes-actions">
+            <button className="btn-primary" onClick={() => setDeletePlanFailed(false)}>{t(lang, 'app.ok') || 'OK'}</button>
+          </div>
+        </InfoModal>
+      )}
 
       {deletePlanTarget && (
         <div className="confirm-modal-backdrop" onClick={() => setDeletePlanTarget(null)}>
