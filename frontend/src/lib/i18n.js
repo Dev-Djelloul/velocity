@@ -604,6 +604,7 @@ export const translations = {
       kpiTableFrequency: 'Fréquence',
       marketingChannelsTitle: 'Canaux de marketing',
       marketingBudgetLabel: 'Budget marketing',
+      marketingBudgetCapHint: (max) => `Plafonné au budget total du lancement (${max})`,
       allocatedLabel: 'Alloué aux canaux actifs',
       enableChannel: 'Activer ce canal',
       disableChannel: 'Désactiver ce canal',
@@ -674,6 +675,7 @@ export const translations = {
       financials: {
         title: 'Prévisionnel financier',
         subtitle: 'Estimation simplifiée à partir de votre budget total',
+        totalBudgetLabel: 'Budget total du lancement',
         monthlyBurn: 'Dépense mensuelle',
         runway: 'Runway',
         months: 'mois',
@@ -2273,6 +2275,7 @@ export const translations = {
       kpiTableFrequency: 'Frequency',
       marketingChannelsTitle: 'Marketing channels',
       marketingBudgetLabel: 'Marketing budget',
+      marketingBudgetCapHint: (max) => `Capped at the total launch budget (${max})`,
       allocatedLabel: 'Allocated to active channels',
       enableChannel: 'Enable this channel',
       disableChannel: 'Disable this channel',
@@ -2338,6 +2341,7 @@ export const translations = {
       financials: {
         title: 'Financial forecast',
         subtitle: 'Simplified estimate based on your total budget',
+        totalBudgetLabel: 'Total launch budget',
         monthlyBurn: 'Monthly burn',
         runway: 'Runway',
         months: 'months',

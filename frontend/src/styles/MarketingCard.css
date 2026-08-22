@@ -24,6 +24,7 @@
 
 .marketing-budget-control label { color: var(--color-text-secondary); font-size: var(--font-size-sm); }
 .marketing-budget-control input[type="range"] { width: 100%; accent-color: var(--color-primary); }
+.marketing-budget-cap-hint { margin: 0.3rem 0 0; color: var(--color-text-muted, #9ca3af); font-size: var(--font-size-xs); }
 
 .marketing-budget {
   padding: var(--spacing-lg) 0;

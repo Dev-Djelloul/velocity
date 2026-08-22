@@ -6,7 +6,7 @@ import '../styles/MarketingCard.css'
 
 const CHANNEL_PALETTE = ['#9184d9', '#06b6d4', '#f59e0b', '#22c55e', '#ec4899', '#6366f1', '#eab308', '#f97316']
 
-export default function MarketingCard({ marketing, lang, disabledChannels = [], onToggleChannel, budget, onBudgetChange }) {
+export default function MarketingCard({ marketing, lang, disabledChannels = [], onToggleChannel, budget, onBudgetChange, maxBudget }) {
   const [expanded, setExpanded] = useState({})
   if (!marketing) return null
 
@@ -29,8 +29,13 @@ export default function MarketingCard({ marketing, lang, disabledChannels = [], 
           <label>
             {t(lang, 'outputs.marketingBudgetLabel')}: <strong>{formatMoney(budget)}</strong>
           </label>
-          <input type="range" min="2000" max="50000" step="500" value={budget}
+          {/* Plafonné au budget total du lancement (le marketing n'en est qu'une part, voir
+              carte Prévisionnel financier) plutôt qu'à un maximum fixe de 50 000€. */}
+          <input type="range" min="2000" max={Math.max(2000, maxBudget || 50000)} step="500" value={budget}
             onChange={e => onBudgetChange(Number(e.target.value))} />
+          {maxBudget != null && (
+            <p className="marketing-budget-cap-hint">{t(lang, 'outputs.marketingBudgetCapHint')(formatMoney(maxBudget))}</p>
+          )}
         </div>
       )}
 

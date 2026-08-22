@@ -28,6 +28,8 @@ import PresenceBar from './PresenceBar'
 import { connectCollab, seedDocFromRoadmap, roadmapFromDoc, applyRoadmapDiff } from '../lib/collab'
 import { sendTeamPresenceHeartbeat, clearTeamPresence } from '../lib/serverStorage'
 import { generateMarketingStrategy } from '../lib/planGenerator'
+import { generateFinancials } from '../lib/extendedGenerator'
+import { budgetFromKey } from '../lib/budgetTiers'
 import { formatMoney } from '../lib/currency'
 import { savePlan as savePlanToStorage } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
@@ -89,6 +91,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [showCoverPicker, setShowCoverPicker] = useState(false)
   const [showBgPicker, setShowBgPicker] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
+  const [totalBudget, setTotalBudget] = useState(budgetFromKey(plan.resources?.totalBudget))
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
   const [pendingChanges, setPendingChanges] = useState([])
@@ -201,6 +204,13 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     setBudget(plan.marketing.totalBudget)
   }, [plan.marketing.totalBudget])
 
+  // Même mécanique pour le budget total du lancement (carte Prévisionnel financier),
+  // stocké sous forme de tranche (resources.totalBudget, ex. "b25k") — converti en valeur
+  // numérique pour le slider, reconverti en tranche à l'enregistrement (voir handleSave).
+  useEffect(() => {
+    setTotalBudget(budgetFromKey(plan.resources?.totalBudget))
+  }, [plan.resources?.totalBudget])
+
   // Une description précise (pas juste le nom de la section) pour chaque modification,
   // calculée au moment du changement pendant qu'on a encore l'ancienne ET la nouvelle
   // valeur sous la main — impossible à reconstituer après coup. `key` identifie l'élément
@@ -233,11 +243,37 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     return { ...base, channels: redistributed, totalBudget: budget }
   })()
 
+  // Le budget marketing ne peut pas dépasser le budget total du lancement (dont il n'est
+  // qu'une part, voir le tooltip de la carte d'identité) — plafonné ici plutôt que dans le
+  // slider (max de l'<input> figé), pour suivre le budget total même quand il change.
   const handleBudgetChange = (nextBudget) => {
-    setBudget(nextBudget)
+    const clamped = Math.min(nextBudget, totalBudget)
+    setBudget(clamped)
     markChanged('marketingBudget', 'marketingBudget', lang === 'fr'
-      ? `Budget : ${plan.marketing.totalBudget}€ → ${nextBudget}€`
-      : `Budget: €${plan.marketing.totalBudget} → €${nextBudget}`)
+      ? `Budget : ${plan.marketing.totalBudget}€ → ${clamped}€`
+      : `Budget: €${plan.marketing.totalBudget} → €${clamped}`)
+  }
+
+  // Prévisionnel financier (carte "Prévisionnel financier") : recalculé en direct à partir
+  // du budget TOTAL du lancement (pas du budget marketing, qui n'en est qu'une part — voir
+  // discussion produit). generateFinancials attend une tranche (ex. "b25k"), pas un montant
+  // brut : reconversion via budgetKeyFor, comme pour le budget marketing juste au-dessus.
+  const liveFinancials = generateFinancials({ ...plan.resources, totalBudget: budgetKeyFor(totalBudget) }, plan.market, plan.language || lang)
+
+  const handleTotalBudgetChange = (nextTotal) => {
+    setTotalBudget(nextTotal)
+    markChanged('totalBudget', 'totalBudget', lang === 'fr'
+      ? `Budget total : ${budgetFromKey(plan.resources?.totalBudget)}€ → ${nextTotal}€`
+      : `Total budget: €${budgetFromKey(plan.resources?.totalBudget)} → €${nextTotal}`)
+    // Rabaisse aussi le budget marketing s'il dépassait désormais le nouveau total — clamp
+    // direct sur nextTotal plutôt que via handleBudgetChange, dont le plafond lirait encore
+    // l'ancienne valeur de `totalBudget` (mise à jour asynchrone de l'état React ci-dessus).
+    if (budget > nextTotal) {
+      setBudget(nextTotal)
+      markChanged('marketingBudget', 'marketingBudget', lang === 'fr'
+        ? `Budget : ${plan.marketing.totalBudget}€ → ${nextTotal}€`
+        : `Budget: €${plan.marketing.totalBudget} → €${nextTotal}`)
+    }
   }
 
   const toggleChannel = (name) => {
@@ -510,6 +546,8 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       // rechargement) — les persister effacerait définitivement des canaux que
       // l'utilisateur n'a fait que masquer temporairement à l'affichage.
       marketing: { ...plan.marketing, totalBudget: budget },
+      resources: { ...plan.resources, totalBudget: budgetKeyFor(totalBudget) },
+      financials: liveFinancials,
       changeLog: nextChangeLog
     })
     setPlan(savedPlan)
@@ -836,14 +874,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-burndown" className={`plan-section-anchor ${mobileSectionId === 'section-burndown' ? 'is-active' : ''}`}><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>
-        <div id="section-marketing" className={`plan-section-anchor ${mobileSectionId === 'section-marketing' ? 'is-active' : ''}`}><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={handleBudgetChange} /></div>
+        <div id="section-marketing" className={`plan-section-anchor ${mobileSectionId === 'section-marketing' ? 'is-active' : ''}`}><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={handleBudgetChange} maxBudget={totalBudget} /></div>
         <div id="section-gtm-calendar" className={`plan-section-anchor ${mobileSectionId === 'section-gtm-calendar' ? 'is-active' : ''}`}><GtmCalendarCard plan={{ ...plan, marketing: liveMarketing }} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} userId={userId} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.performance')}</h2>
         <div id="section-kpis" className={`plan-section-anchor ${mobileSectionId === 'section-kpis' ? 'is-active' : ''}`}><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-abtest" className={`plan-section-anchor ${mobileSectionId === 'section-abtest' ? 'is-active' : ''}`}><ABTestCalculatorCard lang={lang} /></div>
         <div id="section-benchmarks" className={`plan-section-anchor ${mobileSectionId === 'section-benchmarks' ? 'is-active' : ''}`}><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} userId={userId} /></div>
-        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={plan.financials} lang={lang} /></div>
+        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={liveFinancials} lang={lang} budget={totalBudget} onBudgetChange={handleTotalBudgetChange} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.compliance')}</h2>
         <div id="section-rgpd" className={`plan-section-anchor ${mobileSectionId === 'section-rgpd' ? 'is-active' : ''}`}><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} userId={userId} /></div>
