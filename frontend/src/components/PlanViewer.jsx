@@ -28,7 +28,6 @@ import PresenceBar from './PresenceBar'
 import { connectCollab, seedDocFromRoadmap, roadmapFromDoc, applyRoadmapDiff } from '../lib/collab'
 import { sendTeamPresenceHeartbeat, clearTeamPresence } from '../lib/serverStorage'
 import { generateMarketingStrategy } from '../lib/planGenerator'
-import { generateFinancials } from '../lib/extendedGenerator'
 import { formatMoney } from '../lib/currency'
 import { savePlan as savePlanToStorage } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
@@ -233,15 +232,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const redistributed = filtered.map(c => ({ ...c, budget: Math.round((c.pct / totalPct) * budget) }))
     return { ...base, channels: redistributed, totalBudget: budget }
   })()
-
-  // Le prévisionnel financier (carte "Prévisionnel financier") était calculé une seule
-  // fois à la génération à partir de resources.totalBudget (la tranche choisie au
-  // questionnaire) et ne bougeait plus jamais ensuite, même après avoir déplacé le slider
-  // de budget marketing — écart signalé par l'utilisateur. Recalculé ici en direct à
-  // partir du budget courant (même mécanique que liveMarketing juste au-dessus), et
-  // persisté dans plan.financials à l'enregistrement (voir handleSave) pour rester
-  // cohérent après rechargement, export PDF, et comparaison de versions.
-  const liveFinancials = generateFinancials({ ...plan.resources, totalBudget: budgetKeyFor(budget) }, plan.market, plan.language || lang)
 
   const handleBudgetChange = (nextBudget) => {
     setBudget(nextBudget)
@@ -520,7 +510,6 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       // rechargement) — les persister effacerait définitivement des canaux que
       // l'utilisateur n'a fait que masquer temporairement à l'affichage.
       marketing: { ...plan.marketing, totalBudget: budget },
-      financials: liveFinancials,
       changeLog: nextChangeLog
     })
     setPlan(savedPlan)
@@ -854,7 +843,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-kpis" className={`plan-section-anchor ${mobileSectionId === 'section-kpis' ? 'is-active' : ''}`}><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-abtest" className={`plan-section-anchor ${mobileSectionId === 'section-abtest' ? 'is-active' : ''}`}><ABTestCalculatorCard lang={lang} /></div>
         <div id="section-benchmarks" className={`plan-section-anchor ${mobileSectionId === 'section-benchmarks' ? 'is-active' : ''}`}><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} userId={userId} /></div>
-        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={liveFinancials} lang={lang} /></div>
+        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={plan.financials} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.compliance')}</h2>
         <div id="section-rgpd" className={`plan-section-anchor ${mobileSectionId === 'section-rgpd' ? 'is-active' : ''}`}><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} userId={userId} /></div>
