@@ -9,7 +9,7 @@ import '../styles/BudgetTimelineCard.css'
 // les stats de la carte d'identité tout en haut du plan. Demandé explicitement pour que
 // "tout se recalcule à partir du budget total", plutôt que d'avoir un budget marketing
 // éditable sans référence commune.
-export default function BudgetTimelineCard({ lang, totalBudget, onTotalBudgetChange, timelineWeeks, onTimelineWeeksChange }) {
+export default function BudgetTimelineCard({ lang, totalBudget, onTotalBudgetChange, timelineWeeks, onTimelineWeeksChange, onRegenerateRoadmap }) {
   return (
     <div className="budget-timeline-card card">
       <div className="budget-timeline-header">
@@ -34,6 +34,12 @@ export default function BudgetTimelineCard({ lang, totalBudget, onTotalBudgetCha
       </div>
 
       <p className="budget-timeline-hint">{t(lang, 'outputs.budgetTimeline.hint')}</p>
+
+      {onRegenerateRoadmap && (
+        <button type="button" className="btn-secondary budget-timeline-regenerate" onClick={onRegenerateRoadmap}>
+          {t(lang, 'outputs.budgetTimeline.regenerateButton')}
+        </button>
+      )}
     </div>
   )
 }

@@ -27,7 +27,7 @@ import CoverPicker from './CoverPicker'
 import PresenceBar from './PresenceBar'
 import { connectCollab, seedDocFromRoadmap, roadmapFromDoc, applyRoadmapDiff } from '../lib/collab'
 import { sendTeamPresenceHeartbeat, clearTeamPresence } from '../lib/serverStorage'
-import { generateMarketingStrategy } from '../lib/planGenerator'
+import { generateMarketingStrategy, generateRoadmap } from '../lib/planGenerator'
 import { generateFinancials } from '../lib/extendedGenerator'
 import { budgetFromKey } from '../lib/budgetTiers'
 import { weeksFromKey, weeksKeyFor } from '../lib/timelineTiers'
@@ -101,6 +101,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [pendingChanges, setPendingChanges] = useState([])
   const [justSaved, setJustSaved] = useState(false)
   const [confirmLeave, setConfirmLeave] = useState(false)
+  const [confirmRegenerateRoadmap, setConfirmRegenerateRoadmap] = useState(false)
   const [mobileSectionId, setMobileSectionId] = useState(SECTION_LIST[0].id)
   const captureRef = useRef(null)
   const coverBannerRef = useRef(null)
@@ -307,6 +308,27 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         ? `Budget : ${plan.marketing.totalBudget}€ → ${nextTotal}€`
         : `Budget: €${plan.marketing.totalBudget} → €${nextTotal}`)
     }
+  }
+
+  // Reconstruction volontaire de la roadmap à partir du délai courant (voir
+  // BudgetTimelineCard) — appelée seulement après confirmation explicite (voir
+  // confirmRegenerateRoadmap ci-dessous) : ça remplace entièrement sprints/stories,
+  // déplacements et statuts déjà en place, pas de fusion possible avec l'existant.
+  const handleRegenerateRoadmap = () => {
+    const nextRoadmap = generateRoadmap(
+      { ...plan.resources, timelineWeeks: weeksKeyFor(timelineWeeks) },
+      plan.product,
+      plan.priorities,
+      plan.language || lang
+    )
+    markChanged('roadmap', 'roadmap', lang === 'fr' ? 'Roadmap reconstruite à partir du nouveau délai' : 'Roadmap rebuilt from the new timeline')
+    if (collabRef.current) {
+      const detail = lang === 'fr' ? 'Roadmap reconstruite' : 'Roadmap rebuilt'
+      applyRoadmapDiff(collabRef.current.doc, lastSyncedRoadmapRef.current, nextRoadmap, detail)
+      lastSyncedRoadmapRef.current = nextRoadmap
+    }
+    setPlan(p => ({ ...p, roadmap: nextRoadmap }))
+    setConfirmRegenerateRoadmap(false)
   }
 
   const toggleChannel = (name) => {
@@ -907,7 +929,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-burndown" className={`plan-section-anchor ${mobileSectionId === 'section-burndown' ? 'is-active' : ''}`}><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>
-        <div id="section-budget-timeline" className={`plan-section-anchor ${mobileSectionId === 'section-budget-timeline' ? 'is-active' : ''}`}><BudgetTimelineCard lang={lang} totalBudget={totalBudget} onTotalBudgetChange={handleTotalBudgetChange} timelineWeeks={timelineWeeks} onTimelineWeeksChange={handleTimelineChange} /></div>
+        <div id="section-budget-timeline" className={`plan-section-anchor ${mobileSectionId === 'section-budget-timeline' ? 'is-active' : ''}`}><BudgetTimelineCard lang={lang} totalBudget={totalBudget} onTotalBudgetChange={handleTotalBudgetChange} timelineWeeks={timelineWeeks} onTimelineWeeksChange={handleTimelineChange} onRegenerateRoadmap={() => setConfirmRegenerateRoadmap(true)} /></div>
         <div id="section-marketing" className={`plan-section-anchor ${mobileSectionId === 'section-marketing' ? 'is-active' : ''}`}><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={handleBudgetChange} maxBudget={totalBudget} /></div>
         <div id="section-gtm-calendar" className={`plan-section-anchor ${mobileSectionId === 'section-gtm-calendar' ? 'is-active' : ''}`}><GtmCalendarCard plan={{ ...plan, marketing: liveMarketing }} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} userId={userId} /></div>
 
@@ -978,6 +1000,24 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
             </button>
             <button className="btn-primary" onClick={() => { handleSave(); setConfirmLeave(false); onReset() }}>
               {t(lang, 'app.saveAndContinue')}
+            </button>
+          </div>
+        </InfoModal>
+      )}
+
+      {confirmRegenerateRoadmap && (
+        <InfoModal
+          icon={<IconAlertTriangle width={22} height={22} />}
+          title={t(lang, 'outputs.budgetTimeline.regenerateConfirmTitle')}
+          onClose={() => setConfirmRegenerateRoadmap(false)}
+        >
+          <p className="unsaved-changes-body">{t(lang, 'outputs.budgetTimeline.regenerateConfirmBody')}</p>
+          <div className="unsaved-changes-actions">
+            <button className="btn-secondary" onClick={() => setConfirmRegenerateRoadmap(false)}>
+              {t(lang, 'outputs.budgetTimeline.regenerateCancel')}
+            </button>
+            <button className="btn-primary" onClick={handleRegenerateRoadmap}>
+              {t(lang, 'outputs.budgetTimeline.regenerateConfirm')}
             </button>
           </div>
         </InfoModal>

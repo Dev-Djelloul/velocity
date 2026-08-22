@@ -35,3 +35,7 @@
   color: var(--color-text-muted, #9ca3af);
   font-size: var(--font-size-xs);
 }
+
+.budget-timeline-regenerate {
+  margin-top: 1rem;
+}

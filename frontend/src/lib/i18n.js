@@ -611,7 +611,12 @@ export const translations = {
         budgetLabel: 'Budget total du lancement',
         timelineLabel: 'Délai visé jusqu\'au lancement',
         weeks: (n) => n === 1 ? '1 semaine' : `${n} semaines`,
-        hint: 'La roadmap (nombre de sprints, stories déjà planifiées) ne change pas automatiquement avec le délai — seule la date de lancement cible se met à jour, pour ne jamais écraser silencieusement le travail déjà fait sur la roadmap.'
+        hint: 'La roadmap (nombre de sprints, stories déjà planifiées) ne change pas automatiquement avec le délai — seule la date de lancement cible se met à jour, pour ne jamais écraser silencieusement le travail déjà fait sur la roadmap.',
+        regenerateButton: 'Reconstruire la roadmap à partir du délai actuel',
+        regenerateConfirmTitle: 'Reconstruire la roadmap ?',
+        regenerateConfirmBody: 'Ça remplace entièrement les sprints et stories actuels par une nouvelle roadmap basée sur le délai en cours. Tout ce qui a déjà été généré ou modifié sur la roadmap (déplacements de stories, statuts, éditions manuelles) sera perdu — cette action ne peut pas être annulée une fois enregistrée.',
+        regenerateCancel: 'Annuler',
+        regenerateConfirm: 'Reconstruire quand même'
       },
       allocatedLabel: 'Alloué aux canaux actifs',
       enableChannel: 'Activer ce canal',
@@ -2300,7 +2305,12 @@ export const translations = {
         budgetLabel: 'Total launch budget',
         timelineLabel: 'Target time to launch',
         weeks: (n) => n === 1 ? '1 week' : `${n} weeks`,
-        hint: 'The roadmap (sprint count, already-planned stories) does not change automatically with the timeline — only the target launch date updates, so existing roadmap work is never silently overwritten.'
+        hint: 'The roadmap (sprint count, already-planned stories) does not change automatically with the timeline — only the target launch date updates, so existing roadmap work is never silently overwritten.',
+        regenerateButton: 'Rebuild the roadmap from the current timeline',
+        regenerateConfirmTitle: 'Rebuild the roadmap?',
+        regenerateConfirmBody: 'This entirely replaces the current sprints and stories with a new roadmap based on the current timeline. Everything already generated or edited on the roadmap (story moves, statuses, manual edits) will be lost — this cannot be undone once saved.',
+        regenerateCancel: 'Cancel',
+        regenerateConfirm: 'Rebuild anyway'
       },
       allocatedLabel: 'Allocated to active channels',
       enableChannel: 'Enable this channel',

@@ -4,6 +4,7 @@ import { generatePersona } from './personaGenerator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary } from './extendedGenerator'
 import { c } from './contentI18n'
 import { budgetFromKey } from './budgetTiers'
+import { weeksFromKey } from './timelineTiers'
 
 const STORY_TEMPLATES = [
   { key: 'onboarding', category: 'product', type: 'frontend', effort: 8, assignee: 'Dev' },
@@ -41,13 +42,9 @@ function applyRules(templates, rulesFlags) {
   return templates.map((tmpl, idx) => ({ tmpl, idx })).sort((a, b) => weight(a.tmpl) - weight(b.tmpl) || a.idx - b.idx).map(x => x.tmpl)
 }
 
-function timelineWeeksFromKey(key) {
-  return { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }[key] ?? 8
-}
-
 export function generateRoadmap(resources, product, priorities, lang) {
   const dict = c(lang)
-  const weeks = timelineWeeksFromKey(resources?.timelineWeeks)
+  const weeks = weeksFromKey(resources?.timelineWeeks)
   const nbSprints = sprintCount(weeks)
   const capacity = sprintCapacity(resources?.teamSize)
   const risk = dict.riskLabels[priorities?.riskKnown]
