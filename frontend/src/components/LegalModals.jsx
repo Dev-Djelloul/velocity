@@ -17,6 +17,26 @@ export function PrivacyModal({ lang, onClose }) {
       </section>
 
       <section>
+        <h2>{t(lang, 'modals.privacy.accountHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.accountText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.privacy.aiHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.aiText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.privacy.integrationsHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.integrationsText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.privacy.paymentHeading')}</h2>
+        <p>{t(lang, 'modals.privacy.paymentText')}</p>
+      </section>
+
+      <section>
         <h2>{t(lang, 'modals.privacy.usageHeading')}</h2>
         <p>{t(lang, 'modals.privacy.usageText')}</p>
       </section>
