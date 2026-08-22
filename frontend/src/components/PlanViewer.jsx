@@ -30,6 +30,8 @@ import { sendTeamPresenceHeartbeat, clearTeamPresence } from '../lib/serverStora
 import { generateMarketingStrategy } from '../lib/planGenerator'
 import { generateFinancials } from '../lib/extendedGenerator'
 import { budgetFromKey } from '../lib/budgetTiers'
+import { weeksFromKey, weeksKeyFor } from '../lib/timelineTiers'
+import BudgetTimelineCard from './BudgetTimelineCard'
 import { formatMoney } from '../lib/currency'
 import { savePlan as savePlanToStorage } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
@@ -56,6 +58,7 @@ const SECTION_LIST = [
   { id: 'section-backlog', labelKey: 'backlog.title' },
   { id: 'section-gantt', labelKey: 'gantt.title' },
   { id: 'section-burndown', labelKey: 'burndown.title' },
+  { id: 'section-budget-timeline', labelKey: 'outputs.budgetTimeline.title' },
   { id: 'section-marketing', labelKey: 'outputs.marketing' },
   { id: 'section-gtm-calendar', labelKey: 'gtm.title' },
   { id: 'section-kpis', labelKey: 'outputs.kpis' },
@@ -92,6 +95,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const [showBgPicker, setShowBgPicker] = useState(false)
   const [budget, setBudget] = useState(plan.marketing.totalBudget)
   const [totalBudget, setTotalBudget] = useState(budgetFromKey(plan.resources?.totalBudget))
+  const [timelineWeeks, setTimelineWeeks] = useState(weeksFromKey(plan.resources?.timelineWeeks))
   const [disabledChannels, setDisabledChannels] = useState([])
   const [summaryCopied, setSummaryCopied] = useState(false)
   const [pendingChanges, setPendingChanges] = useState([])
@@ -211,6 +215,10 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     setTotalBudget(budgetFromKey(plan.resources?.totalBudget))
   }, [plan.resources?.totalBudget])
 
+  useEffect(() => {
+    setTimelineWeeks(weeksFromKey(plan.resources?.timelineWeeks))
+  }, [plan.resources?.timelineWeeks])
+
   // Une description précise (pas juste le nom de la section) pour chaque modification,
   // calculée au moment du changement pendant qu'on a encore l'ancienne ET la nouvelle
   // valeur sous la main — impossible à reconstituer après coup. `key` identifie l'élément
@@ -256,9 +264,34 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
   // Prévisionnel financier (carte "Prévisionnel financier") : recalculé en direct à partir
   // du budget TOTAL du lancement (pas du budget marketing, qui n'en est qu'une part — voir
-  // discussion produit). generateFinancials attend une tranche (ex. "b25k"), pas un montant
-  // brut : reconversion via budgetKeyFor, comme pour le budget marketing juste au-dessus.
-  const liveFinancials = generateFinancials({ ...plan.resources, totalBudget: budgetKeyFor(totalBudget) }, plan.market, plan.language || lang)
+  // discussion produit) ET du délai visé (weeks détermine le dénominateur "mois" de la
+  // dépense mensuelle dans generateFinancials). Les deux attendent une tranche (ex. "b25k",
+  // "w12"), pas une valeur brute : reconversion via budgetKeyFor/weeksKeyFor.
+  const liveFinancials = generateFinancials(
+    { ...plan.resources, totalBudget: budgetKeyFor(totalBudget), timelineWeeks: weeksKeyFor(timelineWeeks) },
+    plan.market,
+    plan.language || lang
+  )
+
+  // Le délai jusqu'au lancement ne redimensionne PAS automatiquement la roadmap (nombre de
+  // sprints, stories déjà planifiées) : ça écraserait silencieusement du travail déjà fait
+  // (déplacements, statuts...). Seule la date de lancement cible se déplace en conséquence
+  // — elle cascade déjà naturellement partout où elle est lue (carte d'identité, suivi
+  // post-lancement, calendrier).
+  const handleTimelineChange = (nextWeeks) => {
+    setTimelineWeeks(nextWeeks)
+    const base = plan.planStartDate || plan.generatedAt || new Date().toISOString()
+    const nextLaunchDate = new Date(new Date(base).getTime() + nextWeeks * 7 * 24 * 60 * 60 * 1000).toISOString()
+    markChanged('timelineWeeks', 'timelineWeeks', lang === 'fr'
+      ? `Délai : ${weeksFromKey(plan.resources?.timelineWeeks)} → ${nextWeeks} semaines`
+      : `Timeline: ${weeksFromKey(plan.resources?.timelineWeeks)} → ${nextWeeks} weeks`)
+    markChanged('launchDate', 'launchDate', describeDateChange(plan.launchDate, nextLaunchDate, lang))
+    // Mutation immédiate de plan.launchDate (même convention que updateLaunchDate
+    // ci-dessous) : contrairement au budget, ce n'est pas un slider à haute fréquence de
+    // changement, la date doit cascader tout de suite partout où elle est lue (calendrier,
+    // suivi post-lancement, carte d'identité).
+    setPlan(p => ({ ...p, launchDate: nextLaunchDate }))
+  }
 
   const handleTotalBudgetChange = (nextTotal) => {
     setTotalBudget(nextTotal)
@@ -546,7 +579,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       // rechargement) — les persister effacerait définitivement des canaux que
       // l'utilisateur n'a fait que masquer temporairement à l'affichage.
       marketing: { ...plan.marketing, totalBudget: budget },
-      resources: { ...plan.resources, totalBudget: budgetKeyFor(totalBudget) },
+      resources: { ...plan.resources, totalBudget: budgetKeyFor(totalBudget), timelineWeeks: weeksKeyFor(timelineWeeks) },
       financials: liveFinancials,
       changeLog: nextChangeLog
     })
@@ -874,6 +907,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-burndown" className={`plan-section-anchor ${mobileSectionId === 'section-burndown' ? 'is-active' : ''}`}><BurndownChart roadmap={plan.roadmap} lang={lang} generatedAt={plan.planStartDate || plan.generatedAt} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.gtm')}</h2>
+        <div id="section-budget-timeline" className={`plan-section-anchor ${mobileSectionId === 'section-budget-timeline' ? 'is-active' : ''}`}><BudgetTimelineCard lang={lang} totalBudget={totalBudget} onTotalBudgetChange={handleTotalBudgetChange} timelineWeeks={timelineWeeks} onTimelineWeeksChange={handleTimelineChange} /></div>
         <div id="section-marketing" className={`plan-section-anchor ${mobileSectionId === 'section-marketing' ? 'is-active' : ''}`}><MarketingCard marketing={liveMarketing} lang={lang} disabledChannels={disabledChannels} onToggleChannel={toggleChannel} budget={budget} onBudgetChange={handleBudgetChange} maxBudget={totalBudget} /></div>
         <div id="section-gtm-calendar" className={`plan-section-anchor ${mobileSectionId === 'section-gtm-calendar' ? 'is-active' : ''}`}><GtmCalendarCard plan={{ ...plan, marketing: liveMarketing }} lang={lang} onEditorialChange={updateEditorial} onAdvertisingChange={updateAdvertising} userId={userId} /></div>
 
@@ -881,7 +915,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
         <div id="section-kpis" className={`plan-section-anchor ${mobileSectionId === 'section-kpis' ? 'is-active' : ''}`}><KPIDashboard kpis={plan.kpis} lang={lang} onKpisChange={updateKpis} /></div>
         <div id="section-abtest" className={`plan-section-anchor ${mobileSectionId === 'section-abtest' ? 'is-active' : ''}`}><ABTestCalculatorCard lang={lang} /></div>
         <div id="section-benchmarks" className={`plan-section-anchor ${mobileSectionId === 'section-benchmarks' ? 'is-active' : ''}`}><BenchmarksCard plan={plan} lang={lang} onBenchmarksChange={updateBenchmarks} userId={userId} /></div>
-        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={liveFinancials} lang={lang} budget={totalBudget} onBudgetChange={handleTotalBudgetChange} /></div>
+        <div id="section-financials" className={`plan-section-anchor ${mobileSectionId === 'section-financials' ? 'is-active' : ''}`}><FinancialsCard financials={liveFinancials} lang={lang} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.compliance')}</h2>
         <div id="section-rgpd" className={`plan-section-anchor ${mobileSectionId === 'section-rgpd' ? 'is-active' : ''}`}><RgpdCard plan={plan} lang={lang} onRgpdChange={updateRgpd} userId={userId} /></div>

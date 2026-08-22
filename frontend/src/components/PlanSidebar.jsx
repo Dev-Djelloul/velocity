@@ -41,6 +41,7 @@ const GROUPS = [
   {
     key: 'gtm',
     sections: [
+      { id: 'section-budget-timeline', labelKey: 'outputs.budgetTimeline.title', Icon: IconCoin },
       { id: 'section-marketing', labelKey: 'outputs.marketing', Icon: IconRocket },
       { id: 'section-gtm-calendar', labelKey: 'gtm.title', Icon: IconMegaphone }
     ]

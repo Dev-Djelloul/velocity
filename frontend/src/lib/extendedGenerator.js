@@ -2,8 +2,8 @@
 // l'application génère un plan hors-ligne / sans backend (repli local).
 
 import { BUDGET } from './budgetTiers'
+import { TIMELINE_WEEKS } from './timelineTiers'
 
-const TIMELINE_WEEKS = { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }
 const ARPU_BY_MODEL = { b2b: 99, b2c: 15, hybrid: 40 }
 
 const COST_CATEGORY_LABELS = {

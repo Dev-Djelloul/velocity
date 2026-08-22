@@ -15,22 +15,6 @@
   font-size: var(--font-size-xs);
 }
 
-.financials-budget-control {
-  margin-bottom: var(--spacing-lg);
-}
-
-.financials-budget-control label {
-  color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
-}
-
-.financials-budget-control input[type="range"] {
-  width: 100%;
-  accent-color: var(--color-primary);
-  display: block;
-  margin-top: 0.4rem;
-}
-
 .financials-metrics {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

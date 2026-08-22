@@ -5,7 +5,7 @@ import '../styles/FinancialsCard.css'
 
 const COST_PALETTE = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#f472b6']
 
-export default function FinancialsCard({ financials, lang, budget: totalBudget, onBudgetChange }) {
+export default function FinancialsCard({ financials, lang }) {
   if (!financials) return null
 
   const { monthlyBurn, runwayMonths, assumedArpu, arpuRationale, breakEvenUsers, breakEvenMonthlyRevenue, costBreakdown } = financials
@@ -20,16 +20,6 @@ export default function FinancialsCard({ financials, lang, budget: totalBudget, 
         <h3>{t(lang, 'outputs.financials.title')}</h3>
         <p className="financials-subtitle">{t(lang, 'outputs.financials.subtitle')}</p>
       </div>
-
-      {onBudgetChange && (
-        <div className="financials-budget-control">
-          <label>
-            {t(lang, 'outputs.financials.totalBudgetLabel')}: <strong>{formatMoney(totalBudget)}</strong>
-          </label>
-          <input type="range" min="2000" max="100000" step="500" value={totalBudget}
-            onChange={e => onBudgetChange(Number(e.target.value))} />
-        </div>
-      )}
 
       <div className="financials-metrics">
         <div className="fin-tile" style={{ '--fin-color': '#9184d9' }}>

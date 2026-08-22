@@ -605,6 +605,14 @@ export const translations = {
       marketingChannelsTitle: 'Canaux de marketing',
       marketingBudgetLabel: 'Budget marketing',
       marketingBudgetCapHint: (max) => `Plafonné au budget total du lancement (${max})`,
+      budgetTimeline: {
+        title: 'Budget & Délai',
+        subtitle: 'Source unique du budget total et du délai visé — pilote le prévisionnel financier, le budget marketing et la carte d\'identité du plan',
+        budgetLabel: 'Budget total du lancement',
+        timelineLabel: 'Délai visé jusqu\'au lancement',
+        weeks: (n) => n === 1 ? '1 semaine' : `${n} semaines`,
+        hint: 'La roadmap (nombre de sprints, stories déjà planifiées) ne change pas automatiquement avec le délai — seule la date de lancement cible se met à jour, pour ne jamais écraser silencieusement le travail déjà fait sur la roadmap.'
+      },
       allocatedLabel: 'Alloué aux canaux actifs',
       enableChannel: 'Activer ce canal',
       disableChannel: 'Désactiver ce canal',
@@ -675,7 +683,6 @@ export const translations = {
       financials: {
         title: 'Prévisionnel financier',
         subtitle: 'Estimation simplifiée à partir de votre budget total',
-        totalBudgetLabel: 'Budget total du lancement',
         monthlyBurn: 'Dépense mensuelle',
         runway: 'Runway',
         months: 'mois',
@@ -2276,6 +2283,14 @@ export const translations = {
       marketingChannelsTitle: 'Marketing channels',
       marketingBudgetLabel: 'Marketing budget',
       marketingBudgetCapHint: (max) => `Capped at the total launch budget (${max})`,
+      budgetTimeline: {
+        title: 'Budget & Timeline',
+        subtitle: 'Single source for the total budget and target timeline — drives the financial forecast, the marketing budget and the plan\'s identity card',
+        budgetLabel: 'Total launch budget',
+        timelineLabel: 'Target time to launch',
+        weeks: (n) => n === 1 ? '1 week' : `${n} weeks`,
+        hint: 'The roadmap (sprint count, already-planned stories) does not change automatically with the timeline — only the target launch date updates, so existing roadmap work is never silently overwritten.'
+      },
       allocatedLabel: 'Allocated to active channels',
       enableChannel: 'Enable this channel',
       disableChannel: 'Disable this channel',
@@ -2341,7 +2356,6 @@ export const translations = {
       financials: {
         title: 'Financial forecast',
         subtitle: 'Simplified estimate based on your total budget',
-        totalBudgetLabel: 'Total launch budget',
         monthlyBurn: 'Monthly burn',
         runway: 'Runway',
         months: 'months',
