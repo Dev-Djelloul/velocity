@@ -90,8 +90,18 @@ export function CookiesModal({ lang, onClose }) {
       </section>
 
       <section>
+        <h2>{t(lang, 'modals.cookies.preferencesHeading')}</h2>
+        <p>{t(lang, 'modals.cookies.preferencesText')}</p>
+      </section>
+
+      <section>
         <h2>{t(lang, 'modals.cookies.analyticsHeading')}</h2>
         <p>{t(lang, 'modals.cookies.analyticsText')}</p>
+      </section>
+
+      <section>
+        <h2>{t(lang, 'modals.cookies.marketingHeading')}</h2>
+        <p>{t(lang, 'modals.cookies.marketingText')}</p>
       </section>
 
       <section>
