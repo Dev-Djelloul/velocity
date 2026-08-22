@@ -132,7 +132,15 @@ export function getPlanById(id) {
 // local ni la bonne ligne côté serveur (WHERE id=? AND team_id=? ne matchait rien), donc le
 // plan revenait après rechargement (retour utilisateur, bug critique). D'où ces deux
 // paramètres explicites, à fournir dès que le plan peut venir d'un espace non actif.
-export function deletePlan(id, teamId, role) {
+// Async et attendue par ses appelants (AccountPage/SpacePage) avant tout rafraîchissement
+// de liste — auparavant fire-and-forget : un refreshPlans() lancé juste après, sans
+// attendre la fin réelle de la requête DELETE serveur, pouvait recevoir sa réponse GET
+// AVANT que la suppression ait fini de s'exécuter côté Worker (3 requêtes D1 enchaînées :
+// plans, plan_versions, copilot_conversations) et réécrasait alors l'état local avec le
+// plan encore présent — le retirer du localStorage ne suffisait pas si un refresh
+// concurrent remettait aussitôt l'ancienne liste par-dessus (retour utilisateur : la
+// suppression "prenait" un instant puis le plan revenait, y compris sans recharger).
+export async function deletePlan(id, teamId, role) {
   if (!activeUserId) return
   const scopeTeamId = teamId !== undefined ? (teamId || null) : activeTeamId
   const scopeRole = teamId !== undefined ? (role || null) : activeRole
@@ -143,7 +151,7 @@ export function deletePlan(id, teamId, role) {
   } catch { /* clé corrompue, on repart d'une liste vide */ }
   const filtered = plans.filter(p => p.id !== id)
   localStorage.setItem(key, JSON.stringify(filtered))
-  removePlan(activeUserId, id, scopeTeamId, scopeRole)
+  await removePlan(activeUserId, id, scopeTeamId, scopeRole)
 }
 
 // Déplace un plan de l'espace actif vers un autre espace (personnel ou une autre équipe).

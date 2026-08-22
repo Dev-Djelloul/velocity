@@ -104,14 +104,18 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     }
   }, [isTeam, plans, team.members])
 
-  const confirmDelete = () => {
+  const confirmDelete = async () => {
     // Cette page ne liste que les plans de l'espace ACTUELLEMENT actif, donc team.teamId
     // correspond toujours bien à deleteTarget — explicite quand même (au lieu de compter
     // sur le repli implicite de deletePlan) pour rester correct si cette page listait un
     // jour des plans d'un autre espace.
-    deletePlan(deleteTarget.id, team.teamId ?? null, team.role)
-    setPlans(getAllPlans())
+    const target = deleteTarget
     setDeleteTarget(null)
+    // Le retrait local (localStorage) est déjà fait de façon synchrone dans deletePlan —
+    // attendre ici sert surtout à éviter qu'un refresh serveur concurrent ailleurs dans
+    // l'app ne réécrase l'état local avant que la suppression n'ait fini côté serveur.
+    await deletePlan(target.id, team.teamId ?? null, team.role)
+    setPlans(getAllPlans())
   }
 
   const handleDuplicate = (plan) => {

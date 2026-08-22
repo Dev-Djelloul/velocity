@@ -116,7 +116,7 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
   const used = getUsedCredits(userId)
   const remaining = remainingCredits(userId)
 
-  const confirmRemovePlan = () => {
+  const confirmRemovePlan = async () => {
     // deletePlanTarget peut venir de n'importe quel espace (cette page liste tous les plans,
     // tous espaces confondus) — jamais supposer que c'est l'espace actuellement actif, voir
     // le commentaire de deletePlan() dans planStorage.js pour le bug que ça causait.
@@ -124,9 +124,12 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
     const role = planTeamId === (team.teamId ?? null)
       ? team.role
       : team.myTeams?.find(tm => tm.id === planTeamId)?.role
-    deletePlan(deletePlanTarget.id, planTeamId, role)
-    refreshPlans()
+    const target = deletePlanTarget
     setDeletePlanTarget(null)
+    // Attendu avant refreshPlans() : sinon le GET de refresh peut répondre avant que le
+    // DELETE ait fini côté serveur et réécraser l'état local avec le plan encore présent.
+    await deletePlan(target.id, planTeamId, role)
+    refreshPlans()
   }
 
   // Mise à jour optimiste plutôt que refreshPlans() : en Pro, refreshPlans() relance un
