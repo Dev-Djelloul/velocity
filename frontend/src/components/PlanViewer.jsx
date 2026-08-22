@@ -84,6 +84,14 @@ function scheduleProgress(startIso, launchIso) {
   return Math.max(0, Math.min(100, Math.round(pct)))
 }
 
+// Jours restants avant le lancement — arrondi au jour supérieur pour rester cohérent avec
+// "il reste encore un peu aujourd'hui" plutôt que d'afficher 0 dès le matin du jour J.
+function daysUntilLaunch(launchIso) {
+  const launch = new Date(launchIso).getTime()
+  if (Number.isNaN(launch)) return null
+  return Math.ceil((launch - Date.now()) / 86400000)
+}
+
 export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, lang, isPro, onRequestUpgrade, readOnly, onDuplicateReadOnly, novaToggle, onCompareVersions }) {
   // Choke point unique : un plan partagé (lien /s/:id) ouvert par un visiteur
   // connecté avec SON PROPRE compte ne doit jamais pouvoir écraser le plan d'un autre —
@@ -697,6 +705,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
   const schedulePct = (plan.planStartDate || plan.generatedAt) && plan.launchDate
     ? scheduleProgress(plan.planStartDate || plan.generatedAt, plan.launchDate)
     : null
+  const daysLeft = plan.launchDate ? daysUntilLaunch(plan.launchDate) : null
 
   // Une ligne de changement : compatible avec les entrées enregistrées avant l'ajout du
   // préfixe de section (simples chaînes).
@@ -894,7 +903,15 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                 {schedulePct}%
               </span>
             )}
-            {!(plan.planStartDate || plan.generatedAt) && !plan.launchDate && plan.resources?.timelineWeeks && (
+            {daysLeft !== null && (
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.daysLeftHelp')}>
+                <IconClock width={13} height={13} />
+                {daysLeft > 0
+                  ? t(lang, 'resources.daysLeft')(daysLeft)
+                  : (daysLeft === 0 ? t(lang, 'resources.daysLeftToday') : t(lang, 'resources.daysLeftOverdue')(-daysLeft))}
+              </span>
+            )}
+            {!((plan.planStartDate || plan.generatedAt) && plan.launchDate) && plan.resources?.timelineWeeks && (
               <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.timelineWeeksHelp')}>
                 <IconClock width={13} height={13} />
                 {t(lang, 'resources.timelineOptions')[plan.resources.timelineWeeks] || plan.resources.timelineWeeks}
