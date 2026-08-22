@@ -37,9 +37,9 @@ import { savePlan as savePlanToStorage } from '../lib/planStorage'
 import { notifyMentions } from '../lib/serverStorage'
 import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
-import { formatFullDateTime } from '../lib/dateFormat'
+import { formatFullDateTime, formatDateNumeric } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconImage, IconPlus, IconDroplet, IconX } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconImage, IconPlus, IconDroplet, IconX, IconCalendar } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -864,7 +864,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
                   : (t(lang, 'resources.budgetOptions')[plan.resources.budgetEur] || plan.resources.budgetEur)}
               </span>
             )}
-            {plan.resources?.timelineWeeks && (
+            {(plan.planStartDate || plan.generatedAt) && plan.launchDate && (
+              <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.launchWindowHelp')}>
+                <IconCalendar width={13} height={13} />
+                {formatDateNumeric(plan.planStartDate || plan.generatedAt, lang)} → {formatDateNumeric(plan.launchDate, lang)}
+                {plan.resources?.timelineWeeks && ` (${t(lang, 'resources.timelineOptions')[plan.resources.timelineWeeks] || plan.resources.timelineWeeks})`}
+              </span>
+            )}
+            {!(plan.planStartDate || plan.generatedAt) && !plan.launchDate && plan.resources?.timelineWeeks && (
               <span className="plan-stat plan-stat-tooltip" data-tooltip={t(lang, 'resources.timelineWeeksHelp')}>
                 <IconClock width={13} height={13} />
                 {t(lang, 'resources.timelineOptions')[plan.resources.timelineWeeks] || plan.resources.timelineWeeks}
