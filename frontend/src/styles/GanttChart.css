@@ -181,7 +181,12 @@
 .gantt-bar-status-icon { flex-shrink: 0; opacity: 0.9; }
 .gantt-bar-story-id { overflow: hidden; text-overflow: ellipsis; }
 
-.gantt-bar-story.status-done { opacity: 0.6; }
+/* Barre "Terminé" atténuée en ne baissant l'opacité que de l'icône et du texte de la
+   barre (pas de opacity sur .gantt-bar-story lui-même) : opacity sur l'ancêtre atténuerait
+   aussi le popover .gantt-detail imbriqué dedans (survol), le rendant translucide alors
+   qu'il doit rester parfaitement lisible dans les deux thèmes (retour utilisateur). */
+.gantt-bar-story.status-done > .gantt-bar-status-icon,
+.gantt-bar-story.status-done > .gantt-bar-story-id { opacity: 0.6; }
 .gantt-bar-story.status-done .gantt-bar-story-id { text-decoration: line-through; }
 .gantt-bar-story.status-in_progress { box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.5), 0 2px 6px rgba(0, 0, 0, 0.25); }
 
