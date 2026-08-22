@@ -176,16 +176,25 @@ export async function getRecentComments(env, userId, teamIds = []) {
 // vérification de rôle plus fine (ex: réserver aux admins) se fait côté route API, qui
 // reçoit le rôle envoyé par le client (même modèle de confiance que le reste de l'app,
 // voir la note en tête de fichier sur l'absence de vérification JWT serveur).
+// Renvoie le nombre de lignes réellement supprimées de `plans` — un appelant scopé sur le
+// mauvais espace (ex. teamId ne correspondant pas à celui du plan) ne matchait jusqu'ici
+// aucune ligne mais recevait quand même {ok:true} côté route, un échec invisible identique
+// à celui d'un rejet 403 mais sans jamais le signaler (retour utilisateur : suppression
+// "réussie" dans l'UI, plan toujours présent partout ailleurs).
 export async function deletePlan(env, userId, id, teamId) {
+  let changes = 0
   if (teamId) {
-    await env.DB.prepare('DELETE FROM plans WHERE id = ? AND team_id = ?').bind(id, teamId).run()
+    const result = await env.DB.prepare('DELETE FROM plans WHERE id = ? AND team_id = ?').bind(id, teamId).run()
+    changes = result.meta?.changes || 0
   } else {
-    await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ? AND team_id IS NULL').bind(id, userId).run()
+    const result = await env.DB.prepare('DELETE FROM plans WHERE id = ? AND user_id = ? AND team_id IS NULL').bind(id, userId).run()
+    changes = result.meta?.changes || 0
   }
   // plan_versions et copilot_conversations n'ont pas de contrainte FK (D1/SQLite) —
   // nettoyage explicite pour ne pas laisser d'instantanés/fils orphelins d'un plan supprimé.
   await env.DB.prepare('DELETE FROM plan_versions WHERE plan_id = ?').bind(id).run()
   await env.DB.prepare('DELETE FROM copilot_conversations WHERE plan_id = ?').bind(id).run()
+  return changes > 0
 }
 
 // Déplace un plan existant vers un autre espace (personnel <-> équipe, ou équipe <-> équipe).

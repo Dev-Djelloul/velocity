@@ -1,4 +1,4 @@
-import { fetchPlans, fetchAllPlans, pushPlan, removePlan, movePlan as moveServerPlan, createShare as serverCreateShare, resolveShare } from './serverStorage'
+import { fetchPlans, fetchAllPlans, pushPlan, removePlan, movePlan as moveServerPlan, createShare as serverCreateShare, resolveShare, isServerConfigured } from './serverStorage'
 
 const SHARES_KEY = 'plp_plan_shares'
 
@@ -140,8 +140,16 @@ export function getPlanById(id) {
 // plan encore présent — le retirer du localStorage ne suffisait pas si un refresh
 // concurrent remettait aussitôt l'ancienne liste par-dessus (retour utilisateur : la
 // suppression "prenait" un instant puis le plan revenait, y compris sans recharger).
+// Renvoie true/false selon que la suppression a réellement été acceptée par le serveur.
+// Avant, le résultat de removePlan() n'était jamais vérifié : un rejet serveur (403 —
+// rôle insuffisant sur un plan d'équipe, le cas le plus probable) laissait quand même le
+// retrait local en place, donc la vue qui vient de supprimer semble juste (le plan disparaît
+// de sa propre liste, relue en local) alors que rien n'a bougé côté serveur — visible
+// seulement ailleurs, sur une vue qui relit la vérité serveur (ex. le dashboard, "2 plans"
+// qui ne redescend jamais à 1). Un échec restaure maintenant le retrait local au lieu de le
+// laisser diverger silencieusement de l'état réel.
 export async function deletePlan(id, teamId, role) {
-  if (!activeUserId) return
+  if (!activeUserId) return false
   const scopeTeamId = teamId !== undefined ? (teamId || null) : activeTeamId
   const scopeRole = teamId !== undefined ? (role || null) : activeRole
   const key = plansKey(activeUserId, scopeTeamId)
@@ -149,9 +157,19 @@ export async function deletePlan(id, teamId, role) {
   try {
     plans = JSON.parse(localStorage.getItem(key) || '[]')
   } catch { /* clé corrompue, on repart d'une liste vide */ }
+  const previous = plans
   const filtered = plans.filter(p => p.id !== id)
   localStorage.setItem(key, JSON.stringify(filtered))
-  await removePlan(activeUserId, id, scopeTeamId, scopeRole)
+  // Sans backend configuré (dev local sans serveur), removePlan() renvoie toujours null par
+  // design (voir serverStorage.js) — ce n'est pas un échec, le local-only est le mode
+  // attendu, pas de vérité serveur à laquelle se fier ici.
+  if (!isServerConfigured) return true
+  const result = await removePlan(activeUserId, id, scopeTeamId, scopeRole)
+  if (!result?.ok) {
+    localStorage.setItem(key, JSON.stringify(previous))
+    return false
+  }
+  return true
 }
 
 // Déplace un plan de l'espace actif vers un autre espace (personnel ou une autre équipe).

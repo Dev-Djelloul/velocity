@@ -128,7 +128,12 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
     setDeletePlanTarget(null)
     // Attendu avant refreshPlans() : sinon le GET de refresh peut répondre avant que le
     // DELETE ait fini côté serveur et réécraser l'état local avec le plan encore présent.
-    await deletePlan(target.id, planTeamId, role)
+    // deletePlan restaure lui-même le retrait local si le serveur refuse (droits
+    // insuffisants sur un plan d'équipe...) — sans cette vérification, le plan disparaissait
+    // de cette page sans jamais avoir vraiment été supprimé côté serveur, réapparaissant
+    // ailleurs (dashboard, retour utilisateur, bug critique).
+    const ok = await deletePlan(target.id, planTeamId, role)
+    if (!ok) alert(t(lang, 'plans.deleteFailed'))
     refreshPlans()
   }
 

@@ -265,7 +265,8 @@ export async function handleApi(request, env, url) {
     // créer/éditer mais pas supprimer. Le rôle vient du client (voir la note de confiance
     // en tête de db.js) : suffisant pour ce produit, à durcir avec la vérification JWT.
     if (teamId && role !== 'org:admin') return json({ error: 'forbidden' }, 403)
-    await db.deletePlan(env, userId, planMatch[1], teamId)
+    const deleted = await db.deletePlan(env, userId, planMatch[1], teamId)
+    if (!deleted) return json({ error: 'not_found' }, 404)
     return json({ ok: true })
   }
 

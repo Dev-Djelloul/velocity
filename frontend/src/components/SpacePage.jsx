@@ -114,7 +114,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
     // Le retrait local (localStorage) est déjà fait de façon synchrone dans deletePlan —
     // attendre ici sert surtout à éviter qu'un refresh serveur concurrent ailleurs dans
     // l'app ne réécrase l'état local avant que la suppression n'ait fini côté serveur.
-    await deletePlan(target.id, team.teamId ?? null, team.role)
+    // deletePlan restaure lui-même le retrait local si le serveur refuse (droits
+    // insuffisants...) — sans cette vérification, le plan disparaissait ici sans jamais
+    // avoir vraiment été supprimé côté serveur, réapparaissant ailleurs (dashboard, retour
+    // utilisateur, bug critique).
+    const ok = await deletePlan(target.id, team.teamId ?? null, team.role)
+    if (!ok) alert(t(lang, 'plans.deleteFailed'))
     setPlans(getAllPlans())
   }
 
