@@ -122,11 +122,13 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
                   <IconPencil width={12} height={12} />
                 </button>
               </div>
+              <p className="roadmap-start-date-hint">{t(lang, 'outputs.prepStartHint')}</p>
+
               <div className="roadmap-launch-date-display">
                 <span className="roadmap-start-date-label">{t(lang, 'outputs.projectedLaunchLabel')}</span>
                 <span className="roadmap-start-date-value">{projectedLaunchDate}</span>
               </div>
-              <p className="roadmap-start-date-hint">{t(lang, 'outputs.prepStartHint')}</p>
+              <p className="roadmap-start-date-hint">{t(lang, 'outputs.projectedLaunchHint')}</p>
             </>
           )}
         </div>
