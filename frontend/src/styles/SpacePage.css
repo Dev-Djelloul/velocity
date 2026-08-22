@@ -478,6 +478,43 @@ img.space-page-avatar {
   letter-spacing: 0.03em;
 }
 
+/* Lignes des popups "Bibliothèque de versions" / "Budget cumulé — détail par plan" :
+   passent d'une bande large (miniature + texte côte à côte, étirée sur toute la largeur) à
+   une grille de cartes carrées/compactes (miniature en haut, texte en dessous) — demandé
+   explicitement, la bande large "en triangle" manquait de netteté visuelle. */
+.space-detail-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.space-detail-item {
+  padding: 0;
+}
+
+.space-detail-thumb-top {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  padding: 0.6rem;
+  text-align: center;
+}
+
+.space-detail-thumb-top .account-list-item-thumb {
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
+}
+
+.space-detail-thumb-top .account-list-item-text {
+  align-items: center;
+  text-align: center;
+}
+
+.space-detail-thumb-top .account-list-item-meta {
+  font-size: 0.7rem;
+}
+
 /* Indice visuel qu'une carte est cliquable (ouvre un détail) plutôt qu'une simple stat —
    même principe sur la tuile "Budget cumulé" et la carte "Bibliothèque de versions". */
 .space-dashboard-tile-cta,

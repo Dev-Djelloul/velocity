@@ -366,11 +366,11 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           onClose={() => setShowVersionsPicker(false)}
         >
           <p className="unsaved-changes-body">{t(lang, 'planVersions.pickerBody')}</p>
-          <div className="account-list">
+          <div className="account-list space-detail-grid">
             {plans.map(p => (
-              <div key={p.id} className="account-list-item">
+              <div key={p.id} className="account-list-item space-detail-item">
                 <button
-                  className="account-list-item-main has-thumb"
+                  className="account-list-item-main has-thumb space-detail-thumb-top"
                   onClick={() => { setShowVersionsPicker(false); onCompareVersions?.(p) }}
                 >
                   {p.coverImage
@@ -398,13 +398,13 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
               ? 'Le budget total (développement, marketing, opérations) et le budget marketing (une part du budget total) de chaque plan de cet espace.'
               : "Each plan's total budget (development, marketing, operations) and marketing budget (a share of the total) in this space."}
           </p>
-          <div className="account-list">
+          <div className="account-list space-detail-grid">
             {plans.map(p => {
               const planLaunchBudget = p.resources?.totalBudget ? resolveBudgetAmount(p.resources.totalBudget) : 0
               const planMarketingBudget = p.marketing?.totalBudget || 0
               return (
-                <div key={p.id} className="account-list-item">
-                  <div className="account-list-item-main has-thumb">
+                <div key={p.id} className="account-list-item space-detail-item">
+                  <div className="account-list-item-main has-thumb space-detail-thumb-top">
                     {p.coverImage
                       ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
                       : <div className="account-list-item-thumb account-list-item-thumb-placeholder" aria-hidden="true" />}
