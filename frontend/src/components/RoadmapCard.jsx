@@ -53,6 +53,12 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
   }
 
   const { sprints, totalDuration, estimatedCost } = roadmap
+  // Dérivée directement de CETTE roadmap (début + nombre de semaines de ses sprints),
+  // pas de plan.launchDate — qui peut diverger si le délai a été changé dans Budget & Délai
+  // sans reconstruire la roadmap (voir la discussion produit à ce sujet). Ici, la date
+  // affichée correspond toujours exactement à ce qui est planifié juste en dessous.
+  const projectedLaunchDate = new Date(new Date(startDateStr).getTime() + totalDuration * 7 * 24 * 60 * 60 * 1000)
+    .toLocaleDateString(lang === 'en' ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })
   const now = new Date()
   const issues = validateRoadmap(roadmap)
 
@@ -112,6 +118,10 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
                 <button className="roadmap-start-date-edit-btn" onClick={() => setIsEditingStartDate(true)} title={t(lang, 'outputs.editPrepStartDate')}>
                   <IconPencil width={12} height={12} />
                 </button>
+              </div>
+              <div className="roadmap-launch-date-display">
+                <span className="roadmap-start-date-label">{t(lang, 'outputs.projectedLaunchLabel')}</span>
+                <span className="roadmap-start-date-value">{projectedLaunchDate}</span>
               </div>
               <p className="roadmap-start-date-hint">{t(lang, 'outputs.prepStartHint')}</p>
             </>
