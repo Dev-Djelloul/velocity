@@ -295,8 +295,10 @@ img.space-page-avatar {
   z-index: 0;
   pointer-events: none;
   border-radius: inherit;
-  /* Léger reflet en haut de carte (comme du verre), fond uni juste en dessous. */
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.16) 0%, transparent 32%), var(--tile-tint);
+  /* Teinte plate et uniforme plutôt qu'un reflet diagonal façon verre — ce dernier créait
+     un triangle de lumière visible dans le coin haut-gauche de la carte (retour utilisateur,
+     capture à l'appui) ; la carte doit rester un bloc "carré" bien net. */
+  background: var(--tile-tint);
 }
 
 /* Le contenu de la carte doit passer au-dessus du calque ::before. */
@@ -474,6 +476,19 @@ img.space-page-avatar {
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.03em;
+}
+
+/* Indice visuel qu'une carte est cliquable (ouvre un détail) plutôt qu'une simple stat —
+   même principe sur la tuile "Budget cumulé" et la carte "Bibliothèque de versions". */
+.space-dashboard-tile-cta,
+.space-page-versions-cta {
+  display: block;
+  margin-top: 0.2rem;
+  font-size: 0.64rem;
+  font-weight: 600;
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 0.75;
 }
 
 .space-page-section-head {

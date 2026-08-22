@@ -231,9 +231,8 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           <button className="space-dashboard-tile space-dashboard-tile-cyan space-dashboard-tile-clickable" onClick={() => setShowBudgetDetail(true)}>
             <span className="space-dashboard-icon"><IconCoin width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.totalBudget.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}€</span>
-            <span className="space-dashboard-label">
-              {lang === 'fr' ? 'Budget cumulé' : 'Combined budget'} · {lang === 'fr' ? 'détail' : 'details'}
-            </span>
+            <span className="space-dashboard-label">{lang === 'fr' ? 'Budget cumulé' : 'Combined budget'}</span>
+            <span className="space-dashboard-tile-cta">{lang === 'fr' ? 'Détails en cliquant' : 'Click for details'}</span>
           </button>
           <div className="space-dashboard-tile space-dashboard-tile-white">
             <span className="space-dashboard-icon"><IconClock width={16} height={16} /></span>
@@ -251,6 +250,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
           <div>
             <h3>{t(lang, 'planVersions.title')}</h3>
             <p>{t(lang, 'planVersions.cardDesc')}</p>
+            <span className="space-page-versions-cta">{lang === 'fr' ? 'Détails en cliquant' : 'Click for details'}</span>
           </div>
         </button>
       )}
