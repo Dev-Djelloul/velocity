@@ -248,6 +248,17 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           </button>
         )}
       </div>
+
+      <div className="dashboard-home-links">
+        <button className="dashboard-home-link" onClick={onOpenAccount}>
+          <span className="dashboard-home-link-icon"><IconClipboard width={13} height={13} /></span>
+          {t(lang, 'dashboard.viewHistory')}
+        </button>
+        <button className="dashboard-home-link" onClick={onOpenGallery}>
+          <span className="dashboard-home-link-icon"><IconImage width={13} height={13} /></span>
+          {t(lang, 'dashboard.viewGallery')}
+        </button>
+      </div>
       </div>
 
       <div className="dashboard-home-widgets">
@@ -275,17 +286,6 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           )}
         </div>
       </div>
-      </div>
-
-      <div className="dashboard-home-links">
-        <button className="dashboard-home-link" onClick={onOpenAccount}>
-          <span className="dashboard-home-link-icon"><IconClipboard width={13} height={13} /></span>
-          {t(lang, 'dashboard.viewHistory')}
-        </button>
-        <button className="dashboard-home-link" onClick={onOpenGallery}>
-          <span className="dashboard-home-link-icon"><IconImage width={13} height={13} /></span>
-          {t(lang, 'dashboard.viewGallery')}
-        </button>
       </div>
       </div>
     </div>
