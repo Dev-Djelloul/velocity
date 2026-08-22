@@ -492,7 +492,11 @@ img.space-page-avatar {
   padding: 0;
 }
 
-.space-detail-thumb-top {
+/* Spécificité renforcée (deux classes) pour l'emporter sur .account-list-item-main.has-thumb
+   (flex-direction: row) — un seul .space-detail-thumb-top ne suffisait pas, le texte
+   restait collé à côté de la miniature au lieu de passer dessous (retour utilisateur,
+   capture à l'appui : texte qui déborde du cadre). */
+.account-list-item-main.space-detail-thumb-top {
   flex-direction: column;
   align-items: stretch;
   gap: 0.6rem;
