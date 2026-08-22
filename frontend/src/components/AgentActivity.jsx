@@ -106,11 +106,17 @@ export default function AgentActivity({ plan, userId, lang, onRoadmapChange }) {
   const runBudgetOptimization = async () => {
     if (busy || !plan.marketing?.channels?.length) return
     setBusy(true)
+    // Remis à l'échelle du budget courant via le pct de chaque canal (stable, indépendant
+    // du montant), sans se fier au champ `budget` stocké — un plan enregistré avant le
+    // correctif qui recale les canaux au moment de sauvegarder (voir PlanViewer.jsx) garde
+    // sinon des montants figés à sa génération initiale, ce qui a fait planter l'agent sur
+    // une "incohérence" qui n'existait que dans la donnée stockée, pas dans le budget réel.
+    const totalBudget = plan.marketing.totalBudget
     await enqueueAgentTask(planId, userId, 'budget_optimization', {
       lang,
       productName: plan.product?.name,
-      totalBudget: plan.marketing.totalBudget,
-      channels: plan.marketing.channels.map(c => ({ name: c.name, budget: c.budget, pct: c.pct, goal: c.goal }))
+      totalBudget,
+      channels: plan.marketing.channels.map(c => ({ name: c.name, budget: Math.round((c.pct / 100) * totalBudget), pct: c.pct, goal: c.goal }))
     })
     await refresh()
     setBusy(false)
