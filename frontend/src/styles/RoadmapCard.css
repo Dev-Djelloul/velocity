@@ -127,6 +127,35 @@
   border-bottom: 1px solid rgba(145, 132, 217, 0.1);
 }
 
+/* Écart entre la durée réellement planifiée (roadmap.totalDuration) et le délai visé dans
+   Budget & Délai — orange plutôt que rouge (.roadmap-issues-banner) : ce n'est pas une
+   erreur de données, juste un rappel que les deux ne se recalculent pas l'un l'autre tant
+   que la roadmap n'est pas reconstruite. */
+.roadmap-timeline-mismatch {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  color: #f59e0b;
+}
+
+.roadmap-timeline-mismatch svg {
+  flex-shrink: 0;
+}
+
+.roadmap-timeline-mismatch p {
+  flex: 1;
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  min-width: 200px;
+}
+
 .roadmap-issues-banner {
   background: rgba(239, 68, 68, 0.08);
   border: 1px solid rgba(239, 68, 68, 0.3);

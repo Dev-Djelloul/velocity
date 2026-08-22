@@ -29,7 +29,7 @@ function formatRange(start, end, lang) {
   return `${start.toLocaleDateString(locale, opts)} → ${end.toLocaleDateString(locale, opts)}`
 }
 
-export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartDateChange, onRoadmapChange }) {
+export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartDateChange, onRoadmapChange, targetTimelineWeeks, onRegenerateRoadmap }) {
   const [issuesExpanded, setIssuesExpanded] = useState(false)
   const [expandedStories, setExpandedStories] = useState(() => new Set())
   const [isEditingStartDate, setIsEditingStartDate] = useState(false)
@@ -131,6 +131,20 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
           )}
         </div>
       </div>
+
+      {targetTimelineWeeks != null && targetTimelineWeeks !== totalDuration && (
+        <div className="roadmap-timeline-mismatch">
+          <IconAlertTriangle width={14} height={14} />
+          <p>
+            {t(lang, 'outputs.timelineMismatch')(totalDuration, targetTimelineWeeks)}
+          </p>
+          {onRegenerateRoadmap && (
+            <button type="button" className="btn-sm" onClick={onRegenerateRoadmap}>
+              {t(lang, 'outputs.budgetTimeline.regenerateButton')}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="roadmap-metrics">
         <div className="gauge">
