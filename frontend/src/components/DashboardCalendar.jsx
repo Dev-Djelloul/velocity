@@ -25,12 +25,17 @@ export default function DashboardCalendar({ lang, deadlines }) {
   const today = new Date()
   const [viewDate, setViewDate] = useState(new Date(today.getFullYear(), today.getMonth(), 1))
 
-  const deadlineDays = useMemo(() => {
-    const set = new Set()
+  // Deux points possibles par jour (lancement / fin de sprint), pas un seul point neutre —
+  // demandé explicitement pour qu'un coup d'œil au calendrier dise de quel type d'échéance
+  // il s'agit, sans avoir à ouvrir la carte "Prochaines échéances" en dessous.
+  const deadlinesByDay = useMemo(() => {
+    const map = new Map()
     for (const d of deadlines || []) {
-      set.add(isoDateOnly(new Date(d.date)))
+      const iso = isoDateOnly(new Date(d.date))
+      if (!map.has(iso)) map.set(iso, new Set())
+      map.get(iso).add(d.kind === 'sprint' ? 'sprint' : 'launch')
     }
-    return set
+    return map
   }, [deadlines])
 
   const cells = useMemo(() => buildMonthGrid(viewDate.getFullYear(), viewDate.getMonth()), [viewDate])
@@ -62,14 +67,28 @@ export default function DashboardCalendar({ lang, deadlines }) {
           if (!date) return <span key={`blank-${i}`} className="dashboard-calendar-cell is-blank" />
           const iso = isoDateOnly(date)
           const isToday = iso === todayIso
-          const hasDeadline = deadlineDays.has(iso)
+          const kinds = deadlinesByDay.get(iso)
+          const title = kinds && [
+            kinds.has('launch') ? t(lang, 'dashboard.calendarLegendLaunch') : null,
+            kinds.has('sprint') ? t(lang, 'dashboard.calendarLegendSprint') : null
+          ].filter(Boolean).join(' · ')
           return (
-            <span key={iso} className={`dashboard-calendar-cell ${isToday ? 'is-today' : ''}`}>
+            <span key={iso} className={`dashboard-calendar-cell ${isToday ? 'is-today' : ''}`} title={title || undefined}>
               <span className="dashboard-calendar-day-num">{date.getDate()}</span>
-              {hasDeadline && <span className="dashboard-calendar-dot" aria-hidden="true" />}
+              {kinds && (
+                <span className="dashboard-calendar-dots" aria-hidden="true">
+                  {kinds.has('launch') && <span className="dashboard-calendar-dot dashboard-calendar-dot-launch" />}
+                  {kinds.has('sprint') && <span className="dashboard-calendar-dot dashboard-calendar-dot-sprint" />}
+                </span>
+              )}
             </span>
           )
         })}
+      </div>
+
+      <div className="dashboard-calendar-legend">
+        <span><span className="dashboard-calendar-dot dashboard-calendar-dot-launch" /> {t(lang, 'dashboard.calendarLegendLaunch')}</span>
+        <span><span className="dashboard-calendar-dot dashboard-calendar-dot-sprint" /> {t(lang, 'dashboard.calendarLegendSprint')}</span>
       </div>
     </div>
   )

@@ -236,6 +236,16 @@ img.space-page-avatar {
   padding: 1rem 1.1rem;
 }
 
+/* La carte "Budget cumulé" est un <button> (ouvre le détail par plan) plutôt qu'un simple
+   tooltip au survol — reset des styles par défaut du navigateur pour rester identique aux
+   autres tuiles, purement décoratives. */
+.space-dashboard-tile-clickable {
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+}
+
 .space-dashboard-icon {
   color: var(--color-primary);
   margin-bottom: 0.15rem;

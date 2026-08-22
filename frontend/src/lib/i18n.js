@@ -1533,7 +1533,9 @@ export const translations = {
       deadlinesKindSprint: (n) => `Fin du sprint ${n}`,
       calendarWeekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
       calendarPrev: 'Mois précédent',
-      calendarNext: 'Mois suivant'
+      calendarNext: 'Mois suivant',
+      calendarLegendLaunch: 'Lancement',
+      calendarLegendSprint: 'Fin de sprint'
     },
     planVersions: {
       back: 'Retour au plan',
@@ -3223,7 +3225,9 @@ export const translations = {
       deadlinesKindSprint: (n) => `Sprint ${n} ends`,
       calendarWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       calendarPrev: 'Previous month',
-      calendarNext: 'Next month'
+      calendarNext: 'Next month',
+      calendarLegendLaunch: 'Launch',
+      calendarLegendSprint: 'Sprint end'
     },
     planVersions: {
       back: 'Back to plan',

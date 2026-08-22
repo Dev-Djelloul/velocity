@@ -46,6 +46,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [personalSpace, setPersonalSpace] = useState(() => getPersonalSpace(userId, lang))
   const [showEditPersonal, setShowEditPersonal] = useState(false)
   const [showVersionsPicker, setShowVersionsPicker] = useState(false)
+  const [showBudgetDetail, setShowBudgetDetail] = useState(false)
   const [showPersonalAvatarPicker, setShowPersonalAvatarPicker] = useState(false)
   const [editName, setEditName] = useState('')
 
@@ -227,18 +228,13 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             <span className="space-dashboard-label">{lang === 'fr' ? 'Membres' : 'Members'}</span>
             <MembersPresenceRow teamId={team.teamId} members={team.members} lang={lang} />
           </div>
-          <div className="space-dashboard-tile space-dashboard-tile-cyan">
+          <button className="space-dashboard-tile space-dashboard-tile-cyan space-dashboard-tile-clickable" onClick={() => setShowBudgetDetail(true)}>
             <span className="space-dashboard-icon"><IconCoin width={16} height={16} /></span>
             <span className="space-dashboard-value">{stats.totalBudget.toLocaleString(lang === 'fr' ? 'fr-FR' : 'en-US')}€</span>
-            <span
-              className="space-dashboard-label avatar-tooltip"
-              data-tooltip={lang === 'fr'
-                ? `${stats.launchBudget.toLocaleString('fr-FR')} € budget total + ${stats.marketingBudget.toLocaleString('fr-FR')} € marketing`
-                : `${stats.launchBudget.toLocaleString('en-US')}€ total budget + ${stats.marketingBudget.toLocaleString('en-US')}€ marketing`}
-            >
-              {lang === 'fr' ? 'Budget cumulé' : 'Combined budget'}
+            <span className="space-dashboard-label">
+              {lang === 'fr' ? 'Budget cumulé' : 'Combined budget'} · {lang === 'fr' ? 'détail' : 'details'}
             </span>
-          </div>
+          </button>
           <div className="space-dashboard-tile space-dashboard-tile-white">
             <span className="space-dashboard-icon"><IconClock width={16} height={16} /></span>
             <span className="space-dashboard-value space-dashboard-value-sm">
@@ -387,6 +383,43 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                 </button>
               </div>
             ))}
+          </div>
+        </InfoModal>
+      )}
+
+      {showBudgetDetail && (
+        <InfoModal
+          icon={<IconCoin width={22} height={22} />}
+          title={lang === 'fr' ? 'Budget cumulé — détail par plan' : 'Combined budget — breakdown by plan'}
+          onClose={() => setShowBudgetDetail(false)}
+        >
+          <p className="unsaved-changes-body">
+            {lang === 'fr'
+              ? 'Le budget total (développement, marketing, opérations) et le budget marketing (une part du budget total) de chaque plan de cet espace.'
+              : "Each plan's total budget (development, marketing, operations) and marketing budget (a share of the total) in this space."}
+          </p>
+          <div className="account-list">
+            {plans.map(p => {
+              const planLaunchBudget = p.resources?.totalBudget ? resolveBudgetAmount(p.resources.totalBudget) : 0
+              const planMarketingBudget = p.marketing?.totalBudget || 0
+              return (
+                <div key={p.id} className="account-list-item">
+                  <div className="account-list-item-main has-thumb">
+                    {p.coverImage
+                      ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
+                      : <div className="account-list-item-thumb account-list-item-thumb-placeholder" aria-hidden="true" />}
+                    <div className="account-list-item-text">
+                      <span className="account-list-item-name">{p.product?.name || t(lang, 'plans.untitled')}</span>
+                      <span className="account-list-item-meta">
+                        {lang === 'fr'
+                          ? `${planLaunchBudget.toLocaleString('fr-FR')} € budget total · ${planMarketingBudget.toLocaleString('fr-FR')} € marketing`
+                          : `${planLaunchBudget.toLocaleString('en-US')}€ total budget · ${planMarketingBudget.toLocaleString('en-US')}€ marketing`}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </InfoModal>
       )}

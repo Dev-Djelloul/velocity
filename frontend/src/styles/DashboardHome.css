@@ -359,13 +359,48 @@
   font-weight: 700;
 }
 
-.dashboard-calendar-dot {
+/* Deux points distincts (lancement / fin de sprint) plutôt qu'un seul point neutre —
+   regroupés dans .dashboard-calendar-dots pour rester centrés sous le chiffre du jour même
+   quand les deux types tombent le même jour. */
+.dashboard-calendar-dots {
   position: absolute;
   bottom: 1px;
+  display: flex;
+  gap: 2px;
+}
+
+.dashboard-calendar-dot {
   width: 3px;
   height: 3px;
   border-radius: 50%;
+}
+
+.dashboard-calendar-dot-launch {
+  background: #9184d9;
+}
+
+.dashboard-calendar-dot-sprint {
   background: #06b6d4;
+}
+
+.dashboard-calendar-legend {
+  display: flex;
+  gap: 0.9rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.12);
+}
+
+.dashboard-calendar-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.6rem;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.dashboard-calendar-legend .dashboard-calendar-dot {
+  position: static;
 }
 
 .dashboard-deadlines-empty {
