@@ -68,3 +68,25 @@ export async function generateAdvertisingWithAI(plan, lang, env) {
     timeoutMs: 25000
   })
 }
+
+// Filet de sécurité budgétaire : le prompt demande déjà à l'IA de respecter le budget
+// marketing réel (buildUserPrompt ci-dessus), mais le schéma ne contraint `budget`/
+// `totalBudget` que par une description en prose — le modèle peut renvoyer des chiffres
+// totalement déconnectés (ex. 5000€ de CPM cible sur un budget réel de 41 000€, signalé par
+// l'utilisateur). Recalé après coup : chaque budget de campagne est mis à l'échelle pour que
+// leur somme corresponde exactement au vrai budget marketing, en conservant la répartition
+// relative déjà proposée par le modèle entre semaines/canaux.
+export function reconcileAdvertisingBudget(advertising, marketingBudget) {
+  if (!advertising?.campaigns?.length || marketingBudget == null) return advertising
+  const rawTotal = advertising.campaigns.reduce((s, c) => s + (c.budget || 0), 0)
+  if (!rawTotal) return advertising
+  const scale = marketingBudget / rawTotal
+  let allocated = 0
+  const nextCampaigns = advertising.campaigns.map((c, idx) => {
+    const isLast = idx === advertising.campaigns.length - 1
+    const budget = isLast ? Math.max(0, marketingBudget - allocated) : Math.max(0, Math.round((c.budget || 0) * scale))
+    allocated += budget
+    return { ...c, budget }
+  })
+  return { ...advertising, campaigns: nextCampaigns, totalBudget: marketingBudget }
+}

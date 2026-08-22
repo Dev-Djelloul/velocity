@@ -9,7 +9,7 @@ import { generateBenchmarksWithAI } from '../lib/ai/benchmarksClient'
 import { generateBenchmarksFallback } from '../lib/generator/benchmarksFallback'
 import { generateEditorialWithAI } from '../lib/ai/editorialClient'
 import { generateEditorialFallback } from '../lib/generator/editorialFallback'
-import { generateAdvertisingWithAI } from '../lib/ai/advertisingClient'
+import { generateAdvertisingWithAI, reconcileAdvertisingBudget } from '../lib/ai/advertisingClient'
 import { generateAdvertisingFallback } from '../lib/generator/advertisingFallback'
 import { generateRgpdWithAI } from '../lib/ai/rgpdClient'
 import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
@@ -471,7 +471,12 @@ export async function handleApi(request, env, url) {
     const { plan, lang, userId } = await request.json()
     let result
     try {
-      result = { ...(await generateAdvertisingWithAI(plan, lang || 'fr', env)), source: 'ai' }
+      const ai = await generateAdvertisingWithAI(plan, lang || 'fr', env)
+      // Le budget marketing réel (plan.marketing.totalBudget) prime toujours sur ce que
+      // l'IA a renvoyé — voir reconcileAdvertisingBudget, même filet de sécurité que pour
+      // le prévisionnel financier et le coût de la roadmap.
+      const budget = plan?.marketing?.totalBudget
+      result = { ...(budget != null ? reconcileAdvertisingBudget(ai, budget) : ai), source: 'ai' }
     } catch {
       result = { ...generateAdvertisingFallback(plan, lang || 'fr'), source: 'rules' }
     }
