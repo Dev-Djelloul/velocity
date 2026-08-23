@@ -1728,9 +1728,26 @@
    son propre texte (même bug que le champ de recherche de la bibliothèque de widgets ou
    le titre "Nouveautés") — le nom du plan débordait de la ligne en taille "Petit" au lieu
    de se tronquer avec l'ellipsis déjà posé (retour utilisateur, capture à l'appui). */
-.dashboard-history-name {
+/* Colonne titre + date de création, sous le titre plutôt qu'à côté : l'espace horizontal
+   de la ligne est déjà pris par la miniature + le nom du plan (retour utilisateur). */
+.dashboard-history-info {
+  display: flex;
+  flex-direction: column;
   flex: 1;
   min-width: 0;
+  gap: 0.05rem;
+}
+
+.dashboard-history-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-history-date {
+  font-size: 0.62rem;
+  color: var(--color-text-tertiary, rgba(255, 255, 255, 0.45));
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

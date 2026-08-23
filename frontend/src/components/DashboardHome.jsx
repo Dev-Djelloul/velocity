@@ -177,6 +177,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     { weekday: 'short', day: 'numeric', month: 'short' }
   )
 
+  // Format court numérique (ex: "23/08/26") pour la date de création dans l'historique des
+  // plans : l'espace y est très serré (retour utilisateur), pas de place pour un libellé
+  // du type "lun. 25 août" comme pour les échéances ci-dessus.
+  const shortDateLabel = (isoDate) => new Date(isoDate).toLocaleDateString(
+    lang === 'fr' ? 'fr-FR' : 'en-US',
+    { day: '2-digit', month: '2-digit', year: '2-digit' }
+  )
+
   // Urgence par code couleur sur le badge — imminent (aujourd'hui/demain) en rouge, cette
   // semaine en ambre, plus loin dans la couleur neutre d'origine. Un simple "Dans X jours"
   // wa noyé sans hiérarchie visuelle entre "demain" et "dans 3 semaines" (retour
@@ -548,7 +556,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                                 ? <img src={p.coverImage} alt="" />
                                 : <span className="dashboard-history-thumb-fallback" aria-hidden="true" />}
                             </span>
-                            <span className="dashboard-history-name">{p.product?.name || t(lang, 'plans.untitled')}</span>
+                            <span className="dashboard-history-info">
+                              <span className="dashboard-history-name">{p.product?.name || t(lang, 'plans.untitled')}</span>
+                              {p.generatedAt && (
+                                <span className="dashboard-history-date">
+                                  {t(lang, 'dashboard.historyCreatedOn')(shortDateLabel(p.generatedAt))}
+                                </span>
+                              )}
+                            </span>
                           </button>
                         </li>
                       ))}

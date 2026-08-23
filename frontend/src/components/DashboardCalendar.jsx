@@ -53,7 +53,16 @@ function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onCl
     // toute la page" (retour utilisateur, capture à l'appui). Un scroll d'un ascendant ne
     // "bubble" pas en JS, mais la phase de capture sur window intercepte bien l'événement
     // quel que soit le conteneur qui défile réellement.
-    const onScroll = () => onClose()
+    // Le popover a lui-même un overflow-y:auto (liste de stories) : un scroll À L'INTÉRIEUR
+    // de son propre contenu déclenche aussi cet événement en phase de capture, fermant le
+    // popover dès la première tentative de défilement interne (retour utilisateur : "on ne
+    // peut même plus scroller que la popup disparaît"). On ignore donc les scrolls dont la
+    // cible est le popover ou l'un de ses descendants — seul un scroll d'un vrai ascendant
+    // de la page doit encore le fermer.
+    const onScroll = (e) => {
+      if (ref.current && e.target instanceof Node && ref.current.contains(e.target)) return
+      onClose()
+    }
     document.addEventListener('mousedown', onDocClick)
     document.addEventListener('keydown', onKeyDown)
     window.addEventListener('scroll', onScroll, { capture: true, passive: true })
