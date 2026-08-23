@@ -212,22 +212,6 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         </button>
       </div>
 
-      {lastUsedPlan && (
-        <button className="dashboard-resume-card" onClick={() => onLoadPlan?.(lastUsedPlan)}>
-          <div className="dashboard-resume-card-media">
-            {lastUsedPlan.coverImage
-              ? <img src={lastUsedPlan.coverImage} alt="" />
-              : <span className="dashboard-resume-card-fallback" aria-hidden="true"><IconClipboard width={22} height={22} /></span>}
-          </div>
-          <div className="dashboard-resume-card-body">
-            <span className="dashboard-resume-card-label">{t(lang, 'dashboard.resumeLabel')}</span>
-            <span className="dashboard-resume-card-name">{lastUsedPlan.product?.name || t(lang, 'plans.untitled')}</span>
-            <span className="dashboard-resume-card-space">{lastUsedPlanSpaceName}</span>
-          </div>
-          <IconChevronRight width={18} height={18} className="dashboard-resume-card-arrow" />
-        </button>
-      )}
-
       <div className="dashboard-home-grid">
         {spaces.map(space => {
           const isCurrent = (team.teamId ?? null) === space.id
@@ -320,6 +304,22 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         </button>
       </div>
       </div>
+
+      {lastUsedPlan && (
+        <button className="dashboard-resume-square" onClick={() => onLoadPlan?.(lastUsedPlan)}>
+          {lastUsedPlan.coverImage
+            ? <img src={lastUsedPlan.coverImage} alt="" className="dashboard-resume-square-bg" />
+            : <span className="dashboard-resume-square-bg dashboard-resume-square-fallback" aria-hidden="true" />}
+          <span className="dashboard-resume-square-overlay">
+            <span className="dashboard-resume-square-label">{t(lang, 'dashboard.resumeLabel')}</span>
+            <span className="dashboard-resume-square-name">{lastUsedPlan.product?.name || t(lang, 'plans.untitled')}</span>
+            <span className="dashboard-resume-square-space">
+              {lastUsedPlanSpaceName}
+              <IconChevronRight width={14} height={14} />
+            </span>
+          </span>
+        </button>
+      )}
 
       <div className="dashboard-home-widgets">
         <DashboardCalendar lang={lang} deadlines={deadlines} plans={allPlans || activePlans} onOpenPlan={onLoadPlan} />

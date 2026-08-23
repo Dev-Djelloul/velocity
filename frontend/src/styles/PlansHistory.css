@@ -142,9 +142,9 @@
 }
 
 .plan-info h3 {
-  font-size: 15px;
-  font-weight: 600;
-  margin-bottom: 2px;
+  font-size: 21px;
+  font-weight: 700;
+  margin-bottom: 4px;
   color: var(--color-text-primary);
 }
 
@@ -215,16 +215,21 @@
   line-height: 1.2;
 }
 
+/* Grille 2 colonnes plutôt qu'un flex-wrap : "Supprimer" (texte court) se retrouvait
+   nettement plus étroit que "Dupliquer" juste au-dessus (retour utilisateur) — chaque
+   bouton occupe désormais une cellule de largeur identique. */
 .plan-actions {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-.plan-actions .btn-secondary {
-  padding: 0.3rem 0.65rem;
-  font-size: 11px;
+.plan-actions .btn-secondary,
+.plan-actions .btn-plan-danger {
+  padding: 0.55rem 0.65rem;
+  font-size: 13px;
+  width: 100%;
 }
 
 .plan-favorite-btn {
@@ -332,22 +337,20 @@
 
   .plan-actions {
     width: 100%;
-    flex-wrap: wrap;
   }
 
   .plan-actions .btn-secondary,
   .btn-plan-danger {
-    flex: 1 1 auto;
     min-width: 0;
     white-space: nowrap;
   }
 }
 
 @media (max-width: 400px) {
-  /* En dessous de 400px, même avec flex-wrap, 3 boutons "Charger / Partager /
-     Supprimer" côte à côte n'ont plus la place de respirer — on les empile. */
+  /* En dessous de 400px, même la grille 2 colonnes n'a plus la place de respirer — on
+     empile les 4 boutons sur une seule colonne. */
   .plan-actions {
-    flex-direction: column;
+    grid-template-columns: 1fr;
   }
 
   .plan-actions .btn-secondary,
