@@ -275,6 +275,16 @@
   margin-top: auto;
 }
 
+/* Avatar réel de Nova (même image que le bouton flottant du copilote sur le plan) plutôt
+   qu'une icône générique — retour utilisateur. */
+.dashboard-nova-btn-avatar {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
 .dashboard-nova-spin {
   animation: dashboard-nova-spin 1s linear infinite;
 }
@@ -309,11 +319,30 @@
   margin-bottom: 0.6rem;
 }
 
+/* Icônes et titres uniformisés sur tous les widgets (retour utilisateur) : icône violette
+   pleine (au lieu du dégradé multicolore utilisé ailleurs sur certaines, ex. gradientIcon
+   sur "Prochaines échéances") et titre en texte dégradé violet→bleu→cyan, cohérent avec le
+   dégradé de marque utilisé partout dans l'app (boutons, bordures). `!important` sur le
+   svg : sans ça, une icône passée par gradientIcon() (stroke="url(#defs)" posé en attribut
+   direct) resterait multicolore malgré cette règle, une simple couleur CSS ayant moins de
+   poids qu'un attribut de présentation... sauf qu'ici on veut justement l'écraser. */
+.dashboard-widget-header svg,
+.dashboard-widget-header-link svg {
+  color: #9184d9 !important;
+  stroke: #9184d9 !important;
+}
+
 .dashboard-widget-header h3 {
   margin: 0;
   font-size: 0.85rem;
   font-weight: 700;
-  color: var(--color-text-primary);
+}
+
+.dashboard-widget-card h3 {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 /* Widget calendrier mensuel façon Apple Calendar — voir DashboardCalendar.jsx. Réduit et
