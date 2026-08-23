@@ -884,6 +884,16 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Bibliothèque de widgets en verre dépoli, texte blanc sur Budget cumulé et Mon compte',
+            items: [
+              'Bibliothèque de widgets : aspect verre dépoli (fond translucide + flou) sur tout le panneau, cartes et barre latérale comprises, plutôt qu\'un fond plein opaque',
+              'Corrige le champ "Chercher des widgets" dont le texte débordait légèrement du cadre',
+              'Tuile "Budget cumulé" (espace d\'équipe) : "Détails en cliquant" repassé en blanc, illisible en thème clair (c\'est un bouton, qui n\'héritait pas de la couleur blanche du reste de la tuile)',
+              'Mon compte, thème clair : "Membre Pro" et sa description redevenus lisibles sur la photo de fond (texte sombre par défaut, quasiment invisible sur l\'encart quasi transparent)'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Bibliothèque de widgets : panneau ancré en bas façon macOS, badge "Nouveautés" et infobulles corrigés',
             items: [
               'Le panneau de la bibliothèque de widgets ("+") ne flotte plus au centre de l\'écran : il glisse depuis le bas et reste ancré au bord inférieur, coins arrondis en haut seulement — comme le centre de widgets macOS',
@@ -2792,6 +2802,16 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Frosted-glass widget library, white text on Combined budget and My account',
+            items: [
+              'Widget library: frosted-glass look (translucent background + blur) across the whole panel, including cards and sidebar, instead of a flat opaque background',
+              'Fixed the "Search widgets" field whose text slightly overflowed its frame',
+              '"Combined budget" tile (team space): "Click for details" back to white, unreadable in light theme (it\'s a button, which wasn\'t inheriting the white color the rest of the tile gets)',
+              'My account, light theme: "Pro member" and its description are readable again over the background photo (default dark text was nearly invisible on the near-transparent panel)'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Widget library: bottom-docked panel like macOS, fixed "New" badge and tooltips',

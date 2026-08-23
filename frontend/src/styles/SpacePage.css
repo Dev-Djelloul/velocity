@@ -532,6 +532,16 @@ img.space-page-avatar {
   opacity: 0.75;
 }
 
+/* La tuile "Budget cumulé" est un <button> : sans cette règle, "Détails en cliquant"
+   hérite de la couleur de texte par défaut du navigateur pour un bouton (sombre en clair)
+   au lieu du blanc appliqué à .space-dashboard-value/.space-dashboard-label juste
+   au-dessus — illisible sur le fond cyan en thème clair (retour utilisateur, capture à
+   l'appui). */
+.space-dashboard-tile-cta {
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5), 0 1px 8px rgba(0, 0, 0, 0.35);
+}
+
 .space-page-section-head {
   display: flex;
   align-items: center;

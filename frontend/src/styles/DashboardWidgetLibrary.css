@@ -19,16 +19,34 @@
 .widget-library-panel {
   display: flex;
   width: 100%;
-  max-width: 920px;
+  max-width: 980px;
   height: 640px;
   max-height: 82vh;
   border-radius: 20px 20px 0 0;
   overflow: hidden;
+  /* Verre dépoli plutôt qu'un fond opaque plein (retour utilisateur) — même recette que
+     les cartes de Mon compte/Espace (AccountPage.css, SpacePage.css) : fond translucide +
+     backdrop-filter, avec repli opaque pour les moteurs qui ne le supportent pas. */
   background: var(--color-bg-secondary);
   border: 1px solid rgba(145, 132, 217, 0.15);
   border-bottom: none;
   box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.35);
   animation: widget-library-in 0.22s cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+:root:not([data-theme="light"]) .widget-library-panel {
+  background: rgba(20, 22, 30, 0.6);
+}
+
+[data-theme="light"] .widget-library-panel {
+  background: rgba(255, 255, 255, 0.65);
+}
+
+@supports (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px)) {
+  .widget-library-panel {
+    backdrop-filter: blur(28px) saturate(1.5);
+    -webkit-backdrop-filter: blur(28px) saturate(1.5);
+  }
 }
 
 @keyframes widget-library-in {
@@ -37,14 +55,14 @@
 }
 
 .widget-library-sidebar {
-  width: 220px;
+  width: 240px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: 0.3rem;
   padding: 1rem 0.75rem;
   border-right: 1px solid rgba(145, 132, 217, 0.15);
-  background: rgba(145, 132, 217, 0.04);
+  background: rgba(145, 132, 217, 0.06);
   overflow-y: auto;
 }
 
@@ -55,13 +73,19 @@
   padding: 0.5rem 0.7rem;
   margin-bottom: 0.5rem;
   border-radius: 10px;
-  background: var(--color-bg-primary);
+  background: rgba(145, 132, 217, 0.08);
   border: 1px solid rgba(145, 132, 217, 0.18);
   color: var(--color-text-secondary);
 }
 
+/* min-width:0 : un <input> a une largeur intrinsèque minimale (basée sur son attribut
+   size par défaut) que flex:1 seul ne suffit pas à annuler — sans ça, le placeholder
+   "Chercher des widgets" débordait légèrement de la barre dans la colonne de 240px
+   (retour utilisateur, capture à l'appui). */
 .widget-library-search input {
   flex: 1;
+  min-width: 0;
+  width: 100%;
   border: none;
   outline: none;
   background: none;
@@ -124,7 +148,11 @@
   padding: 0.9rem;
   border-radius: 14px;
   border: 1px solid rgba(145, 132, 217, 0.16);
-  background: var(--color-bg-primary);
+  background: rgba(145, 132, 217, 0.06);
+}
+
+[data-theme="light"] .widget-library-card {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .widget-library-card.is-added {
