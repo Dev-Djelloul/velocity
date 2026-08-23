@@ -884,6 +884,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Bibliothèque de widgets : panneau ancré en bas façon macOS, badge "Nouveautés" corrigé',
+            items: [
+              'Le panneau de la bibliothèque de widgets ("+") ne flotte plus au centre de l\'écran : il glisse depuis le bas et reste ancré au bord inférieur, coins arrondis en haut seulement — comme le centre de widgets macOS',
+              'Corrige le badge "Nouveautés" qui se superposait au bouton "Ajouter" sur les cartes Santé du portefeuille/Streak/Météo business : le titre tronque proprement avec "…" au lieu de déborder sur le bouton'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrections UX : bouton Nova, badge "Actuel", centre de notifications, liens dans les exports',
             items: [
               'Bouton "Demander à Nova" (widget résumé de la semaine) : passe en bordure et texte dégradé violet-bleu-cyan, comme les autres boutons de génération IA',
@@ -2783,6 +2791,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Widget library: bottom-docked panel like macOS, fixed "New" badge overlap',
+            items: [
+              'The widget library panel ("+") no longer floats centered on screen: it slides up from the bottom and stays docked to the bottom edge, rounded corners on top only — like the macOS widget gallery',
+              'Fixed the "New" badge overlapping the "Add" button on the Portfolio health/Streak/Business weather cards: the title now truncates cleanly with "…" instead of spilling over the button'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'UX fixes: Nova button, "Current" badge, notification center, links in exports',

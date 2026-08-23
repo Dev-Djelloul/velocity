@@ -1,6 +1,9 @@
 /* Bibliothèque de widgets façon macOS — barre de recherche + catégories à gauche, grille de
    cartes à droite, "Terminé" en bas. Réutilise les variables de thème de l'app (comme
    InfoModal.css) plutôt que des couleurs fixes, pour rester cohérent en clair/sombre. */
+/* Panneau ancré en bas de l'écran façon centre de widgets macOS (retour utilisateur : pas
+   une popup flottante vide de tous les côtés) — le fond assombri couvre tout l'écran, mais
+   le panneau lui-même colle au bord inférieur et ne garde des coins arrondis qu'en haut. */
 .widget-library-backdrop {
   position: fixed;
   inset: 0;
@@ -8,10 +11,9 @@
   backdrop-filter: blur(4px);
   -webkit-backdrop-filter: blur(4px);
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: center;
   z-index: 1000;
-  padding: 24px;
 }
 
 .widget-library-panel {
@@ -19,18 +21,19 @@
   width: 100%;
   max-width: 920px;
   height: 640px;
-  max-height: 88vh;
-  border-radius: 20px;
+  max-height: 82vh;
+  border-radius: 20px 20px 0 0;
   overflow: hidden;
   background: var(--color-bg-secondary);
   border: 1px solid rgba(145, 132, 217, 0.15);
-  box-shadow: var(--shadow-lg);
-  animation: widget-library-in 0.16s ease;
+  border-bottom: none;
+  box-shadow: 0 -20px 60px rgba(0, 0, 0, 0.35);
+  animation: widget-library-in 0.22s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 @keyframes widget-library-in {
-  from { opacity: 0; transform: scale(0.97); }
-  to { opacity: 1; transform: scale(1); }
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .widget-library-sidebar {
@@ -149,12 +152,25 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  min-width: 0;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
+/* Le titre seul se tronque avec ellipsis, jamais les badges à côté — sans le min-width:0
+   + ellipsis ici, un titre + badge "NOUVEAUTÉS" dépassaient la largeur de la carte et
+   venaient se superposer au bouton Ajouter à droite (retour utilisateur, capture à
+   l'appui) : par défaut, un enfant flex ne peut pas rétrécir sous sa largeur de contenu. */
+.widget-library-card-title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
 .widget-library-badge {
+  flex-shrink: 0;
   font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;

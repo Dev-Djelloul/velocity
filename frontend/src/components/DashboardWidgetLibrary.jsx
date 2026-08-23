@@ -89,7 +89,7 @@ export default function DashboardWidgetLibrary({ lang, availableIds, hidden, pro
                   <div className="widget-library-card-icon"><Icon width={20} height={20} /></div>
                   <div className="widget-library-card-body">
                     <span className="widget-library-card-title">
-                      {w.title}
+                      <span className="widget-library-card-title-text">{w.title}</span>
                       {w.isNew && <span className="widget-library-badge widget-library-badge-new">{t(lang, 'dashboard.widgetLibrary.categories.insights')}</span>}
                       {w.proOnly && <span className="widget-library-badge">{t(lang, 'dashboard.widgetLibrary.proOnly')}</span>}
                     </span>
