@@ -5,6 +5,7 @@ import { resolveBudgetAmount } from '../lib/budgetTiers'
 import { IconArrowLeft, IconCoin, IconTrendingUp, IconTarget, IconAlertTriangle } from './Icons'
 import financialReportBackground from '../../assets/img/financial-plan-velocity.webp'
 import '../styles/TeamPage.css'
+import '../styles/PlanVersionsPage.css'
 import '../styles/FinancialsCard.css'
 import '../styles/PlanFinancialReportPage.css'
 
