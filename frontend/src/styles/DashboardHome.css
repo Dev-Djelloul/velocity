@@ -766,8 +766,27 @@
   text-shadow: none;
 }
 
+/* Plus grande que les autres cartes (min-height) et texte de description qui passe à la
+   ligne au lieu de se tronquer en un mot — .dashboard-space-meta est nowrap+ellipsis par
+   défaut (pensé pour la ligne "date" courte des autres cartes), ce qui coupait la phrase
+   d'explication ici (retour utilisateur). */
 .dashboard-space-card-new {
   border-style: dashed;
+  min-height: 120px;
+}
+
+.dashboard-space-card-new .dashboard-space-card-body {
+  padding: 1.4rem;
+}
+
+.dashboard-space-card-new .dashboard-space-meta {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  line-height: 1.4;
+}
+
+.dashboard-space-card-new {
   background:
     linear-gradient(var(--color-bg-secondary, #16161d), var(--color-bg-secondary, #16161d)) padding-box,
     linear-gradient(135deg, rgba(145, 132, 217, 0.4) 0%, rgba(99, 102, 241, 0.4) 55%, rgba(6, 182, 212, 0.4) 100%) border-box;
