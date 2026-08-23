@@ -393,6 +393,13 @@
 }
 
 .dashboard-health-plan-list {
+  /* list-style:none + margin/padding à 0 : sans ça, chaque <li> affiche la puce ronde par
+     défaut du navigateur en plus de notre point de couleur personnalisé (retour
+     utilisateur, capture à l'appui — les petits points blancs à gauche des points rouge/
+     vert n'avaient aucune utilité, c'était un oubli). */
+  list-style: none;
+  margin: 0;
+  padding: 0;
   display: flex;
   flex-direction: column;
   gap: 0.1rem;

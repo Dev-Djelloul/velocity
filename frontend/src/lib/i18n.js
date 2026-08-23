@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Santé du portefeuille simplifiée : pénalité fixe plafonnée, plus de proportionnalité',
+            items: [
+              'Retire la pénalité proportionnelle au nombre de plans (jugée trop difficile à suivre) : chaque échéance urgente coûte maintenant 10 pts fixes (plafonné à -30 au total), chaque échéance proche 4 pts fixes (plafonné à -15) — plus simple à vérifier soi-même',
+              'Retire la ligne "Aucune échéance urgente" qui faisait doublon, en apparence contradictoire, avec la phrase de détail juste en dessous (qui parle, elle, des échéances "urgentes" ET "proches") — une seule phrase de détail désormais',
+              'Corrige les puces blanches parasites à gauche des points de couleur dans la liste "Par plan" (puce par défaut du navigateur sur les `<li>`, jamais désactivée)'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Avatars sur les notifications, popup calendrier corrigée à gauche, points restants',
             items: [
               'Centre de notifications et fil d\'activité du Dashboard : petit avatar à gauche de chaque ligne — initiales colorées quand un nom est repérable, avatar de Nova pour les notifications système (génération IA)',
@@ -1773,8 +1782,7 @@ export const translations = {
       },
       portfolioHealthTitle: 'Santé du portefeuille',
       portfolioHealthLevel: { good: 'Au beau fixe', medium: 'À surveiller', low: 'Attention requise' },
-      portfolioHealthUrgent: (n) => n === 0 ? 'Aucune échéance urgente' : n === 1 ? '1 échéance urgente' : `${n} échéances urgentes`,
-      portfolioHealthExplain: 'Score = % de stories terminées, moins des points par échéance proche (pénalité proportionnelle au nombre de plans).',
+      portfolioHealthExplain: 'Score = % de stories terminées, moins 10 pts par échéance urgente (max -30) et 4 pts par échéance proche (max -15).',
       portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
         const parts = [`${doneRatio}% des stories sont terminées.`]
         if (urgentPenalty > 0) parts.push(`${urgentCount} échéance${urgentCount > 1 ? 's' : ''} urgente${urgentCount > 1 ? 's' : ''} (-${urgentPenalty} pts).`)
@@ -2917,6 +2925,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Portfolio health simplified: flat capped penalty, no more proportionality',
+            items: [
+              'Removed the penalty scaled to your number of plans (found too hard to follow): each urgent deadline now costs a flat 10 pts (capped at -30 total), each upcoming deadline a flat 4 pts (capped at -15) — easier to verify by hand',
+              'Removed the "No urgent deadlines" line, which duplicated and seemingly contradicted the detail sentence right below it (which covers both "urgent" AND "upcoming" deadlines) — a single detail sentence now',
+              'Fixed stray white bullets to the left of the colored dots in the "By plan" list (default browser bullet on `<li>` elements, never disabled)'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Avatars on notifications, fixed left-side calendar popup, remaining points',
             items: [
               'Notification center and Dashboard activity feed: small avatar on the left of each row — colored initials when a name is found, Nova\'s avatar for system notifications (AI generation)',
@@ -3796,8 +3813,7 @@ export const translations = {
       },
       portfolioHealthTitle: 'Portfolio health',
       portfolioHealthLevel: { good: 'Smooth sailing', medium: 'Worth watching', low: 'Needs attention' },
-      portfolioHealthUrgent: (n) => n === 0 ? 'No urgent deadlines' : n === 1 ? '1 urgent deadline' : `${n} urgent deadlines`,
-      portfolioHealthExplain: 'Score = % of stories done, minus points for deadlines coming up soon (penalty scaled to your number of plans).',
+      portfolioHealthExplain: 'Score = % of stories done, minus 10 pts per urgent deadline (max -30) and 4 pts per upcoming deadline (max -15).',
       portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
         const parts = [`${doneRatio}% of stories are done.`]
         if (urgentPenalty > 0) parts.push(`${urgentCount} urgent deadline${urgentCount > 1 ? 's' : ''} (-${urgentPenalty} pts).`)

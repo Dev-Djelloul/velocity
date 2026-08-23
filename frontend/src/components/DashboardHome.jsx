@@ -641,7 +641,12 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                     <span className="dashboard-health-gauge-score">{portfolioHealth.score}%</span>
                   </div>
                   <p className="dashboard-health-label">{t(lang, `dashboard.portfolioHealthLevel.${portfolioHealth.level}`)}</p>
-                  <p className="dashboard-health-sub">{t(lang, 'dashboard.portfolioHealthUrgent')(portfolioHealth.urgentCount)}</p>
+                  {/* Une seule phrase de détail (voir portfolioHealthDetail) plutôt que deux
+                      lignes séparées ("Aucune échéance urgente" + détail complet) qui se
+                      contredisaient en apparence : la première ne parlait QUE des échéances
+                      "urgentes" (≤1 jour), la seconde ajoutait les "proches" (2-7 jours)
+                      sans que la distinction soit expliquée — source de confusion (retour
+                      utilisateur, capture à l'appui). */}
                   <p className="dashboard-widget-detail">
                     {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount, portfolioHealth.urgentPenalty, portfolioHealth.soonPenalty)}
                   </p>
