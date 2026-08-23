@@ -472,15 +472,20 @@
    CardHelp dans DashboardBI.jsx, pour rester utilisable sur mobile. Ancré au centre de la
    cellule, largeur fixe, au-dessus du reste (z-index) puisque la carte parente n'a pas
    d'overflow:hidden qui le couperait. */
+/* Large plutôt que haute — retour utilisateur : la première version listait les stories
+   verticalement (une par ligne), ce qui rendait la popover démesurément haute dès qu'un
+   sprint avait plus de 3-4 stories. Les stories passent maintenant en puces qui s'enchaînent
+   horizontalement (voir .dashboard-calendar-day-popover-stories) dans une carte large. */
 .dashboard-calendar-day-popover {
   position: absolute;
   top: calc(100% + 6px);
   left: 50%;
   transform: translateX(-50%);
-  width: 220px;
-  max-height: 280px;
+  width: 360px;
+  max-width: min(360px, 80vw);
+  max-height: 320px;
   overflow-y: auto;
-  padding: 0.7rem;
+  padding: 0.8rem;
   border-radius: 10px;
   border: 1px solid rgba(145, 132, 217, 0.25);
   background: var(--color-bg-secondary, #16161d);
@@ -541,33 +546,56 @@
 }
 
 .dashboard-calendar-day-popover-stories {
-  list-style: none;
-  margin: 0.3rem 0 0;
-  padding: 0 0 0 1.15rem;
+  margin: 0.35rem 0 0;
   display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
+  flex-wrap: wrap;
+  gap: 0.3rem;
 }
 
-.dashboard-calendar-day-popover-stories li {
-  display: flex;
+/* Une puce par story, colorée selon son statut — mêmes couleurs que le Backlog/la Roadmap
+   du plan (retour utilisateur : ça doit être "tel qu'il est dans le plan généré", pas une
+   palette réinventée pour le Dashboard) : vert #4ade80 terminé, ambre #f59e0b en cours,
+   neutre à faire. */
+.dashboard-calendar-story-chip {
+  display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  font-size: 0.68rem;
+  gap: 0.3rem;
+  max-width: 150px;
+  padding: 0.2rem 0.45rem;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  border: 1px solid transparent;
+  background: rgba(255, 255, 255, 0.06);
   color: var(--color-text-secondary);
 }
 
-.dashboard-calendar-day-popover-stories li span {
+.dashboard-calendar-story-chip span {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.dashboard-calendar-story-status.is-done { color: #4ade80; }
-.dashboard-calendar-story-status.is-in_progress { color: #facc15; }
-.dashboard-calendar-story-status.is-todo { color: var(--color-text-muted, #9ca3af); }
+.dashboard-calendar-story-chip.is-done {
+  color: #4ade80;
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.1);
+}
+
+.dashboard-calendar-story-chip.is-in_progress {
+  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.35);
+  background: rgba(245, 158, 11, 0.1);
+}
+
+.dashboard-calendar-story-chip.is-todo {
+  color: var(--color-text-muted, #9ca3af);
+  border-color: rgba(255, 255, 255, 0.12);
+}
 
 .dashboard-calendar-day-popover-more {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.66rem;
   color: var(--color-text-muted, #9ca3af);
   font-style: italic;
 }

@@ -61,23 +61,27 @@ function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onCl
             <span className="dashboard-calendar-day-popover-plan-tag">{t(lang, 'dashboard.calendarSprintLabel')(entry.sprintId)}</span>
           </button>
           {!!entry.stories.length && (
-            <ul className="dashboard-calendar-day-popover-stories">
-              {entry.stories.slice(0, 6).map(story => {
+            <div className="dashboard-calendar-day-popover-stories">
+              {entry.stories.slice(0, 8).map(story => {
                 const StatusIcon = STATUS_ICONS[story.status] || IconCircleDot
                 const statusKey = STATUS_I18N_KEY[story.status] || 'todo'
                 return (
-                  <li key={story.id} title={t(lang, `outputs.rollover.status.${statusKey}`)}>
-                    <StatusIcon width={11} height={11} className={`dashboard-calendar-story-status is-${story.status || 'todo'}`} />
+                  <span
+                    key={story.id}
+                    className={`dashboard-calendar-story-chip is-${story.status || 'todo'}`}
+                    title={t(lang, `outputs.rollover.status.${statusKey}`)}
+                  >
+                    <StatusIcon width={10} height={10} />
                     <span>{story.title}</span>
-                  </li>
+                  </span>
                 )
               })}
-              {entry.stories.length > 6 && (
-                <li className="dashboard-calendar-day-popover-more">
-                  {t(lang, 'dashboard.calendarMoreStories')(entry.stories.length - 6)}
-                </li>
+              {entry.stories.length > 8 && (
+                <span className="dashboard-calendar-day-popover-more">
+                  {t(lang, 'dashboard.calendarMoreStories')(entry.stories.length - 8)}
+                </span>
               )}
-            </ul>
+            </div>
           )}
         </div>
       ))}
