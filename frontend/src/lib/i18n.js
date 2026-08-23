@@ -884,6 +884,16 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Santé du portefeuille par plan, points restants sur les échéances, calendrier par sprint',
+            items: [
+              'Santé du portefeuille (tailles Moyen/Grand) : ajoute une ventilation "Par plan" — chaque plan avec son propre score et son niveau, triés du moins bon au meilleur, pour repérer d\'un coup d\'œil lequel tire la moyenne vers le bas plutôt qu\'un seul score agrégé',
+              'Prochaines échéances : les fins de sprint affichent maintenant les points restants (stories pas encore terminées) directement dans la liste',
+              'Calendrier du Dashboard : les sprints actifs affichent une ligne colorée continue (une couleur par sprint) sur toute leur durée, plutôt qu\'une même teinte uniforme pour tous les sprints — deux sprints qui se chevauchent restent maintenant distinguables d\'un coup d\'œil',
+              'Corrige le débordement de texte du widget "Historique des plans" en taille Petit'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Streak avec record + paliers, légende détaillée sur les 3 nouveaux widgets',
             items: [
               'Streak : garde maintenant le record du plus long streak jamais atteint (dérivé du même historique de plans, sans stockage séparé), affiché à côté du streak en cours',
@@ -1747,6 +1757,7 @@ export const translations = {
         medium: '40-69% — À surveiller',
         low: '< 40% — Attention requise'
       },
+      portfolioHealthByPlan: 'Par plan',
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 jour' : `${n} jours`,
       streakSubtitle: "d'activité consécutifs",
@@ -1812,6 +1823,7 @@ export const translations = {
       deadlinesInDays: (n) => `Dans ${n} jours`,
       deadlinesKindLaunch: 'Lancement',
       deadlinesKindSprint: (n) => `Fin du sprint ${n}`,
+      deadlinesPointsLeft: (n) => `${n} pt${n > 1 ? 's' : ''} restant${n > 1 ? 's' : ''}`,
       calendarWeekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
       calendarPrev: 'Mois précédent',
       calendarNext: 'Mois suivant',
@@ -2874,6 +2886,16 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Portfolio health by plan, remaining points on deadlines, calendar by sprint',
+            items: [
+              'Portfolio health (Medium/Large sizes): adds a "By plan" breakdown — each plan with its own score and level, sorted worst to best, to spot which one is dragging the average down instead of a single aggregated score',
+              'Upcoming deadlines: sprint-end entries now show remaining points (stories not yet done) right in the list',
+              'Dashboard calendar: active sprints now show a continuous colored line (one color per sprint) across their full span, instead of the same flat tint for every sprint — two overlapping sprints stay distinguishable at a glance',
+              'Fixed text overflow on the "Plan history" widget at Small size'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Streak with a record + tiers, detailed legend on the 3 new widgets',
             items: [
               'Streak: now keeps the longest streak ever reached (derived from the same plan history, no separate storage), shown next to the current streak',
@@ -3727,6 +3749,7 @@ export const translations = {
         medium: '40-69% — Worth watching',
         low: '< 40% — Needs attention'
       },
+      portfolioHealthByPlan: 'By plan',
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 day' : `${n} days`,
       streakSubtitle: 'consecutive active days',
@@ -3798,6 +3821,7 @@ export const translations = {
       deadlinesInDays: (n) => `In ${n} days`,
       deadlinesKindLaunch: 'Launch',
       deadlinesKindSprint: (n) => `Sprint ${n} ends`,
+      deadlinesPointsLeft: (n) => `${n} pt${n > 1 ? 's' : ''} left`,
       calendarWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       calendarPrev: 'Previous month',
       calendarNext: 'Next month',

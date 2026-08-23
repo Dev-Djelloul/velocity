@@ -5,6 +5,10 @@ import { IconChevronLeft, IconChevronRight, IconCircleDot, IconClock, IconCheckC
 const SPRINT_DAYS = 14
 const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
 const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
+// Une couleur par sprint (pas juste une teinte cyan uniforme pour tout sprint actif) —
+// pour distinguer d'un coup d'œil plusieurs sprints qui se chevauchent sur le calendrier
+// (retour utilisateur), même palette que BenchmarksCard.jsx.
+const SPRINT_PALETTE = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#f472b6', '#eab308']
 
 function isoDateOnly(date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
@@ -111,9 +115,28 @@ export default function DashboardCalendar({ lang, deadlines, plans, onOpenPlan }
     return map
   }, [deadlines])
 
+  // Une couleur stable par sprint (planId + sprintId), attribuée dans l'ordre de première
+  // rencontre — stable d'un rendu à l'autre tant que la liste de plans ne change pas,
+  // pour que la ligne colorée d'un sprint reste la même couleur tous les mois où on la
+  // recroise.
+  const sprintColorMap = useMemo(() => {
+    const map = new Map()
+    let i = 0
+    for (const plan of plans || []) {
+      for (const sp of (plan.roadmap?.sprints || [])) {
+        const key = `${plan.id}:${sp.sprintId}`
+        if (!map.has(key)) { map.set(key, SPRINT_PALETTE[i % SPRINT_PALETTE.length]); i++ }
+      }
+    }
+    return map
+  }, [plans])
+
   // Étale chaque sprint de chaque plan sur toute sa fenêtre de 14 jours (pas juste son jour
   // de fin) — "on aura une vue globale" : la période active de tous les sprints, tous plans
   // confondus, se voit directement sur le calendrier plutôt qu'un seul point par plan.
+  // `isStart`/`isEnd` et `color` permettent de dessiner une ligne continue colorée par
+  // sprint (coins arrondis seulement aux deux bouts) plutôt qu'une simple teinte uniforme
+  // qui ne distinguait pas deux sprints actifs en même temps (retour utilisateur).
   const sprintsByDay = useMemo(() => {
     const map = new Map()
     for (const plan of plans || []) {
@@ -123,23 +146,32 @@ export default function DashboardCalendar({ lang, deadlines, plans, onOpenPlan }
       for (const sp of sprints) {
         const start = new Date(base)
         start.setDate(start.getDate() + (sp.sprintId - 1) * SPRINT_DAYS)
+        const key = `${plan.id}:${sp.sprintId}`
         for (let i = 0; i < SPRINT_DAYS; i++) {
           const day = new Date(start)
           day.setDate(day.getDate() + i)
           const iso = isoDateOnly(day)
           if (!map.has(iso)) map.set(iso, [])
           map.get(iso).push({
+            key,
             planId: plan.id,
             planName: plan.product?.name || null,
             sprintId: sp.sprintId,
             stories: sp.stories || [],
-            plan
+            plan,
+            color: sprintColorMap.get(key),
+            isStart: i === 0,
+            isEnd: i === SPRINT_DAYS - 1
           })
         }
       }
     }
+    // Ordre stable (par clé sprint) pour que la même barre reste au même "étage" d'un jour
+    // à l'autre quand plusieurs sprints se chevauchent — sans ça, la ligne semblerait
+    // sauter de position au fil des jours.
+    map.forEach(entries => entries.sort((a, b) => a.key.localeCompare(b.key)))
     return map
-  }, [plans])
+  }, [plans, sprintColorMap])
 
   const launchesByDay = useMemo(() => {
     const map = new Map()
@@ -220,6 +252,17 @@ export default function DashboardCalendar({ lang, deadlines, plans, onOpenPlan }
               aria-expanded={hasActivity ? openDay === iso : undefined}
             >
               <span className="dashboard-calendar-day-num">{date.getDate()}</span>
+              {sprintEntries.length > 0 && (
+                <span className="dashboard-calendar-sprint-bars" aria-hidden="true">
+                  {sprintEntries.slice(0, 3).map(entry => (
+                    <span
+                      key={entry.key}
+                      className={`dashboard-calendar-sprint-bar ${entry.isStart ? 'is-start' : ''} ${entry.isEnd ? 'is-end' : ''}`}
+                      style={{ background: entry.color }}
+                    />
+                  ))}
+                </span>
+              )}
               {kinds && (
                 <span className="dashboard-calendar-dots" aria-hidden="true">
                   {kinds.has('launch') && <span className="dashboard-calendar-dot dashboard-calendar-dot-launch" />}

@@ -372,6 +372,58 @@
   font-style: italic;
 }
 
+/* Ventilation "Par plan" du widget Santé du portefeuille (Moyen/Grand) — même recette
+   visuelle que .dashboard-history-row (ligne cliquable, nom tronqué proprement). */
+.dashboard-widget-subhead {
+  margin: 0.6rem 0 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.dashboard-health-plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.dashboard-health-plan-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  min-width: 0;
+  padding: 0.3rem 0.35rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-size: 0.76rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-health-plan-row:hover {
+  background: rgba(145, 132, 217, 0.1);
+}
+
+.dashboard-health-plan-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-health-plan-score {
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
 .dashboard-legend-dot {
   flex-shrink: 0;
   width: 8px;
@@ -757,6 +809,39 @@
   gap: 2px;
 }
 
+/* Ligne(s) colorée(s) continue(s) par sprint, en haut de la cellule — sans gap dans
+   .dashboard-calendar-grid, une barre pleine largeur (left:0; right:0) se raccorde
+   pixel pour pixel à celle de la cellule voisine tant que le sprint reste actif, donnant
+   l'effet d'une ligne continue plutôt qu'un simple point par jour (retour utilisateur).
+   Coins arrondis uniquement aux deux bouts réels du sprint (isStart/isEnd). */
+.dashboard-calendar-sprint-bars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.dashboard-calendar-sprint-bar {
+  display: block;
+  height: 3px;
+  opacity: 0.85;
+}
+
+.dashboard-calendar-sprint-bar.is-start {
+  margin-left: 2px;
+  border-top-left-radius: 3px;
+  border-bottom-left-radius: 3px;
+}
+
+.dashboard-calendar-sprint-bar.is-end {
+  margin-right: 2px;
+  border-top-right-radius: 3px;
+  border-bottom-right-radius: 3px;
+}
+
 .dashboard-calendar-dot {
   width: 3px;
   height: 3px;
@@ -1025,6 +1110,11 @@
 .dashboard-deadline-kind {
   font-size: 0.62rem;
   color: var(--color-text-muted, #9ca3af);
+}
+
+.dashboard-deadline-points {
+  font-weight: 600;
+  color: #9184d9;
 }
 
 .dashboard-deadline-date {
@@ -1517,6 +1607,7 @@
   align-items: center;
   gap: 0.55rem;
   width: 100%;
+  min-width: 0;
   padding: 0.35rem 0.4rem;
   border: none;
   border-radius: 7px;
@@ -1553,7 +1644,13 @@
   height: 100%;
 }
 
+/* min-width:0 + flex:1 : sans ça, un enfant flex ne rétrécit jamais sous la largeur de
+   son propre texte (même bug que le champ de recherche de la bibliothèque de widgets ou
+   le titre "Nouveautés") — le nom du plan débordait de la ligne en taille "Petit" au lieu
+   de se tronquer avec l'ellipsis déjà posé (retour utilisateur, capture à l'appui). */
 .dashboard-history-name {
+  flex: 1;
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

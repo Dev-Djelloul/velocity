@@ -26,30 +26,44 @@ function nextSprint(plan) {
   return null
 }
 
-export function getUpcomingDeadlines(plans, limit = 5) {
-  const now = Date.now()
+// Échéances d'UN plan (date de lancement + fin du sprint en cours) — factorisé hors de
+// getUpcomingDeadlines pour être réutilisable par plan isolément (voir
+// portfolioHealth.js, computePlanHealth : la santé par plan a besoin des mêmes échéances
+// mais sans le plafond `limit` global qui, appliqué à tous les plans confondus, aurait pu
+// masquer les échéances d'un plan précis derrière celles d'un autre).
+export function getPlanDeadlines(p, now = Date.now()) {
+  const name = p.product?.name || null
+  // coverImage transmise pour que le dashboard puisse afficher une vignette par échéance
+  // (retour utilisateur : sans repère visuel, une liste de plusieurs plans se ressemble
+  // trop pour distinguer lequel est lequel d'un coup d'œil).
+  const coverImage = p.coverImage || null
   const items = []
 
-  for (const p of plans || []) {
-    const name = p.product?.name || null
-    // coverImage transmise pour que le dashboard puisse afficher une vignette par échéance
-    // (retour utilisateur : sans repère visuel, une liste de plusieurs plans se ressemble
-    // trop pour distinguer lequel est lequel d'un coup d'œil).
-    const coverImage = p.coverImage || null
-
-    if (p.launchDate) {
-      const time = new Date(p.launchDate).getTime()
-      if (Number.isFinite(time) && time >= now) {
-        items.push({ id: `${p.id}:launch`, kind: 'launch', name, coverImage, date: p.launchDate, time, plan: p })
-      }
-    }
-
-    const sprint = nextSprint(p)
-    if (sprint) {
-      items.push({ id: `${p.id}:sprint`, kind: 'sprint', name, coverImage, sprintId: sprint.sprintId, date: sprint.end.toISOString(), time: sprint.end.getTime(), plan: p })
+  if (p.launchDate) {
+    const time = new Date(p.launchDate).getTime()
+    if (Number.isFinite(time) && time >= now) {
+      items.push({ id: `${p.id}:launch`, kind: 'launch', name, coverImage, date: p.launchDate, time, plan: p })
     }
   }
 
+  const sprint = nextSprint(p)
+  if (sprint) {
+    // Points restants du sprint (stories pas encore "done") — pour répondre directement
+    // à "il reste combien de travail avant cette échéance ?" sans avoir à rouvrir le plan
+    // (retour utilisateur).
+    const sprintData = (p.roadmap?.sprints || []).find(s => s.sprintId === sprint.sprintId)
+    const remainingPoints = (sprintData?.stories || [])
+      .filter(s => s.status !== 'done')
+      .reduce((sum, s) => sum + (s.effort || 0), 0)
+    items.push({ id: `${p.id}:sprint`, kind: 'sprint', name, coverImage, sprintId: sprint.sprintId, remainingPoints, date: sprint.end.toISOString(), time: sprint.end.getTime(), plan: p })
+  }
+
+  return items
+}
+
+export function getUpcomingDeadlines(plans, limit = 5) {
+  const now = Date.now()
+  const items = (plans || []).flatMap(p => getPlanDeadlines(p, now))
   return items.sort((a, b) => a.time - b.time).slice(0, limit)
 }
 

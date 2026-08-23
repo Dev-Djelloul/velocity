@@ -16,9 +16,9 @@ import DashboardWidgetLibrary from './DashboardWidgetLibrary'
 import HoverTooltip from './HoverTooltip'
 import { loadWidgetLayout, saveWidgetLayout } from '../lib/dashboardWidgets'
 import { getDailyTip } from '../lib/dailyTips'
-import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
+import { getUpcomingDeadlines, getPlanDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
-import { computePortfolioHealth, classifyWeather } from '../lib/portfolioHealth'
+import { computePortfolioHealth, computePlanHealth, classifyWeather } from '../lib/portfolioHealth'
 import { computeActivityStreaks, streakTier } from '../lib/activityStreak'
 import { recordAndGetTrend } from '../lib/portfolioHealthHistory'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
@@ -220,6 +220,17 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   const portfolioHealth = useMemo(() => computePortfolioHealth(weeklyStats), [weeklyStats])
 
+  // Ventilation par plan (widget "Santé du portefeuille", tailles Moyen/Grand) — le score
+  // agrégé seul ne dit pas QUEL plan tire la moyenne vers le bas (retour utilisateur). Trié
+  // du moins bon au meilleur score : les plans qui ont besoin d'attention remontent en tête
+  // de liste plutôt que d'être noyés dans l'ordre par défaut.
+  const planHealthList = useMemo(() => {
+    const pool = allPlans || activePlans
+    return pool
+      .map(p => ({ plan: p, health: computePlanHealth(p, getPlanDeadlines(p)) }))
+      .sort((a, b) => a.health.score - b.health.score)
+  }, [allPlans, activePlans])
+
   // Tendance de la Santé du portefeuille vs il y a ~7 jours (widget "Météo business",
   // masqué par défaut) — sans historique, la météo n'était qu'un second affichage du même
   // score sans rien y ajouter (retour utilisateur). Purement local par appareil (voir
@@ -253,7 +264,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     sizes: {
       calendar: 'large', deadlines: 'medium', activity: 'medium', nova: 'medium',
       resume: 'small', newTeam: 'medium', history: 'small', gallery: 'small',
-      portfolioHealth: 'small', streak: 'small', businessWeather: 'small'
+      portfolioHealth: 'medium', streak: 'small', businessWeather: 'small'
     },
     // Widgets tout juste ajoutés au catalogue par une mise à jour du produit : masqués tant
     // que l'utilisateur ne les ajoute pas lui-même via la bibliothèque ("+").
@@ -377,7 +388,17 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                           </span>
                           <span className="dashboard-deadline-info">
                             <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
-                            <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>
+                            <span className="dashboard-deadline-kind">
+                              {deadlineKind(d)}
+                              {/* Points restants (stories pas encore "done" de ce sprint) —
+                                  répond directement à "il reste combien de travail avant
+                                  cette échéance ?" sans rouvrir le plan (retour utilisateur).
+                                  Uniquement pour les échéances de fin de sprint : une date
+                                  de lancement n'a pas de "points restants" associés. */}
+                              {d.kind === 'sprint' && d.remainingPoints > 0 && (
+                                <span className="dashboard-deadline-points"> · {t(lang, 'dashboard.deadlinesPointsLeft')(d.remainingPoints)}</span>
+                              )}
+                            </span>
                             {/* Date exacte, pour s'y référer directement sur le calendrier
                                 au-dessus — le badge "Dans X jours" seul ne dit pas quel jour. */}
                             <span className="dashboard-deadline-date">{deadlineDateLabel(d.date)}</span>
@@ -563,43 +584,68 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             // en Moyen/Grand, une légende complète (seuils, méthode de calcul) s'affiche en
             // plus — retour utilisateur : comprendre exactement de quoi relève chaque widget,
             // pas seulement lire un chiffre brut.
-            portfolioHealth: (size) => (
-              <div className="dashboard-widget-card dashboard-portfolio-health-widget">
-                <div className="dashboard-widget-header">
-                  {gradientIcon(<IconGauge width={16} height={16} />)}
-                  <h3>{t(lang, 'dashboard.portfolioHealthTitle')}</h3>
-                </div>
-                <div className={`dashboard-health-gauge is-${portfolioHealth.level}`}>
-                  <svg viewBox="0 0 100 56" className="dashboard-health-gauge-svg">
-                    <path d="M6 50a44 44 0 0 1 88 0" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="10" strokeLinecap="round" />
-                    <path
-                      d="M6 50a44 44 0 0 1 88 0"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="10"
-                      strokeLinecap="round"
-                      strokeDasharray={`${(portfolioHealth.score / 100) * 138} 138`}
-                    />
-                  </svg>
-                  <span className="dashboard-health-gauge-score">{portfolioHealth.score}%</span>
-                </div>
-                <p className="dashboard-health-label">{t(lang, `dashboard.portfolioHealthLevel.${portfolioHealth.level}`)}</p>
-                <p className="dashboard-health-sub">{t(lang, 'dashboard.portfolioHealthUrgent')(portfolioHealth.urgentCount)}</p>
-                <p className="dashboard-widget-detail">
-                  {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount, portfolioHealth.urgentPenalty, portfolioHealth.soonPenalty)}
-                </p>
-                {size === 'small' ? (
-                  <p className="dashboard-widget-explain">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
-                ) : (
-                  <div className="dashboard-widget-legend">
-                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-good" />{t(lang, 'dashboard.portfolioHealthLegend.good')}</div>
-                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-medium" />{t(lang, 'dashboard.portfolioHealthLegend.medium')}</div>
-                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-low" />{t(lang, 'dashboard.portfolioHealthLegend.low')}</div>
-                    <p className="dashboard-widget-method">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+            portfolioHealth: (size) => {
+              const planRows = { medium: 3, large: 8 }[size] || 0
+              return (
+                <div className="dashboard-widget-card dashboard-portfolio-health-widget">
+                  <div className="dashboard-widget-header">
+                    {gradientIcon(<IconGauge width={16} height={16} />)}
+                    <h3>{t(lang, 'dashboard.portfolioHealthTitle')}</h3>
                   </div>
-                )}
-              </div>
-            ),
+                  <div className={`dashboard-health-gauge is-${portfolioHealth.level}`}>
+                    <svg viewBox="0 0 100 56" className="dashboard-health-gauge-svg">
+                      <path d="M6 50a44 44 0 0 1 88 0" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="10" strokeLinecap="round" />
+                      <path
+                        d="M6 50a44 44 0 0 1 88 0"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="10"
+                        strokeLinecap="round"
+                        strokeDasharray={`${(portfolioHealth.score / 100) * 138} 138`}
+                      />
+                    </svg>
+                    <span className="dashboard-health-gauge-score">{portfolioHealth.score}%</span>
+                  </div>
+                  <p className="dashboard-health-label">{t(lang, `dashboard.portfolioHealthLevel.${portfolioHealth.level}`)}</p>
+                  <p className="dashboard-health-sub">{t(lang, 'dashboard.portfolioHealthUrgent')(portfolioHealth.urgentCount)}</p>
+                  <p className="dashboard-widget-detail">
+                    {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount, portfolioHealth.urgentPenalty, portfolioHealth.soonPenalty)}
+                  </p>
+                  {size === 'small' ? (
+                    <p className="dashboard-widget-explain">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+                  ) : (
+                    <>
+                      {/* Ventilation par plan (retour utilisateur : le score agrégé seul ne
+                          dit pas quel plan tire la moyenne vers le bas) — triée du moins
+                          bon au meilleur score, pour repérer d'un coup d'œil ce qui mérite
+                          de l'attention. */}
+                      {planHealthList.length > 0 && (
+                        <div className="dashboard-health-by-plan">
+                          <h4 className="dashboard-widget-subhead">{t(lang, 'dashboard.portfolioHealthByPlan')}</h4>
+                          <ul className="dashboard-health-plan-list">
+                            {planHealthList.slice(0, planRows).map(({ plan, health }) => (
+                              <li key={plan.id}>
+                                <button className="dashboard-health-plan-row" onClick={() => onLoadPlan?.(plan)}>
+                                  <span className={`dashboard-legend-dot is-${health.level}`} />
+                                  <span className="dashboard-health-plan-name">{plan.product?.name || t(lang, 'plans.untitled')}</span>
+                                  <span className="dashboard-health-plan-score">{health.score}%</span>
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                      <div className="dashboard-widget-legend">
+                        <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-good" />{t(lang, 'dashboard.portfolioHealthLegend.good')}</div>
+                        <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-medium" />{t(lang, 'dashboard.portfolioHealthLegend.medium')}</div>
+                        <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-low" />{t(lang, 'dashboard.portfolioHealthLegend.low')}</div>
+                        <p className="dashboard-widget-method">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+                      </div>
+                    </>
+                  )}
+                </div>
+              )
+            },
             streak: (size) => (
               <div className={`dashboard-widget-card dashboard-streak-widget tier-${streakTierValue}`}>
                 <div className="dashboard-widget-header">

@@ -36,6 +36,24 @@ export function computePortfolioHealth(weeklyStats) {
   return { score, level, doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty }
 }
 
+// Santé d'UN plan pris isolément, même formule que computePortfolioHealth avec
+// planCount=1 (retour utilisateur : "Santé du portefeuille" agrégeait tout ensemble, sans
+// pouvoir dire QUEL plan tire le score vers le bas — la ventilation par plan répond à ça).
+// `deadlines` : le résultat de getPlanDeadlines(plan) (upcomingDeadlines.js), pas la liste
+// globale plafonnée à 5 échéances tous plans confondus, pour ne pas fausser le calcul d'un
+// plan précis avec le plafond pensé pour l'affichage global.
+export function computePlanHealth(plan, deadlines) {
+  const sprints = plan.roadmap?.sprints || []
+  let storiesDone = 0, storiesInProgress = 0, storiesTodo = 0
+  sprints.forEach(sp => (sp.stories || []).forEach(s => {
+    if (s.status === 'done') storiesDone++
+    else if (s.status === 'in_progress') storiesInProgress++
+    else storiesTodo++
+  }))
+  const upcomingDeadlines = (deadlines || []).map(d => ({ daysUntil: Math.round((d.time - Date.now()) / 86400000) }))
+  return computePortfolioHealth({ storiesDone, storiesInProgress, storiesTodo, planCount: 1, upcomingDeadlines })
+}
+
 // Classe le niveau (bon/moyen/faible) ET la tendance (hausse/stable/baisse vs il y a ~7
 // jours) en un seul état météo — sans la tendance, "Météo business" n'était qu'un second
 // affichage du même score que la jauge de santé, sans rien y ajouter (retour utilisateur).
