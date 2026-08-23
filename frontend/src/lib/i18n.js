@@ -890,7 +890,7 @@ export const translations = {
             title: 'Ajoute le vrai Sprint Jira natif (API Agile)',
             items: [
               'Jusqu\'ici le "sprint" n\'existait que via le regroupement par Phase (Epic) et un simple label — le panneau de détail d\'un ticket Jira affichait "Sprint : Aucun" malgré ce regroupement',
-              'L\'export crée maintenant (ou réutilise) un vrai sprint Jira nommé "Sprint N" par phase du plan, sur le board du projet (compatible boards classiques et "nouvelle génération"), et y affecte les tickets correspondants — nécessite de reconnecter Jira une fois si déjà connecté avant cette mise à jour'
+              'L\'export crée maintenant (ou réutilise) un vrai sprint Jira nommé "Sprint N" par phase du plan, sur le board du projet (compatible boards classiques et "nouvelle génération"), et y affecte les stories ET l\'Epic de la phase — nécessite de reconnecter Jira une fois si déjà connecté avant cette mise à jour'
             ]
           },
           {
@@ -1462,7 +1462,7 @@ export const translations = {
           {
             label: 'Intégrations & automatisation',
             items: [
-              'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
+              'Intégrations Notion, Jira (épics, sprints natifs, story points et statuts synchronisés, assignation par membre réel), GitHub, Linear (assignation par membre réel, statuts synchronisés) et Google Calendar',
               "Notifications email (Resend) et Slack : génération terminée, rappel d'inactivité, résumé hebdomadaire",
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in'
             ]
@@ -1505,7 +1505,7 @@ export const translations = {
               'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
               'Présence d\'équipe en temps réel : qui a un plan de l\'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d\'espace',
               'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
-              'Intégrations Notion, Jira, GitHub, Linear et Google Calendar',
+              'Intégrations Notion, Jira (épics, sprints natifs, story points et statuts synchronisés, assignation par membre réel), GitHub, Linear (assignation par membre réel, statuts synchronisés) et Google Calendar',
               'Notifications email (Resend) et Slack : génération terminée, rappel d\'inactivité, résumé hebdomadaire',
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in',
               'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph',
@@ -3006,7 +3006,7 @@ export const translations = {
             title: 'Added real native Jira Sprint support (Agile API)',
             items: [
               'Until now "sprint" only existed via the Phase (Epic) grouping and a plain label — a Jira ticket\'s detail panel showed "Sprint: None" despite that grouping',
-              'Export now creates (or reuses) a real Jira sprint named "Sprint N" per plan phase, on the project\'s board (works with both classic and "next-gen" boards), and assigns the matching tickets to it — requires reconnecting Jira once if it was already connected before this update'
+              'Export now creates (or reuses) a real Jira sprint named "Sprint N" per plan phase, on the project\'s board (works with both classic and "next-gen" boards), and assigns both the phase\'s stories AND its Epic to it — requires reconnecting Jira once if it was already connected before this update'
             ]
           },
           {
@@ -3578,7 +3578,7 @@ export const translations = {
           {
             label: 'Integrations & automation',
             items: [
-              'Notion, Jira, GitHub, Linear and Google Calendar integrations',
+              'Notion, Jira (epics, native sprints, synced story points and statuses, real-member assignment), GitHub, Linear (real-member assignment, synced statuses) and Google Calendar integrations',
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery'
             ]
@@ -3621,7 +3621,7 @@ export const translations = {
               'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
               'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
               '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
-              'Notion, Jira, GitHub, Linear and Google Calendar integrations',
+              'Notion, Jira (epics, native sprints, synced story points and statuses, real-member assignment), GitHub, Linear (real-member assignment, synced statuses) and Google Calendar integrations',
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery',
               'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image',
