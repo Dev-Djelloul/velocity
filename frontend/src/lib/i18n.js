@@ -1593,7 +1593,10 @@ export const translations = {
       title: (name) => `Rapport financier — ${name}`,
       grandTotal: 'Budget total (lancement + marketing)',
       launchBudget: 'Budget de lancement',
-      marketingBudget: 'Budget marketing'
+      marketingBudget: 'Budget marketing',
+      cashProjection: 'Projection de trésorerie',
+      cashProjectionSubtitle: 'Trésorerie restante mois par mois, au rythme de dépense actuel',
+      costBreakdownSubtitle: 'Part de chaque poste dans la dépense mensuelle'
     },
     planVersions: {
       back: 'Retour au plan',
@@ -3343,7 +3346,10 @@ export const translations = {
       title: (name) => `Financial report — ${name}`,
       grandTotal: 'Total budget (launch + marketing)',
       launchBudget: 'Launch budget',
-      marketingBudget: 'Marketing budget'
+      marketingBudget: 'Marketing budget',
+      cashProjection: 'Cash projection',
+      cashProjectionSubtitle: 'Remaining cash month by month, at the current burn rate',
+      costBreakdownSubtitle: 'Share of each category in the monthly spend'
     },
     planVersions: {
       back: 'Back to plan',

@@ -20,6 +20,7 @@ import NotificationsPage from './components/NotificationsPage'
 import IntegrationsPage from './components/IntegrationsPage'
 import TeamPage from './components/TeamPage'
 import PlanVersionsPage from './components/PlanVersionsPage'
+import PlanFinancialReportPage from './components/PlanFinancialReportPage'
 import TeamAvatar from './components/TeamAvatar'
 import SpacePage from './components/SpacePage'
 import DashboardHome from './components/DashboardHome'
@@ -569,6 +570,17 @@ export default function App() {
     setJustGenerated(false)
     setIsSharedView(false)
     setCurrentPage('plan-versions')
+    window.scrollTo(0, 0)
+  }
+
+  // Depuis "Budget cumulé" de l'espace d'équipe (voir SpacePage.jsx) : même mécanisme que
+  // handleCompareVersions, mais vers une vraie page dédiée au rapport financier plutôt
+  // qu'une modale — demandé explicitement.
+  const handleOpenFinancialReport = (loadedPlan) => {
+    setPlan(loadedPlan)
+    setJustGenerated(false)
+    setIsSharedView(false)
+    setCurrentPage('plan-financial-report')
     window.scrollTo(0, 0)
   }
 
@@ -1162,6 +1174,13 @@ export default function App() {
             onBack={() => { setCurrentPage('result'); window.scrollTo(0, 0) }}
           />
         )}
+        {currentPage === 'plan-financial-report' && plan && isSignedIn && (
+          <PlanFinancialReportPage
+            plan={plan}
+            lang={lang}
+            onBack={() => { setCurrentPage('result'); window.scrollTo(0, 0) }}
+          />
+        )}
         {currentPage === 'dashboard' && isSignedIn && (
           <DashboardHome
             key={dataVersion}
@@ -1210,6 +1229,7 @@ export default function App() {
             onOpenGallery={() => { setCurrentPage('gallery'); window.scrollTo(0, 0) }}
             onPersonalSpaceChange={() => setDataVersion(v => v + 1)}
             onCompareVersions={handleCompareVersions}
+            onOpenFinancialReport={handleOpenFinancialReport}
           />
         )}
         {currentPage === 'settings' && isSignedIn && (

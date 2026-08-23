@@ -11,7 +11,6 @@ import { teamColor } from './TeamAvatar'
 import { MembersPresenceRow } from './TeamPresenceAvatars'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
-import PlanFinancialReportModal from './PlanFinancialReportModal'
 import teamSpaceBackground from '../../assets/img/hiw-step2-dashboard.webp'
 import teamSpaceBackgroundMobile from '../../assets/img/hiw-step2-dashboard-mobile.webp'
 import personalSpaceBackground from '../../assets/img/my-velocity-space-bg.webp'
@@ -33,7 +32,7 @@ function byRecency(a, b) {
 // crédits et sert désormais d'historique complet de tous les plans de l'espace, pendant
 // que cette page ne montre que les derniers plans actifs (personnel) ou le tableau de bord
 // partagé (équipe).
-export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenHistory, onOpenGallery, onPersonalSpaceChange, onCompareVersions }) {
+export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCreatePlan, onOpenTeamSettings, onSeeFullHistory, onOpenHistory, onOpenGallery, onPersonalSpaceChange, onCompareVersions, onOpenFinancialReport }) {
   const team = useTeam()
   const { user } = useUser()
   const { userId } = useAuth()
@@ -49,7 +48,6 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [showEditPersonal, setShowEditPersonal] = useState(false)
   const [showVersionsPicker, setShowVersionsPicker] = useState(false)
   const [showBudgetDetail, setShowBudgetDetail] = useState(false)
-  const [financialReportPlan, setFinancialReportPlan] = useState(null)
   const [showPersonalAvatarPicker, setShowPersonalAvatarPicker] = useState(false)
   const [editName, setEditName] = useState('')
 
@@ -420,12 +418,12 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
               const planMarketingBudget = p.marketing?.totalBudget || 0
               return (
                 <div key={p.id} className="account-list-item space-detail-item">
-                  {/* Ouvre un rapport financier détaillé, façon feuille de finance
-                      investisseurs, plutôt que de rester une simple liste statique — retour
-                      utilisateur explicite. */}
+                  {/* Ouvre une vraie page dédiée au rapport financier (pas une modale,
+                      demandé explicitement) — même mécanisme que "Bibliothèque de
+                      versions" juste au-dessus (onCompareVersions). */}
                   <button
                     className="account-list-item-main has-thumb space-detail-thumb-top"
-                    onClick={() => { setShowBudgetDetail(false); setFinancialReportPlan(p) }}
+                    onClick={() => { setShowBudgetDetail(false); onOpenFinancialReport?.(p) }}
                   >
                     {p.coverImage
                       ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
@@ -444,14 +442,6 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
             })}
           </div>
         </InfoModal>
-      )}
-
-      {financialReportPlan && (
-        <PlanFinancialReportModal
-          plan={financialReportPlan}
-          lang={lang}
-          onClose={() => setFinancialReportPlan(null)}
-        />
       )}
 
       {deleteFailed && (

@@ -1,0 +1,274 @@
+/* Même recette que PlanVersionsPage.css : fond image plein viewport derrière un contenu
+   translucide en verre dépoli. */
+.plan-financial-report-page-outer {
+  position: relative;
+  display: flow-root;
+}
+
+.plan-financial-report-page-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.3) saturate(1.05);
+}
+
+[data-theme="light"] .plan-financial-report-page-bg {
+  filter: brightness(0.9) saturate(1.05);
+}
+
+.plan-financial-report-page-inner {
+  position: relative;
+  z-index: 1;
+}
+
+.plan-financial-report-page {
+  max-width: 1080px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.plan-financial-report-page-inner .team-back-btn {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+}
+
+[data-theme="light"] .plan-financial-report-page-inner .team-back-btn {
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+/* Bandeau des trois montants clés — même dégradé de bordure que les cartes "actives"
+   ailleurs dans l'app (espace ACTUEL, plan VelocityLaunch de la landing), pour signaler
+   que c'est le résumé exécutif du rapport. */
+.fin-report-totals {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-secondary), var(--color-bg-secondary)) padding-box,
+    linear-gradient(135deg, #9184d9, #6366f1, #06b6d4) border-box;
+}
+
+.fin-report-total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.fin-report-total-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+}
+
+.fin-report-total-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.fin-report-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-sm);
+}
+
+.fin-report-empty svg {
+  flex-shrink: 0;
+  color: #facc15;
+}
+
+.fin-report-kpis {
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.fin-report-charts {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.25rem;
+  align-items: stretch;
+}
+
+.fin-report-chart-card h3 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.fin-report-chart-subtitle {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-xs);
+  margin-bottom: 1rem;
+}
+
+/* Courbe de trésorerie : vraie ligne SVG avec aire remplie sous la courbe, points
+   survolables — pas des barres, demandé explicitement ("un vrai graphique"). */
+.fin-report-line-chart {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.fin-report-gridline {
+  stroke: rgba(145, 132, 217, 0.12);
+  stroke-width: 1;
+}
+
+.fin-report-area {
+  fill: rgba(99, 102, 241, 0.14);
+}
+
+.fin-report-line {
+  fill: none;
+  stroke: #6366f1;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.fin-report-line-dot {
+  fill: var(--color-bg-primary);
+  stroke: #6366f1;
+  stroke-width: 2;
+  cursor: pointer;
+  transition: r 0.1s ease;
+}
+
+.fin-report-axis-label {
+  font-size: 9px;
+  fill: var(--color-text-muted);
+}
+
+.fin-report-chart-tooltip {
+  margin-top: 0.5rem;
+  text-align: center;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* Camembert de répartition des coûts : wedges SVG (même technique que l'anneau
+   "Avancement global" du Dashboard) plutôt que des barres empilées. */
+.fin-report-donut-wrap {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto;
+}
+
+.fin-report-donut {
+  width: 100%;
+  height: 100%;
+}
+
+.fin-report-donut-wedge {
+  cursor: default;
+  transition: opacity 0.12s ease;
+}
+
+.fin-report-donut-wedge:hover {
+  opacity: 0.8;
+}
+
+.fin-report-donut-center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  pointer-events: none;
+}
+
+.fin-report-donut-center-value {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.fin-report-donut-center-label {
+  font-size: 0.62rem;
+  color: var(--color-text-muted);
+  max-width: 80px;
+}
+
+.fin-report-donut-legend {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.fin-report-donut-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.fin-report-donut-legend-item i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.fin-report-donut-legend-item span {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fin-report-donut-legend-item strong {
+  color: var(--color-text-primary);
+}
+
+.fin-report-bridge h3 {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-primary);
+  margin-bottom: 0.2rem;
+}
+
+.fin-report-arpu-rationale {
+  margin: 1rem 0 0;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.1);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+}
+
+.fin-report-arpu-rationale strong {
+  color: var(--color-text-primary);
+}
+
+.fin-report-disclaimer {
+  margin: 0;
+  padding: 1rem 0 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .fin-report-totals {
+    grid-template-columns: 1fr;
+  }
+
+  .fin-report-charts {
+    grid-template-columns: 1fr;
+  }
+}
