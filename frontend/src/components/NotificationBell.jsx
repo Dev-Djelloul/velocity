@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
-import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFeedRead } from '../lib/serverStorage'
-import { IconBell, IconCheckCircle } from './Icons'
+import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFeedRead, deleteAllNotificationFeed } from '../lib/serverStorage'
+import { IconBell, IconCheckCircle, IconTrash } from './Icons'
 import '../styles/NotificationBell.css'
 
 const POLL_MS = 8000
@@ -62,6 +62,14 @@ export default function NotificationBell({ userId, lang, onOpen }) {
     await markAllNotificationFeedRead(userId)
   }
 
+  const deleteAll = async (e) => {
+    e.stopPropagation()
+    if (!window.confirm(t(lang, 'notifCenter.confirmDeleteAll'))) return
+    setItems([])
+    setUnread(0)
+    await deleteAllNotificationFeed(userId)
+  }
+
   return (
     <div className="notif-bell-root" ref={rootRef}>
       <button className="notif-bell-btn" onClick={() => setOpen(v => !v)} title={t(lang, 'notifCenter.title')}>
@@ -72,7 +80,14 @@ export default function NotificationBell({ userId, lang, onOpen }) {
         <div className="notif-bell-panel">
           <div className="notif-bell-header">
             <span>{t(lang, 'notifCenter.title')}</span>
-            {unread > 0 && <button className="notif-bell-markall" onClick={markAllRead}>{t(lang, 'notifCenter.markAllRead')}</button>}
+            <div className="notif-bell-header-actions">
+              {unread > 0 && <button className="notif-bell-markall" onClick={markAllRead}>{t(lang, 'notifCenter.markAllRead')}</button>}
+              {items.length > 0 && (
+                <button className="notif-bell-delete-all" onClick={deleteAll} title={t(lang, 'notifCenter.deleteAll')}>
+                  <IconTrash width={14} height={14} />
+                </button>
+              )}
+            </div>
           </div>
           <div className="notif-bell-list">
             {items.length === 0 && <p className="notif-bell-empty">{t(lang, 'notifCenter.empty')}</p>}

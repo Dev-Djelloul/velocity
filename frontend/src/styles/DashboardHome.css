@@ -167,10 +167,12 @@
   color: #fff;
 }
 
-/* Fond net en mode clair — même logique que SpacePage.css : le flou/assombrissement du
-   fond de page est pensé pour le mode sombre, pas demandé en mode clair. */
+/* Assombri aussi en mode clair (retour utilisateur : quasi netteté à 0.98 rendait la photo
+   trop présente/dominante sur un fond de page clair) — le titre et les liens restent en
+   blanc forcé quel que soit le thème (voir plus haut), ils ont donc besoin d'un fond
+   suffisamment sombre en dessous pour rester lisibles, pas seulement en mode sombre. */
 [data-theme="light"] .dashboard-home-bg {
-  filter: brightness(0.98) saturate(1.05);
+  filter: brightness(0.4) saturate(1.05);
 }
 
 .dashboard-home-header p {

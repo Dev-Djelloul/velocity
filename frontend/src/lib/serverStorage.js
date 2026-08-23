@@ -463,6 +463,10 @@ export function markAllNotificationFeedRead(userId) {
   })
 }
 
+export function deleteAllNotificationFeed(userId) {
+  return safeFetch(`/notification-feed?userId=${encodeURIComponent(userId)}`, { method: 'DELETE' })
+}
+
 export function fetchAgentTasks(planId) {
   return safeFetch(`/agents/tasks?planId=${encodeURIComponent(planId)}`).then(r => r || [])
 }

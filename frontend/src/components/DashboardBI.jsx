@@ -14,11 +14,15 @@ const DONUT_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6
 // orange (pas jaune) — retour utilisateur : l'échelle attendue est vert/orange/rouge (+ gris
 // sombre pour "pas commencé"), et l'orange #f59e0b est aussi celui déjà utilisé pour ce même
 // statut dans le Backlog/la Roadmap du plan et les puces du calendrier — cohérence garantie.
+// "todo" utilisait un blanc translucide, pensé pour se détacher sur un fond de carte
+// sombre — sur fond clair, il devenait quasi invisible/blanc pur au lieu d'un gris
+// discret (retour utilisateur). Un gris opaque fixe reste visible et cohérent dans les
+// deux thèmes, sans dépendre de la couleur qu'il y a en dessous.
 const TICK_COLORS = {
   done: ['#4ade80', '#22c55e'],
   overdue: ['#f87171', '#dc2626'],
   inProgress: ['#fb923c', '#f59e0b'],
-  todo: ['rgba(255, 255, 255, 0.26)', 'rgba(255, 255, 255, 0.12)']
+  todo: ['#9ca3af', '#6b7280']
 }
 
 const STATUS_LABEL_KEYS = { done: 'statusDone', overdue: 'statusOverdue', inProgress: 'statusInProgress', todo: 'statusTodo' }
@@ -301,7 +305,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
             { key: 'done', labelKey: 'statusDone', color: '#4ade80', value: doneEffort, count: doneCount },
             { key: 'overdue', labelKey: 'statusOverdue', color: '#ef4444', value: overdueEffort, count: overdueCount },
             { key: 'inProgress', labelKey: 'statusInProgress', color: '#f59e0b', value: inProgressEffort, count: inProgressCount },
-            { key: 'todo', labelKey: 'statusTodo', color: 'rgba(255, 255, 255, 0.16)', value: todoEffort, count: todoCount }
+            { key: 'todo', labelKey: 'statusTodo', color: '#9ca3af', value: todoEffort, count: todoCount }
           ]
           const ringSegments = allRingSegments.filter(seg => seg.value > 0)
           const overallPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)

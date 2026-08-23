@@ -1,7 +1,7 @@
 import { t } from './i18n'
 import { formatMoney as formatMoneyDisplay } from './currency'
 import { resolveBudgetAmount } from './budgetTiers'
-import { downloadBlob, slug } from './pdfExport'
+import { downloadBlob, slug, toDataUrl } from './pdfExport'
 
 // formatMoney() sépare les milliers avec un espace fine insécable (U+202F, via
 // toLocaleString('fr-FR')) : parfait à l'écran, mais absent de la police Roboto embarquée
@@ -10,6 +10,31 @@ import { downloadBlob, slug } from './pdfExport'
 // une espace normale, invisible à l'oeil mais garantie d'être rendue partout.
 function formatMoney(amount) {
   return formatMoneyDisplay(amount).replace(/ /g, ' ')
+}
+
+// Récupère une image distante en bytes pour un ImageRun docx (qui exige un `type` PNG/JPG
+// explicite, contrairement à pdfmake qui accepte n'importe quelle data URL) — un format
+// non supporté (webp, svg) échoue ici, à charge de l'appelant de l'ignorer.
+async function fetchImageForDocx(url) {
+  const res = await fetch(url)
+  const bytes = new Uint8Array(await res.arrayBuffer())
+  const contentType = res.headers.get('content-type') || ''
+  const type = (contentType.includes('png') || url.toLowerCase().endsWith('.png')) ? 'png' : 'jpg'
+  return { bytes, type }
+}
+
+// docx a besoin des dimensions pixel exactes pour poser une transformation width/height
+// qui respecte le ratio d'origine — pas d'API de décodage d'image côté docx, on passe par
+// une <img> le temps de lire naturalWidth/naturalHeight.
+function imagePixelSize(bytes, type) {
+  return new Promise((resolve, reject) => {
+    const blob = new Blob([bytes], { type: `image/${type === 'jpg' ? 'jpeg' : type}` })
+    const url = URL.createObjectURL(blob)
+    const img = new Image()
+    img.onload = () => { URL.revokeObjectURL(url); resolve({ width: img.naturalWidth, height: img.naturalHeight }) }
+    img.onerror = (e) => { URL.revokeObjectURL(url); reject(e) }
+    img.src = url
+  })
 }
 
 // Exports dédiés au rapport financier par plan (PlanFinancialReportPage) : un vrai
@@ -44,6 +69,13 @@ export async function exportFinancialReportPdf(plan, lang, branding) {
 
   const { en, financials, launchBudget, marketingBudget, grandTotal, cashRows } = buildFinancialReportModel(plan, lang)
   const content = []
+
+  if (plan?.coverImage) {
+    try {
+      const coverDataUrl = await toDataUrl(plan.coverImage)
+      content.push({ image: coverDataUrl, width: 515, margin: [0, 0, 0, 14] })
+    } catch { /* image indisponible : on continue sans bannière */ }
+  }
 
   if (branding?.enabled && branding.logo) {
     content.push({ image: branding.logo, width: 90, margin: [0, 0, 0, 12] })
@@ -234,13 +266,27 @@ export async function exportFinancialReportDocx(plan, lang, branding) {
 
   const children = []
 
+  // Bannière de couverture du plan en pleine largeur en tête de document, façon page de
+  // couverture Notion — jamais bloquante : une image indisponible ou dans un format non
+  // supporté par docx (webp, svg) est simplement ignorée.
+  if (plan?.coverImage) {
+    try {
+      const { bytes, type } = await fetchImageForDocx(plan.coverImage)
+      const { width: iw, height: ih } = await imagePixelSize(bytes, type)
+      const targetW = 600
+      const targetH = Math.round((ih / iw) * targetW)
+      children.push(new Paragraph({ children: [new ImageRun({ data: bytes, type, transformation: { width: targetW, height: targetH } })], spacing: { after: 200 } }))
+    } catch { /* image indisponible ou format non supporté : on continue sans bannière */ }
+  }
+
   if (branding?.enabled && branding.logo) {
     try {
       const base64 = branding.logo.split(',')[1]
       const bin = atob(base64)
       const bytes = new Uint8Array(bin.length)
       for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i)
-      children.push(new Paragraph({ children: [new ImageRun({ data: bytes, transformation: { width: 90, height: 40 } })] }))
+      const type = branding.logo.startsWith('data:image/png') ? 'png' : 'jpg'
+      children.push(new Paragraph({ children: [new ImageRun({ data: bytes, type, transformation: { width: 90, height: 40 } })] }))
     } catch { /* logo mal formé : on continue sans */ }
   }
 
@@ -405,6 +451,13 @@ export function exportFinancialReportHtml(plan, lang, branding) {
     ? `<img src="${branding.logo}" alt="" class="brand-logo" />`
     : ''
 
+  // Bannière de couverture en pleine largeur, façon page de couverture Notion — l'URL
+  // d'origine (Pexels, upload, lien) est utilisée directement, l'HTML n'a pas besoin de
+  // la convertir contrairement au PDF/Word.
+  const coverHtml = plan?.coverImage
+    ? `<img src="${escapeHtml(plan.coverImage)}" alt="" class="cover-banner" />`
+    : ''
+
   const kpisHtml = financials ? `
     <div class="kpis">
       <div class="kpi" style="--c:#9184d9"><div class="kpi-label">${escapeHtml(t(lang, 'outputs.financials.monthlyBurn'))}</div><div class="kpi-value">${escapeHtml(formatMoney(financials.monthlyBurn))}</div></div>
@@ -464,14 +517,17 @@ export function exportFinancialReportHtml(plan, lang, branding) {
 <style>
   * { box-sizing: border-box; }
   body {
-    margin: 0; padding: 3rem 1.5rem 5rem; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+    margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
     background: #0b0e14; color: #f3f4f6;
     background-image:
       radial-gradient(600px 400px at 10% -10%, rgba(145,132,217,0.25), transparent 60%),
       radial-gradient(600px 400px at 100% 0%, rgba(6,182,212,0.18), transparent 60%);
     background-attachment: fixed;
   }
-  .page { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 1.5rem; }
+  /* Pleine largeur de la fenêtre (pas limitée aux 900px du contenu), image entière sans
+     recadrage (pas d'object-fit:cover) — demandé explicitement. */
+  .cover-banner { display: block; width: 100%; height: auto; }
+  .page { max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem 5rem; display: flex; flex-direction: column; gap: 1.5rem; }
   .brand-logo { width: 90px; margin-bottom: 0.75rem; border-radius: 6px; }
   h1 { font-size: 1.9rem; margin: 0 0 0.25rem; background: linear-gradient(135deg, #c4b5fd, #67e8f9); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .header-sub { color: #9ca3af; font-weight: 600; margin: 0 0 0.15rem; }
@@ -527,6 +583,7 @@ export function exportFinancialReportHtml(plan, lang, branding) {
 </style>
 </head>
 <body>
+  ${coverHtml}
   <div class="page">
     ${logoHtml}
     <div>

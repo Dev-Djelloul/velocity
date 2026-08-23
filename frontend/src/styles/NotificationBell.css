@@ -79,6 +79,12 @@
   font-size: 0.85rem;
 }
 
+.notif-bell-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+}
+
 .notif-bell-markall {
   background: none;
   border: none;
@@ -86,6 +92,21 @@
   font-size: 0.75rem;
   font-weight: 600;
   cursor: pointer;
+}
+
+.notif-bell-delete-all {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--color-text-muted, #9ca3af);
+  cursor: pointer;
+  padding: 0.15rem;
+}
+
+.notif-bell-delete-all:hover {
+  color: #ef4444;
 }
 
 .notif-bell-list {

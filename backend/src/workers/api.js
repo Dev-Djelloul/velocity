@@ -1008,6 +1008,13 @@ export async function handleApi(request, env, url) {
     return json({ ok: true })
   }
 
+  if (pathname === '/notification-feed' && method === 'DELETE') {
+    const userId = searchParams.get('userId')
+    if (!userId) return json({ error: 'userId required' }, 400)
+    await db.deleteAllNotifications(env, userId)
+    return json({ ok: true })
+  }
+
   // Présence d'équipe (dashboard + menu de bascule d'espace) — heartbeat périodique côté
   // client tant qu'un plan de l'équipe est ouvert, voir PlanViewer.jsx.
   if (pathname === '/team-presence/heartbeat' && method === 'POST') {

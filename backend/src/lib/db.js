@@ -573,6 +573,10 @@ export async function markAllNotificationsRead(env, userId) {
   await env.DB.prepare('UPDATE notification_feed SET read = 1 WHERE user_id = ? AND read = 0').bind(userId).run()
 }
 
+export async function deleteAllNotifications(env, userId) {
+  await env.DB.prepare('DELETE FROM notification_feed WHERE user_id = ?').bind(userId).run()
+}
+
 // --- Présence d'équipe (dashboard + menu de bascule d'espace, voir migration 0018) ---
 
 const TEAM_PRESENCE_WINDOW_SECONDS = 40

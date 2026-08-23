@@ -752,7 +752,9 @@ export const translations = {
     notifCenter: {
       title: 'Notifications',
       empty: 'Aucune notification pour le moment.',
-      markAllRead: 'Tout marquer comme lu'
+      markAllRead: 'Tout marquer comme lu',
+      deleteAll: 'Tout supprimer',
+      confirmDeleteAll: 'Supprimer définitivement toutes les notifications ?'
     },
     cookieBanner: {
       title: 'Avant de lancer votre prochain plan...',
@@ -2534,7 +2536,9 @@ export const translations = {
     notifCenter: {
       title: 'Notifications',
       empty: 'No notifications yet.',
-      markAllRead: 'Mark all as read'
+      markAllRead: 'Mark all as read',
+      deleteAll: 'Delete all',
+      confirmDeleteAll: 'Permanently delete all notifications?'
     },
     cookieBanner: {
       title: 'Before you launch your next plan...',

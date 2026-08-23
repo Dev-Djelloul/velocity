@@ -8,6 +8,19 @@ const PDFLIB_PAGE_H = 841.89
 const PDFLIB_MARGIN = 50
 const PDFLIB_CONTENT_W = PDFLIB_PAGE_W - PDFLIB_MARGIN * 2
 
+// Récupère une image distante (Pexels, upload, lien externe) et l'embarque dans un
+// PDFDocument pdf-lib. pdf-lib ne sait embarquer que du PNG/JPG (pas de WebP) : une image
+// dans un autre format lève simplement une erreur, à charge de l'appelant de l'ignorer
+// (retour utilisateur : la bannière est un plus, jamais bloquant si l'image est
+// indisponible ou dans un format non supporté).
+async function embedPdfLibImage(pdfDoc, url) {
+  const res = await fetch(url)
+  const bytes = new Uint8Array(await res.arrayBuffer())
+  const contentType = res.headers.get('content-type') || ''
+  if (contentType.includes('png') || url.toLowerCase().endsWith('.png')) return pdfDoc.embedPng(bytes)
+  return pdfDoc.embedJpg(bytes)
+}
+
 function hexToRgbLib(rgbFn, h) {
   const n = parseInt(h, 16)
   return rgbFn(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255)
@@ -303,6 +316,16 @@ export async function exportPDF(plan, lang, branding) {
   pdfMake.vfs = pdfFonts.pdfMake ? pdfFonts.pdfMake.vfs : pdfFonts.vfs
 
   const content = []
+  // Bannière de couverture du plan (image choisie dans CoverPicker — Pexels, upload ou
+  // lien), en pleine largeur en tête de document façon page de couverture Notion. Ne
+  // bloque jamais l'export : une image indisponible (lien mort, CORS) est simplement
+  // ignorée plutôt que de faire échouer tout le PDF.
+  if (plan.coverImage) {
+    try {
+      const coverDataUrl = await toDataUrl(plan.coverImage)
+      content.push({ image: coverDataUrl, width: 515, margin: [0, 0, 0, 14] })
+    } catch { /* image indisponible : on continue sans bannière */ }
+  }
   if (branding?.enabled && branding.logo) {
     content.push({ image: branding.logo, width: 90, margin: [0, 0, 0, 12] })
   }
@@ -463,6 +486,15 @@ export async function exportComplianceReport(plan, lang, branding) {
   const en = lang === 'en'
   const genDate = new Date().toLocaleDateString(en ? 'en-US' : 'fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
 
+  if (plan.coverImage) {
+    try {
+      const cover = await embedPdfLibImage(pdfDoc, plan.coverImage)
+      const h = (cover.height / cover.width) * CONTENT_W
+      state.page.drawImage(cover, { x: MARGIN, y: state.y - h, width: CONTENT_W, height: h })
+      state.y -= h + 14
+    } catch { /* image indisponible ou format non supporté (webp) : on continue sans bannière */ }
+  }
+
   if (branding?.enabled && branding.logo) {
     try {
       const isPng = branding.logo.startsWith('data:image/png')
@@ -596,7 +628,7 @@ function loadImageEl(dataUrl) {
   })
 }
 
-async function toDataUrl(url) {
+export async function toDataUrl(url) {
   const res = await fetch(url)
   const blob = await res.blob()
   return new Promise((resolve, reject) => {
