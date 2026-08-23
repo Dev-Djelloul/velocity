@@ -1,0 +1,127 @@
+/* Grille de widgets façon macOS (centre de notifications / bureau) — colonnes de largeur
+   égale, hauteur de ligne fixe ; chaque widget occupe 1, 2 ou 4 cellules selon sa taille
+   (Petit = 1x1, Moyen = 2x1, Grand = 2x2), glissé-déposé pour être réordonné. */
+.dashboard-widget-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: 170px;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.dashboard-widget-slot {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  cursor: grab;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-widget-slot > * {
+  height: 100%;
+}
+
+.dashboard-widget-slot.size-small { grid-column: span 1; grid-row: span 1; }
+.dashboard-widget-slot.size-medium { grid-column: span 2; grid-row: span 1; }
+.dashboard-widget-slot.size-large { grid-column: span 2; grid-row: span 2; }
+
+.dashboard-widget-slot.is-dragging {
+  opacity: 0.4;
+}
+
+.dashboard-widget-slot.is-drag-over {
+  transform: scale(1.02);
+}
+
+.dashboard-widget-slot.is-drag-over::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border: 2px dashed #9184d9;
+  border-radius: 16px;
+  pointer-events: none;
+}
+
+@media (max-width: 900px) {
+  .dashboard-widget-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .dashboard-widget-slot.size-medium,
+  .dashboard-widget-slot.size-large {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 560px) {
+  .dashboard-widget-grid {
+    grid-template-columns: 1fr;
+    grid-auto-rows: auto;
+  }
+  .dashboard-widget-slot,
+  .dashboard-widget-slot.size-small,
+  .dashboard-widget-slot.size-medium,
+  .dashboard-widget-slot.size-large {
+    grid-column: span 1;
+    grid-row: auto;
+    min-height: 170px;
+  }
+}
+
+/* Menu contextuel "Taille" — même recette visuelle que le menu natif macOS équivalent
+   (fond sombre translucide, flou, coins arrondis), en position fixe pour échapper à
+   l'overflow:hidden de la carte cliquée. */
+.widget-size-menu {
+  position: fixed;
+  z-index: 2000;
+  min-width: 180px;
+  padding: 0.4rem;
+  border-radius: 12px;
+  background: rgba(30, 32, 40, 0.92);
+  backdrop-filter: blur(20px) saturate(1.6);
+  -webkit-backdrop-filter: blur(20px) saturate(1.6);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  animation: widget-size-menu-in 0.12s ease;
+}
+
+@keyframes widget-size-menu-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.widget-size-menu-label {
+  display: block;
+  padding: 0.3rem 0.6rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.widget-size-menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.4rem 0.6rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  color: #fff;
+  font-size: 0.82rem;
+  text-align: left;
+  cursor: pointer;
+}
+
+.widget-size-menu-item:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.widget-size-menu-check {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  flex-shrink: 0;
+  color: #9184d9;
+}

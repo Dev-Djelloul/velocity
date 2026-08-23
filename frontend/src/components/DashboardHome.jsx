@@ -11,6 +11,7 @@ import TeamAvatar from './TeamAvatar'
 import DashboardCalendar from './DashboardCalendar'
 import DashboardActivityFeed from './DashboardActivityFeed'
 import DashboardWeeklySummary from './DashboardWeeklySummary'
+import DashboardWidgetGrid from './DashboardWidgetGrid'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
@@ -151,14 +152,6 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     return pool.slice().sort(byRecency)[0]
   }, [allPlans, activePlans])
 
-  // La phrase d'accroche distingue "tu as déjà des plans, reprends-les" de "tu n'en as
-  // encore aucun, lance le premier" — plutôt qu'une seule formule fixe qui ignorait si
-  // l'utilisateur avait déjà quelque chose en cours (personnel ou équipe, peu importe).
-  const hasAnyPlans = (allPlans || activePlans).length > 0
-  const planStatusKey = pro
-    ? (hasAnyPlans ? 'dashboard.planStatusProActive' : 'dashboard.planStatusProEmpty')
-    : (hasAnyPlans ? 'dashboard.planStatusFreeActive' : 'dashboard.planStatusFreeEmpty')
-
   const deadlineWhen = (isoDate) => {
     const n = daysUntil(isoDate)
     if (n === 0) return t(lang, 'dashboard.deadlinesToday')
@@ -225,30 +218,99 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         aria-hidden="true"
       />
       <div className="dashboard-home">
-      {/* Nouveaux widgets tout en haut de page, avant même le "Bonjour X" — c'est la
-          première chose vue en arrivant sur le dashboard, avant de dérouler vers les
-          espaces et le calendrier. Activité toujours visible ; résumé Nova réservé Pro
-          (même restriction que l'agrégation cross-espaces dont ses statistiques dérivent). */}
-      {userId && (
-        <div className="dashboard-top-widgets">
-          <DashboardActivityFeed userId={userId} lang={lang} onOpen={onOpenActivity} />
-          {pro && <DashboardWeeklySummary userId={userId} lang={lang} stats={weeklyStats} />}
-        </div>
-      )}
-      <div className="dashboard-home-row">
-      <div className="dashboard-home-left">
+      {/* "Bonjour X" en tout premier, avant les widgets — demandé explicitement. Un seul
+          message continu (nom + aperçu du jour + rappel du plan + encouragement) plutôt
+          que trois phrases empilées séparément. */}
       <div className="dashboard-home-header">
-        <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
-        <p>{t(lang, 'dashboard.subtitle')}</p>
-        {/* Petite phrase d'accroche sous le sous-titre, ton différent selon le plan (Pro vs
-            gratuit) ET selon qu'il y a déjà des plans en cours (continuer) ou aucun (lancer
-            le premier) — retour utilisateur : la formule ne devait pas ignorer l'existant. */}
-        <p className="dashboard-home-plan-status">{t(lang, planStatusKey)}</p>
+        <h1>
+          {firstName
+            ? t(lang, 'dashboard.greetingCombined')(firstName, t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))
+            : t(lang, 'dashboard.greetingCombinedGeneric')(t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))}
+        </h1>
         <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
           <IconPlus width={16} height={16} />
           {t(lang, 'dashboard.createPlan')}
         </button>
       </div>
+
+      {/* Widgets façon macOS : déplaçables (glisser-déposer) et redimensionnables (clic
+          droit → Petit/Moyen/Grand), disposition mémorisée par utilisateur. Activité
+          toujours visible ; résumé Nova réservé Pro (même restriction que l'agrégation
+          cross-espaces dont ses statistiques dérivent) ; "Reprendre" seulement s'il existe
+          un dernier plan touché. */}
+      {userId && (
+        <DashboardWidgetGrid
+          userId={userId}
+          lang={lang}
+          widgets={{
+            calendar: <DashboardCalendar lang={lang} deadlines={deadlines} plans={allPlans || activePlans} onOpenPlan={onLoadPlan} />,
+            deadlines: (
+              <div className="dashboard-widget-card dashboard-deadlines-card">
+                <div className="dashboard-widget-header">
+                  {gradientIcon(<IconCalendar width={16} height={16} />)}
+                  <h3>{t(lang, 'dashboard.deadlinesTitle')}</h3>
+                </div>
+                {deadlines.length === 0 ? (
+                  <p className="dashboard-deadlines-empty">{t(lang, 'dashboard.deadlinesEmpty')}</p>
+                ) : (
+                  <ul className="dashboard-deadlines-list">
+                    {deadlines.map(d => (
+                      <li key={d.id}>
+                        {/* Toute la ligne cliquable — redirige directement vers le plan concerné,
+                            même logique que le popover du jour dans le calendrier au-dessus, pour
+                            ne pas avoir à repasser par une carte d'espace ou l'historique. */}
+                        <button
+                          type="button"
+                          className="dashboard-deadline-row"
+                          onClick={() => onLoadPlan?.(d.plan)}
+                          disabled={!d.plan || !onLoadPlan}
+                        >
+                          {/* Vignette discrète du plan (quand il en a une) pour distinguer les
+                              échéances entre plusieurs plans d'un coup d'œil, sans avoir à lire le
+                              nom en entier — même logique que les aperçus de plans des cartes
+                              d'espace juste en dessous. */}
+                          <span className="dashboard-deadline-thumb">
+                            {d.coverImage
+                              ? <img src={d.coverImage} alt="" />
+                              : <span className="dashboard-deadline-thumb-fallback" aria-hidden="true" />}
+                          </span>
+                          <span className="dashboard-deadline-info">
+                            <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
+                            <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>
+                            {/* Date exacte, pour s'y référer directement sur le calendrier
+                                au-dessus — le badge "Dans X jours" seul ne dit pas quel jour. */}
+                            <span className="dashboard-deadline-date">{deadlineDateLabel(d.date)}</span>
+                          </span>
+                          <span className={`dashboard-deadline-when is-${deadlineUrgency(d.date)}`}>{deadlineWhen(d.date)}</span>
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            ),
+            activity: <DashboardActivityFeed userId={userId} lang={lang} onOpen={onOpenActivity} />,
+            ...(pro ? { nova: <DashboardWeeklySummary userId={userId} lang={lang} stats={weeklyStats} /> } : {}),
+            ...(lastUsedPlan ? {
+              resume: (
+                <button className="dashboard-resume-square" onClick={() => onLoadPlan?.(lastUsedPlan)}>
+                  {lastUsedPlan.coverImage
+                    ? <img src={lastUsedPlan.coverImage} alt="" className="dashboard-resume-square-bg" />
+                    : <span className="dashboard-resume-square-bg dashboard-resume-square-fallback" aria-hidden="true" />}
+                  <span className="dashboard-resume-square-overlay">
+                    <span className="dashboard-resume-square-label">{t(lang, 'dashboard.resumeLabel')}</span>
+                    <span className="dashboard-resume-square-name">{lastUsedPlan.product?.name || t(lang, 'plans.untitled')}</span>
+                    <span className="dashboard-resume-square-space">
+                      {lastUsedPlanSpaceName}
+                      <IconChevronRight width={14} height={14} />
+                    </span>
+                  </span>
+                </button>
+              )
+            } : {})
+          }}
+        />
+      )}
 
       <div className="dashboard-home-grid">
         {spaces.map(space => {
@@ -340,72 +402,6 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           <span className="dashboard-home-link-icon"><IconImage width={13} height={13} /></span>
           {t(lang, 'dashboard.viewGallery')}
         </button>
-      </div>
-      </div>
-
-      {lastUsedPlan && (
-        <button className="dashboard-resume-square" onClick={() => onLoadPlan?.(lastUsedPlan)}>
-          {lastUsedPlan.coverImage
-            ? <img src={lastUsedPlan.coverImage} alt="" className="dashboard-resume-square-bg" />
-            : <span className="dashboard-resume-square-bg dashboard-resume-square-fallback" aria-hidden="true" />}
-          <span className="dashboard-resume-square-overlay">
-            <span className="dashboard-resume-square-label">{t(lang, 'dashboard.resumeLabel')}</span>
-            <span className="dashboard-resume-square-name">{lastUsedPlan.product?.name || t(lang, 'plans.untitled')}</span>
-            <span className="dashboard-resume-square-space">
-              {lastUsedPlanSpaceName}
-              <IconChevronRight width={14} height={14} />
-            </span>
-          </span>
-        </button>
-      )}
-
-      <div className="dashboard-home-widgets">
-        <DashboardCalendar lang={lang} deadlines={deadlines} plans={allPlans || activePlans} onOpenPlan={onLoadPlan} />
-
-        <div className="dashboard-widget-card dashboard-deadlines-card">
-          <div className="dashboard-widget-header">
-            {gradientIcon(<IconCalendar width={16} height={16} />)}
-            <h3>{t(lang, 'dashboard.deadlinesTitle')}</h3>
-          </div>
-          {deadlines.length === 0 ? (
-            <p className="dashboard-deadlines-empty">{t(lang, 'dashboard.deadlinesEmpty')}</p>
-          ) : (
-            <ul className="dashboard-deadlines-list">
-              {deadlines.map(d => (
-                <li key={d.id}>
-                  {/* Toute la ligne cliquable — redirige directement vers le plan concerné,
-                      même logique que le popover du jour dans le calendrier au-dessus, pour
-                      ne pas avoir à repasser par une carte d'espace ou l'historique. */}
-                  <button
-                    type="button"
-                    className="dashboard-deadline-row"
-                    onClick={() => onLoadPlan?.(d.plan)}
-                    disabled={!d.plan || !onLoadPlan}
-                  >
-                    {/* Vignette discrète du plan (quand il en a une) pour distinguer les
-                        échéances entre plusieurs plans d'un coup d'œil, sans avoir à lire le
-                        nom en entier — même logique que les aperçus de plans des cartes
-                        d'espace juste au-dessus. */}
-                    <span className="dashboard-deadline-thumb">
-                      {d.coverImage
-                        ? <img src={d.coverImage} alt="" />
-                        : <span className="dashboard-deadline-thumb-fallback" aria-hidden="true" />}
-                    </span>
-                    <span className="dashboard-deadline-info">
-                      <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
-                      <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>
-                      {/* Date exacte, pour s'y référer directement sur le calendrier
-                          au-dessus — le badge "Dans X jours" seul ne dit pas quel jour. */}
-                      <span className="dashboard-deadline-date">{deadlineDateLabel(d.date)}</span>
-                    </span>
-                    <span className={`dashboard-deadline-when is-${deadlineUrgency(d.date)}`}>{deadlineWhen(d.date)}</span>
-                  </button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
       </div>
       </div>
     </div>

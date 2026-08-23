@@ -226,6 +226,14 @@ export function IconHelpCircle(props) {
   )
 }
 
+export function IconCheck(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M5 12l5 5L19 7" />
+    </svg>
+  )
+}
+
 export function IconCheckCircle(props) {
   return (
     <svg {...base} {...props}>
