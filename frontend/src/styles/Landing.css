@@ -511,19 +511,26 @@
 /* Benchmark marché : 3 catégories d'outils existantes + VelocityLaunch, qui combine les
    trois. La carte VelocityLaunch se distingue par le dégradé de marque au lieu du fond uni
    des autres — elle conclut la comparaison, pas une 4e catégorie parmi d'autres. */
+/* Sans padding horizontal propre, cette section touchait les deux bords de la fenêtre sur
+   grand écran (retour utilisateur) — les autres sections (.features-section etc.) ont
+   toutes leur propre padding, celle-ci n'en avait jamais eu. */
+.positioning-section {
+  padding: 6rem 2rem;
+}
+
 .positioning-grid {
-  max-width: 1400px;
+  max-width: 1320px;
   margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
 }
 
 .positioning-card {
   background: var(--color-bg-tertiary);
   border: 1px solid rgba(145, 132, 217, 0.15);
   border-radius: var(--border-radius-sm);
-  padding: 1.75rem;
+  padding: 1.5rem;
 }
 
 .positioning-card h3 {

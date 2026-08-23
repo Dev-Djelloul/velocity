@@ -23,7 +23,7 @@ export const landingTranslations = {
     },
     positioning: {
       title: 'Trois catégories d\'outils. Une seule vous couvre entièrement.',
-      subtitle: 'Le marché des générateurs de plan par IA existe déjà — mais chaque catégorie ne couvre qu\'un tiers du travail réel de lancement.',
+      subtitle: 'Chaque catégorie d\'outils ne couvre qu\'un tiers du travail réel de lancement — VelocityLaunch est le seul à réunir les trois dans un plan unique généré par IA.',
       categories: [
         {
           label: 'Générateurs de business plan',
@@ -166,7 +166,7 @@ export const landingTranslations = {
     },
     positioning: {
       title: 'Three categories of tools. One that covers you entirely.',
-      subtitle: 'The market for AI-generated launch plans already exists — but each category only covers a third of the real launch work.',
+      subtitle: 'Each category of tools only covers a third of the real launch work — VelocityLaunch is the only one to bring all three together in a single AI-generated plan.',
       categories: [
         {
           label: 'Business plan generators',
