@@ -804,8 +804,12 @@
   transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.15s ease;
 }
 
+/* Agrandie à la moitié de la largeur de la carte (30% avant) — demandé explicitement,
+   même proportion que la miniature de "Mes plans" (PlansHistory.css). S'applique aux
+   trois cartes qui partagent cette classe : espace personnel, espaces d'équipe et
+   "Créer une équipe". */
 .dashboard-space-card-media {
-  flex: 0 0 30%;
+  flex: 0 0 50%;
   min-width: 86px;
   position: relative;
   overflow: hidden;
@@ -1260,8 +1264,9 @@
   position: relative;
   aspect-ratio: 1;
   border: none;
-  border-radius: 6px;
-  overflow: hidden;
+  /* Pas de overflow:hidden ici : ça rognerait aussi l'infobulle ".avatar-tooltip" (nom du
+     plan au survol, retour utilisateur), positionnée au-dessus de ce même bouton — les
+     coins arrondis et le recadrage de l'image passent par l'<img> ci-dessous à la place. */
   padding: 0;
   cursor: pointer;
   transition: transform 0.15s ease;
@@ -1276,4 +1281,5 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  border-radius: 6px;
 }
