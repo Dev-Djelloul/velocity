@@ -104,13 +104,26 @@ function isoDatePlusWeeks(baseIso, weeks) {
 async function ensureMilestone(accessToken, owner, repo, title, hiddenKey, dueOn, cache) {
   if (cache.has(hiddenKey)) return cache.get(hiddenKey)
   const list = await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones?state=all&per_page=100`)
-  const existing = list.ok ? (await list.json()).find(m => (m.description || '').includes(hiddenKey)) : null
+  const all = list.ok ? await list.json() : []
   const dueOnIso = dueOn ? `${dueOn}T00:00:00Z` : undefined
+
+  let existing = all.find(m => (m.description || '').includes(hiddenKey))
+  // Milestone créé AVANT cet identifiant caché (aucune description "vl-sprint:…") : on
+  // l'adopte au lieu d'en créer un nouveau — GitHub refuse deux milestones au même titre
+  // dans un dépôt, donc sans cette adoption la création échouait silencieusement à chaque
+  // sync et la date ne se posait jamais sur le "Sprint N" réellement utilisé par les issues
+  // (retour utilisateur, capture à l'appui : "No due date" malgré le correctif).
+  const legacy = !existing && all.find(m => m.title === title && !(m.description || '').startsWith('vl-sprint:'))
+  if (legacy) existing = legacy
+
   if (existing) {
-    if (dueOnIso && existing.due_on !== dueOnIso) {
+    const patch = {}
+    if (existing.description !== hiddenKey) patch.description = hiddenKey
+    if (dueOnIso && existing.due_on !== dueOnIso) patch.due_on = dueOnIso
+    if (Object.keys(patch).length) {
       await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones/${existing.number}`, {
         method: 'PATCH',
-        body: JSON.stringify({ due_on: dueOnIso })
+        body: JSON.stringify(patch)
       }).catch(() => {})
     }
     cache.set(hiddenKey, existing.number)
@@ -192,7 +205,12 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
         ...(milestoneNumber ? { milestone: milestoneNumber } : {})
       }
 
-      const existingNumber = managed[vlId]
+      // Repli sur l'ancien label non préfixé (managed[story.id]) : une issue déjà
+      // synchronisée AVANT ce correctif porte encore "vl-id:US-003" sans planScope — sans ce
+      // repli, le nouveau label recherché ne la retrouverait jamais et une issue en double
+      // serait créée à chaque resync (retour utilisateur, capture à l'appui). Le PATCH
+      // ci-dessous pose le nouveau label scopé dessus, migrant l'issue au passage.
+      const existingNumber = managed[vlId] ?? managed[story.id]
       if (existingNumber) {
         const res = await ghFetch(accessToken, `/repos/${owner}/${repo}/issues/${existingNumber}`, {
           method: 'PATCH',
