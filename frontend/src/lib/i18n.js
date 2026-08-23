@@ -327,7 +327,7 @@ export const translations = {
       costSplit: 'Répartition des coûts',
       overallProgress: 'Avancement global',
       storiesCompleted: (done, inProgress, total) => inProgress
-        ? `${done}/${total} terminées · ${inProgress} en cours`
+        ? `${done}/${total} stories terminées · ${inProgress} en cours`
         : `${done}/${total} stories terminées`,
       total: 'Total',
       totalEffort: 'Effort total',
@@ -2043,7 +2043,7 @@ export const translations = {
       costSplit: 'Cost split',
       overallProgress: 'Overall progress',
       storiesCompleted: (done, inProgress, total) => inProgress
-        ? `${done}/${total} done · ${inProgress} in progress`
+        ? `${done}/${total} stories done · ${inProgress} in progress`
         : `${done}/${total} stories completed`,
       total: 'Total',
       totalEffort: 'Total effort',

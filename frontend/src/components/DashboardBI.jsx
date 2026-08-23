@@ -179,17 +179,6 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
           )
         })()}
 
-        {workloadSegments.length > 0 && (
-          <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.workloadByRole')}</h4>
-            <Donut
-              segments={workloadSegments}
-              centerValue={`${Object.values(workloadMap).reduce((a, b) => a + b, 0)}pts`}
-              centerLabel={t(lang, 'dashboardBi.totalEffort')}
-            />
-          </div>
-        )}
-
         {financials && (
           <div className="dashboard-bi-tile">
             <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
@@ -208,6 +197,17 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
               segments={budgetSegments}
               centerValue={formatMoney(marketing.totalBudget)}
               centerLabel={t(lang, 'dashboardBi.total')}
+            />
+          </div>
+        )}
+
+        {workloadSegments.length > 0 && (
+          <div className="dashboard-bi-tile dashboard-bi-tile-full">
+            <h4>{t(lang, 'dashboardBi.workloadByRole')}</h4>
+            <Donut
+              segments={workloadSegments}
+              centerValue={`${workloadSegments.reduce((s, seg) => s + seg.value, 0)}pts`}
+              centerLabel={t(lang, 'dashboardBi.totalEffort')}
             />
           </div>
         )}
