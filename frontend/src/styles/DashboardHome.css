@@ -372,6 +372,31 @@
   font-style: italic;
 }
 
+/* Détail du calcul en puces (Santé du portefeuille, Moyen/Grand) — plus explicite qu'une
+   phrase dense pour expliquer le plafonnement et l'attribution des points par catégorie
+   (retour utilisateur). */
+.dashboard-widget-method-title {
+  margin: 0.4rem 0 0.2rem;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.dashboard-widget-method-list {
+  margin: 0;
+  padding-left: 1rem;
+  list-style: disc;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.dashboard-widget-method-list li {
+  font-size: 0.66rem;
+  line-height: 1.4;
+  color: var(--color-text-muted, #9ca3af);
+}
+
 /* Ventilation "Par plan" du widget Santé du portefeuille (Moyen/Grand) — même recette
    visuelle que .dashboard-history-row (ligne cliquable, nom tronqué proprement). */
 .dashboard-widget-subhead {
@@ -664,6 +689,11 @@
   margin: 0;
   font-size: 0.85rem;
   font-weight: 700;
+}
+
+.dashboard-widget-header-hint {
+  cursor: help;
+  opacity: 0.6;
 }
 
 .dashboard-widget-card h3 {

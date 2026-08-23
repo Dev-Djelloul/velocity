@@ -884,6 +884,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Santé du portefeuille : icône d\'aide sur le titre, détail du calcul en puces',
+            items: [
+              'Ajoute une icône "?" à côté du titre "Santé du portefeuille" (visible à toutes les tailles, contrairement à la légende détaillée réservée à Moyen/Grand) : survole-la pour voir la formule complète en une phrase',
+              'En taille Moyen/Grand, le détail du calcul passe d\'une phrase dense à 3 puces claires : score de base, pénalité par échéance urgente (et son plafond), pénalité par échéance proche (et son plafond)'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Santé du portefeuille simplifiée : pénalité fixe plafonnée, plus de proportionnalité',
             items: [
               'Retire la pénalité proportionnelle au nombre de plans (jugée trop difficile à suivre) : chaque échéance urgente coûte maintenant 10 pts fixes (plafonné à -30 au total), chaque échéance proche 4 pts fixes (plafonné à -15) — plus simple à vérifier soi-même',
@@ -1783,6 +1791,12 @@ export const translations = {
       portfolioHealthTitle: 'Santé du portefeuille',
       portfolioHealthLevel: { good: 'Au beau fixe', medium: 'À surveiller', low: 'Attention requise' },
       portfolioHealthExplain: 'Score = % de stories terminées, moins 10 pts par échéance urgente (max -30) et 4 pts par échéance proche (max -15).',
+      portfolioHealthRules: {
+        base: 'Score de base = % de stories terminées',
+        urgent: '−10 pts par échéance urgente (≤ 1 jour), plafonné à −30 pts au total',
+        soon: '−4 pts par échéance proche (2-7 jours), plafonné à −15 pts au total'
+      },
+      portfolioHealthRulesTitle: 'Comment le score est calculé',
       portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
         const parts = [`${doneRatio}% des stories sont terminées.`]
         if (urgentPenalty > 0) parts.push(`${urgentCount} échéance${urgentCount > 1 ? 's' : ''} urgente${urgentCount > 1 ? 's' : ''} (-${urgentPenalty} pts).`)
@@ -2925,6 +2939,14 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Portfolio health: help icon on the title, calculation detail as bullet points',
+            items: [
+              'Added a "?" icon next to the "Portfolio health" title (visible at every size, unlike the detailed legend reserved for Medium/Large): hover it for the full formula in one sentence',
+              'At Medium/Large size, the calculation detail moves from a dense sentence to 3 clear bullet points: base score, urgent-deadline penalty (and its cap), upcoming-deadline penalty (and its cap)'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Portfolio health simplified: flat capped penalty, no more proportionality',
             items: [
               'Removed the penalty scaled to your number of plans (found too hard to follow): each urgent deadline now costs a flat 10 pts (capped at -30 total), each upcoming deadline a flat 4 pts (capped at -15) — easier to verify by hand',
@@ -3814,6 +3836,12 @@ export const translations = {
       portfolioHealthTitle: 'Portfolio health',
       portfolioHealthLevel: { good: 'Smooth sailing', medium: 'Worth watching', low: 'Needs attention' },
       portfolioHealthExplain: 'Score = % of stories done, minus 10 pts per urgent deadline (max -30) and 4 pts per upcoming deadline (max -15).',
+      portfolioHealthRules: {
+        base: 'Base score = % of stories done',
+        urgent: '−10 pts per urgent deadline (≤ 1 day), capped at −30 pts total',
+        soon: '−4 pts per upcoming deadline (2-7 days), capped at −15 pts total'
+      },
+      portfolioHealthRulesTitle: 'How the score is calculated',
       portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
         const parts = [`${doneRatio}% of stories are done.`]
         if (urgentPenalty > 0) parts.push(`${urgentCount} urgent deadline${urgentCount > 1 ? 's' : ''} (-${urgentPenalty} pts).`)

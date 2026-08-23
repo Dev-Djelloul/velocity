@@ -604,6 +604,11 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   <div className="dashboard-widget-header">
                     {gradientIcon(<IconGauge width={16} height={16} />)}
                     <h3>{t(lang, 'dashboard.portfolioHealthTitle')}</h3>
+                    {/* Visible à TOUTES les tailles (contrairement à la légende détaillée,
+                        réservée à Moyen/Grand faute de place) — retour utilisateur : "il
+                        faut expliciter le plafonnement et l'attribution des points" même
+                        en taille Petit. */}
+                    <IconHelpCircle width={12} height={12} className="dashboard-widget-header-hint" title={t(lang, 'dashboard.portfolioHealthExplain')} />
                   </div>
                   <div className={`dashboard-health-gauge is-${portfolioHealth.level}`}>
                     <svg viewBox="0 0 100 56" className="dashboard-health-gauge-svg">
@@ -692,7 +697,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                         <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-good" />{t(lang, 'dashboard.portfolioHealthLegend.good')}</div>
                         <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-medium" />{t(lang, 'dashboard.portfolioHealthLegend.medium')}</div>
                         <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-low" />{t(lang, 'dashboard.portfolioHealthLegend.low')}</div>
-                        <p className="dashboard-widget-method">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+                        {/* Détail du calcul en 3 puces plutôt qu'une phrase dense — retour
+                            utilisateur : "expliciter le plafonnement et l'attribution des
+                            points" pour comprendre le calcul, pas juste le résumer en une
+                            ligne. */}
+                        <p className="dashboard-widget-method-title">{t(lang, 'dashboard.portfolioHealthRulesTitle')}</p>
+                        <ul className="dashboard-widget-method-list">
+                          <li>{t(lang, 'dashboard.portfolioHealthRules.base')}</li>
+                          <li>{t(lang, 'dashboard.portfolioHealthRules.urgent')}</li>
+                          <li>{t(lang, 'dashboard.portfolioHealthRules.soon')}</li>
+                        </ul>
                       </div>
                     </>
                   )}
