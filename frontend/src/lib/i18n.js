@@ -1753,12 +1753,12 @@ export const translations = {
       streakExplain: 'Un jour compte dès qu\'un plan a été créé, sauvegardé ou modifié — pas juste ouvert l\'app. Basé sur les dates des plans (serveur) : identique sur tous tes appareils.',
       streakEmpty: 'Crée ou modifie un plan pour démarrer ton streak.',
       streakBest: (n) => `Record : ${n === 1 ? '1 jour' : `${n} jours`}`,
-      streakTierLabel: { none: '', warm: '', hot: 'En feu 🔥', blazing: 'Imparable ⚡' },
+      streakTierLabel: { none: '', warm: '', hot: 'En feu 🔥', blazing: 'Imparable ⚡️' },
       streakTierLegend: {
         none: '0 jour — aucune activité récente',
         warm: '1-6 jours',
-        hot: '7-29 jours — en feu',
-        blazing: '30 jours et plus — imparable'
+        hot: '7-29 jours — en feu 🔥',
+        blazing: '30 jours et plus — imparable ⚡️'
       },
       businessWeatherTitle: 'Météo business',
       businessWeatherExplain: 'Reprend le score de Santé du portefeuille et le compare à celui d\'il y a environ 7 jours (mesuré sur cet appareil).',
@@ -3733,12 +3733,12 @@ export const translations = {
       streakExplain: 'A day counts once a plan has been created, saved, or edited — not just opening the app. Based on plan dates (server-side): the same across all your devices.',
       streakEmpty: 'Create or edit a plan to start your streak.',
       streakBest: (n) => `Best: ${n === 1 ? '1 day' : `${n} days`}`,
-      streakTierLabel: { none: '', warm: '', hot: 'On fire 🔥', blazing: 'Unstoppable ⚡' },
+      streakTierLabel: { none: '', warm: '', hot: 'On fire 🔥', blazing: 'Unstoppable ⚡️' },
       streakTierLegend: {
         none: '0 days — no recent activity',
         warm: '1-6 days',
-        hot: '7-29 days — on fire',
-        blazing: '30+ days — unstoppable'
+        hot: '7-29 days — on fire 🔥',
+        blazing: '30+ days — unstoppable ⚡️'
       },
       businessWeatherTitle: 'Business weather',
       businessWeatherExplain: 'Reuses the Portfolio health score and compares it to about 7 days ago (measured on this device).',
