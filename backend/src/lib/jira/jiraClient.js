@@ -543,8 +543,13 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
     if (boardId) {
       const existingSprints = await fetchExistingSprints(accessToken, cloudId, boardId)
       for (const sprint of plan.roadmap?.sprints || []) {
-        const keys = storyKeysBySprint[sprint.sprintId] || []
-        if (!keys.length) continue
+        const storyKeys = storyKeysBySprint[sprint.sprintId] || []
+        // L'Epic de la phase couvre exactement ce sprint (une phase = un sprint dans ce
+        // modèle) — on l'ajoute aussi au sprint, pas seulement ses stories enfants, sinon
+        // son propre panneau de détail affiche "Sprint : Aucun" (retour utilisateur, capture
+        // à l'appui) alors que toutes ses stories y sont bien affectées.
+        const epicKey = epicKeyBySprint[sprint.sprintId]
+        if (!storyKeys.length && !epicKey) continue
         // Nom conventionnel "Sprint N" (retour utilisateur : préfère ça à "Nom du plan ·
         // Phase N") — l'unicité entre plans repose sur le "goal" caché (vl-sprint:<planScope>-N),
         // jamais affiché dans le backlog, voir fetchExistingSprints ci-dessus.
@@ -552,7 +557,14 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
         const sprintGoal = `vl-sprint:${planScope}-${sprint.sprintId}`
         let sprintId = existingSprints[sprintGoal]
         if (!sprintId) sprintId = await createSprint(accessToken, cloudId, boardId, sprintName, sprintGoal, sprintStart(sprint.sprintId), sprintDue(sprint.sprintId))
-        if (sprintId) await addIssuesToSprint(accessToken, cloudId, sprintId, keys)
+        if (!sprintId) continue
+        // Épic et stories affectées en deux appels séparés : certains projets refusent
+        // d'ajouter une Epic à un sprint (comportement historique des projets "classiques"),
+        // et un lot mixte pourrait faire échouer l'affectation des stories aussi si l'API
+        // rejette le lot entier à cause de l'Epic — on isole donc l'Epic (best-effort) pour
+        // ne jamais bloquer l'affectation des stories, qui est la plus importante des deux.
+        if (epicKey) await addIssuesToSprint(accessToken, cloudId, sprintId, [epicKey])
+        if (storyKeys.length) await addIssuesToSprint(accessToken, cloudId, sprintId, storyKeys)
       }
     }
   } catch { /* API Agile indisponible : on garde le regroupement Epic + label existant */ }
