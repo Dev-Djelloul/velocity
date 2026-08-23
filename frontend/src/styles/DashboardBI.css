@@ -87,7 +87,10 @@
 .card-help-popover {
   position: absolute;
   top: calc(100% + 8px);
-  left: 0;
+  /* Ancré à droite (s'ouvre vers la gauche) plutôt qu'à gauche de l'icône — retour
+     utilisateur : sur la carte la plus à droite d'une ligne (ex: "Répartition des coûts"),
+     un ancrage à gauche poussait le popover hors de l'écran à droite. */
+  right: 0;
   width: 220px;
   max-width: 80vw;
   padding: 8px 10px;
