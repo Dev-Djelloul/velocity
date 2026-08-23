@@ -41,6 +41,23 @@
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
+.fin-report-export-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.fin-report-export-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.fin-report-export-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
 /* Bandeau des trois montants clés — même dégradé de bordure que les cartes "actives"
    ailleurs dans l'app (espace ACTUEL, plan VelocityLaunch de la landing), pour signaler
    que c'est le résumé exécutif du rapport. */

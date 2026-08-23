@@ -1180,6 +1180,7 @@ export default function App() {
           <PlanFinancialReportPage
             plan={plan}
             lang={lang}
+            userId={userId}
             onBack={() => { setCurrentPage('result'); window.scrollTo(0, 0) }}
           />
         )}

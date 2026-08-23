@@ -1599,7 +1599,10 @@ export const translations = {
       costBreakdownSubtitle: 'Part de chaque poste dans la dépense mensuelle',
       monthShort: (n) => `Mois ${n}`,
       cashLegendRemaining: 'Trésorerie restante',
-      cashLegendBurn: (amount) => `Dépense mensuelle : ${amount}`
+      cashLegendBurn: (amount) => `Dépense mensuelle : ${amount}`,
+      exportPdf: 'Exporter en PDF',
+      exportDocx: 'Exporter en Word',
+      exporting: 'Génération…'
     },
     planVersions: {
       back: 'Retour au plan',
@@ -3355,7 +3358,10 @@ export const translations = {
       costBreakdownSubtitle: 'Share of each category in the monthly spend',
       monthShort: (n) => `Month ${n}`,
       cashLegendRemaining: 'Remaining cash',
-      cashLegendBurn: (amount) => `Monthly burn: ${amount}`
+      cashLegendBurn: (amount) => `Monthly burn: ${amount}`,
+      exportPdf: 'Export as PDF',
+      exportDocx: 'Export as Word',
+      exporting: 'Generating…'
     },
     planVersions: {
       back: 'Back to plan',

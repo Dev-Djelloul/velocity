@@ -2,7 +2,9 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { formatMoney } from '../lib/currency'
 import { resolveBudgetAmount } from '../lib/budgetTiers'
-import { IconArrowLeft, IconCoin, IconTrendingUp, IconTarget, IconAlertTriangle } from './Icons'
+import { IconArrowLeft, IconCoin, IconTrendingUp, IconTarget, IconAlertTriangle, IconDownload } from './Icons'
+import { getExportBranding } from '../lib/exportBranding'
+import { exportFinancialReportPdf, exportFinancialReportDocx } from '../lib/financialReportExport'
 import financialReportBackground from '../../assets/img/financial-plan-velocity.webp'
 import '../styles/TeamPage.css'
 import '../styles/PlanVersionsPage.css'
@@ -30,9 +32,19 @@ function donutWedgePath(cx, cy, rOuter, rInner, startAngle, endAngle) {
 // répartition des coûts en camembert), pas juste une reprise de FinancialsCard telle
 // quelle. Ouverte depuis "Budget cumulé" (espace d'équipe, voir SpacePage.jsx) via
 // App.jsx (handleOpenFinancialReport), même mécanisme que "Bibliothèque de versions".
-export default function PlanFinancialReportPage({ plan, lang, onBack }) {
+export default function PlanFinancialReportPage({ plan, lang, userId, onBack }) {
   const [hoverCash, setHoverCash] = useState(null)
   const [hoverWedge, setHoverWedge] = useState(null)
+  const [exporting, setExporting] = useState(null)
+
+  const runExport = async (kind, fn) => {
+    setExporting(kind)
+    try {
+      await fn(plan, lang, getExportBranding(userId))
+    } finally {
+      setExporting(null)
+    }
+  }
 
   const financials = plan?.financials
   const launchBudget = plan?.resources?.totalBudget ? resolveBudgetAmount(plan.resources.totalBudget) : 0
@@ -98,6 +110,24 @@ export default function PlanFinancialReportPage({ plan, lang, onBack }) {
                   {plan?.market?.b2bVsB2c && ` · ${t(lang, 'market.b2bVsB2cOptions')[plan.market.b2bVsB2c] || plan.market.b2bVsB2c}`}
                 </p>
               </div>
+            </div>
+            <div className="fin-report-export-actions">
+              <button
+                className="btn-secondary fin-report-export-btn"
+                onClick={() => runExport('pdf', exportFinancialReportPdf)}
+                disabled={!!exporting}
+              >
+                <IconDownload width={15} height={15} />
+                {exporting === 'pdf' ? t(lang, 'planFinancialReport.exporting') : t(lang, 'planFinancialReport.exportPdf')}
+              </button>
+              <button
+                className="btn-secondary fin-report-export-btn"
+                onClick={() => runExport('docx', exportFinancialReportDocx)}
+                disabled={!!exporting}
+              >
+                <IconDownload width={15} height={15} />
+                {exporting === 'docx' ? t(lang, 'planFinancialReport.exporting') : t(lang, 'planFinancialReport.exportDocx')}
+              </button>
             </div>
           </div>
 
