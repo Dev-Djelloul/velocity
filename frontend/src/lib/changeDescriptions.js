@@ -14,6 +14,7 @@ export const SECTION_LABELS = {
   roadmapAgents: { fr: 'Roadmap · Agents IA', en: 'Roadmap · AI agents' },
   roadmapCollab: { fr: 'Roadmap · Collaboration', en: 'Roadmap · Collaboration' },
   planStartDate: { fr: 'Date de démarrage', en: 'Start date' },
+  productName: { fr: 'Nom du plan', en: 'Plan name' },
   kpis: { fr: 'KPIs', en: 'KPIs' },
   metrics: { fr: 'Suivi post-lancement', en: 'Post-launch tracking' },
   launchDate: { fr: 'Date de lancement', en: 'Launch date' },

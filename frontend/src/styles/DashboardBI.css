@@ -79,11 +79,17 @@
 /* Popover réel (pas juste un ::after sur :hover) : basculé au clic/tap, donc utilisable
    sur mobile où il n'y a pas de survol — le survol desktop reste possible en plus via
    :hover ci-dessous, en confort. */
+/* Ouvert vers le BAS (pas le haut) — retour utilisateur : "le hover ne fonctionne pas du
+   tout" venait en fait du popover qui s'ouvrait au-dessus de l'icône (bottom: 100%+8px) ;
+   pour "Avancement global", la toute première carte tout en haut de la page, ça le
+   poussait hors écran (ou sous le header fixe) sur mobile, où il n'y avait tout simplement
+   pas la place au-dessus. */
 .card-help-popover {
   position: absolute;
-  bottom: calc(100% + 8px);
+  top: calc(100% + 8px);
   left: 0;
   width: 220px;
+  max-width: 80vw;
   padding: 8px 10px;
   border-radius: 8px;
   border: 1px solid rgba(145, 132, 217, 0.25);

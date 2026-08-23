@@ -39,7 +39,7 @@ import { useAuth, useUser, useTeam } from '../lib/auth'
 import { t } from '../lib/i18n'
 import { formatFullDateTime, formatDateNumeric } from '../lib/dateFormat'
 import { diffRoadmapItems, diffKpiItems, describeDateChange, describeMetricsChange, sectionLabel } from '../lib/changeDescriptions'
-import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconImage, IconPlus, IconDroplet, IconX, IconCalendar } from './Icons'
+import { IconSparkle, IconCopy, IconCheckCircle, IconRocket, IconClock, IconCreditCard, IconMegaphone, IconUser, IconCompass, IconSave, IconAlertTriangle, IconImage, IconPlus, IconDroplet, IconX, IconCalendar, IconPencil } from './Icons'
 import '../styles/PlanViewer.css'
 import '../styles/PlanSidebar.css'
 
@@ -415,6 +415,30 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
     const nextIso = dateStr + 'T00:00:00Z'
     markChanged('launchDate', 'launchDate', describeDateChange(plan.launchDate, nextIso, lang))
     setPlan(p => ({ ...p, launchDate: nextIso }))
+  }
+
+  // Le nom du plan (plan.product.name) est lu partout ailleurs dans l'app — cartes du
+  // Dashboard, Historique, Galerie, échéances du calendrier — à partir de ce même objet
+  // plan stocké : le renommer ici et enregistrer suffit à le propager, pas besoin de
+  // toucher chaque page une par une.
+  const updateProductName = (nextName) => {
+    const trimmed = nextName.trim()
+    if (!trimmed || trimmed === plan.product?.name) return
+    markChanged('productName', 'productName', `${plan.product?.name || ''} → ${trimmed}`)
+    setPlan(p => ({ ...p, product: { ...p.product, name: trimmed } }))
+  }
+
+  const [editingName, setEditingName] = useState(false)
+  const [nameDraft, setNameDraft] = useState('')
+
+  const startEditName = () => {
+    setNameDraft(plan.product?.name || '')
+    setEditingName(true)
+  }
+
+  const commitEditName = () => {
+    updateProductName(nameDraft)
+    setEditingName(false)
   }
 
   // Veille/benchmarks/éditorial/pub/RGPD sont régénérés en bloc par un agent IA (pas
@@ -844,7 +868,24 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
       <div className="plan-header card">
         <div className="plan-header-main">
           <div className="plan-header-top">
-            <h2>{plan.product?.name}</h2>
+            {editingName ? (
+              <input
+                className="plan-header-name-input"
+                value={nameDraft}
+                autoFocus
+                onChange={(e) => setNameDraft(e.target.value)}
+                onBlur={commitEditName}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') { e.preventDefault(); commitEditName() }
+                  if (e.key === 'Escape') { e.preventDefault(); setEditingName(false) }
+                }}
+              />
+            ) : (
+              <h2 className={readOnly ? '' : 'plan-header-name-editable'} onClick={readOnly ? undefined : startEditName}>
+                {plan.product?.name}
+                {!readOnly && <IconPencil width={13} height={13} className="plan-header-name-pencil" />}
+              </h2>
+            )}
             <div className="plan-badges">
               {plan.classification && (
                 <span className="plan-badge plan-badge-accent plan-stat-tooltip" data-tooltip={t(lang, 'resources.classificationHelp')}>

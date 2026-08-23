@@ -209,6 +209,40 @@
 
 .plan-header h2 { color: var(--color-text-primary); margin: 0; }
 
+/* Titre renommable directement depuis la carte d'identité — le nom (plan.product.name)
+   est lu depuis ce même objet plan partout ailleurs (cartes du Dashboard, Historique,
+   Galerie, échéances) : le modifier ici et enregistrer suffit à le propager, retour
+   utilisateur. */
+.plan-header-name-editable {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+}
+
+.plan-header-name-pencil {
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.plan-header-name-editable:hover .plan-header-name-pencil {
+  opacity: 1;
+}
+
+.plan-header-name-input {
+  font-family: inherit;
+  font-size: var(--font-size-lg, 1.4rem);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  background: var(--color-bg-tertiary);
+  border: 1.5px solid var(--color-accent);
+  border-radius: 6px;
+  padding: 0.1rem 0.5rem;
+  max-width: 100%;
+}
+
 .plan-badges {
   display: flex;
   align-items: center;
