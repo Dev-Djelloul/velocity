@@ -247,20 +247,29 @@
    visiblement inégales côte à côte — chaque bouton remplit maintenant sa colonne. */
 .gtm-actions {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 0.6rem;
   padding-top: 0.6rem;
   border-top: 1px solid rgba(145, 132, 217, 0.1);
 }
 
 .gtm-actions > button {
+  /* Le bouton est un enfant de grille avec min-width:auto par défaut, qui se calque sur la
+     largeur du texte en une seule ligne (btn-secondary force white-space: nowrap) — plus
+     longue que la colonne pour "Exporter pour Google Ads Editor", ça débordait par-dessus
+     les boutons voisins au lieu de passer à la ligne. min-width:0 + wrap corrige ça. */
   width: 100%;
+  min-width: 0;
   justify-content: center;
+  white-space: normal;
+  text-align: center;
+  line-height: 1.3;
 }
 
 .gtm-export-hint {
   color: var(--color-text-muted);
-  font-size: 0.72rem;
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
   margin-top: 0.5rem;
 }
 

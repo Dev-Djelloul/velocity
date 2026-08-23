@@ -437,6 +437,7 @@ export const translations = {
       exportPaidCsvHint: 'Un pense-bête à garder sous la main pendant la création manuelle de vos campagnes (ou à transmettre à qui les crée pour vous) — noms suggérés, dates et budgets déjà calculés. Pas un fichier d\'import automatique.',
       exportGoogleAds: 'Exporter pour Google Ads Editor',
       exportGoogleAdsHint: 'Fichier au format d\'import CSV de Google Ads Editor (campagnes créées en pause — à vérifier et activer vous-même). Ne contient que les campagnes dont le canal mentionne "Google".',
+      exportHintBoth: 'Deux exports, deux usages : le brief CSV est votre antisèche pour créer les campagnes vous-même (ou les confier à quelqu\'un) — noms, dates et budgets déjà calculés, prêts à copier-coller. Sur Google Ads en particulier ? Prenez plutôt "Exporter pour Google Ads Editor" : ce fichier-là s\'importe directement dans l\'outil et crée les campagnes pour vous, en pause, prêtes à vérifier puis activer.',
       totalPaidBudget: 'Budget média total',
       budgetDrift: (liveBudget) => `Le budget simulé dans « Stratégie Marketing » a changé (${liveBudget.toLocaleString()} €) — régénère pour l'appliquer ici.`
     },
@@ -2165,6 +2166,7 @@ export const translations = {
       exportPaidCsvHint: 'A cheat sheet to keep handy while manually creating your campaigns (or to hand off to whoever creates them for you) — suggested names, dates and budgets already worked out. Not an automatic import file.',
       exportGoogleAds: 'Export for Google Ads Editor',
       exportGoogleAdsHint: 'File in Google Ads Editor\'s CSV import format (campaigns created paused — review and enable them yourself). Only includes campaigns whose channel mentions "Google".',
+      exportHintBoth: 'Two exports, two jobs: the campaign brief CSV is your cheat sheet for building campaigns yourself (or handing them off) — names, dates and budgets already worked out, ready to copy-paste. Running on Google Ads specifically? Grab "Export for Google Ads Editor" instead — that file imports straight into the tool and builds the campaigns for you, paused and ready to review before you flip them on.',
       totalPaidBudget: 'Total media budget',
       budgetDrift: (liveBudget) => `The simulated budget in "Marketing Strategy" has changed (${liveBudget.toLocaleString()} €) — regenerate to apply it here.`
     },

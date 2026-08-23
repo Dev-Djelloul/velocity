@@ -260,7 +260,7 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
               </button>
             )}
           </div>
-          {advertising && <p className="gtm-export-hint">{t(lang, 'gtm.exportPaidCsvHint')}</p>}
+          {advertising && <p className="gtm-export-hint">{t(lang, 'gtm.exportHintBoth')}</p>}
         </div>
       )}
     </div>
