@@ -670,7 +670,7 @@ export async function handleApi(request, env, url) {
     if (!token.project_key) return json({ needsProject: true })
     try {
       const accessToken = await jira.ensureAccessToken(env, userId, token)
-      const result = await jira.exportPlanToJira(accessToken, token, plan, lang || 'fr')
+      const result = await jira.exportPlanToJira(accessToken, token, plan, lang || 'fr', env)
       return json(result)
     } catch {
       return json({ error: 'jira_export_failed' }, 500)
@@ -738,7 +738,7 @@ export async function handleApi(request, env, url) {
     if (!token) return json({ needsAuth: true })
     if (!token.team_id) return json({ needsProject: true })
     try {
-      const result = await linear.exportPlanToLinear(token.api_key, token, plan, lang || 'fr')
+      const result = await linear.exportPlanToLinear(token.api_key, token, plan, lang || 'fr', env)
       return json(result)
     } catch {
       return json({ error: 'linear_export_failed' }, 500)

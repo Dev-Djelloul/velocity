@@ -2,6 +2,8 @@
 // l'utilisateur colle sa propre clé API personnelle (Settings > API > Personal API keys
 // côté Linear), envoyée telle quelle en header Authorization (pas de préfixe "Bearer",
 // contrairement à la plupart des API REST).
+import { getUserEmail } from '../clerk'
+
 const API_URL = 'https://api.linear.app/graphql'
 
 async function graphql(apiKey, query, variables) {
@@ -35,6 +37,18 @@ export async function listTeams(apiKey) {
 async function getOrganizationUrlKey(apiKey) {
   const data = await graphql(apiKey, 'query { organization { urlKey } }')
   return data.organization?.urlKey || null
+}
+
+// id Linear correspondant à un email — pour assigner l'issue au vrai membre d'équipe
+// choisi dans le Backlog (story.assignedToId, un id Clerk résolu en email par l'appelant).
+// Best-effort : la personne peut ne pas avoir de compte sur cette instance Linear.
+async function findUserIdByEmail(apiKey, email) {
+  try {
+    const data = await graphql(apiKey,
+      `query($email: String!) { users(filter: { email: { eq: $email } }, first: 1) { nodes { id } } }`,
+      { email })
+    return data.users?.nodes?.[0]?.id || null
+  } catch { return null }
 }
 
 async function getTeamStates(apiKey, teamId) {
@@ -122,12 +136,27 @@ async function fetchManagedIssues(apiKey, teamId) {
 // Exporte le plan comme issues Linear plates (pas d'équivalent Epic manipulable par API
 // dans une équipe standard) : un label vl-sprint:N par phase joue le rôle de regroupement,
 // comme vl-sprint:N pour Jira. MVP volontairement simple (voir NEXT_FEATURES.md).
-export async function exportPlanToLinear(apiKey, target, plan, lang) {
+export async function exportPlanToLinear(apiKey, target, plan, lang, env) {
   const { team_id: teamId, team_key: teamKey } = target
   const [states, orgUrlKey] = await Promise.all([
     getTeamStates(apiKey, teamId),
     getOrganizationUrlKey(apiKey).catch(() => null)
   ])
+
+  // Cache Clerk userId -> id Linear (ou null si introuvable) — voir resolveAssigneeAccountId
+  // dans jiraClient.js pour la même idée : plusieurs stories partagent souvent le même
+  // assigné, éviter de refaire Clerk + Linear à chaque story. Contrairement à Jira, aucun
+  // repli "assigner à l'auteur·e de l'export" n'existait avant ce correctif (retour
+  // utilisateur : "l'assignation à une personne" n'était jamais envoyée à Linear).
+  const assigneeIdCache = new Map()
+  async function resolveAssigneeId(story) {
+    if (!story.assignedToId || !env) return null
+    if (assigneeIdCache.has(story.assignedToId)) return assigneeIdCache.get(story.assignedToId)
+    const email = await getUserEmail(env, story.assignedToId)
+    const linearUserId = email ? await findUserIdByEmail(apiKey, email) : null
+    assigneeIdCache.set(story.assignedToId, linearUserId)
+    return linearUserId
+  }
 
   // planScope distingue CE plan dans le label vl-id: (voir plus bas) — sans lui, deux plans
   // différents dont les stories repartent toutes deux à "US-001" (voir roadmapGenerator.js)
@@ -159,13 +188,15 @@ export async function exportPlanToLinear(apiKey, target, plan, lang) {
       ]
       const labelIds = [labelIdByName.velocitylaunch, labelIdByName[vlLabel], sprintLabelId].filter(Boolean)
       const state = pickState(states, story.status)
+      const assigneeId = await resolveAssigneeId(story)
 
       const fields = {
         title: `${story.id}: ${story.title}`.slice(0, 255),
         description: descParts.join(''),
         priority: priorityForSprint(sprint.sprintId),
         labelIds,
-        ...(state ? { stateId: state.id } : {})
+        ...(state ? { stateId: state.id } : {}),
+        ...(assigneeId ? { assigneeId } : {})
       }
 
       const existing = managed[vlLabel]

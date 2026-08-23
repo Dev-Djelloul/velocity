@@ -884,6 +884,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Export Jira/Linear : assigne le vrai membre d\'équipe choisi dans le Backlog',
+            items: [
+              'L\'export ne lisait jamais l\'assignation à une vraie personne faite dans le menu déroulant du Backlog — seul un rôle générique ("Dev", "Marketing"...) était mentionné en texte dans le ticket, et Jira assignait systématiquement l\'auteur·e de l\'export par défaut',
+              'Le ticket Jira/Linear est maintenant assigné à la vraie personne choisie dans le Backlog quand elle a un compte connu sur le site Jira / l\'équipe Linear (retrouvé par email via Clerk) — avec repli sur le comportement précédent si elle n\'a pas de compte ou qu\'aucune personne n\'a été choisie'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrige un bug important : l\'export Jira/Linear écrasait les tickets d\'un plan précédent',
             items: [
               'Cause trouvée : chaque plan généré repart de stories "US-001, US-002…" — l\'export Jira/Linear repérait les tickets déjà synchronisés uniquement par cet identifiant (pas par le plan), donc synchroniser un TOUT NOUVEAU plan mettait à jour (et écrasait) les tickets d\'un plan précédent partageant les mêmes numéros, au lieu d\'en créer de nouveaux',
@@ -2962,6 +2970,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Jira/Linear export: assigns the real team member chosen in the Backlog',
+            items: [
+              'The export never read the real-person assignment made in the Backlog\'s dropdown — only a generic role ("Dev", "Marketing"...) was mentioned as text in the ticket, and Jira always defaulted to assigning the export\'s author instead',
+              'The Jira/Linear ticket is now assigned to the actual person chosen in the Backlog when they have a known account on the Jira site / Linear team (matched by email via Clerk) — falling back to the previous behavior if they have no account or no one was chosen'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed a major bug: Jira/Linear export was overwriting a previous plan\'s tickets',

@@ -1,4 +1,5 @@
 import * as db from '../db'
+import { getUserEmail } from '../clerk'
 
 const AUTH_BASE = 'https://auth.atlassian.com'
 const API_BASE = 'https://api.atlassian.com'
@@ -82,12 +83,27 @@ export async function listProjects(accessToken, cloudId) {
 
 // --- Export ---
 
-// accountId de l'utilisateur connecté (pour l'auto-assignation).
+// accountId de l'utilisateur connecté (repli d'auto-assignation quand une story n'a pas
+// d'assigné réel choisi dans le Backlog — voir resolveAssigneeAccountId ci-dessous).
 async function getMyAccountId(accessToken, cloudId) {
   try {
     const res = await jiraFetch(accessToken, cloudId, '/myself')
     if (!res.ok) return null
     return (await res.json()).accountId || null
+  } catch { return null }
+}
+
+// accountId Jira correspondant à un email — pour assigner le ticket au vrai membre
+// d'équipe choisi dans le Backlog (story.assignedToId, un id Clerk résolu en email par
+// l'appelant), pas seulement à l'auteur·e du token OAuth. Best-effort : la personne peut
+// tout simplement ne pas avoir de compte Jira sur ce site.
+async function findAccountIdByEmail(accessToken, cloudId, email) {
+  try {
+    const res = await jiraFetch(accessToken, cloudId, `/user/search?query=${encodeURIComponent(email)}`)
+    if (!res.ok) return null
+    const users = await res.json()
+    const match = users.find(u => (u.emailAddress || '').toLowerCase() === email.toLowerCase()) || users[0]
+    return match?.accountId || null
   } catch { return null }
 }
 
@@ -221,11 +237,25 @@ function labelize(prefix, value) {
 }
 
 // Crée/met à jour les Epics (1/sprint) puis les Stories rattachées. Retourne la carte des liens.
-export async function exportPlanToJira(accessToken, target, plan, lang) {
+export async function exportPlanToJira(accessToken, target, plan, lang, env) {
   const { cloud_id: cloudId, site_url: siteUrl, project_key: projectKey } = target
   const { storyPoints: spField, startDate: startField } = await discoverFields(accessToken, cloudId)
   const managed = await fetchManagedIssues(accessToken, cloudId, projectKey)
   const myAccountId = await getMyAccountId(accessToken, cloudId)
+  // Cache Clerk userId -> accountId Jira (ou null si introuvable) : plusieurs stories
+  // partagent souvent le même assigné, pas besoin de refaire l'aller-retour Clerk + Jira
+  // à chaque fois. Repli sur myAccountId (l'auteur·e de l'export) quand story.assignedToId
+  // est absent (aucune personne choisie dans le Backlog) ou ne correspond à aucun compte
+  // Jira connu — comportement identique à avant pour ce cas-là.
+  const accountIdCache = new Map()
+  async function resolveAssigneeAccountId(story) {
+    if (!story.assignedToId || !env) return myAccountId
+    if (accountIdCache.has(story.assignedToId)) return accountIdCache.get(story.assignedToId) ?? myAccountId
+    const email = await getUserEmail(env, story.assignedToId)
+    const accountId = email ? await findAccountIdByEmail(accessToken, cloudId, email) : null
+    accountIdCache.set(story.assignedToId, accountId)
+    return accountId ?? myAccountId
+  }
   const base = plan.generatedAt
   // Identifiant qui distingue CE plan dans les labels vl-id:/vl-epic: (voir plus bas) —
   // plan.id peut être absent pour un plan pas encore sauvegardé au moins une fois (voir
@@ -311,7 +341,11 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
         priority: { name: priorityForSprint(sprint.sprintId) }
       }, sprint.sprintId)
       if (spField && Number.isFinite(story.effort)) baseFields[spField] = story.effort
-      if (myAccountId) baseFields.assignee = { accountId: myAccountId }
+      // Le vrai membre choisi dans le Backlog (story.assignedToId) plutôt que
+      // systématiquement l'auteur·e de l'export (retour utilisateur : l'assignation à une
+      // personne précise "n'était pas passée" malgré un choix fait dans le Backlog).
+      const assigneeAccountId = await resolveAssigneeAccountId(story)
+      if (assigneeAccountId) baseFields.assignee = { accountId: assigneeAccountId }
 
       const existing = managed[vlLabel]
       if (existing) {

@@ -76,3 +76,19 @@ export async function listOrganizationMembers(env, organizationId) {
 export async function deleteOrganization(env, organizationId) {
   await clerkRequest(env, `/organizations/${organizationId}`, { method: 'DELETE' })
 }
+
+// Email principal d'un utilisateur — nécessaire pour retrouver son compte Jira/Linear par
+// email lors d'un export (voir jiraClient.js/linearClient.js) : `story.assignedToId` (choisi
+// dans le menu déroulant du Backlog, voir BacklogCard.jsx) n'est qu'un id Clerk, jamais une
+// adresse email — celle-ci n'est exposée nulle part côté client (publicUserData/
+// listOrganizationMembers ci-dessus l'omettent volontairement, restriction Clerk), donc pas
+// d'autre choix que ce second appel à la Backend API. Best-effort : jamais bloquant pour
+// l'export si Clerk est indisponible ou l'utilisateur introuvable.
+export async function getUserEmail(env, userId) {
+  try {
+    const data = await clerkRequest(env, `/users/${userId}`)
+    const emails = data?.email_addresses || []
+    const primary = emails.find(e => e.id === data?.primary_email_address_id) || emails[0]
+    return primary?.email_address || null
+  } catch { return null }
+}
