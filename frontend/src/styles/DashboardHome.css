@@ -72,7 +72,9 @@
   /* Nette dans les deux thèmes désormais (plus de flou/assombrissement lourd réservé au
      mode sombre) — les cartes étant elles-mêmes translucides (verre dépoli), l'image
      mérite de rester lisible en dessous plutôt que d'être noyée sous un voile sombre. */
-  filter: brightness(0.85) saturate(1.05);
+  /* Nettement assombri (retour utilisateur) — les cartes du calendrier/échéances,
+     translucides, se détachent mal sur un fond encore assez lumineux. */
+  filter: brightness(0.35) saturate(1.05);
 }
 
 @media (max-width: 768px) {
@@ -220,7 +222,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 280px;
+  width: 340px;
   justify-self: end;
 }
 
@@ -286,15 +288,18 @@
 
 .dashboard-calendar-month {
   margin: 0;
-  font-size: 0.72rem;
+  font-size: 0.8rem;
   font-weight: 700;
   color: var(--color-text-primary);
   text-transform: capitalize;
+  white-space: nowrap;
 }
 
 .dashboard-calendar-nav {
   display: flex;
+  align-items: center;
   gap: 0.25rem;
+  flex-shrink: 0;
 }
 
 .dashboard-calendar-nav button {
