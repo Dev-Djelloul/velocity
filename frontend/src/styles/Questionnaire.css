@@ -383,7 +383,13 @@
 
 .button-group-row .btn-secondary {
   flex: 1;
-  min-width: 220px;
+  /* 220px forçait la ligne des 3 boutons secondaires (Précédent/Continuer plus tard/Mes
+     brouillons) à dépasser la largeur disponible dans le conteneur (max-width 900px),
+     poussant "Suivant" à la ligne du dessous par effet du flex-wrap du parent
+     .button-group — désaligné avec les trois autres (retour utilisateur, capture à
+     l'appui). 180px suffit à rester lisible tout en laissant la place à "Suivant" sur la
+     même ligne. */
+  min-width: 180px;
   justify-content: center;
 }
 

@@ -884,6 +884,17 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Clarté sur Santé du portefeuille, alignement du bouton Suivant, corrections diverses',
+            items: [
+              'Santé du portefeuille : la phrase de détail reformulée en vraies phrases ("62% des stories sont terminées. 2 échéances proches (-10 pts).") plutôt qu\'un format compact peu explicite ("62% terminé · -10 pts (2 bientôt)")',
+              'Santé du portefeuille : chaque ligne "Par plan" affiche désormais au survol le détail du calcul propre à CE plan, pas seulement le score agrégé de la carte',
+              'Repère de couleur du sprint dans le popover du calendrier : passé de vertical à horizontal (retour utilisateur)',
+              'Formulaire de création de plan : corrige le bouton "Suivant" qui retombait sur sa propre ligne au lieu de rester aligné avec Précédent/Continuer plus tard/Mes brouillons sur les largeurs d\'écran intermédiaires',
+              'Corrige à nouveau le chevauchement du widget "Historique des plans" en taille Petit : le titre tronque maintenant sur une seule ligne au lieu de repasser à la ligne et de chevaucher le premier élément de la liste'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Santé du portefeuille par plan, points restants sur les échéances, calendrier par sprint',
             items: [
               'Santé du portefeuille (tailles Moyen/Grand) : ajoute une ventilation "Par plan" — chaque plan avec son propre score et son niveau, triés du moins bon au meilleur, pour repérer d\'un coup d\'œil lequel tire la moyenne vers le bas plutôt qu\'un seul score agrégé',
@@ -1747,10 +1758,10 @@ export const translations = {
       portfolioHealthUrgent: (n) => n === 0 ? 'Aucune échéance urgente' : n === 1 ? '1 échéance urgente' : `${n} échéances urgentes`,
       portfolioHealthExplain: 'Score = % de stories terminées, moins des points par échéance proche (pénalité proportionnelle au nombre de plans).',
       portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
-        const parts = [`${doneRatio}% terminé`]
-        if (urgentPenalty > 0) parts.push(`-${urgentPenalty} pts (${urgentCount} urgente${urgentCount > 1 ? 's' : ''})`)
-        if (soonPenalty > 0) parts.push(`-${soonPenalty} pts (${soonCount} bientôt)`)
-        return parts.join(' · ')
+        const parts = [`${doneRatio}% des stories sont terminées.`]
+        if (urgentPenalty > 0) parts.push(`${urgentCount} échéance${urgentCount > 1 ? 's' : ''} urgente${urgentCount > 1 ? 's' : ''} (-${urgentPenalty} pts).`)
+        if (soonPenalty > 0) parts.push(`${soonCount} échéance${soonCount > 1 ? 's' : ''} proche${soonCount > 1 ? 's' : ''} (-${soonPenalty} pts).`)
+        return parts.join(' ')
       },
       portfolioHealthLegend: {
         good: '≥ 70% — Au beau fixe',
@@ -2886,6 +2897,17 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Clarity on Portfolio health, Next button alignment, misc fixes',
+            items: [
+              'Portfolio health: the detail sentence reworded into real sentences ("62% of stories are done. 2 deadlines coming up (-10 pts).") instead of a compact, not-very-explicit format ("62% done · -10 pts (2 soon)")',
+              'Portfolio health: each "By plan" row now shows that specific plan\'s own calculation breakdown on hover, not just the card\'s aggregated score',
+              'Sprint color marker in the calendar popover: switched from vertical to horizontal (user feedback)',
+              'Plan creation form: fixed the "Next" button dropping to its own line instead of staying aligned with Previous/Save for later/My drafts at intermediate screen widths',
+              'Fixed the "Plan history" widget overlap at Small size again: the title now truncates to one line instead of wrapping and overlapping the first list item'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Portfolio health by plan, remaining points on deadlines, calendar by sprint',
             items: [
               'Portfolio health (Medium/Large sizes): adds a "By plan" breakdown — each plan with its own score and level, sorted worst to best, to spot which one is dragging the average down instead of a single aggregated score',
@@ -3739,10 +3761,10 @@ export const translations = {
       portfolioHealthUrgent: (n) => n === 0 ? 'No urgent deadlines' : n === 1 ? '1 urgent deadline' : `${n} urgent deadlines`,
       portfolioHealthExplain: 'Score = % of stories done, minus points for deadlines coming up soon (penalty scaled to your number of plans).',
       portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
-        const parts = [`${doneRatio}% done`]
-        if (urgentPenalty > 0) parts.push(`-${urgentPenalty} pts (${urgentCount} urgent)`)
-        if (soonPenalty > 0) parts.push(`-${soonPenalty} pts (${soonCount} soon)`)
-        return parts.join(' · ')
+        const parts = [`${doneRatio}% of stories are done.`]
+        if (urgentPenalty > 0) parts.push(`${urgentCount} urgent deadline${urgentCount > 1 ? 's' : ''} (-${urgentPenalty} pts).`)
+        if (soonPenalty > 0) parts.push(`${soonCount} deadline${soonCount > 1 ? 's' : ''} coming up (-${soonPenalty} pts).`)
+        return parts.join(' ')
       },
       portfolioHealthLegend: {
         good: '≥ 70% — Smooth sailing',

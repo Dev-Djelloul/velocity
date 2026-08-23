@@ -962,11 +962,12 @@
 
 /* Petit repère de couleur accolé à "Sprint N" dans le popover — même couleur que la ligne
    continue de ce sprint sur la grille du calendrier au-dessus, pour relier visuellement
-   les deux (retour utilisateur, mémo repère). */
+   les deux (retour utilisateur, mémo repère). Horizontale plutôt que verticale (retour
+   utilisateur) : rappelle la forme de la ligne du calendrier dont elle est le repère. */
 .dashboard-calendar-popover-sprint-swatch {
   flex-shrink: 0;
-  width: 3px;
-  height: 12px;
+  width: 12px;
+  height: 3px;
   border-radius: 2px;
 }
 
@@ -1586,6 +1587,20 @@
   cursor: pointer;
   color: inherit;
   text-align: left;
+}
+
+/* Titre tronqué sur une seule ligne plutôt que d'être autorisé à passer sur deux — en
+   taille "Petit", un titre long ("Voir tout l'historique des plans") qui repassait à la
+   ligne agrandissait la boîte du titre sans marge supplémentaire en dessous, et le fond du
+   premier élément de la liste juste après venait toucher/chevaucher visuellement la
+   deuxième ligne du titre (retour utilisateur, capture à l'appui). min-width:0 nécessaire
+   ici : un enfant flex ne rétrécit jamais sous sa largeur de contenu par défaut. */
+.dashboard-widget-header-link h3 {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dashboard-widget-header-link:hover h3 {

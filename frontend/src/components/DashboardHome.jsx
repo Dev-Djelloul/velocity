@@ -625,7 +625,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                           <ul className="dashboard-health-plan-list">
                             {planHealthList.slice(0, planRows).map(({ plan, health }) => (
                               <li key={plan.id}>
-                                <button className="dashboard-health-plan-row" onClick={() => onLoadPlan?.(plan)}>
+                                {/* title natif : détail du calcul POUR CE PLAN précisément
+                                    (retour utilisateur — comprendre pourquoi CE plan est à
+                                    ce score, pas seulement le score agrégé de la carte). */}
+                                <button
+                                  className="dashboard-health-plan-row"
+                                  onClick={() => onLoadPlan?.(plan)}
+                                  title={t(lang, 'dashboard.portfolioHealthDetail')(Math.round(health.doneRatio * 100), health.urgentCount, health.soonCount, health.urgentPenalty, health.soonPenalty)}
+                                >
                                   <span className={`dashboard-legend-dot is-${health.level}`} />
                                   <span className="dashboard-health-plan-name">{plan.product?.name || t(lang, 'plans.untitled')}</span>
                                   <span className="dashboard-health-plan-score">{health.score}%</span>
