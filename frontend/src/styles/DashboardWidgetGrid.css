@@ -130,3 +130,22 @@
   flex-shrink: 0;
   color: #9184d9;
 }
+
+.widget-size-menu-divider {
+  display: block;
+  height: 1px;
+  margin: 0.3rem 0.2rem;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.widget-size-menu-item-danger {
+  color: #f87171;
+}
+
+.widget-size-menu-item-danger .widget-size-menu-check {
+  color: #f87171;
+}
+
+.widget-size-menu-item-danger:hover {
+  background: rgba(248, 113, 113, 0.14);
+}

@@ -1,0 +1,244 @@
+/* Bibliothèque de widgets façon macOS — barre de recherche + catégories à gauche, grille de
+   cartes à droite, "Terminé" en bas. Réutilise les variables de thème de l'app (comme
+   InfoModal.css) plutôt que des couleurs fixes, pour rester cohérent en clair/sombre. */
+.widget-library-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+
+.widget-library-panel {
+  display: flex;
+  width: 100%;
+  max-width: 920px;
+  height: 640px;
+  max-height: 88vh;
+  border-radius: 20px;
+  overflow: hidden;
+  background: var(--color-bg-secondary);
+  border: 1px solid rgba(145, 132, 217, 0.15);
+  box-shadow: var(--shadow-lg);
+  animation: widget-library-in 0.16s ease;
+}
+
+@keyframes widget-library-in {
+  from { opacity: 0; transform: scale(0.97); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.widget-library-sidebar {
+  width: 220px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 0.75rem;
+  border-right: 1px solid rgba(145, 132, 217, 0.15);
+  background: rgba(145, 132, 217, 0.04);
+  overflow-y: auto;
+}
+
+.widget-library-search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.7rem;
+  margin-bottom: 0.5rem;
+  border-radius: 10px;
+  background: var(--color-bg-primary);
+  border: 1px solid rgba(145, 132, 217, 0.18);
+  color: var(--color-text-secondary);
+}
+
+.widget-library-search input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: none;
+  font-size: 0.85rem;
+  color: var(--color-text-primary);
+}
+
+.widget-library-cat {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--color-text-secondary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.widget-library-cat:hover {
+  background: rgba(145, 132, 217, 0.1);
+  color: var(--color-text-primary);
+}
+
+.widget-library-cat.is-active {
+  background: linear-gradient(135deg, rgba(145, 132, 217, 0.22) 0%, rgba(99, 102, 241, 0.22) 55%, rgba(6, 182, 212, 0.22) 100%);
+  color: var(--color-text-primary);
+  font-weight: 600;
+}
+
+.widget-library-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.widget-library-grid {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.25rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-content: start;
+}
+
+.widget-library-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  color: var(--color-text-secondary);
+  padding: 2rem 0;
+}
+
+.widget-library-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.9rem;
+  border-radius: 14px;
+  border: 1px solid rgba(145, 132, 217, 0.16);
+  background: var(--color-bg-primary);
+}
+
+.widget-library-card.is-added {
+  border-color: rgba(99, 102, 241, 0.4);
+}
+
+.widget-library-card-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #fff;
+}
+
+.widget-library-card-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.widget-library-card-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.widget-library-badge {
+  font-size: 0.6rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: rgba(145, 132, 217, 0.18);
+  color: #9184d9;
+}
+
+.widget-library-badge-new {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  color: #fff;
+}
+
+.widget-library-card-desc {
+  margin: 0.2rem 0 0;
+  font-size: 0.76rem;
+  color: var(--color-text-secondary);
+  line-height: 1.35;
+}
+
+.widget-library-status {
+  flex-shrink: 0;
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  padding-top: 0.2rem;
+}
+
+.widget-library-action {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(145, 132, 217, 0.3);
+  background: none;
+  color: #6366f1;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.widget-library-action:hover {
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.widget-library-action.is-remove {
+  color: #10b981;
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.widget-library-action.is-remove:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  border-color: rgba(239, 68, 68, 0.35);
+}
+
+.widget-library-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.9rem 1.25rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.15);
+}
+
+@media (max-width: 640px) {
+  .widget-library-panel {
+    flex-direction: column;
+    height: 88vh;
+  }
+  .widget-library-sidebar {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    border-right: none;
+    border-bottom: 1px solid rgba(145, 132, 217, 0.15);
+  }
+  .widget-library-search {
+    width: 100%;
+  }
+  .widget-library-grid {
+    grid-template-columns: 1fr;
+  }
+}

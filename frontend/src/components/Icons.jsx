@@ -629,3 +629,35 @@ export function IconShrink(props) {
     </svg>
   )
 }
+
+// Grille 2x2 — bouton d'ouverture de la bibliothèque de widgets.
+export function IconLayoutGrid(props) {
+  return (
+    <svg {...base} {...props}>
+      <rect x="3" y="3" width="8" height="8" rx="1.5" />
+      <rect x="13" y="3" width="8" height="8" rx="1.5" />
+      <rect x="3" y="13" width="8" height="8" rx="1.5" />
+      <rect x="13" y="13" width="8" height="8" rx="1.5" />
+    </svg>
+  )
+}
+
+// Flamme — widget "Streak".
+export function IconFlame(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M12 2c1 3-3 4-3 8a3 3 0 0 0 6 0c1 1 2 2.5 2 4.5A5 5 0 0 1 7 14.5C7 9 12 7 12 2z" />
+    </svg>
+  )
+}
+
+// Soleil derrière un nuage — widget "Météo business".
+export function IconCloudSun(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M9 3v2M4.2 6.2l1.4 1.4M3 12h2" />
+      <circle cx="8" cy="9" r="3" />
+      <path d="M9 16h8a3.5 3.5 0 0 0 0-7 5 5 0 0 0-9.6-1.5" />
+    </svg>
+  )
+}

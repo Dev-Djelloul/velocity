@@ -198,6 +198,115 @@
   transform: scale(1.04);
 }
 
+.dashboard-home-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* Bouton d'ouverture de la bibliothèque de widgets — même verre dépoli que les cartes de
+   widget en dessous, posé lui aussi directement sur la photo de fond. */
+.dashboard-widgets-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-widgets-btn:hover {
+  background: rgba(255, 255, 255, 0.22);
+  transform: scale(1.04);
+}
+
+/* Widget "Santé du portefeuille" — jauge en demi-cercle façon compteur, même dégradé de
+   marque que le reste de l'app appliqué via currentColor sur le tracé SVG. */
+.dashboard-health-gauge {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.2rem 0;
+  color: #9184d9;
+}
+
+.dashboard-health-gauge.is-medium { color: #f59e0b; }
+.dashboard-health-gauge.is-low { color: #ef4444; }
+
+.dashboard-health-gauge-svg {
+  width: 100%;
+  max-width: 140px;
+}
+
+.dashboard-health-gauge-score {
+  position: absolute;
+  bottom: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+.dashboard-health-label {
+  margin: 0;
+  text-align: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.dashboard-health-sub {
+  margin: 0.1rem 0 0;
+  text-align: center;
+  font-size: 0.72rem;
+  color: var(--color-text-secondary);
+}
+
+/* Widget "Streak" — flamme + compteur de jours, centré verticalement dans la carte. */
+.dashboard-streak-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  flex: 1;
+}
+
+.dashboard-streak-count {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}
+
+/* Widget "Météo business" — même principe visuel que Streak, coloré selon le niveau de
+   santé du portefeuille (bon/moyen/faible) dont il dérive. */
+.dashboard-weather-body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  flex: 1;
+  color: #9184d9;
+}
+
+.dashboard-weather-widget.is-medium .dashboard-weather-body { color: #f59e0b; }
+.dashboard-weather-widget.is-low .dashboard-weather-body { color: #ef4444; }
+
+.dashboard-weather-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
 .dashboard-activity-list {
   display: flex;
   flex-direction: column;

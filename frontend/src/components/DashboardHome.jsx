@@ -6,15 +6,19 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
-import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight } from './Icons'
+import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight, IconLayoutGrid, IconGauge, IconFlame, IconCloudSun } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import DashboardCalendar from './DashboardCalendar'
 import DashboardActivityFeed from './DashboardActivityFeed'
 import DashboardWeeklySummary from './DashboardWeeklySummary'
 import DashboardWidgetGrid from './DashboardWidgetGrid'
+import DashboardWidgetLibrary from './DashboardWidgetLibrary'
+import { loadWidgetLayout, saveWidgetLayout } from '../lib/dashboardWidgets'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
+import { computePortfolioHealth } from '../lib/portfolioHealth'
+import { recordVisitAndGetStreak } from '../lib/streakTracker'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
 import createTeamImage from '../../assets/img/hiw-hero-tablets-purple.webp'
@@ -205,6 +209,56 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     ? (spaces.find(s => s.id === (lastUsedPlan.team_id ?? lastUsedPlan.createdSpaceId ?? null))?.name || personalSpace.name)
     : null
 
+  // Streak de jours d'activité consécutifs (widget "Streak", masqué par défaut — voir
+  // WIDGET_DEFAULT_HIDDEN) — un seul enregistrement par ouverture du Dashboard, aucun appel
+  // serveur.
+  const [streak, setStreak] = useState({ count: 0 })
+  useEffect(() => { if (userId) setStreak(recordVisitAndGetStreak(userId)) }, [userId])
+
+  const portfolioHealth = useMemo(() => computePortfolioHealth(weeklyStats), [weeklyStats])
+
+  const [libraryOpen, setLibraryOpen] = useState(false)
+
+  // Ids de tous les widgets potentiellement affichables à cet instant — dérivés (jamais
+  // figés) car certains n'existent que sous condition (résumé Nova réservé Pro, "Reprendre"
+  // seulement s'il y a un dernier plan, une carte par espace réellement présent, "Créer une
+  // équipe" tant que la limite n'est pas atteinte). Sert à la fois à charger/persister la
+  // disposition (dashboardWidgets.js) et à savoir quels widgets un id de la bibliothèque
+  // (widgetCatalog.js) peut réellement être ajouté ou retiré.
+  const availableWidgetIds = useMemo(() => [
+    'calendar', 'deadlines', 'activity',
+    ...(pro ? ['nova'] : []),
+    ...(lastUsedPlan ? ['resume'] : []),
+    ...spaces.map(space => `space:${space.id ?? 'personal'}`),
+    ...(!teamLimitReached ? ['newTeam'] : []),
+    'history', 'gallery',
+    'portfolioHealth', 'streak', 'businessWeather'
+  ], [pro, lastUsedPlan, spaces, teamLimitReached])
+
+  const widgetDefaults = {
+    order: ['calendar', 'deadlines', 'activity', 'nova', 'resume', 'newTeam', 'history', 'gallery', 'portfolioHealth', 'streak', 'businessWeather'],
+    sizes: {
+      calendar: 'large', deadlines: 'medium', activity: 'medium', nova: 'medium',
+      resume: 'small', newTeam: 'medium', history: 'small', gallery: 'small',
+      portfolioHealth: 'small', streak: 'small', businessWeather: 'small'
+    },
+    // Widgets tout juste ajoutés au catalogue par une mise à jour du produit : masqués tant
+    // que l'utilisateur ne les ajoute pas lui-même via la bibliothèque ("+").
+    hidden: ['portfolioHealth', 'streak', 'businessWeather']
+  }
+
+  const widgetIdsKey = availableWidgetIds.slice().sort().join(',')
+  const [widgetLayout, setWidgetLayout] = useState(() => loadWidgetLayout(userId, availableWidgetIds, widgetDefaults))
+  useEffect(() => {
+    setWidgetLayout(loadWidgetLayout(userId, availableWidgetIds, widgetDefaults))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, widgetIdsKey])
+
+  const persistWidgetLayout = (next) => {
+    setWidgetLayout(next)
+    saveWidgetLayout(userId, next)
+  }
+
   return (
     <div className="dashboard-home-outer">
       <IconGradientDefs />
@@ -243,10 +297,23 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             t(lang, 'dashboard.greetingCombinedGeneric')(t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))
           )}
         </h1>
-        <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
-          <IconPlus width={16} height={16} />
-          {t(lang, 'dashboard.createPlan')}
-        </button>
+        <div className="dashboard-home-header-actions">
+          {userId && (
+            <button
+              type="button"
+              className="dashboard-widgets-btn"
+              onClick={() => setLibraryOpen(true)}
+              aria-label={t(lang, 'dashboard.addWidgets')}
+              title={t(lang, 'dashboard.addWidgets')}
+            >
+              <IconLayoutGrid width={18} height={18} />
+            </button>
+          )}
+          <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
+            <IconPlus width={16} height={16} />
+            {t(lang, 'dashboard.createPlan')}
+          </button>
+        </div>
       </div>
 
       {/* Widgets façon macOS : déplaçables (glisser-déposer) et redimensionnables (clic
@@ -259,13 +326,10 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           "Reprendre" seulement s'il existe un dernier plan touché. */}
       {userId && (
         <DashboardWidgetGrid
-          userId={userId}
           lang={lang}
-          defaultOrder={['calendar', 'deadlines', 'activity', 'nova', 'resume', 'newTeam', 'history', 'gallery']}
-          defaultSizes={{
-            calendar: 'large', deadlines: 'medium', activity: 'medium', nova: 'medium',
-            resume: 'small', newTeam: 'medium', history: 'small', gallery: 'small'
-          }}
+          layout={widgetLayout}
+          onLayoutChange={persistWidgetLayout}
+          mandatoryIds={['calendar', 'resume']}
           widgets={{
             calendar: <DashboardCalendar lang={lang} deadlines={deadlines} plans={allPlans || activePlans} onOpenPlan={onLoadPlan} />,
             deadlines: (
@@ -472,8 +536,74 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   )}
                 </div>
               )
-            }
+            },
+
+            // Trois nouveaux widgets (voir widgetCatalog.js) : masqués par défaut, ajoutés
+            // via la bibliothèque de widgets ("+"). Dérivés des mêmes statistiques déjà
+            // agrégées pour le résumé Nova / les échéances — aucune donnée ni appel
+            // supplémentaire.
+            portfolioHealth: (
+              <div className="dashboard-widget-card dashboard-portfolio-health-widget">
+                <div className="dashboard-widget-header">
+                  {gradientIcon(<IconGauge width={16} height={16} />)}
+                  <h3>{t(lang, 'dashboard.portfolioHealthTitle')}</h3>
+                </div>
+                <div className={`dashboard-health-gauge is-${portfolioHealth.level}`}>
+                  <svg viewBox="0 0 100 56" className="dashboard-health-gauge-svg">
+                    <path d="M6 50a44 44 0 0 1 88 0" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="10" strokeLinecap="round" />
+                    <path
+                      d="M6 50a44 44 0 0 1 88 0"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="10"
+                      strokeLinecap="round"
+                      strokeDasharray={`${(portfolioHealth.score / 100) * 138} 138`}
+                    />
+                  </svg>
+                  <span className="dashboard-health-gauge-score">{portfolioHealth.score}%</span>
+                </div>
+                <p className="dashboard-health-label">{t(lang, `dashboard.portfolioHealthLevel.${portfolioHealth.level}`)}</p>
+                <p className="dashboard-health-sub">{t(lang, 'dashboard.portfolioHealthUrgent')(portfolioHealth.urgentCount)}</p>
+              </div>
+            ),
+            streak: (
+              <div className="dashboard-widget-card dashboard-streak-widget">
+                <div className="dashboard-widget-header">
+                  {gradientIcon(<IconFlame width={16} height={16} />)}
+                  <h3>{t(lang, 'dashboard.streakTitle')}</h3>
+                </div>
+                <div className="dashboard-streak-body">
+                  {gradientIcon(<IconFlame width={32} height={32} />)}
+                  <span className="dashboard-streak-count">{t(lang, 'dashboard.streakDays')(streak.count)}</span>
+                </div>
+                <p className="dashboard-health-sub">{t(lang, 'dashboard.streakSubtitle')}</p>
+              </div>
+            ),
+            businessWeather: (
+              <div className={`dashboard-widget-card dashboard-weather-widget is-${portfolioHealth.level}`}>
+                <div className="dashboard-widget-header">
+                  {gradientIcon(<IconCloudSun width={16} height={16} />)}
+                  <h3>{t(lang, 'dashboard.businessWeatherTitle')}</h3>
+                </div>
+                <div className="dashboard-weather-body">
+                  {gradientIcon(<IconCloudSun width={32} height={32} />)}
+                  <span className="dashboard-weather-label">{t(lang, `dashboard.businessWeatherLevel.${portfolioHealth.level}`)}</span>
+                </div>
+              </div>
+            )
           }}
+        />
+      )}
+
+      {libraryOpen && (
+        <DashboardWidgetLibrary
+          lang={lang}
+          availableIds={availableWidgetIds}
+          hidden={widgetLayout.hidden || []}
+          pro={pro}
+          onAdd={(id) => persistWidgetLayout({ ...widgetLayout, hidden: (widgetLayout.hidden || []).filter(h => h !== id) })}
+          onRemove={(id) => persistWidgetLayout({ ...widgetLayout, hidden: [...new Set([...(widgetLayout.hidden || []), id])] })}
+          onClose={() => setLibraryOpen(false)}
         />
       )}
       </div>

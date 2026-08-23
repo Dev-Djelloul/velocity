@@ -883,6 +883,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Bibliothèque de widgets façon macOS sur le Dashboard',
+            items: [
+              'Nouveau bouton "+" à côté de "Créer un plan" : ouvre une bibliothèque de widgets (recherche, catégories, ajout/retrait en un clic) inspirée du centre de widgets macOS — jusqu\'ici la grille du Dashboard ne permettait que de réordonner et redimensionner les widgets déjà affichés, jamais d\'en retirer ou d\'en ajouter',
+              'Calendrier et "Reprendre" restent toujours affichés ; tous les autres widgets (échéances, activité, résumé Nova, historique, galerie...) peuvent être retirés puis ré-ajoutés à tout moment sans perdre leur position',
+              'Trois nouveaux widgets à ajouter depuis la bibliothèque : "Santé du portefeuille" (jauge d\'avancement global), "Streak" (jours d\'activité consécutifs) et "Météo business" (dynamique récente en un coup d\'œil) — masqués par défaut'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Cartes de lien avec favicon sur Veille, Benchmarks, RGPD et le calendrier GTM',
             items: [
               'Ces quatre sections générées par IA ne pointaient vers aucun vrai lien externe (RGPD réutilisait une liste statique de 4 liens strictement identique à chaque plan) — remplacé par de vraies cartes de lien (favicon + titre + domaine) vers des sites réels, différentes à chaque génération',
@@ -1264,7 +1273,7 @@ export const translations = {
               "Espaces d'équipe (Clerk Organizations), commentaires avec @mentions, fil d'activité par plan, tags transversaux",
               'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
               "Présence d'équipe en temps réel : qui a un plan de l'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d'espace",
-              'Tableau de bord en widgets déplaçables et redimensionnables façon macOS (glisser-déposer, clic droit → Petit/Moyen/Grand, disposition mémorisée) : calendrier mettant en évidence tous les sprints actifs (tous plans confondus) avec détail cliquable par jour, prochaines échéances enrichies (date exacte, urgence en couleur, accès direct au plan), carte "Reprendre" vers le dernier plan touché, fil d\'activité récente et résumé hebdomadaire cross-plans généré par Nova (Pro), bandeau défilant de conseils générés par IA',
+              'Tableau de bord en widgets déplaçables et redimensionnables façon macOS (glisser-déposer, clic droit → Petit/Moyen/Grand, disposition mémorisée), avec une bibliothèque de widgets ("+") pour en ajouter/retirer (recherche, catégories) — calendrier, activité, résumé Nova (Pro), historique, galerie, et trois nouveaux widgets d\'aperçu (santé du portefeuille, streak, météo business) : calendrier mettant en évidence tous les sprints actifs (tous plans confondus) avec détail cliquable par jour, prochaines échéances enrichies (date exacte, urgence en couleur, accès direct au plan), carte "Reprendre" vers le dernier plan touché, fil d\'activité récente et résumé hebdomadaire cross-plans généré par Nova (Pro), bandeau défilant de conseils générés par IA',
               'Dashboard du plan : avancement global en double anneau interactif (terminé/en cours/en retard/pas commencé, survol par story), rythme réel vs calendrier, charge par membre réel de l\'équipe'
             ]
           },
@@ -1630,6 +1639,41 @@ export const translations = {
       resumeLabel: 'Reprendre',
       widgetSizeLabel: 'Taille',
       widgetSize: { small: 'Petit', medium: 'Moyen', large: 'Grand' },
+      widgetRemove: 'Retirer le widget',
+      addWidgets: 'Ajouter des widgets',
+      widgetLibrary: {
+        title: 'Widgets',
+        searchPlaceholder: 'Chercher des widgets',
+        allWidgets: 'Tous les widgets',
+        categories: { essentials: 'Essentiels', organisation: 'Organisation', insights: 'Nouveautés' },
+        added: 'Ajouté',
+        add: 'Ajouter',
+        remove: 'Retirer',
+        alwaysShown: 'Toujours affiché',
+        proOnly: 'Pro',
+        empty: 'Aucun widget ne correspond à ta recherche.',
+        done: 'Terminé'
+      },
+      widgetCatalog: {
+        calendar: { title: 'Calendrier', desc: 'Vue mensuelle de tes échéances et dates de lancement.' },
+        resume: { title: 'Reprendre', desc: 'Reviens directement sur le dernier plan touché.' },
+        deadlines: { title: 'Prochaines échéances', desc: 'Liste des dates de lancement et sprints à venir.' },
+        activity: { title: 'Activité récente', desc: 'Dernières actions sur tes plans, tous espaces confondus.' },
+        nova: { title: 'Résumé Nova', desc: 'Un résumé de la semaine généré par l\'IA.' },
+        history: { title: 'Historique des plans', desc: 'Tes plans les plus récents, un clic pour les rouvrir.' },
+        gallery: { title: 'Galerie publique', desc: 'Mosaïque des couvertures de tes plans partagés.' },
+        portfolioHealth: { title: 'Santé du portefeuille', desc: 'Jauge d\'avancement global de tes plans en cours.' },
+        streak: { title: 'Streak', desc: 'Nombre de jours consécutifs d\'activité sur VelocityLaunch.' },
+        businessWeather: { title: 'Météo business', desc: 'Dynamique récente de tes plans, en un coup d\'œil.' }
+      },
+      portfolioHealthTitle: 'Santé du portefeuille',
+      portfolioHealthLevel: { good: 'Au beau fixe', medium: 'À surveiller', low: 'Attention requise' },
+      portfolioHealthUrgent: (n) => n === 0 ? 'Aucune échéance urgente' : n === 1 ? '1 échéance urgente' : `${n} échéances urgentes`,
+      streakTitle: 'Streak',
+      streakDays: (n) => n === 1 ? '1 jour' : `${n} jours`,
+      streakSubtitle: "d'activité consécutifs",
+      businessWeatherTitle: 'Météo business',
+      businessWeatherLevel: { good: 'Grand soleil', medium: 'Quelques nuages', low: 'Ciel orageux' },
       activityTitle: 'Activité récente',
       activityEmpty: 'Rien à signaler pour le moment.',
       novaSummaryTitle: 'Résumé de la semaine',
@@ -2728,6 +2772,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'macOS-style widget library on the Dashboard',
+            items: [
+              'New "+" button next to "Create a plan": opens a widget library (search, categories, one-click add/remove) inspired by the macOS widget gallery — until now the Dashboard grid only let you reorder and resize widgets already shown, never add or remove them',
+              'Calendar and "Resume" stay always shown; every other widget (deadlines, activity, Nova summary, history, gallery...) can be removed and re-added anytime without losing its position',
+              'Three new widgets available from the library: "Portfolio health" (overall progress gauge), "Streak" (consecutive active days) and "Business weather" (recent momentum at a glance) — hidden by default'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Favicon link cards on Market Watch, Benchmarks, GDPR and the GTM calendar',
             items: [
               'These four AI-generated sections never linked to any real external site (GDPR reused a static list of 4 links, strictly identical on every plan) — replaced with real link cards (favicon + title + domain) to real websites, different on every generation',
@@ -3109,7 +3162,7 @@ export const translations = {
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
               'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
               'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
-              'Dashboard as movable, resizable macOS-style widgets (drag and drop, right-click → Small/Medium/Large, saved layout): calendar highlighting every active sprint across all plans with a clickable day detail, richer upcoming deadlines (exact date, color-coded urgency, direct link to the plan), "Resume" card to the last-touched plan, recent-activity feed, cross-plan weekly summary generated by Nova (Pro), scrolling AI-generated tip ticker',
+              'Dashboard as movable, resizable macOS-style widgets (drag and drop, right-click → Small/Medium/Large, saved layout), with a widget library ("+") to add/remove them (search, categories) — calendar, activity, Nova summary (Pro), history, gallery, plus three new at-a-glance widgets (portfolio health, streak, business weather): calendar highlighting every active sprint across all plans with a clickable day detail, richer upcoming deadlines (exact date, color-coded urgency, direct link to the plan), "Resume" card to the last-touched plan, recent-activity feed, cross-plan weekly summary generated by Nova (Pro), scrolling AI-generated tip ticker',
               'Plan dashboard: overall progress as an interactive double ring (done/in progress/overdue/not started, hover per story), real pace vs schedule, workload by real team member'
             ]
           },
@@ -3465,6 +3518,41 @@ export const translations = {
       planLabelFree: 'Free',
       widgetSizeLabel: 'Size',
       widgetSize: { small: 'Small', medium: 'Medium', large: 'Large' },
+      widgetRemove: 'Remove widget',
+      addWidgets: 'Add widgets',
+      widgetLibrary: {
+        title: 'Widgets',
+        searchPlaceholder: 'Search widgets',
+        allWidgets: 'All widgets',
+        categories: { essentials: 'Essentials', organisation: 'Organisation', insights: 'New' },
+        added: 'Added',
+        add: 'Add',
+        remove: 'Remove',
+        alwaysShown: 'Always shown',
+        proOnly: 'Pro',
+        empty: 'No widget matches your search.',
+        done: 'Done'
+      },
+      widgetCatalog: {
+        calendar: { title: 'Calendar', desc: 'Monthly view of your deadlines and launch dates.' },
+        resume: { title: 'Resume', desc: 'Jump straight back into your last opened plan.' },
+        deadlines: { title: 'Upcoming deadlines', desc: 'List of upcoming launch dates and sprints.' },
+        activity: { title: 'Recent activity', desc: 'Latest actions on your plans, across all spaces.' },
+        nova: { title: 'Nova summary', desc: 'An AI-generated summary of your week.' },
+        history: { title: 'Plan history', desc: 'Your most recent plans, one click to reopen.' },
+        gallery: { title: 'Public gallery', desc: 'A mosaic of your shared plan covers.' },
+        portfolioHealth: { title: 'Portfolio health', desc: 'Overall progress gauge for your active plans.' },
+        streak: { title: 'Streak', desc: 'Number of consecutive active days on VelocityLaunch.' },
+        businessWeather: { title: 'Business weather', desc: 'Recent momentum of your plans, at a glance.' }
+      },
+      portfolioHealthTitle: 'Portfolio health',
+      portfolioHealthLevel: { good: 'Smooth sailing', medium: 'Worth watching', low: 'Needs attention' },
+      portfolioHealthUrgent: (n) => n === 0 ? 'No urgent deadlines' : n === 1 ? '1 urgent deadline' : `${n} urgent deadlines`,
+      streakTitle: 'Streak',
+      streakDays: (n) => n === 1 ? '1 day' : `${n} days`,
+      streakSubtitle: 'consecutive active days',
+      businessWeatherTitle: 'Business weather',
+      businessWeatherLevel: { good: 'Clear skies', medium: 'A few clouds', low: 'Stormy' },
       planStatusProEmpty: 'Pro plan active 🚀 — you\'ve got everything you need, all that\'s left is a first plan to launch.',
       planStatusProActive: 'Pro plan active 🚀 — pick up right where you left off on your plans in progress, personal or team.',
       planStatusFreeEmpty: 'Free plan active ✨ — plenty to get started with, launch your very first plan.',
