@@ -405,8 +405,11 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                                   cette échéance ?" sans rouvrir le plan (retour utilisateur).
                                   Uniquement pour les échéances de fin de sprint : une date
                                   de lancement n'a pas de "points restants" associés. */}
-                              {d.kind === 'sprint' && d.remainingPoints > 0 && (
-                                <span className="dashboard-deadline-points"> · {t(lang, 'dashboard.deadlinesPointsLeft')(d.remainingPoints)}</span>
+                              {d.kind === 'sprint' && (
+                                <span className="dashboard-deadline-points">
+                                  {' · '}
+                                  {d.remainingPoints > 0 ? t(lang, 'dashboard.deadlinesPointsLeft')(d.remainingPoints) : t(lang, 'dashboard.deadlinesPointsDone')}
+                                </span>
                               )}
                             </span>
                             {/* Date exacte, pour s'y référer directement sur le calendrier

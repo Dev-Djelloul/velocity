@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { t } from '../lib/i18n'
 import { IconChevronLeft, IconChevronRight, IconCircleDot, IconClock, IconCheckCircle } from './Icons'
 
@@ -29,7 +30,17 @@ function buildMonthGrid(year, month) {
 // Popover d'un jour du calendrier — clic/tap (pas seulement survol, voir CardHelp dans
 // DashboardBI.jsx : le survol seul ne marche pas sur mobile). Liste les sprints actifs ce
 // jour-là tous plans confondus, avec leurs stories ; cliquer un plan y redirige directement.
-function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onClose }) {
+//
+// Rendu via portail dans document.body, en position:fixed à partir de `anchorRect` (plutôt
+// qu'ancré en position:absolute dans la cellule du jour) — la carte de widget ancêtre a un
+// overflow-y:auto (nécessaire pour son propre défilement), qui force aussi overflow-x:auto
+// (impossible à éviter en CSS pur sur un même élément). Un popover positionné en absolute
+// dans une cellule proche du bord GAUCHE de la grille se faisait donc rogner par ce clip
+// dès qu'il débordait vers la gauche — invisible/non scrollable côté gauche, correct côté
+// droit où le débordement se faisait plutôt vers la droite, à l'intérieur de la carte
+// (retour utilisateur, capture à l'appui). Même recette que HoverTooltip.jsx et le menu
+// contextuel "Taille" (DashboardWidgetGrid.jsx) pour le même problème structurel.
+function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onClose, anchorRect }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -45,8 +56,20 @@ function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onCl
 
   const dateLabel = date.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', { weekday: 'long', day: 'numeric', month: 'long' })
 
-  return (
-    <div className="dashboard-calendar-day-popover" ref={ref} onClick={(e) => e.stopPropagation()}>
+  // Centré sous la cellule, mais rabattu pour ne jamais sortir du viewport (bord gauche ou
+  // droit de l'écran, pas seulement de la carte) — largeur du popover fixe (360px, voir
+  // CSS) donc calculable ici sans mesurer le DOM après coup.
+  const POPOVER_WIDTH = 360
+  const MARGIN = 8
+  const centerX = anchorRect.left + anchorRect.width / 2
+  const left = Math.min(
+    Math.max(centerX - POPOVER_WIDTH / 2, MARGIN),
+    window.innerWidth - POPOVER_WIDTH - MARGIN
+  )
+  const style = { position: 'fixed', top: anchorRect.bottom + 6, left, width: POPOVER_WIDTH }
+
+  return createPortal(
+    <div className="dashboard-calendar-day-popover" ref={ref} style={style} onClick={(e) => e.stopPropagation()}>
       <div className="dashboard-calendar-day-popover-date">{dateLabel}</div>
 
       {launchEntries.map(entry => (
@@ -94,7 +117,8 @@ function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onCl
           )}
         </div>
       ))}
-    </div>
+    </div>,
+    document.body
   )
 }
 
@@ -249,12 +273,20 @@ export default function DashboardCalendar({ lang, deadlines, plans, onOpenPlan }
               tabIndex={hasActivity ? 0 : undefined}
               className={`dashboard-calendar-cell ${isToday ? 'is-today' : ''} ${sprintEntries.length ? 'has-sprint' : ''} ${hasActivity ? 'is-clickable' : ''}`}
               title={title || undefined}
-              onClick={() => hasActivity && setOpenDay(o => (o === iso ? null : iso))}
+              onClick={(e) => {
+                if (!hasActivity) return
+                const rect = e.currentTarget.getBoundingClientRect()
+                setOpenDay(o => (o?.iso === iso ? null : { iso, rect }))
+              }}
               onKeyDown={(e) => {
                 if (!hasActivity) return
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpenDay(o => (o === iso ? null : iso)) }
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault()
+                  const rect = e.currentTarget.getBoundingClientRect()
+                  setOpenDay(o => (o?.iso === iso ? null : { iso, rect }))
+                }
               }}
-              aria-expanded={hasActivity ? openDay === iso : undefined}
+              aria-expanded={hasActivity ? openDay?.iso === iso : undefined}
             >
               <span className="dashboard-calendar-day-num">{date.getDate()}</span>
               {sprintEntries.length > 0 && (
@@ -274,7 +306,7 @@ export default function DashboardCalendar({ lang, deadlines, plans, onOpenPlan }
                   {kinds.has('sprint') && <span className="dashboard-calendar-dot dashboard-calendar-dot-sprint" />}
                 </span>
               )}
-              {openDay === iso && (
+              {openDay?.iso === iso && (
                 <DayPopover
                   date={date}
                   lang={lang}
@@ -282,6 +314,7 @@ export default function DashboardCalendar({ lang, deadlines, plans, onOpenPlan }
                   launchEntries={launchEntries}
                   onOpenPlan={onOpenPlan}
                   onClose={() => setOpenDay(null)}
+                  anchorRect={openDay.rect}
                 />
               )}
             </div>

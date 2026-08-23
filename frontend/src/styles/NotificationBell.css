@@ -194,8 +194,8 @@
 .notif-bell-item {
   position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
+  align-items: flex-start;
+  gap: 0.55rem;
   width: 100%;
   text-align: left;
   padding: 0.6rem 1.6rem 0.6rem 0.9rem;
@@ -206,6 +206,15 @@
   color: var(--color-text-primary, #fff);
   cursor: pointer;
 }
+
+.notif-bell-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
 
 /* Non lu : nettement plus marqué qu'avant (fond très léger indiscernable de l'état lu,
    retour utilisateur) — liseré cyan + fond teinté cyan pour distinguer d'un coup d'œil. */

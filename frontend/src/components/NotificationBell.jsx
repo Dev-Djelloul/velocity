@@ -3,6 +3,7 @@ import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFeedRead, deleteAllNotificationFeed } from '../lib/serverStorage'
 import { IconBell, IconCheckCircle, IconTrash } from './Icons'
+import NotificationAvatar from './NotificationAvatar'
 import '../styles/NotificationBell.css'
 
 const POLL_MS = 8000
@@ -116,9 +117,12 @@ export default function NotificationBell({ userId, lang, onOpen }) {
             {items.length === 0 && <p className="notif-bell-empty">{t(lang, 'notifCenter.empty')}</p>}
             {items.map(item => (
               <button key={item.id} className={`notif-bell-item ${item.read ? '' : 'is-unread'}`} onClick={() => openItem(item)}>
-                <span className="notif-bell-item-title">{item.title}</span>
-                {item.detail && <span className="notif-bell-item-detail">{item.detail}</span>}
-                <span className="notif-bell-item-date">{formatFullDateTime(item.createdAt, lang)}</span>
+                <NotificationAvatar title={item.title} />
+                <span className="notif-bell-item-body">
+                  <span className="notif-bell-item-title">{item.title}</span>
+                  {item.detail && <span className="notif-bell-item-detail">{item.detail}</span>}
+                  <span className="notif-bell-item-date">{formatFullDateTime(item.createdAt, lang)}</span>
+                </span>
                 {!item.read && <IconCheckCircle width={12} height={12} className="notif-bell-item-dot" />}
               </button>
             ))}

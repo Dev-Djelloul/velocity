@@ -507,8 +507,8 @@
 .dashboard-activity-item {
   position: relative;
   display: flex;
-  flex-direction: column;
-  gap: 0.1rem;
+  align-items: flex-start;
+  gap: 0.5rem;
   width: 100%;
   text-align: left;
   padding: 0.5rem 1.4rem 0.5rem 0.6rem;
@@ -517,6 +517,14 @@
   background: transparent;
   color: var(--color-text-primary);
   cursor: pointer;
+}
+
+.dashboard-activity-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+  flex: 1;
 }
 
 .dashboard-activity-item:hover {
@@ -900,13 +908,12 @@
    verticalement (une par ligne), ce qui rendait la popover démesurément haute dès qu'un
    sprint avait plus de 3-4 stories. Les stories passent maintenant en puces qui s'enchaînent
    horizontalement (voir .dashboard-calendar-day-popover-stories) dans une carte large. */
+/* position/top/left/width posés en inline style (DashboardCalendar.jsx, calculés depuis
+   le rectangle de la cellule cliquée) — rendu via portail dans document.body, voir le
+   commentaire au-dessus de DayPopover pour pourquoi (clip par l'overflow-y:auto de la
+   carte de widget ancêtre, côté gauche de la grille uniquement). */
 .dashboard-calendar-day-popover {
-  position: absolute;
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 360px;
-  max-width: min(360px, 80vw);
+  max-width: min(360px, calc(100vw - 16px));
   max-height: 320px;
   overflow-y: auto;
   padding: 0.8rem;
@@ -914,7 +921,7 @@
   border: 1px solid rgba(145, 132, 217, 0.25);
   background: var(--color-bg-secondary, #16161d);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
-  z-index: 40;
+  z-index: 2000;
   text-align: left;
   white-space: normal;
   cursor: default;

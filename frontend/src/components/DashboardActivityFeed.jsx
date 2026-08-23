@@ -3,6 +3,7 @@ import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { fetchNotificationFeed, markNotificationFeedRead } from '../lib/serverStorage'
 import { IconActivity, IconCheckCircle } from './Icons'
+import NotificationAvatar from './NotificationAvatar'
 
 const POLL_MS = 15000
 const MAX_ITEMS = 5
@@ -42,9 +43,12 @@ export default function DashboardActivityFeed({ userId, lang, onOpen }) {
         <div className="dashboard-activity-list">
           {items.map(item => (
             <button key={item.id} className={`dashboard-activity-item ${item.read ? '' : 'is-unread'}`} onClick={() => openItem(item)}>
-              <span className="dashboard-activity-item-title">{item.title}</span>
-              {item.detail && <span className="dashboard-activity-item-detail">{item.detail}</span>}
-              <span className="dashboard-activity-item-date">{formatFullDateTime(item.createdAt, lang)}</span>
+              <NotificationAvatar title={item.title} />
+              <span className="dashboard-activity-item-body">
+                <span className="dashboard-activity-item-title">{item.title}</span>
+                {item.detail && <span className="dashboard-activity-item-detail">{item.detail}</span>}
+                <span className="dashboard-activity-item-date">{formatFullDateTime(item.createdAt, lang)}</span>
+              </span>
               {!item.read && <IconCheckCircle width={11} height={11} className="dashboard-activity-item-dot" />}
             </button>
           ))}

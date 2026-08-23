@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Avatars sur les notifications, popup calendrier corrigée à gauche, points restants',
+            items: [
+              'Centre de notifications et fil d\'activité du Dashboard : petit avatar à gauche de chaque ligne — initiales colorées quand un nom est repérable, avatar de Nova pour les notifications système (génération IA)',
+              'Corrige la popup d\'un jour du calendrier qui n\'était pas scrollable côté gauche de la grille (rognée par l\'overflow de la carte de widget) — rendue désormais hors de la carte, comme les menus contextuels et infobulles déjà corrigés',
+              '"Prochaines échéances" : affiche maintenant les points restants pour CHAQUE fin de sprint (auparavant seulement si non nul), avec "Tout est fait ✓" quand le sprint est bouclé'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Jauge de Santé du portefeuille segmentée par plan, indice d\'info-bulle',
             items: [
               'La jauge elle-même se divise maintenant en un segment coloré par plan (vert/orange/rouge selon son niveau) au lieu d\'un seul arc pour le score agrégé — on voit d\'un coup d\'œil, sans survoler, quel(s) plan(s) plombent le portefeuille',
@@ -1845,6 +1854,7 @@ export const translations = {
       deadlinesKindLaunch: 'Lancement',
       deadlinesKindSprint: (n) => `Fin du sprint ${n}`,
       deadlinesPointsLeft: (n) => `${n} pt${n > 1 ? 's' : ''} restant${n > 1 ? 's' : ''}`,
+      deadlinesPointsDone: 'Tout est fait ✓',
       calendarWeekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
       calendarPrev: 'Mois précédent',
       calendarNext: 'Mois suivant',
@@ -2907,6 +2917,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Avatars on notifications, fixed left-side calendar popup, remaining points',
+            items: [
+              'Notification center and Dashboard activity feed: small avatar on the left of each row — colored initials when a name is found, Nova\'s avatar for system notifications (AI generation)',
+              'Fixed the calendar day popup not being scrollable on the left side of the grid (clipped by the widget card\'s overflow) — now rendered outside the card, like the context menus and tooltips already fixed',
+              '"Upcoming deadlines": now shows remaining points for EVERY sprint end (previously only when non-zero), with "All done ✓" when the sprint is wrapped up'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Portfolio health gauge split by plan, tooltip discoverability hint',
             items: [
               'The gauge itself now splits into one colored segment per plan (green/orange/red by level) instead of a single arc for the aggregated score — spot at a glance, without hovering, which plan(s) are dragging the portfolio down',
@@ -3864,6 +3883,7 @@ export const translations = {
       deadlinesKindLaunch: 'Launch',
       deadlinesKindSprint: (n) => `Sprint ${n} ends`,
       deadlinesPointsLeft: (n) => `${n} pt${n > 1 ? 's' : ''} left`,
+      deadlinesPointsDone: 'All done ✓',
       calendarWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       calendarPrev: 'Previous month',
       calendarNext: 'Next month',

@@ -1,0 +1,28 @@
+/* Co-localisé avec NotificationAvatar.jsx (plutôt que dans NotificationBell.css) car ce
+   composant est réutilisé par deux endroits qui n'importaient pas forcément la même
+   feuille de style (centre de notifications ET fil d'activité du Dashboard) — un seul
+   fichier source évite de dupliquer ou d'oublier ces règles dans l'un des deux. */
+.notification-avatar {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: 700;
+  color: #fff;
+  overflow: hidden;
+  margin-top: 0.1rem;
+}
+
+.notification-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.notification-avatar-system {
+  background: var(--color-bg-tertiary, #22283a);
+}
