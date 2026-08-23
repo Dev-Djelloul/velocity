@@ -20,3 +20,14 @@
   position: relative;
   z-index: 1;
 }
+
+/* Moins translucide que le verre dépoli par défaut des pages Mon compte (.account-page
+   .card, voir AccountPage.css) — demandé explicitement pour cette page seulement, pas
+   touché ailleurs (Paramètres/Notifications partagent la même règle de base). */
+.integrations-page-inner .card {
+  background: rgba(15, 20, 28, 0.72);
+}
+
+[data-theme="light"] .integrations-page-inner .card {
+  background: rgba(120, 120, 135, 0.38);
+}
