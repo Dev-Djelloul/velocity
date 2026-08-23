@@ -227,21 +227,37 @@ async function buildDatabases(accessToken, parentPageId, plan, lang) {
 export async function syncStoriesToNotion(accessToken, plan, lang, existingNotion) {
   const en = lang === 'en'
   const _ = (fr, eng) => (en ? eng : fr)
+  // planStartDate (pas seulement generatedAt) : même correctif que buildDatabases/jiraClient.js
+  // ci-dessus — c'est le champ que "Modifier la date de démarrage" (RoadmapCard) met à jour.
+  const base = plan.planStartDate || plan.generatedAt
   const allStories = (plan.roadmap?.sprints || []).flatMap(sp => (sp.stories || []).map(s => ({ ...s, sprint: sp.sprintId })))
   if (!allStories.length) return { created: 0, updated: 0, links: {}, databaseId: null, databaseUrl: null }
 
   const properties = {
     [_('Story', 'Story')]: { title: {} },
     Sprint: { number: {} },
+    [_('Début', 'Start')]: { date: {} },
+    [_('Description', 'Description')]: { rich_text: {} },
     [_('Responsable', 'Assignee')]: { rich_text: {} },
     [_('Effort', 'Effort')]: { number: {} },
     [_('Coût (€)', 'Cost (€)')]: { number: {} },
     [_('Statut', 'Status')]: { select: {} }
   }
 
+  // Même contenu que la description ADF posée côté Jira (jiraClient.js, descParts) : le
+  // texte de la story, ses critères d'acceptation et ses dépendances — pour que la sync
+  // rapide vers Notion ne soit pas moins complète que l'export Jira (retour utilisateur).
+  const describeStory = (s) => [
+    s.description || '',
+    s.acceptanceCriteria ? `\n${_('Critères d\'acceptation', 'Acceptance criteria')} : ${s.acceptanceCriteria}` : '',
+    s.dependsOn?.length ? `\n${_('Dépend de', 'Depends on')} : ${s.dependsOn.join(', ')}` : ''
+  ].join('')
+
   const rowFields = (s) => ({
     [_('Story', 'Story')]: propTitle(`${s.id ? s.id + ': ' : ''}${s.title}`),
     Sprint: propNumber(s.sprint),
+    [_('Début', 'Start')]: propDate(isoDatePlusWeeks(base, ((s.sprint || 1) - 1) * 2)),
+    [_('Description', 'Description')]: propText(describeStory(s)),
     [_('Responsable', 'Assignee')]: propText(s.assignee),
     [_('Effort', 'Effort')]: propNumber(s.effort),
     [_('Coût (€)', 'Cost (€)')]: propNumber(s.cost),
@@ -251,12 +267,21 @@ export async function syncStoriesToNotion(accessToken, plan, lang, existingNotio
   let databaseId = existingNotion?.databaseId
   let databaseUrl = existingNotion?.databaseUrl
 
-  // Vérifie que la base référencée existe encore côté Notion (l'utilisateur a pu la supprimer).
+  // Vérifie que la base référencée existe encore côté Notion (l'utilisateur a pu la
+  // supprimer), et met à jour son schéma au passage : une base créée avant l'ajout d'une
+  // colonne (ex. Début, Description) ne la recevait jamais puisque le schéma n'était posé
+  // qu'à la création (retour utilisateur : ni date ni description sur une base déjà
+  // synchronisée). PATCH /databases est idempotent — les colonnes déjà présentes sont
+  // simplement laissées telles quelles.
   if (databaseId) {
     const check = await fetch(`${NOTION_API}/databases/${databaseId}`, {
       headers: { Authorization: `Bearer ${accessToken}`, 'Notion-Version': NOTION_VERSION }
     })
-    if (!check.ok) databaseId = null
+    if (!check.ok) {
+      databaseId = null
+    } else {
+      try { await notionRequest(accessToken, `/databases/${databaseId}`, 'PATCH', { properties }) } catch { /* best-effort */ }
+    }
   }
 
   if (!databaseId) {
