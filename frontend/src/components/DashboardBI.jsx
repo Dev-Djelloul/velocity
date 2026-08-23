@@ -153,6 +153,10 @@ export default function DashboardBI({ plan, lang }) {
         {schedulePacePct !== null && (() => {
           const workProgressPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
           const gap = workProgressPct - schedulePacePct
+          // Seuil de 5 points avant de qualifier l'écart d'avance/retard réel — sous ce seuil,
+          // c'est du bruit de mesure, pas un signal (retour utilisateur : sans ce repère visuel,
+          // "15%" seul donnait l'impression que ça avançait, retard ou pas).
+          const tone = gap >= 5 ? 'good' : gap <= -5 ? 'danger' : 'warning'
           const verdictKey = gap >= 5 ? 'schedulePaceAhead' : gap <= -5 ? 'schedulePaceBehind' : 'schedulePaceOnTrack'
           return (
             <div className="dashboard-bi-tile">
@@ -162,6 +166,7 @@ export default function DashboardBI({ plan, lang }) {
                 <CircularGauge
                   value={workProgressPct}
                   max={100}
+                  tone={tone}
                   label={t(lang, `dashboardBi.${verdictKey}`)}
                 />
               </div>

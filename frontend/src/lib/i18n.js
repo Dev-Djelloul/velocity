@@ -333,7 +333,7 @@ export const translations = {
       totalEffort: 'Effort total',
       monthlyBurn: 'Burn mensuel',
       schedulePace: 'Rythme vs calendrier',
-      schedulePaceHint: (calendarPct) => `${calendarPct}% du temps écoulé entre le début et le lancement`,
+      schedulePaceHint: (calendarPct) => `L'anneau montre l'avancement des stories (terminées + en cours à moitié) — à comparer aux ${calendarPct}% du temps déjà écoulé entre le début et le lancement`,
       schedulePaceAhead: 'En avance sur le calendrier',
       schedulePaceOnTrack: 'Dans les temps',
       schedulePaceBehind: 'En retard sur le calendrier'
@@ -2051,7 +2051,7 @@ export const translations = {
       totalEffort: 'Total effort',
       monthlyBurn: 'Monthly burn',
       schedulePace: 'Pace vs schedule',
-      schedulePaceHint: (calendarPct) => `${calendarPct}% of the time elapsed between start and launch`,
+      schedulePaceHint: (calendarPct) => `The ring shows story progress (done + in-progress at half weight) — compare it to the ${calendarPct}% of time already elapsed between start and launch`,
       schedulePaceAhead: 'Ahead of schedule',
       schedulePaceOnTrack: 'On track',
       schedulePaceBehind: 'Behind schedule'
