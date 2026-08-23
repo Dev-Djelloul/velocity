@@ -19,7 +19,7 @@ import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
 import { computePortfolioHealth, classifyWeather } from '../lib/portfolioHealth'
-import { computeActivityStreak } from '../lib/activityStreak'
+import { computeActivityStreaks, streakTier } from '../lib/activityStreak'
 import { recordAndGetTrend } from '../lib/portfolioHealthHistory'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
@@ -215,7 +215,8 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   // par défaut) — dérivé des horodatages des plans eux-mêmes (activityStreak.js), donc
   // identique quel que soit l'appareil, contrairement à un simple compteur "j'ai ouvert le
   // Dashboard" en localStorage.
-  const streakCount = useMemo(() => computeActivityStreak(allPlans || activePlans), [allPlans, activePlans])
+  const streaks = useMemo(() => computeActivityStreaks(allPlans || activePlans), [allPlans, activePlans])
+  const streakTierValue = streakTier(streaks.current)
 
   const portfolioHealth = useMemo(() => computePortfolioHealth(weeklyStats), [weeklyStats])
 
@@ -557,7 +558,12 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             // supplémentaire. Chacun affiche une ligne "Comment c'est calculé" dans sa
             // propre carte (retour utilisateur) plutôt que de laisser deviner ce que le
             // chiffre représente.
-            portfolioHealth: (
+            // Fonctions (size) => node plutôt que nœuds statiques (voir DashboardWidgetGrid) :
+            // en "Petit" seul l'essentiel (score/compteur + une ligne d'explication) tient ;
+            // en Moyen/Grand, une légende complète (seuils, méthode de calcul) s'affiche en
+            // plus — retour utilisateur : comprendre exactement de quoi relève chaque widget,
+            // pas seulement lire un chiffre brut.
+            portfolioHealth: (size) => (
               <div className="dashboard-widget-card dashboard-portfolio-health-widget">
                 <div className="dashboard-widget-header">
                   {gradientIcon(<IconGauge width={16} height={16} />)}
@@ -582,26 +588,49 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 <p className="dashboard-widget-detail">
                   {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount, portfolioHealth.urgentPenalty, portfolioHealth.soonPenalty)}
                 </p>
-                <p className="dashboard-widget-explain">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+                {size === 'small' ? (
+                  <p className="dashboard-widget-explain">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+                ) : (
+                  <div className="dashboard-widget-legend">
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-good" />{t(lang, 'dashboard.portfolioHealthLegend.good')}</div>
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-medium" />{t(lang, 'dashboard.portfolioHealthLegend.medium')}</div>
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-dot is-low" />{t(lang, 'dashboard.portfolioHealthLegend.low')}</div>
+                    <p className="dashboard-widget-method">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
+                  </div>
+                )}
               </div>
             ),
-            streak: (
-              <div className="dashboard-widget-card dashboard-streak-widget">
+            streak: (size) => (
+              <div className={`dashboard-widget-card dashboard-streak-widget tier-${streakTierValue}`}>
                 <div className="dashboard-widget-header">
                   {gradientIcon(<IconFlame width={16} height={16} />)}
                   <h3>{t(lang, 'dashboard.streakTitle')}</h3>
+                  {t(lang, `dashboard.streakTierLabel.${streakTierValue}`) && (
+                    <span className={`dashboard-streak-tier-badge tier-${streakTierValue}`}>{t(lang, `dashboard.streakTierLabel.${streakTierValue}`)}</span>
+                  )}
                 </div>
                 <div className="dashboard-streak-body">
                   {gradientIcon(<IconFlame width={32} height={32} />)}
-                  <span className="dashboard-streak-count">{t(lang, 'dashboard.streakDays')(streakCount)}</span>
+                  <span className="dashboard-streak-count">{t(lang, 'dashboard.streakDays')(streaks.current)}</span>
                 </div>
                 <p className="dashboard-health-sub">
-                  {streakCount > 0 ? t(lang, 'dashboard.streakSubtitle') : t(lang, 'dashboard.streakEmpty')}
+                  {streaks.current > 0 ? t(lang, 'dashboard.streakSubtitle') : t(lang, 'dashboard.streakEmpty')}
                 </p>
-                <p className="dashboard-widget-explain">{t(lang, 'dashboard.streakExplain')}</p>
+                <p className="dashboard-widget-detail">{t(lang, 'dashboard.streakBest')(streaks.best)}</p>
+                {size === 'small' ? (
+                  <p className="dashboard-widget-explain">{t(lang, 'dashboard.streakExplain')}</p>
+                ) : (
+                  <div className="dashboard-widget-legend">
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-flame tier-none" />{t(lang, 'dashboard.streakTierLegend.none')}</div>
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-flame tier-warm" />{t(lang, 'dashboard.streakTierLegend.warm')}</div>
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-flame tier-hot" />{t(lang, 'dashboard.streakTierLegend.hot')}</div>
+                    <div className="dashboard-widget-legend-row"><span className="dashboard-legend-flame tier-blazing" />{t(lang, 'dashboard.streakTierLegend.blazing')}</div>
+                    <p className="dashboard-widget-method">{t(lang, 'dashboard.streakExplain')}</p>
+                  </div>
+                )}
               </div>
             ),
-            businessWeather: (() => {
+            businessWeather: (size) => {
               const weather = classifyWeather(portfolioHealth.level, healthTrend.trend)
               const trendText = healthTrend.trend == null
                 ? t(lang, 'dashboard.businessWeatherTrend.none')
@@ -619,10 +648,18 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                     <span className="dashboard-weather-label">{t(lang, `dashboard.businessWeatherLevel.${weather.key}`)}</span>
                   </div>
                   <p className={`dashboard-widget-detail dashboard-weather-trend is-${weather.trendDir}`}>{trendText}</p>
-                  <p className="dashboard-widget-explain">{t(lang, 'dashboard.businessWeatherExplain')}</p>
+                  {size === 'small' ? (
+                    <p className="dashboard-widget-explain">{t(lang, 'dashboard.businessWeatherExplain')}</p>
+                  ) : (
+                    <div className="dashboard-widget-legend">
+                      <div className="dashboard-widget-legend-row">{t(lang, 'dashboard.businessWeatherLegendLevel')}</div>
+                      <div className="dashboard-widget-legend-row">{t(lang, 'dashboard.businessWeatherLegendTrend')}</div>
+                      <p className="dashboard-widget-method">{t(lang, 'dashboard.businessWeatherExplain')}</p>
+                    </div>
+                  )}
                 </div>
               )
-            })()
+            }
           }}
         />
       )}

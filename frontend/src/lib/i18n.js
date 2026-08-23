@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Streak avec record + paliers, légende détaillée sur les 3 nouveaux widgets',
+            items: [
+              'Streak : garde maintenant le record du plus long streak jamais atteint (dérivé du même historique de plans, sans stockage séparé), affiché à côté du streak en cours',
+              'Streak : paliers visuels — flamme dégradée dès 7 jours ("En feu 🔥"), flamme dorée dès 30 jours ("Imparable ⚡"), badge visible même en taille Petit',
+              'Santé du portefeuille, Streak et Météo business affichent désormais une légende complète (seuils, paliers, méthode de calcul exacte) en taille Moyen/Grand — plus besoin de deviner ce que représente le chiffre affiché'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Santé du portefeuille : pénalité d\'échéance proportionnelle au nombre de plans',
             items: [
               'La pénalité retirée pour une échéance urgente/proche était un forfait fixe (-12/-4 pts par échéance), identique qu\'on ait 1 seul plan en cours ou un portefeuille de 10 — 2 échéances urgentes suffisaient à écraser un score autrement excellent',
@@ -1733,13 +1742,26 @@ export const translations = {
         if (soonPenalty > 0) parts.push(`-${soonPenalty} pts (${soonCount} bientôt)`)
         return parts.join(' · ')
       },
+      portfolioHealthLegend: {
+        good: '≥ 70% — Au beau fixe',
+        medium: '40-69% — À surveiller',
+        low: '< 40% — Attention requise'
+      },
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 jour' : `${n} jours`,
       streakSubtitle: "d'activité consécutifs",
-      streakExplain: 'Un jour compte dès qu\'un plan a été créé, sauvegardé ou modifié — pas juste ouvert l\'app.',
+      streakExplain: 'Un jour compte dès qu\'un plan a été créé, sauvegardé ou modifié — pas juste ouvert l\'app. Basé sur les dates des plans (serveur) : identique sur tous tes appareils.',
       streakEmpty: 'Crée ou modifie un plan pour démarrer ton streak.',
+      streakBest: (n) => `Record : ${n === 1 ? '1 jour' : `${n} jours`}`,
+      streakTierLabel: { none: '', warm: '', hot: 'En feu 🔥', blazing: 'Imparable ⚡' },
+      streakTierLegend: {
+        none: '0 jour — aucune activité récente',
+        warm: '1-6 jours',
+        hot: '7-29 jours — en feu',
+        blazing: '30 jours et plus — imparable'
+      },
       businessWeatherTitle: 'Météo business',
-      businessWeatherExplain: 'Même score que Santé du portefeuille, comparé à il y a 7 jours.',
+      businessWeatherExplain: 'Reprend le score de Santé du portefeuille et le compare à celui d\'il y a environ 7 jours (mesuré sur cet appareil).',
       businessWeatherTrend: {
         up: (n) => `En amélioration (+${n} pts vs il y a 7 j)`,
         down: (n) => `En recul (${n} pts vs il y a 7 j)`,
@@ -1751,6 +1773,8 @@ export const translations = {
         medium_up: 'Ça se dégage', medium_flat: 'Quelques nuages', medium_down: 'Nuages qui s\'épaississent',
         low_up: 'Éclaircie après l\'orage', low_flat: 'Ciel orageux', low_down: 'Tempête qui s\'intensifie'
       },
+      businessWeatherLegendLevel: 'Niveau : même score que Santé du portefeuille (Au beau fixe / À surveiller / Attention requise).',
+      businessWeatherLegendTrend: 'Tendance : ↑ amélioration (+5 pts ou plus) · stable · ↓ recul (-5 pts ou plus), vs il y a 7 jours.',
       activityTitle: 'Activité récente',
       activityEmpty: 'Rien à signaler pour le moment.',
       novaSummaryTitle: 'Résumé de la semaine',
@@ -2850,6 +2874,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Streak with a record + tiers, detailed legend on the 3 new widgets',
+            items: [
+              'Streak: now keeps the longest streak ever reached (derived from the same plan history, no separate storage), shown next to the current streak',
+              'Streak: visual tiers — gradient flame from 7 days ("On fire 🔥"), gold flame from 30 days ("Unstoppable ⚡"), badge visible even at Small size',
+              'Portfolio health, Streak, and Business weather now show a full legend (thresholds, tiers, exact calculation method) at Medium/Large size — no more guessing what the number represents'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Portfolio health: deadline penalty now scales with your number of plans',
             items: [
               'The points removed for an urgent/upcoming deadline used to be a flat amount (-12/-4 pts per deadline), the same whether you had 1 plan in progress or a 10-plan portfolio — 2 urgent deadlines were enough to crush an otherwise excellent score',
@@ -3689,13 +3722,26 @@ export const translations = {
         if (soonPenalty > 0) parts.push(`-${soonPenalty} pts (${soonCount} soon)`)
         return parts.join(' · ')
       },
+      portfolioHealthLegend: {
+        good: '≥ 70% — Smooth sailing',
+        medium: '40-69% — Worth watching',
+        low: '< 40% — Needs attention'
+      },
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 day' : `${n} days`,
       streakSubtitle: 'consecutive active days',
-      streakExplain: 'A day counts once a plan has been created, saved, or edited — not just opening the app.',
+      streakExplain: 'A day counts once a plan has been created, saved, or edited — not just opening the app. Based on plan dates (server-side): the same across all your devices.',
       streakEmpty: 'Create or edit a plan to start your streak.',
+      streakBest: (n) => `Best: ${n === 1 ? '1 day' : `${n} days`}`,
+      streakTierLabel: { none: '', warm: '', hot: 'On fire 🔥', blazing: 'Unstoppable ⚡' },
+      streakTierLegend: {
+        none: '0 days — no recent activity',
+        warm: '1-6 days',
+        hot: '7-29 days — on fire',
+        blazing: '30+ days — unstoppable'
+      },
       businessWeatherTitle: 'Business weather',
-      businessWeatherExplain: 'Same score as Portfolio health, compared to 7 days ago.',
+      businessWeatherExplain: 'Reuses the Portfolio health score and compares it to about 7 days ago (measured on this device).',
       businessWeatherTrend: {
         up: (n) => `Improving (+${n} pts vs 7 days ago)`,
         down: (n) => `Declining (${n} pts vs 7 days ago)`,
@@ -3707,6 +3753,8 @@ export const translations = {
         medium_up: 'Clearing up', medium_flat: 'A few clouds', medium_down: 'Clouds gathering',
         low_up: 'Clearing after the storm', low_flat: 'Stormy', low_down: 'Storm intensifying'
       },
+      businessWeatherLegendLevel: 'Level: same score as Portfolio health (Smooth sailing / Worth watching / Needs attention).',
+      businessWeatherLegendTrend: 'Trend: ↑ improving (+5 pts or more) · stable · ↓ declining (-5 pts or more), vs 7 days ago.',
       planStatusProEmpty: 'Pro plan active 🚀 — you\'ve got everything you need, all that\'s left is a first plan to launch.',
       planStatusProActive: 'Pro plan active 🚀 — pick up right where you left off on your plans in progress, personal or team.',
       planStatusFreeEmpty: 'Free plan active ✨ — plenty to get started with, launch your very first plan.',
