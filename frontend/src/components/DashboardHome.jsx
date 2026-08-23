@@ -129,6 +129,25 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     return t(lang, 'dashboard.deadlinesInDays')(n)
   }
 
+  // Jour + mois abrégés (ex: "lun. 25 août") plutôt qu'un format numérique — se lit
+  // directement comme une case du calendrier au-dessus, plus facile à repérer d'un coup
+  // d'œil que "25/08/26" (retour utilisateur : pouvoir s'y référer directement).
+  const deadlineDateLabel = (isoDate) => new Date(isoDate).toLocaleDateString(
+    lang === 'fr' ? 'fr-FR' : 'en-US',
+    { weekday: 'short', day: 'numeric', month: 'short' }
+  )
+
+  // Urgence par code couleur sur le badge — imminent (aujourd'hui/demain) en rouge, cette
+  // semaine en ambre, plus loin dans la couleur neutre d'origine. Un simple "Dans X jours"
+  // wa noyé sans hiérarchie visuelle entre "demain" et "dans 3 semaines" (retour
+  // utilisateur : "à toi d'innover").
+  const deadlineUrgency = (isoDate) => {
+    const n = daysUntil(isoDate)
+    if (n <= 1) return 'urgent'
+    if (n <= 7) return 'soon'
+    return 'later'
+  }
+
   const deadlineKind = (d) => d.kind === 'sprint'
     ? t(lang, 'dashboard.deadlinesKindSprint')(d.sprintId)
     : t(lang, 'dashboard.deadlinesKindLaunch')
@@ -287,20 +306,33 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             <ul className="dashboard-deadlines-list">
               {deadlines.map(d => (
                 <li key={d.id}>
-                  {/* Vignette discrète du plan (quand il en a une) pour distinguer les
-                      échéances entre plusieurs plans d'un coup d'œil, sans avoir à lire le
-                      nom en entier — même logique que les aperçus de plans des cartes
-                      d'espace juste au-dessus. */}
-                  <span className="dashboard-deadline-thumb">
-                    {d.coverImage
-                      ? <img src={d.coverImage} alt="" />
-                      : <span className="dashboard-deadline-thumb-fallback" aria-hidden="true" />}
-                  </span>
-                  <span className="dashboard-deadline-info">
-                    <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
-                    <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>
-                  </span>
-                  <span className="dashboard-deadline-when">{deadlineWhen(d.date)}</span>
+                  {/* Toute la ligne cliquable — redirige directement vers le plan concerné,
+                      même logique que le popover du jour dans le calendrier au-dessus, pour
+                      ne pas avoir à repasser par une carte d'espace ou l'historique. */}
+                  <button
+                    type="button"
+                    className="dashboard-deadline-row"
+                    onClick={() => onLoadPlan?.(d.plan)}
+                    disabled={!d.plan || !onLoadPlan}
+                  >
+                    {/* Vignette discrète du plan (quand il en a une) pour distinguer les
+                        échéances entre plusieurs plans d'un coup d'œil, sans avoir à lire le
+                        nom en entier — même logique que les aperçus de plans des cartes
+                        d'espace juste au-dessus. */}
+                    <span className="dashboard-deadline-thumb">
+                      {d.coverImage
+                        ? <img src={d.coverImage} alt="" />
+                        : <span className="dashboard-deadline-thumb-fallback" aria-hidden="true" />}
+                    </span>
+                    <span className="dashboard-deadline-info">
+                      <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
+                      <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>
+                      {/* Date exacte, pour s'y référer directement sur le calendrier
+                          au-dessus — le badge "Dans X jours" seul ne dit pas quel jour. */}
+                      <span className="dashboard-deadline-date">{deadlineDateLabel(d.date)}</span>
+                    </span>
+                    <span className={`dashboard-deadline-when is-${deadlineUrgency(d.date)}`}>{deadlineWhen(d.date)}</span>
+                  </button>
                 </li>
               ))}
             </ul>

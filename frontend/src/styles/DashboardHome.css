@@ -625,19 +625,35 @@
   flex-direction: column;
 }
 
-.dashboard-deadlines-list li {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  font-size: 0.74rem;
-  padding: 0.5rem 0;
-}
-
 /* Une ligne par échéance, séparées d'un filet plutôt qu'un simple espacement — plus lisible
    dès qu'il y a plusieurs plans à la suite (retour utilisateur). Pas de filet avant la
    première ni après la dernière. */
 .dashboard-deadlines-list li + li {
   border-top: 1px solid rgba(145, 132, 217, 0.12);
+}
+
+/* Toute la ligne est un bouton cliquable qui redirige vers le plan — reprend les styles de
+   l'ancien <li> flex, plus le comportement bouton (fond transparent, curseur, hover). */
+.dashboard-deadline-row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 0.65rem;
+  font-size: 0.74rem;
+  padding: 0.5rem 0;
+  background: none;
+  border: none;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.dashboard-deadline-row:disabled {
+  cursor: default;
+}
+
+.dashboard-deadline-row:not(:disabled):hover .dashboard-deadline-name {
+  color: var(--color-accent);
 }
 
 .dashboard-deadline-thumb {
@@ -683,6 +699,12 @@
   color: var(--color-text-muted, #9ca3af);
 }
 
+.dashboard-deadline-date {
+  font-size: 0.62rem;
+  color: var(--color-text-secondary);
+  text-transform: capitalize;
+}
+
 .dashboard-deadline-when {
   flex-shrink: 0;
   font-weight: 600;
@@ -691,6 +713,19 @@
   border-radius: 999px;
   background: rgba(145, 132, 217, 0.14);
   color: #9184d9;
+}
+
+/* Code couleur par urgence — imminent en rouge, cette semaine en ambre, plus loin dans la
+   couleur neutre d'origine. Un simple "Dans X jours" ne distinguait pas visuellement
+   "demain" de "dans 3 semaines" (retour utilisateur). */
+.dashboard-deadline-when.is-urgent {
+  background: rgba(239, 68, 68, 0.16);
+  color: #f87171;
+}
+
+.dashboard-deadline-when.is-soon {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f59e0b;
 }
 
 @media (max-width: 860px) {

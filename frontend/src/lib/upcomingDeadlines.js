@@ -40,13 +40,13 @@ export function getUpcomingDeadlines(plans, limit = 5) {
     if (p.launchDate) {
       const time = new Date(p.launchDate).getTime()
       if (Number.isFinite(time) && time >= now) {
-        items.push({ id: `${p.id}:launch`, kind: 'launch', name, coverImage, date: p.launchDate, time })
+        items.push({ id: `${p.id}:launch`, kind: 'launch', name, coverImage, date: p.launchDate, time, plan: p })
       }
     }
 
     const sprint = nextSprint(p)
     if (sprint) {
-      items.push({ id: `${p.id}:sprint`, kind: 'sprint', name, coverImage, sprintId: sprint.sprintId, date: sprint.end.toISOString(), time: sprint.end.getTime() })
+      items.push({ id: `${p.id}:sprint`, kind: 'sprint', name, coverImage, sprintId: sprint.sprintId, date: sprint.end.toISOString(), time: sprint.end.getTime(), plan: p })
     }
   }
 
