@@ -69,7 +69,12 @@ export function generateRoadmap(resources, product, priorities, lang) {
         assignee: (who => dict.assignees[who] || who)(resolveAssignee(tmpl.assignee, resources?.rolesPresent)),
         effort: tmpl.effort,
         cost: costFor(tmpl.category, tmpl.type),
-        dependsOn: stories.length > 0 && templateIdx % 3 === 1 ? [stories[stories.length - 1].id] : []
+        dependsOn: stories.length > 0 && templateIdx % 3 === 1 ? [stories[stories.length - 1].id] : [],
+        // Même correctif que le générateur backend (roadmapGenerator.js) : statut
+        // explicite dès la génération, pas seulement le repli d'affichage
+        // `story.status || 'todo'` — un consommateur qui l'ignore (export Jira) traitait
+        // sinon le statut comme absent plutôt que "à faire".
+        status: 'todo'
       })
       storyCounter++
       templateIdx++

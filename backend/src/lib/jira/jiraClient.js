@@ -179,6 +179,7 @@ async function updateIssue(accessToken, cloudId, key, fields) {
 // Transitionne un ticket vers une catégorie de statut donnée ('done' ou 'new'/'indeterminate').
 // Dans Jira le statut ne se met pas via un champ mais via une transition disponible.
 async function transitionTo(accessToken, cloudId, key, targetCategory) {
+  if (!targetCategory) return // statut VelocityLaunch absent/inconnu : ne pas toucher au ticket
   try {
     const res = await jiraFetch(accessToken, cloudId, `/issue/${key}/transitions`)
     if (!res.ok) return
@@ -192,11 +193,17 @@ async function transitionTo(accessToken, cloudId, key, targetCategory) {
   } catch { /* transition best-effort */ }
 }
 
-// Catégorie de statut Jira cible pour un statut de story VelocityLaunch (tri-état).
+// Catégorie de statut Jira cible pour un statut de story VelocityLaunch. `null` en retour
+// (statut absent/inconnu) signifie explicitement "ne pas transitionner" — auparavant un
+// statut manquant retombait sur 'new', ce qui repoussait silencieusement un ticket déjà
+// avancé (En cours/Terminé) vers "À faire" à chaque resynchronisation dès que la story
+// correspondante arrivait sans son champ `status` (retour utilisateur : les statuts
+// "à faire/en cours/terminées" n'étaient "pas du tout pris en compte" après un export).
 function jiraCategoryFor(status) {
   if (status === 'done') return 'done'
   if (status === 'in_progress') return 'indeterminate'
-  return 'new'
+  if (status === 'todo') return 'new'
+  return null
 }
 
 const CATEGORY_LABELS = { product: 'produit', marketing: 'marketing', ops: 'ops' }
@@ -220,6 +227,14 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
   const managed = await fetchManagedIssues(accessToken, cloudId, projectKey)
   const myAccountId = await getMyAccountId(accessToken, cloudId)
   const base = plan.generatedAt
+  // Identifiant qui distingue CE plan dans les labels vl-id:/vl-epic: (voir plus bas) —
+  // plan.id peut être absent pour un plan pas encore sauvegardé au moins une fois (voir
+  // PlanViewer.jsx, `if (plan.id) savePlan(...)` à plusieurs endroits) ; generatedAt (un
+  // timestamp, toujours présent) sert de repli pour ne jamais retomber sur une valeur
+  // partagée par deux plans différents.
+  // Nettoyé (alphanumérique uniquement) : generatedAt est un timestamp ISO avec des
+  // caractères (":", ".") que Jira n'accepte pas forcément dans une valeur de label.
+  const planScope = String(plan.id || plan.generatedAt || 'plan').replace(/[^a-zA-Z0-9-]/g, '')
 
   // Dates du sprint (calendrier réel) : début = base + (n-1)*2 sem., échéance = base + n*2 sem.
   const sprintStart = (n) => isoDatePlusWeeks(base, (n - 1) * 2)
@@ -241,7 +256,13 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
 
   // 1) Epics par phase (= lot de livraison, avec budget ; le regroupement par phase + label vl-sprint:N joue le rôle de sprint)
   for (const sprint of plan.roadmap?.sprints || []) {
-    const epicLabel = `vl-epic:${sprint.sprintId}`
+    // planId préfixé dans le label (pas juste sprint.sprintId) : sinon deux plans DIFFÉRENTS
+    // partagent le même sprintId "1, 2, 3…" (chaque plan repart de 1), et fetchManagedIssues
+    // les traite comme la MÊME epic dès qu'ils atterrissent dans le même projet Jira — un
+    // nouveau plan mettait alors à jour (et écrasait) les tickets d'un plan précédent
+    // (retour utilisateur, confirmé en capture : les tickets d'un ancien plan se
+    // retrouvaient réécrits par le nouveau).
+    const epicLabel = `vl-epic:${planScope}-${sprint.sprintId}`
     const summary = `${lang === 'en' ? 'Phase' : 'Phase'} ${sprint.sprintId} — ${sprint.estimatedCost} €`
     const fields = withDates({
       project: { key: projectKey },
@@ -266,7 +287,11 @@ export async function exportPlanToJira(accessToken, target, plan, lang) {
   // 2) Stories
   for (const sprint of plan.roadmap?.sprints || []) {
     for (const story of sprint.stories || []) {
-      const vlLabel = `vl-id:${story.id}`
+      // Même correctif que epicLabel ci-dessus : story.id ("US-001", "US-002"…) repart de 1
+      // à CHAQUE plan généré (voir roadmapGenerator.js) — sans le planId dans le label, la
+      // story US-001 d'un nouveau plan matchait celle d'un ancien plan dans le même projet
+      // Jira et écrasait son ticket au lieu d'en créer un nouveau.
+      const vlLabel = `vl-id:${planScope}-${story.id}`
       const descParts = [
         story.description || '',
         story.acceptanceCriteria ? `\n${lang === 'en' ? 'Acceptance criteria' : 'Critères d\'acceptation'} : ${story.acceptanceCriteria}` : '',

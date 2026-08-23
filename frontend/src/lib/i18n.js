@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige un bug important : l\'export Jira/Linear écrasait les tickets d\'un plan précédent',
+            items: [
+              'Cause trouvée : chaque plan généré repart de stories "US-001, US-002…" — l\'export Jira/Linear repérait les tickets déjà synchronisés uniquement par cet identifiant (pas par le plan), donc synchroniser un TOUT NOUVEAU plan mettait à jour (et écrasait) les tickets d\'un plan précédent partageant les mêmes numéros, au lieu d\'en créer de nouveaux',
+              'Corrigé en distinguant chaque plan dans l\'étiquette de suivi Jira/Linear — un nouveau plan crée maintenant toujours ses propres tickets, sans jamais toucher à ceux d\'un plan différent',
+              'Corrige aussi pourquoi les statuts (à faire / en cours / terminé) n\'étaient "pas du tout pris en compte" : une story sans statut explicite forçait silencieusement son ticket Jira/Linear vers "à faire", écrasant une progression déjà enregistrée — les stories ont maintenant un statut réel dès leur génération, et un statut inconnu ne touche plus au ticket'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrige le décalage d\'un jour des stories dans le calendrier de la Roadmap',
             items: [
               'Une story du 28 juillet s\'ouvrait sous l\'étiquette "27 juillet" en cliquant sur sa case : la clé de date du calendrier convertissait la date en UTC (toISOString) alors qu\'elle était construite en heure locale — pour un fuseau en avance sur UTC (France), minuit local tombe la veille en UTC, décalant systématiquement toutes les stories d\'un jour plus tôt que leur case visuelle',
@@ -2953,6 +2962,15 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed a major bug: Jira/Linear export was overwriting a previous plan\'s tickets',
+            items: [
+              'Root cause: every generated plan restarts its stories at "US-001, US-002…" — the Jira/Linear export identified already-synced tickets only by that id (not by which plan it came from), so syncing a BRAND NEW plan updated (and overwrote) a previous plan\'s tickets sharing the same numbers, instead of creating new ones',
+              'Fixed by distinguishing each plan in the Jira/Linear tracking label — a new plan now always creates its own tickets, never touching a different plan\'s',
+              'Also fixes why statuses (to do / in progress / done) were "not taken into account at all": a story with no explicit status silently forced its Jira/Linear ticket back to "to do", wiping out progress already recorded there — stories now get a real status as soon as they\'re generated, and an unknown status no longer touches the ticket'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed the one-day offset for stories on the Roadmap calendar',

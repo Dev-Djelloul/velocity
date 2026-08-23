@@ -45,20 +45,29 @@ async function getTeamStates(apiKey, teamId) {
 }
 
 // Une valeur de statut Linear (type de workflow state) pour un statut de story VelocityLaunch.
+// `null` pour un statut absent/inconnu — voir pickState ci-dessous : sans distinction, un
+// statut manquant retombait sur "backlog/unstarted" et repoussait silencieusement une
+// issue déjà avancée vers l'arrière à chaque resynchronisation (même bug que jiraClient.js,
+// jiraCategoryFor).
 function stateTypeFor(status) {
   if (status === 'done') return 'completed'
   if (status === 'in_progress') return 'started'
-  return ['backlog', 'unstarted']
+  if (status === 'todo') return ['backlog', 'unstarted']
+  return null
 }
 
+// Renvoie `null` (pas d'état à appliquer) plutôt que `states[0]` en dernier recours quand
+// le statut VelocityLaunch est inconnu — un repli "premier état de la liste" forcerait
+// quand même une transition non voulue.
 function pickState(states, status) {
   const wanted = stateTypeFor(status)
+  if (!wanted) return null
   const types = Array.isArray(wanted) ? wanted : [wanted]
   for (const type of types) {
     const match = states.find(s => s.type === type)
     if (match) return match
   }
-  return states[0] || null
+  return null
 }
 
 async function getOrCreateLabels(apiKey, teamId, names) {
@@ -120,9 +129,16 @@ export async function exportPlanToLinear(apiKey, target, plan, lang) {
     getOrganizationUrlKey(apiKey).catch(() => null)
   ])
 
+  // planScope distingue CE plan dans le label vl-id: (voir plus bas) — sans lui, deux plans
+  // différents dont les stories repartent toutes deux à "US-001" (voir roadmapGenerator.js)
+  // partagent le même label dans la même équipe Linear, et fetchManagedIssues traite la
+  // story d'un nouveau plan comme "déjà exportée" : elle met à jour (et écrase) l'issue de
+  // l'ANCIEN plan au lieu d'en créer une nouvelle (même bug que jiraClient.js, retour
+  // utilisateur confirmé côté Jira).
+  const planScope = String(plan.id || plan.generatedAt || 'plan').replace(/[^a-zA-Z0-9-]/g, '')
   const sprintIds = (plan.roadmap?.sprints || []).map(s => s.sprintId)
   const storyIds = (plan.roadmap?.sprints || []).flatMap(s => (s.stories || []).map(story => story.id))
-  const wantedLabels = ['velocitylaunch', ...sprintIds.map(n => `vl-sprint:${n}`), ...storyIds.map(id => `vl-id:${id}`)]
+  const wantedLabels = ['velocitylaunch', ...sprintIds.map(n => `vl-sprint:${n}`), ...storyIds.map(id => `vl-id:${planScope}-${id}`)]
   const labelIdByName = await getOrCreateLabels(apiKey, teamId, wantedLabels)
   const managed = await fetchManagedIssues(apiKey, teamId)
 
@@ -133,7 +149,7 @@ export async function exportPlanToLinear(apiKey, target, plan, lang) {
   for (const sprint of plan.roadmap?.sprints || []) {
     const sprintLabelId = labelIdByName[`vl-sprint:${sprint.sprintId}`]
     for (const story of sprint.stories || []) {
-      const vlLabel = `vl-id:${story.id}`
+      const vlLabel = `vl-id:${planScope}-${story.id}`
       const descParts = [
         story.description || '',
         story.acceptanceCriteria ? `\n\n**${lang === 'en' ? 'Acceptance criteria' : 'Critères d\'acceptation'}** : ${story.acceptanceCriteria}` : '',

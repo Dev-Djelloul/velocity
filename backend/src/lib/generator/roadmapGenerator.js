@@ -45,7 +45,13 @@ export function generateRoadmap(resources, product, priorities, lang) {
         assignee: (who => dict.assignees[who] || who)(resolveAssignee(tmpl.assignee, resources?.rolesPresent)),
         effort: tmpl.effort,
         cost: costFor(tmpl.category, tmpl.type),
-        dependsOn: stories.length > 0 && templateIdx % 3 === 1 ? [stories[stories.length - 1].id] : []
+        dependsOn: stories.length > 0 && templateIdx % 3 === 1 ? [stories[stories.length - 1].id] : [],
+        // Statut explicite dès la génération plutôt que délégué au repli d'affichage
+        // (`story.status || 'todo'`, voir BacklogCard.jsx) : sans ce champ réel, un
+        // consommateur qui ne connaît pas ce repli (l'export Jira, notamment) traitait le
+        // statut comme totalement absent plutôt que "à faire" (retour utilisateur : les
+        // statuts à faire/en cours/terminé n'étaient "pas du tout pris en compte").
+        status: 'todo'
       })
       storyCounter++
       templateIdx++
@@ -97,6 +103,14 @@ export function generateRoadmap(resources, product, priorities, lang) {
 // budget marketing), en conservant les proportions relatives déjà proposées par le modèle.
 export function reconcileRoadmapCosts(roadmap, resources) {
   if (!roadmap?.sprints?.length) return roadmap
+  // Le schéma de sortie IA (planSchema.js) ne demande pas de champ `status` — une story
+  // fraîchement générée par l'IA en arrivait donc sans statut du tout, contrairement au
+  // moteur à règles qui le fixe désormais à 'todo' dès sa création. Sans ce filet, un
+  // consommateur qui ne connaît pas le repli d'affichage `story.status || 'todo'`
+  // (l'export Jira, notamment) traitait le statut comme absent plutôt que "à faire". Fait
+  // avant les `return` anticipés ci-dessous pour s'appliquer même si le budget ne permet
+  // pas de recaler les coûts.
+  roadmap.sprints.forEach(sp => (sp.stories || []).forEach(story => { story.status = story.status || 'todo' }))
   const totalBudget = BUDGET[resources?.totalBudget]
   const marketingBudget = BUDGET[resources?.budgetEur] ?? 0
   if (totalBudget == null) return roadmap
