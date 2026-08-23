@@ -887,6 +887,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Ajoute la date d\'échéance sur la synchronisation GitHub',
+            items: [
+              'Les issues GitHub n\'ont pas de champ "due date" natif contrairement à Jira/Notion — aucune échéance n\'était visible sur les issues synchronisées',
+              'Chaque sprint pose maintenant sa date de fin sur son Milestone GitHub (le seul endroit où GitHub expose nativement une échéance), et celle-ci est aussi écrite en toutes lettres dans le corps de chaque issue pour rester visible sans ouvrir le milestone'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Ajoute la date de début et la description à la sync Notion depuis le Backlog',
             items: [
               'La synchronisation rapide depuis le Backlog ne posait que Story, Sprint, Responsable, Effort, Coût et Statut — contrairement à l\'export complet du plan et à Jira, ni date de début ni description de la story',
@@ -3017,6 +3025,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Added a due date to the GitHub sync',
+            items: [
+              'GitHub issues have no native "due date" field, unlike Jira/Notion — synced issues showed no deadline at all',
+              'Each sprint now sets its end date on its GitHub Milestone (the only place GitHub natively exposes a deadline), and that date is also written out in each issue\'s body so it stays visible without opening the milestone'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Added start date and description to the quick Notion sync from the Backlog',
