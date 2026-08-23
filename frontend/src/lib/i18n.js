@@ -870,6 +870,18 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '23 août 2026',
+            title: 'Dashboard : calendrier des sprints, avancement global interactif, rapport financier par plan',
+            items: [
+              'Le calendrier du tableau de bord met en évidence tous les sprints actifs (tous plans confondus), pas seulement leur date de fin — cliquer un jour ouvre le détail (plans, sprints, stories) avec accès direct au plan',
+              '"Prochaines échéances" affiche la date exacte de chaque échéance, un badge coloré selon l\'urgence, et redirige directement vers le plan au clic',
+              'Avancement global (dashboard du plan) en double anneau SVG interactif : une part par story sur la couronne extérieure, le % agrégé sur l\'anneau intérieur, info-bulle au survol de chaque part',
+              '"Charge par responsable" et les barres de "Vélocité par sprint" reflètent les vrais membres de l\'équipe (assignation nominative depuis le Backlog), plus des rôles génériques',
+              'Nouveau rapport financier par plan, façon feuille investisseurs, ouvert depuis "Budget cumulé" en espace d\'équipe',
+              'Titre du plan renommable directement depuis la carte d\'identité'
+            ]
+          },
+          {
             date: '22 août 2026',
             title: 'Carte "Budget & Délai" : source unique pour le budget total et le délai de lancement',
             items: [
@@ -1177,7 +1189,8 @@ export const translations = {
               'Carte "Budget & Délai" : budget total et délai de lancement éditables, source unique qui pilote le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan, avec reconstruction possible de la roadmap depuis le nouveau délai',
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
               'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
-              'Suivi post-lancement & simulateur budget/timeline en direct'
+              'Suivi post-lancement & simulateur budget/timeline en direct',
+              'Rapport financier par plan façon feuille investisseurs (depuis "Budget cumulé" en espace d\'équipe) : budgets clés en en-tête, burn/runway, seuil de rentabilité avec justification ARPU, répartition des coûts par poste'
             ]
           },
           {
@@ -1186,7 +1199,8 @@ export const translations = {
               "Espaces d'équipe (Clerk Organizations), commentaires avec @mentions, fil d'activité par plan, tags transversaux",
               'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
               "Présence d'équipe en temps réel : qui a un plan de l'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d'espace",
-              'Tableau de bord : bandeau défilant de conseils générés par IA (renouvelés toutes les 15 min), calendrier du mois avec échéances de lancement, prochaines échéances tous plans confondus'
+              'Tableau de bord : bandeau défilant de conseils générés par IA (renouvelés toutes les 15 min), calendrier du mois mettant en évidence tous les sprints actifs (tous plans confondus) avec détail cliquable par jour, prochaines échéances enrichies (date exacte, urgence en couleur, accès direct au plan)',
+              'Dashboard du plan : avancement global en double anneau interactif (terminé/en cours/en retard/pas commencé, survol par story), rythme réel vs calendrier, charge par membre réel de l\'équipe'
             ]
           },
           {
@@ -2606,6 +2620,18 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: 'August 23, 2026',
+            title: 'Dashboard: sprint calendar, interactive overall progress, per-plan financial report',
+            items: [
+              'The dashboard calendar now highlights every active sprint (across all plans), not just its end date — clicking a day opens the detail (plans, sprints, stories) with direct access to the plan',
+              '"Upcoming deadlines" shows the exact date for each deadline, a color-coded urgency badge, and links directly to the plan on click',
+              'Overall progress (plan dashboard) is now an interactive SVG double ring: one wedge per story on the outer ring, the aggregate % on the inner ring, hover tooltip per wedge',
+              '"Workload by role" and the "Velocity by sprint" bars now reflect real team members (named assignment from the Backlog) instead of generic roles',
+              'New per-plan financial report in investor-sheet style, opened from "Combined budget" in team spaces',
+              'Plan title is now renamable directly from the identity card'
+            ]
+          },
+          {
             date: 'August 22, 2026',
             title: '"Budget & Timeline" card: single source for total budget and launch timeline',
             items: [
@@ -2913,7 +2939,8 @@ export const translations = {
               '"Budget & Timeline" card: editable total budget and launch timeline, single source driving the financial forecast, the marketing budget cap and the plan\'s identity card, with an option to rebuild the roadmap from the new timeline',
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
               'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
-              'Post-launch tracking & live budget/timeline simulator'
+              'Post-launch tracking & live budget/timeline simulator',
+              'Per-plan financial report in investor-sheet style (from "Combined budget" in team spaces): key budgets up top, burn/runway, break-even with ARPU rationale, cost breakdown by category'
             ]
           },
           {
@@ -2922,7 +2949,8 @@ export const translations = {
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
               'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
               'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
-              'Dashboard: scrolling AI-generated tip ticker (refreshed every 15 min), monthly calendar with launch deadlines, upcoming deadlines across all plans'
+              'Dashboard: scrolling AI-generated tip ticker (refreshed every 15 min), monthly calendar highlighting every active sprint across all plans with a clickable day detail, richer upcoming deadlines (exact date, color-coded urgency, direct link to the plan)',
+              'Plan dashboard: overall progress as an interactive double ring (done/in progress/overdue/not started, hover per story), real pace vs schedule, workload by real team member'
             ]
           },
           {
