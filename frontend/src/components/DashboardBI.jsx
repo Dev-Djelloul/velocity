@@ -46,7 +46,7 @@ function latestTrackedValue(metricsHistory, idx) {
   return entries.reduce((latest, h) => (!latest || h.date > latest.date ? h : latest), null).value
 }
 
-export default function DashboardBI({ plan, lang }) {
+export default function DashboardBI({ plan, lang, teamMembers }) {
   if (!plan) return null
 
   const { roadmap, marketing, kpis, financials, metricsHistory } = plan
@@ -57,13 +57,37 @@ export default function DashboardBI({ plan, lang }) {
     display: formatMoney(ch.budget)
   }))
 
-  const workloadMap = {}
-  ;(roadmap?.sprints || []).forEach(sp => sp.stories.forEach(s => {
-    workloadMap[s.assignee] = (workloadMap[s.assignee] || 0) + s.effort
-  }))
-  const workloadSegments = Object.entries(workloadMap).map(([name, value]) => ({
-    name, value, display: `${value}pts`
-  }))
+  // "Charge par responsable" doit refléter de vraies personnes, pas des rôles génériques
+  // "Dev"/"Marketing" déconnectés de l'équipe réelle (retour utilisateur) — chaque story
+  // assignée à un membre réel (BacklogCard, story.assignedToName) compte pour ce membre ;
+  // le travail encore sans assignation nominative est réparti à parts égales entre tous les
+  // membres de l'équipe, pour que le total corresponde bien à tous les membres plutôt qu'à
+  // un panier "rôle" fourre-tout. En espace personnel (pas de teamMembers), on retombe sur
+  // le rôle générique de la story faute de mieux.
+  const allRoadmapStories = (roadmap?.sprints || []).flatMap(sp => sp.stories)
+  let workloadSegments
+  if (teamMembers?.length) {
+    const perMember = new Map(teamMembers.map(m => [m.id, { name: m.name, effort: 0 }]))
+    let unassignedEffort = 0
+    allRoadmapStories.forEach(s => {
+      const entry = s.assignedToId && perMember.get(s.assignedToId)
+      if (entry) entry.effort += s.effort
+      else unassignedEffort += s.effort
+    })
+    if (unassignedEffort > 0) {
+      const share = unassignedEffort / teamMembers.length
+      perMember.forEach(entry => { entry.effort += share })
+    }
+    workloadSegments = [...perMember.values()].map(({ name, effort }) => ({
+      name, value: Math.round(effort), display: `${Math.round(effort)}pts`
+    }))
+  } else {
+    const workloadMap = {}
+    allRoadmapStories.forEach(s => { workloadMap[s.assignee] = (workloadMap[s.assignee] || 0) + s.effort })
+    workloadSegments = Object.entries(workloadMap).map(([name, value]) => ({
+      name, value, display: `${value}pts`
+    }))
+  }
 
   const sprints = roadmap?.sprints || []
   const maxSprintEffort = Math.max(1, ...sprints.map(sp => sp.stories.reduce((s, x) => s + x.effort, 0)))

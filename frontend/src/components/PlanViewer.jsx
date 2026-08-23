@@ -971,7 +971,7 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
       <div className="plan-grid">
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.synthese')}</h2>
-        <div id="section-dashboard" className={`plan-section-anchor ${mobileSectionId === 'section-dashboard' ? 'is-active' : ''}`}><DashboardBI plan={plan} lang={lang} /></div>
+        <div id="section-dashboard" className={`plan-section-anchor ${mobileSectionId === 'section-dashboard' ? 'is-active' : ''}`}><DashboardBI plan={plan} lang={lang} teamMembers={team.teamId ? team.members : []} /></div>
 
         <h2 className="plan-section-title">{t(lang, 'sidebar.groups.market')}</h2>
         <div id="section-persona" className={`plan-section-anchor ${mobileSectionId === 'section-persona' ? 'is-active' : ''}`}>
