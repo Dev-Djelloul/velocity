@@ -8,6 +8,16 @@ import '../styles/DashboardBI.css'
 
 const DONUT_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6366f1', '#f472b6', '#a89fe8']
 
+// Deux nuances (claire/sombre) par statut de story — alternées d'une story à l'autre sur la
+// couronne extérieure de "Avancement global" pour que deux stories voisines du même statut
+// restent visuellement deux parts distinctes plutôt qu'un seul bloc continu.
+const TICK_COLORS = {
+  done: ['#4ade80', '#22c55e'],
+  overdue: ['#f87171', '#dc2626'],
+  inProgress: ['#fde047', '#eab308'],
+  todo: ['rgba(255, 255, 255, 0.26)', 'rgba(255, 255, 255, 0.12)']
+}
+
 // Icône d'aide sur chaque titre de carte du Dashboard — avant, seule une poignée de cartes
 // expliquaient ce qu'elles montraient. Un pur ::after CSS sur :hover (même mécanisme que
 // plan-stat-tooltip) ne marche que sur desktop : sur mobile/tactile, il n'y a pas de survol,
@@ -169,17 +179,24 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
   // reste de l'app plutôt que d'inventer une nouvelle notion de retard.
   const SPRINT_DAYS = 14
   const nowMs = Date.now()
-  let doneEffort = 0, inProgressEffort = 0, overdueEffort = 0, todoEffort = 0
-  let doneCount = 0, inProgressCount = 0, overdueCount = 0, todoCount = 0
-  sprints.forEach(sp => {
+  // Source unique pour l'anneau (moyen agrégé) ET pour la couronne extérieure (une part
+  // par story, voir plus bas) — évite de recalculer le statut de chaque story deux fois
+  // avec un risque de divergence entre les deux.
+  const storyStatuses = sprints.flatMap(sp => {
     const sprintEndMs = new Date(scheduleStart || nowMs).getTime() + sp.sprintId * SPRINT_DAYS * 86400000
     const sprintOverdue = sprintEndMs < nowMs
-    sp.stories.forEach(s => {
-      if (s.status === 'done') { doneEffort += s.effort; doneCount++ }
-      else if (sprintOverdue) { overdueEffort += s.effort; overdueCount++ }
-      else if (s.status === 'in_progress') { inProgressEffort += s.effort; inProgressCount++ }
-      else { todoEffort += s.effort; todoCount++ }
-    })
+    return sp.stories.map(s => ({
+      effort: s.effort,
+      status: s.status === 'done' ? 'done' : sprintOverdue ? 'overdue' : s.status === 'in_progress' ? 'inProgress' : 'todo'
+    }))
+  })
+  let doneEffort = 0, inProgressEffort = 0, overdueEffort = 0, todoEffort = 0
+  let doneCount = 0, inProgressCount = 0, overdueCount = 0, todoCount = 0
+  storyStatuses.forEach(s => {
+    if (s.status === 'done') { doneEffort += s.effort; doneCount++ }
+    else if (s.status === 'overdue') { overdueEffort += s.effort; overdueCount++ }
+    else if (s.status === 'inProgress') { inProgressEffort += s.effort; inProgressCount++ }
+    else { todoEffort += s.effort; todoCount++ }
   })
 
   const primaryKpi = kpis?.[0]
@@ -209,19 +226,46 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
             return stop
           })
           const overallPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
+
+          // Couronne extérieure : une part par story (pas par effort) — retour utilisateur :
+          // l'anneau seul ne montrait jamais qu'il y avait "12 stories" au total, deux stories
+          // du même statut fusionnaient en un seul bloc de couleur continu. Chaque part est
+          // ici discrète (petit espace vide entre deux) et alterne deux nuances de sa couleur
+          // de statut (claire/sombre) pour rester distincte de sa voisine même de même statut.
+          const tickCount = storyStatuses.length
+          const tickStops = []
+          if (tickCount > 0) {
+            const slot = 100 / tickCount
+            const gap = Math.min(slot * 0.22, 1.4)
+            storyStatuses.forEach((s, i) => {
+              const start = i * slot
+              const end = start + slot - gap
+              const color = TICK_COLORS[s.status][i % 2]
+              tickStops.push(`${color} ${start}%`, `${color} ${end}%`, `transparent ${end}%`, `transparent ${start + slot}%`)
+            })
+          }
+
           return (
             <div className="dashboard-bi-tile">
               <h4>{t(lang, 'dashboardBi.overallProgress')} <CardHelp text={t(lang, 'dashboardBi.overallProgressHelp')} /></h4>
               <div className="status-ring-wrap">
-                <div className="donut status-ring" style={{ background: `conic-gradient(${stops.join(', ')})` }}>
-                  <div className="donut-center">
-                    <span className="status-ring-value">{overallPct}%</span>
+                <div
+                  className="status-ring-outer"
+                  style={{ background: tickCount ? `conic-gradient(${tickStops.join(', ')})` : 'none' }}
+                  title={t(lang, 'dashboardBi.storyCount')(tickCount)}
+                >
+                  <div className="status-ring-outer-mask">
+                    <div className="donut status-ring" style={{ background: `conic-gradient(${stops.join(', ')})` }}>
+                      <div className="donut-center">
+                        <span className="status-ring-value">{overallPct}%</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
                 {/* Une ligne par statut, avec le nombre de stories (pas les points, qui
-                    n'avaient de sens que pour dessiner l'anneau) — retour utilisateur : "2/12
-                    · 3 en cours" en une phrase ne disait rien sur le "pas commencé" ni le
-                    "en retard", il fallait tout détailler ligne par ligne. */}
+                    n'avaient de sens que pour dessiner l'anneau intérieur) — retour
+                    utilisateur : "2/12 · 3 en cours" en une phrase ne disait rien sur le "pas
+                    commencé" ni le "en retard", il fallait tout détailler ligne par ligne. */}
                 <div className="status-ring-list">
                   {ringSegments.map(seg => (
                     <div key={seg.key} className="status-ring-row">

@@ -266,6 +266,29 @@
   justify-content: center;
 }
 
+/* Couronne extérieure (une part par story) + anneau intérieur (le %) imbriqués en cercles
+   concentriques, même technique de "trou" que .donut : un cercle plein masqué en son centre
+   par un cercle de la couleur du fond, laissant juste l'anneau visible. */
+.status-ring-outer {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-ring-outer-mask {
+  width: 138px;
+  height: 138px;
+  border-radius: 50%;
+  background: var(--color-bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .status-ring {
   width: 130px;
   height: 130px;
