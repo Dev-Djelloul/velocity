@@ -336,7 +336,8 @@
 .plan-actions > .plan-save-btn {
   min-width: 148px;
   justify-content: center;
-  font-size: 0.85rem;
+  font-size: 0.85rem !important;
+  font-weight: 600 !important;
 }
 
 .plan-save-btn {
