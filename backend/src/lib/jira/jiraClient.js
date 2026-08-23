@@ -242,7 +242,7 @@ async function discoverFields(accessToken, cloudId) {
   } catch { return {} }
 }
 
-// Date au format YYYY-MM-DD, décalée de N semaines depuis la base (generatedAt). 2 semaines/sprint.
+// Date au format YYYY-MM-DD, décalée de N semaines depuis la base (planStartDate/generatedAt). 2 semaines/sprint.
 function isoDatePlusWeeks(baseIso, weeks) {
   const d = baseIso ? new Date(baseIso) : new Date()
   if (isNaN(d.getTime())) return null
@@ -382,7 +382,14 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
     accountIdCache.set(story.assignedToId, accountId)
     return accountId ?? myAccountId
   }
-  const base = plan.generatedAt
+  // planStartDate (pas generatedAt) est la vraie base de calendrier utilisée partout dans
+  // l'app (RoadmapCard/GanttChart/CalendarView/BurndownChart) — c'est le champ que
+  // "Modifier la date de démarrage" met à jour ; generatedAt lui ne change jamais après la
+  // création du plan. En ne lisant que generatedAt ici, l'export Jira retombait
+  // systématiquement sur la date de génération initiale même après un changement manuel de
+  // la date de démarrage, pourtant bien répercuté partout ailleurs dans l'app (retour
+  // utilisateur : dates Jira figées au 22 août malgré un changement vers le 3 juin).
+  const base = plan.planStartDate || plan.generatedAt
   // Identifiant qui distingue CE plan dans les labels vl-id:/vl-epic: (voir plus bas) —
   // plan.id peut être absent pour un plan pas encore sauvegardé au moins une fois (voir
   // PlanViewer.jsx, `if (plan.id) savePlan(...)` à plusieurs endroits) ; generatedAt (un
