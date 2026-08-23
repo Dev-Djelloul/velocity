@@ -960,6 +960,16 @@
   color: var(--color-text-muted, #9ca3af);
 }
 
+/* Petit repère de couleur accolé à "Sprint N" dans le popover — même couleur que la ligne
+   continue de ce sprint sur la grille du calendrier au-dessus, pour relier visuellement
+   les deux (retour utilisateur, mémo repère). */
+.dashboard-calendar-popover-sprint-swatch {
+  flex-shrink: 0;
+  width: 3px;
+  height: 12px;
+  border-radius: 2px;
+}
+
 /* Empilées en pleine largeur plutôt que côte à côte — retour utilisateur : les puces
    côte à côte tronquaient presque tout le titre ("Construire le parc…"). Une par ligne,
    texte plus petit mais complet (retour à la ligne autorisé), on privilégie pouvoir tout

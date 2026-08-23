@@ -62,6 +62,11 @@ function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onCl
           <button className="dashboard-calendar-day-popover-plan" onClick={() => onOpenPlan(entry.plan)}>
             <span className="dashboard-calendar-dot dashboard-calendar-dot-sprint" />
             <span className="dashboard-calendar-day-popover-plan-name">{entry.planName || t(lang, 'dashboard.deadlinesUntitled')}</span>
+            {/* Repère de couleur du sprint (même couleur que sa ligne continue sur la
+                grille du calendrier) accolé au libellé "Sprint N" — permet de relier d'un
+                coup d'œil les stories affichées ici à leur ligne sur le calendrier
+                au-dessus (retour utilisateur). */}
+            <span className="dashboard-calendar-popover-sprint-swatch" style={{ background: entry.color }} aria-hidden="true" />
             <span className="dashboard-calendar-day-popover-plan-tag">{t(lang, 'dashboard.calendarSprintLabel')(entry.sprintId)}</span>
           </button>
           {!!entry.stories.length && (
