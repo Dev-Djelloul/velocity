@@ -871,6 +871,16 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Vraies cases à cocher PDF, export HTML du rapport financier, icônes des exports',
+            items: [
+              'Rapport investisseurs (PDF) : la checklist RGPD utilise désormais de vraies cases à cocher interactives (cochables dans Acrobat/Preview), plus des symboles qui s\'affichaient en carré vide selon le lecteur PDF',
+              'Rapport financier (Word) : titre et sous-titre nettement réduits (ils utilisaient le style par défaut de Word, démesuré)',
+              'Nouvel export HTML du rapport financier : page autonome au rendu proche de l\'app (halos dégradés, cartes en verre dépoli, graphiques identiques)',
+              'Icônes ajoutées sur tous les boutons d\'export, du rapport financier et de la fenêtre d\'export générale du plan (PDF, Word, HTML, PPTX, CSV, JSON, PNG, RGPD)'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Rapport financier : export PDF/Word, graphique amélioré ; notifications et Gantt affinés',
             items: [
               'Rapport financier par plan : export dédié en PDF et en Word (synthèse des budgets, KPIs, trésorerie mois par mois, répartition des coûts, pont coûts/revenus), avec la marque personnalisée déjà configurable',
@@ -1201,7 +1211,8 @@ export const translations = {
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
               'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
               'Suivi post-lancement & simulateur budget/timeline en direct',
-              'Rapport financier par plan façon feuille investisseurs (depuis "Budget cumulé" en espace d\'équipe) : budgets clés en en-tête, burn/runway, seuil de rentabilité avec justification ARPU, répartition des coûts par poste, export dédié en PDF et en Word'
+              'Rapport financier par plan façon feuille investisseurs (depuis "Budget cumulé" en espace d\'équipe) : budgets clés en en-tête, burn/runway, seuil de rentabilité avec justification ARPU, répartition des coûts par poste, export dédié en PDF, Word et HTML',
+              'Rapport investisseurs (export PDF du plan complet) : checklist RGPD avec de vraies cases à cocher interactives (cochables dans Acrobat/Preview), pas de simples symboles'
             ]
           },
           {
@@ -2642,6 +2653,16 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Real PDF checkboxes, financial report HTML export, export icons',
+            items: [
+              'Investor report (PDF): the GDPR checklist now uses real interactive checkboxes (checkable in Acrobat/Preview), instead of symbols that showed as an empty square depending on the PDF reader',
+              'Financial report (Word): title and subtitle sized way down (they used Word\'s oversized default heading style)',
+              'New HTML export for the financial report: a standalone page closely matching the app\'s look (gradient glows, glass cards, identical charts)',
+              'Icons added to every export button, on the financial report and the plan\'s general export window (PDF, Word, HTML, PPTX, CSV, JSON, PNG, GDPR)'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Financial report: PDF/Word export, improved chart; refined notifications and Gantt',
             items: [
               'Per-plan financial report: dedicated PDF and Word export (budget summary, KPIs, month-by-month cash runway, cost breakdown, cost/revenue bridge), honoring the existing custom branding',
@@ -2972,7 +2993,8 @@ export const translations = {
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
               'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
               'Post-launch tracking & live budget/timeline simulator',
-              'Per-plan financial report in investor-sheet style (from "Combined budget" in team spaces): key budgets up top, burn/runway, break-even with ARPU rationale, cost breakdown by category, dedicated PDF and Word export'
+              'Per-plan financial report in investor-sheet style (from "Combined budget" in team spaces): key budgets up top, burn/runway, break-even with ARPU rationale, cost breakdown by category, dedicated PDF, Word and HTML export',
+              'Investor report (full-plan PDF export): GDPR checklist with real interactive checkboxes (checkable in Acrobat/Preview), not plain symbols'
             ]
           },
           {
