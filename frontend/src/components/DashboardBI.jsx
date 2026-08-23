@@ -125,6 +125,26 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
     }
   }
 
+  // "Avancement global" doit distinguer terminé / en cours / pas commencé / en retard
+  // plutôt qu'une seule couleur (retour utilisateur : c'est la première métrique regardée,
+  // elle doit tout dire d'un coup d'œil). "En retard" = story pas terminée dont le sprint
+  // est déjà censé être fini — même calcul de fin de sprint que upcomingDeadlines.js/
+  // GanttChart.jsx (planStartDate + 14 jours par sprint), pour rester cohérent avec le
+  // reste de l'app plutôt que d'inventer une nouvelle notion de retard.
+  const SPRINT_DAYS = 14
+  const nowMs = Date.now()
+  let doneEffort = 0, inProgressEffort = 0, overdueEffort = 0, todoEffort = 0
+  sprints.forEach(sp => {
+    const sprintEndMs = new Date(scheduleStart || nowMs).getTime() + sp.sprintId * SPRINT_DAYS * 86400000
+    const sprintOverdue = sprintEndMs < nowMs
+    sp.stories.forEach(s => {
+      if (s.status === 'done') doneEffort += s.effort
+      else if (sprintOverdue) overdueEffort += s.effort
+      else if (s.status === 'in_progress') inProgressEffort += s.effort
+      else todoEffort += s.effort
+    })
+  })
+
   const primaryKpi = kpis?.[0]
 
   return (
@@ -136,23 +156,40 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
       <div className="dashboard-bi-grid">
         {allStories.length > 0 && (() => {
-          // Vert seulement si tout est vraiment terminé ; jaune dès qu'il y a du travail "en
-          // cours" (retour utilisateur : une story à moitié faite ne doit pas paraître aussi
-          // aboutie qu'une story terminée) ; neutre (vert) si rien n'a encore démarré, pour ne
-          // pas alarmer sur un plan qui n'a simplement pas commencé.
-          const allDone = doneStoryCount === allStories.length
-          const overallTone = allDone ? 'good' : inProgressStoryCount > 0 ? 'warning' : 'good'
+          const ringSegments = [
+            { key: 'done', labelKey: 'statusDone', color: '#4ade80', value: doneEffort },
+            { key: 'overdue', labelKey: 'statusOverdue', color: '#ef4444', value: overdueEffort },
+            { key: 'inProgress', labelKey: 'statusInProgress', color: '#facc15', value: inProgressEffort },
+            { key: 'todo', labelKey: 'statusTodo', color: 'rgba(255, 255, 255, 0.16)', value: todoEffort }
+          ].filter(seg => seg.value > 0)
+          const ringTotal = ringSegments.reduce((s, seg) => s + seg.value, 0) || 1
+          let cursor = 0
+          const stops = ringSegments.map(seg => {
+            const pct = (seg.value / ringTotal) * 100
+            const stop = `${seg.color} ${cursor}% ${cursor + pct}%`
+            cursor += pct
+            return stop
+          })
+          const overallPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
           return (
             <div className="dashboard-bi-tile">
               <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
-              <div className="dashboard-bi-progress-wrap">
-                <CircularGauge
-                  value={progressStoryEffort}
-                  max={totalStoryEffort || 1}
-                  tone={overallTone}
-                  label={t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, inProgressStoryCount, allStories.length)}
-                />
+              <div className="status-ring-wrap">
+                <div className="donut status-ring" style={{ background: `conic-gradient(${stops.join(', ')})` }}>
+                  <div className="donut-center">
+                    <span className="status-ring-value">{overallPct}%</span>
+                  </div>
+                </div>
+                <div className="status-ring-legend">
+                  {ringSegments.map(seg => (
+                    <span key={seg.key} className="status-ring-legend-item" title={t(lang, `dashboardBi.${seg.labelKey}`)}>
+                      <i className="status-ring-dot" style={{ background: seg.color }} />
+                      {Math.round(seg.value)}
+                    </span>
+                  ))}
+                </div>
               </div>
+              <p className="dashboard-bi-tile-hint">{t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, inProgressStoryCount, allStories.length)}</p>
             </div>
           )
         })()}

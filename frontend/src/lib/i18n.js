@@ -335,7 +335,11 @@ export const translations = {
       schedulePace: 'Rythme vs calendrier',
       paceStories: 'Stories',
       paceCalendar: 'Calendrier',
-      pointsDone: 'terminés'
+      pointsDone: 'terminés',
+      statusDone: 'Terminé',
+      statusInProgress: 'En cours',
+      statusTodo: 'Pas commencé',
+      statusOverdue: 'En retard'
     },
     sidebar: {
       title: 'Sommaire du plan',
@@ -2052,7 +2056,11 @@ export const translations = {
       schedulePace: 'Pace vs schedule',
       paceStories: 'Stories',
       paceCalendar: 'Calendar',
-      pointsDone: 'done'
+      pointsDone: 'done',
+      statusDone: 'Done',
+      statusInProgress: 'In progress',
+      statusTodo: 'Not started',
+      statusOverdue: 'Overdue'
     },
     sidebar: {
       title: 'Plan overview',

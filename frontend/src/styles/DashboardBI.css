@@ -201,6 +201,54 @@
   color: var(--color-text-muted);
 }
 
+.status-ring-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex: 1;
+  justify-content: center;
+}
+
+.status-ring {
+  width: 130px;
+  height: 130px;
+}
+
+.status-ring .donut-center {
+  width: 84px;
+  height: 84px;
+}
+
+.status-ring-value {
+  font-size: 1.35rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+}
+
+.status-ring-legend {
+  display: flex;
+  gap: 0.7rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.status-ring-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  cursor: help;
+}
+
+.status-ring-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
 .pace-compare {
   display: flex;
   align-items: center;
