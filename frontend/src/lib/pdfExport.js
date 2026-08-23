@@ -228,7 +228,7 @@ export async function exportPDF(plan, lang, branding) {
       { text: t(lang, 'rgpd.title'), style: 'section' },
       { text: r.applicability, margin: [0, 0, 0, 3], italics: true },
       { text: `${t(lang, 'rgpd.checklist')}:`, bold: true, margin: [0, 2, 0, 1] },
-      ...(r.checklist || []).map(it => ({ text: `${it.done ? '☑' : '☐'} ${it.item} [${t(lang, `rgpd.priority.${it.priority}`) || it.priority}]`, margin: [0, 1, 0, 1] })),
+      ...(r.checklist || []).map(it => ({ text: `${it.done ? '[x]' : '[ ]'} ${it.item} [${t(lang, `rgpd.priority.${it.priority}`) || it.priority}]`, margin: [0, 1, 0, 1] })),
       { text: t(lang, 'rgpd.disclaimer'), margin: [0, 3, 0, 0], italics: true, fontSize: 8 }
     )
   }
@@ -336,7 +336,10 @@ export async function exportComplianceReport(plan, lang, branding) {
       { text: r.applicability, margin: [0, 0, 0, 6], italics: true },
       { text: `${t(lang, 'rgpd.checklist')}:`, bold: true, margin: [0, 2, 0, 4] },
       {
-        ul: (r.checklist || []).map(it => `${it.done ? '☑' : '☐'} ${it.item} — ${t(lang, `rgpd.priority.${it.priority}`) || it.priority}`),
+        // "☑"/"☐" ne sont pas dans la police Roboto embarquée par pdfmake (vfs_fonts) et
+        // s'affichaient en carré vide ("tofu") dans le PDF — repli sur des cases ASCII,
+        // garanties d'être rendues par n'importe quelle police.
+        ul: (r.checklist || []).map(it => `${it.done ? '[x]' : '[ ]'} ${it.item} — ${t(lang, `rgpd.priority.${it.priority}`) || it.priority}`),
         margin: [0, 0, 0, 8]
       }
     )

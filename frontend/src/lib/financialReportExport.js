@@ -1,7 +1,16 @@
 import { t } from './i18n'
-import { formatMoney } from './currency'
+import { formatMoney as formatMoneyDisplay } from './currency'
 import { resolveBudgetAmount } from './budgetTiers'
 import { downloadBlob, slug } from './pdfExport'
+
+// formatMoney() sépare les milliers avec un espace fine insécable (U+202F, via
+// toLocaleString('fr-FR')) : parfait à l'écran, mais absent de la police Roboto embarquée
+// par pdfmake et mal géré par certains moteurs de rendu .docx — il s'affichait en carré
+// vide ("tofu") dans les exports PDF/Word du rapport (retour utilisateur). On retombe sur
+// une espace normale, invisible à l'oeil mais garantie d'être rendue partout.
+function formatMoney(amount) {
+  return formatMoneyDisplay(amount).replace(/ /g, ' ')
+}
 
 // Exports dédiés au rapport financier par plan (PlanFinancialReportPage) : un vrai
 // document PDF (pdfmake, même moteur que le rapport de conformité) et un vrai .docx
@@ -185,29 +194,40 @@ export async function exportFinancialReportDocx(plan, lang, branding) {
   const NO_BORDER = { style: BorderStyle.NONE, size: 0, color: 'FFFFFF' }
   const cellBorders = { top: NO_BORDER, bottom: NO_BORDER, left: NO_BORDER, right: NO_BORDER }
 
-  function headerCell(text) {
+  // Largeur totale utile d'une page A4 avec marges normales, en dxa (1/20e de point) —
+  // sans largeur de colonne explicite en dxa, Pages/LibreOffice ignorent le pourcentage et
+  // retombent sur un auto-fit qui écrase chaque colonne à la largeur de son contenu le plus
+  // étroit (une lettre par ligne, cf. retour utilisateur) là où Word s'en sortait à peu près.
+  const PAGE_WIDTH_DXA = 9026
+
+  function headerCell(text, widthDxa) {
     return new TableCell({
       borders: cellBorders,
+      width: { size: widthDxa, type: WidthType.DXA },
       shading: { type: ShadingType.CLEAR, fill: 'F3F1FB' },
       margins: { top: 100, bottom: 100, left: 120, right: 120 },
       children: [new Paragraph({ children: [new TextRun({ text, bold: true, size: 18, color: '6B7280' })] })]
     })
   }
 
-  function cell(text, opts = {}) {
+  function cell(text, widthDxa, opts = {}) {
     return new TableCell({
       borders: cellBorders,
+      width: { size: widthDxa, type: WidthType.DXA },
       margins: { top: 100, bottom: 100, left: 120, right: 120 },
       children: [new Paragraph({ children: [new TextRun({ text: String(text), bold: !!opts.bold, size: opts.size || 20, color: opts.color })] })]
     })
   }
 
   function dataTable(headerLabels, rows) {
+    const colCount = headerLabels.length
+    const colWidth = Math.floor(PAGE_WIDTH_DXA / colCount)
     return new Table({
-      width: { size: 100, type: WidthType.PERCENTAGE },
+      width: { size: PAGE_WIDTH_DXA, type: WidthType.DXA },
+      columnWidths: new Array(colCount).fill(colWidth),
       rows: [
-        new TableRow({ children: headerLabels.map(headerCell) }),
-        ...rows.map(r => new TableRow({ children: r.map(v => cell(v)) }))
+        new TableRow({ children: headerLabels.map(h => headerCell(h, colWidth)) }),
+        ...rows.map(r => new TableRow({ children: r.map(v => cell(v, colWidth)) }))
       ]
     })
   }
