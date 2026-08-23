@@ -887,6 +887,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Ajoute la date de début et la description à la sync Notion depuis le Backlog',
+            items: [
+              'La synchronisation rapide depuis le Backlog ne posait que Story, Sprint, Responsable, Effort, Coût et Statut — contrairement à l\'export complet du plan et à Jira, ni date de début ni description de la story',
+              'Une base Notion déjà synchronisée avant cet ajout reçoit maintenant aussi ces colonnes au prochain sync, sans avoir besoin de la recréer'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrige les dates Jira/Notion figées à la génération initiale du plan',
             items: [
               'Modifier la date de démarrage du plan (RoadmapCard) met à jour un champ dédié déjà utilisé partout ailleurs (Calendrier, Gantt, Burndown) — mais les exports Jira et Notion continuaient de calculer les dates de sprints/stories à partir de la date de génération d\'origine, jamais mise à jour',
@@ -3009,6 +3017,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Added start date and description to the quick Notion sync from the Backlog',
+            items: [
+              'The quick sync from the Backlog only wrote Story, Sprint, Assignee, Effort, Cost and Status — unlike the full plan export and Jira, no story start date or description',
+              'A Notion database already synced before this update now also gets these columns on the next sync, no need to recreate it'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed Jira/Notion dates stuck at the plan\'s original generation date',
