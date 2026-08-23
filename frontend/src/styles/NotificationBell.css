@@ -70,6 +70,7 @@
 }
 
 .notif-bell-header {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -77,6 +78,71 @@
   border-bottom: 1px solid rgba(145, 132, 217, 0.15);
   font-weight: 700;
   font-size: 0.85rem;
+}
+
+/* Bulle compacte ancrée sous l'icône poubelle plutôt qu'une grande modale centrée avec
+   fond assombri — supprimer des notifications n'est pas une action critique (retour
+   utilisateur), la confirmation reste discrète et proche du geste qui l'a déclenchée. */
+.notif-delete-confirm {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0.9rem;
+  z-index: 90;
+  width: 220px;
+  padding: 0.7rem 0.8rem;
+  border-radius: 10px;
+  background: var(--color-bg-tertiary, #22283a);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+  font-weight: 400;
+  animation: notif-delete-confirm-in 0.12s ease;
+}
+
+@keyframes notif-delete-confirm-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-delete-confirm p {
+  margin: 0 0 0.6rem;
+  font-size: 0.76rem;
+  line-height: 1.35;
+  color: var(--color-text-secondary, #d1d5db);
+}
+
+.notif-delete-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+.notif-delete-confirm-cancel,
+.notif-delete-confirm-ok {
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  border: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.notif-delete-confirm-cancel {
+  background: transparent;
+  color: var(--color-text-secondary, #d1d5db);
+}
+
+.notif-delete-confirm-cancel:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.notif-delete-confirm-ok {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
+}
+
+.notif-delete-confirm-ok:hover {
+  background: rgba(239, 68, 68, 0.25);
 }
 
 .notif-bell-header-actions {

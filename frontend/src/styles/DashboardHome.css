@@ -864,6 +864,40 @@
   padding: 1.3rem;
 }
 
+/* En widget "Petit" (1x1, ~170px de côté), la moitié réservée au texte ne fait plus que
+   ~85px de large — largement insuffisant pour le nom de l'espace, le badge, la liste de
+   miniatures de plans et le résumé, qui se retrouvaient coupés en plein milieu d'un mot
+   (retour utilisateur, capture à l'appui). On empile l'image au-dessus du texte plutôt que
+   côte à côte, et on masque les éléments secondaires (miniatures, résumé) qui n'ont de
+   toute façon pas la place de s'afficher correctement à cette taille. */
+.dashboard-widget-slot.size-small .dashboard-space-card {
+  flex-direction: column;
+}
+
+.dashboard-widget-slot.size-small .dashboard-space-card-media {
+  flex: 0 0 58%;
+  width: 100%;
+}
+
+.dashboard-widget-slot.size-small .dashboard-space-card-body {
+  padding: 0.5rem 0.65rem;
+  align-items: flex-start;
+}
+
+.dashboard-widget-slot.size-small .dashboard-space-plans-row,
+.dashboard-widget-slot.size-small .dashboard-space-summary {
+  display: none;
+}
+
+.dashboard-widget-slot.size-small .dashboard-space-name {
+  flex-wrap: wrap;
+}
+
+.dashboard-widget-slot.size-small .dashboard-space-name-text {
+  font-size: 0.8rem;
+  white-space: normal;
+}
+
 .dashboard-space-card:hover {
   transform: scale(1.025);
   filter: brightness(1.08);

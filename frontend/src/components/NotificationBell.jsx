@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFeedRead, deleteAllNotificationFeed } from '../lib/serverStorage'
-import { IconBell, IconCheckCircle, IconTrash, IconAlertTriangle } from './Icons'
+import { IconBell, IconCheckCircle, IconTrash } from './Icons'
 import '../styles/NotificationBell.css'
 
 const POLL_MS = 8000
@@ -43,6 +43,10 @@ export default function NotificationBell({ userId, lang, onOpen }) {
     document.addEventListener('mousedown', onClickOutside)
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [open])
+
+  // La bulle de confirmation n'a plus son propre fond assombri cliquable pour se fermer
+  // (voir plus bas) — elle se referme avec le panneau, pas indépendamment de lui.
+  useEffect(() => { if (!open) setConfirmingDeleteAll(false) }, [open])
 
   if (!userId) return null
 
@@ -93,6 +97,20 @@ export default function NotificationBell({ userId, lang, onOpen }) {
                 </button>
               )}
             </div>
+
+            {/* Petite bulle ancrée juste sous l'icône poubelle plutôt qu'une grande modale
+                centrée avec fond assombri — supprimer des notifications n'a rien d'un
+                avertissement critique (retour utilisateur), pas besoin de l'habillage
+                habituel réservé aux actions vraiment destructrices (suppression de plan...). */}
+            {confirmingDeleteAll && (
+              <div className="notif-delete-confirm" onClick={e => e.stopPropagation()}>
+                <p>{t(lang, 'notifCenter.confirmDeleteAll')}</p>
+                <div className="notif-delete-confirm-actions">
+                  <button className="notif-delete-confirm-cancel" onClick={() => setConfirmingDeleteAll(false)}>{t(lang, 'plans.cancel')}</button>
+                  <button className="notif-delete-confirm-ok" onClick={confirmDeleteAll}>{t(lang, 'notifCenter.deleteAll')}</button>
+                </div>
+              </div>
+            )}
           </div>
           <div className="notif-bell-list">
             {items.length === 0 && <p className="notif-bell-empty">{t(lang, 'notifCenter.empty')}</p>}
@@ -104,20 +122,6 @@ export default function NotificationBell({ userId, lang, onOpen }) {
                 {!item.read && <IconCheckCircle width={12} height={12} className="notif-bell-item-dot" />}
               </button>
             ))}
-          </div>
-        </div>
-      )}
-
-      {confirmingDeleteAll && (
-        <div className="confirm-modal-backdrop" onClick={() => setConfirmingDeleteAll(false)}>
-          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
-            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
-            <h3>{t(lang, 'notifCenter.deleteAll')}</h3>
-            <p>{t(lang, 'notifCenter.confirmDeleteAll')}</p>
-            <div className="confirm-modal-actions">
-              <button className="btn-secondary" onClick={() => setConfirmingDeleteAll(false)}>{t(lang, 'plans.cancel')}</button>
-              <button className="btn-danger" onClick={confirmDeleteAll}>{t(lang, 'notifCenter.deleteAll')}</button>
-            </div>
           </div>
         </div>
       )}
