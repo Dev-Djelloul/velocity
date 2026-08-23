@@ -239,7 +239,7 @@ export default function GanttChart({ roadmap, lang, generatedAt, onRoadmapChange
                   {story.title}
                 </div>
                 <div
-                  className={`gantt-bar gantt-bar-story status-${status}`}
+                  className={`gantt-bar gantt-bar-story status-${status} ${isExpanded ? 'is-expanded' : ''}`}
                   style={{ gridRow, gridColumn: 2 + (story.sprintId - 1), '--group-color': color }}
                   draggable
                   onDragStart={e => e.dataTransfer.setData('text/plain', `${story.id}::${story.sprintId}`)}

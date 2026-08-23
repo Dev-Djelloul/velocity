@@ -47,7 +47,7 @@ export default function PlanFinancialReportPage({ plan, lang, onBack }) {
   let maxCash = 1
   const chartW = 640
   const chartH = 220
-  const padL = 46
+  const padL = 60
   const padR = 16
   const padT = 16
   const padB = 26
@@ -102,9 +102,9 @@ export default function PlanFinancialReportPage({ plan, lang, onBack }) {
           </div>
 
           <div className="fin-report-totals card">
-            <div className="fin-report-total">
+            <div className="fin-report-total fin-report-total-grand">
               <span className="fin-report-total-label">{t(lang, 'planFinancialReport.grandTotal')}</span>
-              <span className="fin-report-total-value">{formatMoney(grandTotal)}</span>
+              <span className="fin-report-total-value fin-report-total-value-grand">{formatMoney(grandTotal)}</span>
             </div>
             <div className="fin-report-total">
               <span className="fin-report-total-label">{t(lang, 'planFinancialReport.launchBudget')}</span>
@@ -147,13 +147,22 @@ export default function PlanFinancialReportPage({ plan, lang, onBack }) {
                   <p className="fin-report-chart-subtitle">{t(lang, 'planFinancialReport.cashProjectionSubtitle')}</p>
                   <svg viewBox={`0 0 ${chartW} ${chartH}`} className="fin-report-line-chart" onMouseLeave={() => setHoverCash(null)}>
                     {[0.25, 0.5, 0.75, 1].map(f => (
-                      <line
-                        key={f}
-                        x1={padL} x2={chartW - padR}
-                        y1={padT + (1 - f) * (chartH - padT - padB)}
-                        y2={padT + (1 - f) * (chartH - padT - padB)}
-                        className="fin-report-gridline"
-                      />
+                      <g key={f}>
+                        <line
+                          x1={padL} x2={chartW - padR}
+                          y1={padT + (1 - f) * (chartH - padT - padB)}
+                          y2={padT + (1 - f) * (chartH - padT - padB)}
+                          className="fin-report-gridline"
+                        />
+                        <text
+                          x={padL - 8}
+                          y={padT + (1 - f) * (chartH - padT - padB) + 3}
+                          textAnchor="end"
+                          className="fin-report-axis-y-label"
+                        >
+                          {formatMoney(Math.round(maxCash * f))}
+                        </text>
+                      </g>
                     ))}
                     <path d={areaPath} className="fin-report-area" />
                     <path d={linePath} className="fin-report-line" />
@@ -165,14 +174,31 @@ export default function PlanFinancialReportPage({ plan, lang, onBack }) {
                         onMouseEnter={() => setHoverCash(c)}
                       />
                     ))}
-                    <text x={padL} y={chartH - 6} className="fin-report-axis-label">M0</text>
-                    <text x={chartW - padR} y={chartH - 6} textAnchor="end" className="fin-report-axis-label">
-                      M{cashPoints.length ? cashPoints[cashPoints.length - 1].i : 0}
-                    </text>
+                    {cashPoints.map((c, idx) => {
+                      const showLabel = cashPoints.length <= 8 || idx === 0 || idx === cashPoints.length - 1 || idx % 2 === 0
+                      if (!showLabel) return null
+                      const anchor = idx === 0 ? 'start' : idx === cashPoints.length - 1 ? 'end' : 'middle'
+                      return (
+                        <text key={c.i} x={c.x} y={chartH - 6} textAnchor={anchor} className="fin-report-axis-label">
+                          {t(lang, 'planFinancialReport.monthShort')(c.i)}
+                        </text>
+                      )
+                    })}
                   </svg>
                   {hoverCash && (
-                    <div className="fin-report-chart-tooltip">M{hoverCash.i} — {formatMoney(hoverCash.v)}</div>
+                    <div className="fin-report-chart-tooltip">
+                      {t(lang, 'planFinancialReport.monthShort')(hoverCash.i)} — {formatMoney(hoverCash.v)}
+                    </div>
                   )}
+                  <div className="fin-report-chart-legend">
+                    <span className="fin-report-chart-legend-item">
+                      <i className="fin-report-chart-legend-swatch" />
+                      {t(lang, 'planFinancialReport.cashLegendRemaining')}
+                    </span>
+                    <span className="fin-report-chart-legend-item fin-report-chart-legend-muted">
+                      {t(lang, 'planFinancialReport.cashLegendBurn')(formatMoney(financials.monthlyBurn))}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="fin-report-chart-card card">

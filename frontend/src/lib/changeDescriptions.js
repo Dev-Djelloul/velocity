@@ -46,8 +46,8 @@ export function diffRoadmapItems(oldRoadmap, newRoadmap, lang) {
       items.push({
         key: `story:${story.id}`,
         detail: lang === 'fr'
-          ? `« ${story.title} » déplacée de ${prev.sprintId} à ${story.sprintId}`
-          : `"${story.title}" moved from ${prev.sprintId} to ${story.sprintId}`
+          ? `${story.id} « ${story.title} » déplacée du Sprint ${prev.sprintId} au Sprint ${story.sprintId}`
+          : `${story.id} "${story.title}" moved from Sprint ${prev.sprintId} to Sprint ${story.sprintId}`
       })
     } else if (prev.status !== story.status) {
       const statusKey = { todo: 'todo', in_progress: 'inProgress', done: 'done' }[story.status] || story.status
@@ -55,8 +55,22 @@ export function diffRoadmapItems(oldRoadmap, newRoadmap, lang) {
       items.push({
         key: `story:${story.id}`,
         detail: lang === 'fr'
-          ? `« ${story.title} » : statut → ${statusLabel}`
-          : `"${story.title}": status → ${statusLabel}`
+          ? `${story.id} « ${story.title} » : statut → ${statusLabel}`
+          : `${story.id} "${story.title}": status → ${statusLabel}`
+      })
+    } else if (prev.assignee !== story.assignee) {
+      items.push({
+        key: `story:${story.id}`,
+        detail: lang === 'fr'
+          ? `${story.id} « ${story.title} » réassignée de ${prev.assignee || '—'} à ${story.assignee || '—'}`
+          : `${story.id} "${story.title}" reassigned from ${prev.assignee || '—'} to ${story.assignee || '—'}`
+      })
+    } else if (prev.effort !== story.effort) {
+      items.push({
+        key: `story:${story.id}`,
+        detail: lang === 'fr'
+          ? `${story.id} « ${story.title} » : effort ${prev.effort ?? '—'} → ${story.effort ?? '—'} pts`
+          : `${story.id} "${story.title}": effort ${prev.effort ?? '—'} → ${story.effort ?? '—'} pts`
       })
     }
   }

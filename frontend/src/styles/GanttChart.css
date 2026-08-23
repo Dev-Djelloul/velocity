@@ -178,6 +178,14 @@
 .gantt-bar-story:hover { transform: translateY(-1px); box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35); z-index: 10; }
 .gantt-bar-story:active { cursor: grabbing; }
 
+/* Une barre avec son popover ouvert doit passer devant TOUTES les autres lignes du
+   Gantt (métiers/sprints suivants inclus), pas seulement devant ses voisines immédiates :
+   sans ce z-index élevé sur la barre elle-même, les barres des lignes en dessous (peintes
+   plus tard dans le DOM) recouvraient visuellement le popover même si celui-ci avait son
+   propre z-index élevé (retour utilisateur — popup qui se superposait aux barres Dev/
+   Marketing/Ops). */
+.gantt-bar-story.is-expanded { z-index: 50; }
+
 .gantt-bar-status-icon { flex-shrink: 0; opacity: 0.9; }
 .gantt-bar-story-id { overflow: hidden; text-overflow: ellipsis; }
 

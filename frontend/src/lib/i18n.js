@@ -1596,7 +1596,10 @@ export const translations = {
       marketingBudget: 'Budget marketing',
       cashProjection: 'Projection de trésorerie',
       cashProjectionSubtitle: 'Trésorerie restante mois par mois, au rythme de dépense actuel',
-      costBreakdownSubtitle: 'Part de chaque poste dans la dépense mensuelle'
+      costBreakdownSubtitle: 'Part de chaque poste dans la dépense mensuelle',
+      monthShort: (n) => `Mois ${n}`,
+      cashLegendRemaining: 'Trésorerie restante',
+      cashLegendBurn: (amount) => `Dépense mensuelle : ${amount}`
     },
     planVersions: {
       back: 'Retour au plan',
@@ -3349,7 +3352,10 @@ export const translations = {
       marketingBudget: 'Marketing budget',
       cashProjection: 'Cash projection',
       cashProjectionSubtitle: 'Remaining cash month by month, at the current burn rate',
-      costBreakdownSubtitle: 'Share of each category in the monthly spend'
+      costBreakdownSubtitle: 'Share of each category in the monthly spend',
+      monthShort: (n) => `Month ${n}`,
+      cashLegendRemaining: 'Remaining cash',
+      cashLegendBurn: (amount) => `Monthly burn: ${amount}`
     },
     planVersions: {
       back: 'Back to plan',

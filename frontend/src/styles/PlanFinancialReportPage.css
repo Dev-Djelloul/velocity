@@ -71,6 +71,14 @@
   color: var(--color-text-primary);
 }
 
+/* Le montant global du plan doit sauter aux yeux en premier — teinte dédiée qui reprend
+   le dégradé de la bordure du bandeau, plutôt que la même couleur neutre que les deux
+   sous-totaux (lancement / marketing). */
+.fin-report-total-value-grand {
+  color: #9184d9;
+  font-size: 1.75rem;
+}
+
 .fin-report-empty {
   display: flex;
   align-items: center;
@@ -147,12 +155,48 @@
   fill: var(--color-text-muted);
 }
 
+.fin-report-axis-y-label {
+  font-size: 8.5px;
+  fill: var(--color-text-muted);
+}
+
 .fin-report-chart-tooltip {
   margin-top: 0.5rem;
   text-align: center;
   font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text-primary);
+}
+
+.fin-report-chart-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.1);
+}
+
+.fin-report-chart-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+}
+
+.fin-report-chart-legend-muted {
+  color: var(--color-text-muted);
+}
+
+.fin-report-chart-legend-swatch {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: #6366f1;
+  flex-shrink: 0;
 }
 
 /* Camembert de répartition des coûts : wedges SVG (même technique que l'anneau
