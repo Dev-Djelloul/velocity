@@ -80,15 +80,39 @@ async function ensureLabel(accessToken, owner, repo, name, color) {
   }).catch(() => {})
 }
 
+// Date au format YYYY-MM-DD, décalée de N semaines depuis la base (planStartDate/generatedAt) —
+// même calcul que jiraClient.js/notionClient.js. 2 semaines/sprint.
+function isoDatePlusWeeks(baseIso, weeks) {
+  const d = baseIso ? new Date(baseIso) : new Date()
+  if (isNaN(d.getTime())) return null
+  d.setUTCDate(d.getUTCDate() + Math.round(weeks * 7))
+  return d.toISOString().slice(0, 10)
+}
+
 // Milestones GitHub : pas de recherche par titre, il faut lister puis matcher soi-même.
-async function ensureMilestone(accessToken, owner, repo, title, cache) {
+// `dueOn` (échéance du sprint, voir isoDatePlusWeeks) est le seul endroit où GitHub expose
+// nativement une "due date" — les issues elles-mêmes n'ont pas ce champ (retour utilisateur :
+// aucune échéance visible sur les issues GitHub, contrairement à Jira/Notion) ; posée aussi
+// en toutes lettres dans le corps de chaque issue (storyBody) pour qu'elle soit visible sans
+// avoir à ouvrir le milestone.
+async function ensureMilestone(accessToken, owner, repo, title, dueOn, cache) {
   if (cache.has(title)) return cache.get(title)
   const list = await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones?state=all&per_page=100`)
   const existing = list.ok ? (await list.json()).find(m => m.title === title) : null
-  if (existing) { cache.set(title, existing.number); return existing.number }
+  const dueOnIso = dueOn ? `${dueOn}T00:00:00Z` : undefined
+  if (existing) {
+    if (dueOnIso && existing.due_on !== dueOnIso) {
+      await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones/${existing.number}`, {
+        method: 'PATCH',
+        body: JSON.stringify({ due_on: dueOnIso })
+      }).catch(() => {})
+    }
+    cache.set(title, existing.number)
+    return existing.number
+  }
   const created = await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones`, {
     method: 'POST',
-    body: JSON.stringify({ title })
+    body: JSON.stringify({ title, ...(dueOnIso ? { due_on: dueOnIso } : {}) })
   })
   if (!created.ok) { cache.set(title, null); return null }
   const num = (await created.json()).number
@@ -109,13 +133,14 @@ async function fetchManagedIssues(accessToken, owner, repo) {
   return map
 }
 
-function storyBody(story, sprintId, lang) {
+function storyBody(story, sprintId, lang, dueOn) {
   const en = lang === 'en'
   return [
     story.description || '',
     story.acceptanceCriteria ? `\n**${en ? 'Acceptance criteria' : 'Critères d\'acceptation'}** : ${story.acceptanceCriteria}` : '',
     `\n**${en ? 'Effort' : 'Effort'}** : ${story.effort} story points`,
     `\n**${en ? 'Estimated cost' : 'Coût estimé'}** : ${story.cost} €`,
+    dueOn ? `\n**${en ? 'Due date' : 'Date d\'échéance'}** : ${dueOn}` : '',
     story.assignee ? `\n**${en ? 'Suggested assignee' : 'Responsable suggéré'}** : ${story.assignee}` : '',
     story.dependsOn?.length ? `\n**${en ? 'Depends on' : 'Dépend de'}** : ${story.dependsOn.join(', ')}` : ''
   ].filter(Boolean).join('\n')
@@ -127,6 +152,9 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
   const { owner, repo } = target
   const managed = await fetchManagedIssues(accessToken, owner, repo)
   const milestoneCache = new Map()
+  // planStartDate (pas seulement generatedAt) : même correctif que jiraClient.js/notionClient.js
+  // — c'est le champ que "Modifier la date de démarrage" (RoadmapCard) met à jour.
+  const base = plan.planStartDate || plan.generatedAt
 
   await ensureLabel(accessToken, owner, repo, 'velocitylaunch', '9184D9')
 
@@ -136,7 +164,8 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
 
   for (const sprint of plan.roadmap?.sprints || []) {
     const milestoneTitle = `${lang === 'en' ? 'Sprint' : 'Sprint'} ${sprint.sprintId}`
-    const milestoneNumber = await ensureMilestone(accessToken, owner, repo, milestoneTitle, milestoneCache)
+    const dueOn = isoDatePlusWeeks(base, sprint.sprintId * 2)
+    const milestoneNumber = await ensureMilestone(accessToken, owner, repo, milestoneTitle, dueOn, milestoneCache)
 
     for (const story of sprint.stories || []) {
       const vlLabel = `vl-id:${story.id}`
@@ -145,7 +174,7 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
       const labels = ['velocitylaunch', vlLabel, `sprint-${sprint.sprintId}`, story.assignee].filter(Boolean)
       const payload = {
         title: `[${story.id}] ${story.title}`,
-        body: storyBody(story, sprint.sprintId, lang),
+        body: storyBody(story, sprint.sprintId, lang, dueOn),
         labels,
         ...(milestoneNumber ? { milestone: milestoneNumber } : {})
       }
