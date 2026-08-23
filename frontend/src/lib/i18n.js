@@ -871,6 +871,17 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Rapport financier : export PDF/Word, graphique amélioré ; notifications et Gantt affinés',
+            items: [
+              'Rapport financier par plan : export dédié en PDF et en Word (synthèse des budgets, KPIs, trésorerie mois par mois, répartition des coûts, pont coûts/revenus), avec la marque personnalisée déjà configurable',
+              'Montant total du plan mis en avant visuellement dans le rapport financier',
+              'Projection de trésorerie : mois nommés en toutes lettres, axe des montants et légende ajoutés pour un rendu plus lisible',
+              'Notifications de collaboration sur la roadmap : détail de chaque story modifiée avec son identifiant, en plus du statut/sprint/assignation/effort',
+              'Gantt interactif : le popup de détail d\'une story ne se superpose plus aux barres des autres métiers'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Dashboard : calendrier des sprints, avancement global interactif, rapport financier par plan',
             items: [
               'Le calendrier du tableau de bord met en évidence tous les sprints actifs (tous plans confondus), pas seulement leur date de fin — cliquer un jour ouvre le détail (plans, sprints, stories) avec accès direct au plan',
@@ -1190,7 +1201,7 @@ export const translations = {
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
               'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
               'Suivi post-lancement & simulateur budget/timeline en direct',
-              'Rapport financier par plan façon feuille investisseurs (depuis "Budget cumulé" en espace d\'équipe) : budgets clés en en-tête, burn/runway, seuil de rentabilité avec justification ARPU, répartition des coûts par poste'
+              'Rapport financier par plan façon feuille investisseurs (depuis "Budget cumulé" en espace d\'équipe) : budgets clés en en-tête, burn/runway, seuil de rentabilité avec justification ARPU, répartition des coûts par poste, export dédié en PDF et en Word'
             ]
           },
           {
@@ -2630,6 +2641,17 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Financial report: PDF/Word export, improved chart; refined notifications and Gantt',
+            items: [
+              'Per-plan financial report: dedicated PDF and Word export (budget summary, KPIs, month-by-month cash runway, cost breakdown, cost/revenue bridge), honoring the existing custom branding',
+              'The plan\'s total budget is now visually highlighted in the financial report',
+              'Cash projection chart: months spelled out, an amount axis and a legend added for a clearer, more professional read',
+              'Roadmap collaboration notifications: each changed story\'s detail now includes its ID, in addition to status/sprint/assignee/effort',
+              'Interactive Gantt: a story\'s detail popup no longer overlaps other roles\' bars'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Dashboard: sprint calendar, interactive overall progress, per-plan financial report',
             items: [
               'The dashboard calendar now highlights every active sprint (across all plans), not just its end date — clicking a day opens the detail (plans, sprints, stories) with direct access to the plan',
@@ -2949,7 +2971,7 @@ export const translations = {
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
               'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
               'Post-launch tracking & live budget/timeline simulator',
-              'Per-plan financial report in investor-sheet style (from "Combined budget" in team spaces): key budgets up top, burn/runway, break-even with ARPU rationale, cost breakdown by category'
+              'Per-plan financial report in investor-sheet style (from "Combined budget" in team spaces): key budgets up top, burn/runway, break-even with ARPU rationale, cost breakdown by category, dedicated PDF and Word export'
             ]
           },
           {
