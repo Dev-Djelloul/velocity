@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFeedRead, deleteAllNotificationFeed } from '../lib/serverStorage'
@@ -20,8 +21,11 @@ export default function NotificationBell({ userId, lang, onOpen }) {
   const [unread, setUnread] = useState(0)
   const [open, setOpen] = useState(false)
   const [confirmingDeleteAll, setConfirmingDeleteAll] = useState(false)
+  const [confirmRect, setConfirmRect] = useState(null)
   const pollRef = useRef(null)
   const rootRef = useRef(null)
+  const deleteAllBtnRef = useRef(null)
+  const confirmRef = useRef(null)
 
   const refresh = async () => {
     if (!userId) return
@@ -40,7 +44,14 @@ export default function NotificationBell({ userId, lang, onOpen }) {
 
   useEffect(() => {
     if (!open) return
-    const onClickOutside = (e) => { if (rootRef.current && !rootRef.current.contains(e.target)) setOpen(false) }
+    // confirmRef (portail dans document.body, voir plus bas) est HORS de rootRef dans le DOM
+    // — sans ce second test, cliquer un bouton de la bulle de confirmation serait vu comme
+    // un clic "extérieur" et fermerait tout le panneau au lieu de juste agir sur la bulle.
+    const onClickOutside = (e) => {
+      if (rootRef.current?.contains(e.target)) return
+      if (confirmRef.current?.contains(e.target)) return
+      setOpen(false)
+    }
     document.addEventListener('mousedown', onClickOutside)
     return () => document.removeEventListener('mousedown', onClickOutside)
   }, [open])
@@ -70,6 +81,7 @@ export default function NotificationBell({ userId, lang, onOpen }) {
 
   const askDeleteAll = (e) => {
     e.stopPropagation()
+    setConfirmRect(deleteAllBtnRef.current?.getBoundingClientRect() || null)
     setConfirmingDeleteAll(true)
   }
 
@@ -93,7 +105,7 @@ export default function NotificationBell({ userId, lang, onOpen }) {
             <div className="notif-bell-header-actions">
               {unread > 0 && <button className="notif-bell-markall" onClick={markAllRead}>{t(lang, 'notifCenter.markAllRead')}</button>}
               {items.length > 0 && (
-                <button className="notif-bell-delete-all" onClick={askDeleteAll} title={t(lang, 'notifCenter.deleteAll')}>
+                <button ref={deleteAllBtnRef} className="notif-bell-delete-all" onClick={askDeleteAll} title={t(lang, 'notifCenter.deleteAll')}>
                   <IconTrash width={14} height={14} />
                 </button>
               )}
@@ -102,15 +114,27 @@ export default function NotificationBell({ userId, lang, onOpen }) {
             {/* Petite bulle ancrée juste sous l'icône poubelle plutôt qu'une grande modale
                 centrée avec fond assombri — supprimer des notifications n'a rien d'un
                 avertissement critique (retour utilisateur), pas besoin de l'habillage
-                habituel réservé aux actions vraiment destructrices (suppression de plan...). */}
-            {confirmingDeleteAll && (
-              <div className="notif-delete-confirm" onClick={e => e.stopPropagation()}>
+                habituel réservé aux actions vraiment destructrices (suppression de plan...).
+                Rendue via portail dans document.body, en position:fixed depuis le rectangle
+                du bouton poubelle : .notif-bell-panel a overflow:hidden (nécessaire pour son
+                propre défilement de liste), qui rognait cette bulle en position:absolute
+                dès qu'elle débordait — même correctif structurel que HoverTooltip.jsx et le
+                popover du calendrier (retour utilisateur, capture à l'appui : bulle coupée
+                et mélangée à la liste de notifications derrière). */}
+            {confirmingDeleteAll && confirmRect && createPortal(
+              <div
+                ref={confirmRef}
+                className="notif-delete-confirm"
+                style={{ position: 'fixed', top: confirmRect.bottom + 6, right: window.innerWidth - confirmRect.right }}
+                onClick={e => e.stopPropagation()}
+              >
                 <p>{t(lang, 'notifCenter.confirmDeleteAll')}</p>
                 <div className="notif-delete-confirm-actions">
                   <button className="notif-delete-confirm-cancel" onClick={() => setConfirmingDeleteAll(false)}>{t(lang, 'plans.cancel')}</button>
                   <button className="notif-delete-confirm-ok" onClick={confirmDeleteAll}>{t(lang, 'notifCenter.deleteAll')}</button>
                 </div>
-              </div>
+              </div>,
+              document.body
             )}
           </div>
           <div className="notif-bell-list">
