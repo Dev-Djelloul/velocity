@@ -234,9 +234,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           que trois phrases empilées séparément. */}
       <div className="dashboard-home-header">
         <h1>
-          {firstName
-            ? t(lang, 'dashboard.greetingCombined')(firstName, t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))
-            : t(lang, 'dashboard.greetingCombinedGeneric')(t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))}
+          {firstName ? (
+            <>
+              {t(lang, 'dashboard.greetingPrefix')} <span className="dashboard-greeting-name">{firstName}</span>
+              {t(lang, 'dashboard.greetingCombinedRest')(t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))}
+            </>
+          ) : (
+            t(lang, 'dashboard.greetingCombinedGeneric')(t(lang, pro ? 'dashboard.planLabelPro' : 'dashboard.planLabelFree'))
+          )}
         </h1>
         <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
           <IconPlus width={16} height={16} />

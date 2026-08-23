@@ -127,6 +127,17 @@
   white-space: pre-line;
 }
 
+/* Le prénom seul en dégradé de marque (retour utilisateur) — le reste de la phrase garde
+   le blanc/ombré du bloc suivant, nécessaire pour rester lisible posé directement sur la
+   photo de fond (pas de carte derrière lui, contrairement aux titres de widgets). */
+.dashboard-greeting-name {
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: none;
+}
+
 /* Le titre/sous-titre et les puces Historique/Galerie reposent sur la photo de fond
    (.dashboard-home-bg), désormais nette dans les deux thèmes (voir filter ci-dessus) — une
    ombre portée légère garde le contraste quelle que soit la zone de la photo en dessous. En

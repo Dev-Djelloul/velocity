@@ -1594,6 +1594,10 @@ export const translations = {
       // Message d'accueil unique (nom + aperçu du jour + rappel du plan + encouragement),
       // demandé textuellement ainsi plutôt qu'en plusieurs phrases séparées.
       greetingCombined: (name, planLabel) => `Bonjour ${name}, voici un aperçu du jour.\nTu es sur le plan ${planLabel}, alors n'hésite pas à travailler et à créer la start-up de tes rêves ! 🚀`,
+      // Découpées en deux pour pouvoir mettre le prénom seul en dégradé (voir DashboardHome.jsx) —
+      // "Bonjour" reste en blanc/ombré comme le reste du texte, posé directement sur la photo de fond.
+      greetingPrefix: 'Bonjour',
+      greetingCombinedRest: (planLabel) => `, voici un aperçu du jour.\nTu es sur le plan ${planLabel}, alors n'hésite pas à travailler et à créer la start-up de tes rêves ! 🚀`,
       greetingCombinedGeneric: (planLabel) => `Bonjour, voici un aperçu du jour.\nTu es sur le plan ${planLabel}, alors n'hésite pas à travailler et à créer la start-up de tes rêves ! 🚀`,
       planLabelPro: 'Pro',
       planLabelFree: 'Gratuit',
@@ -3415,6 +3419,8 @@ export const translations = {
       greetingGeneric: 'Hi there',
       subtitle: 'Here\'s an overview of your spaces',
       greetingCombined: (name, planLabel) => `Hi ${name}, here's a look at your day.\nYou're on the ${planLabel} plan, so don't hold back — go build the startup of your dreams! 🚀`,
+      greetingPrefix: 'Hi',
+      greetingCombinedRest: (planLabel) => `, here's a look at your day.\nYou're on the ${planLabel} plan, so don't hold back — go build the startup of your dreams! 🚀`,
       greetingCombinedGeneric: (planLabel) => `Hi there, here's a look at your day.\nYou're on the ${planLabel} plan, so don't hold back — go build the startup of your dreams! 🚀`,
       planLabelPro: 'Pro',
       planLabelFree: 'Free',
