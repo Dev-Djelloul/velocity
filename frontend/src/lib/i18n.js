@@ -887,6 +887,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige un bug important : l\'export GitHub pouvait écraser les issues d\'un plan précédent',
+            items: [
+              'Même cause que le bug déjà corrigé sur Jira/Linear : chaque plan généré repart de stories "US-001, US-002…", et l\'export GitHub ne les distinguait pas entre plans différents — synchroniser un nouveau plan dans le même dépôt pouvait mettre à jour (et écraser) les issues d\'un plan précédent partageant les mêmes numéros',
+              'Même correctif sur les Milestones GitHub, jusqu\'ici partagés par erreur entre plans dès qu\'ils portaient le même nom "Sprint N"'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Ajoute la date d\'échéance sur la synchronisation GitHub',
             items: [
               'Les issues GitHub n\'ont pas de champ "due date" natif contrairement à Jira/Notion — aucune échéance n\'était visible sur les issues synchronisées',
@@ -3025,6 +3033,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed a major bug: GitHub export could overwrite a previous plan\'s issues',
+            items: [
+              'Same root cause as the bug already fixed for Jira/Linear: every generated plan restarts its stories at "US-001, US-002…", and the GitHub export never distinguished between different plans — syncing a new plan into the same repo could update (and overwrite) a previous plan\'s issues sharing the same numbers',
+              'Same fix applied to GitHub Milestones, previously shared by mistake between plans whenever they had the same "Sprint N" name'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Added a due date to the GitHub sync',
