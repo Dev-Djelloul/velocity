@@ -38,5 +38,11 @@ export function generateBenchmarksFallback(plan, lang = 'fr') {
     ? 'Your targets look plausible for the category. Focus on activation and CAC payback — these are where early plans most often drift from benchmarks.'
     : "Vos cibles semblent plausibles pour la catégorie. Concentrez-vous sur l'activation et le retour sur CAC — c'est là que les plans dérivent le plus souvent des benchmarks."
 
-  return { metrics, channels, takeaway }
+  const sources = [
+    { name: 'SaaS Capital', url: 'https://www.saas-capital.com' },
+    { name: 'OpenView', url: 'https://openviewpartners.com' },
+    { name: 'ProfitWell (Paddle)', url: 'https://www.paddle.com/profitwell' }
+  ]
+
+  return { metrics, channels, takeaway, sources }
 }

@@ -33,7 +33,19 @@ const BENCHMARKS_TOOL = {
           required: ['channel', 'benchmark', 'note']
         }
       },
-      takeaway: { type: 'string', description: 'Synthèse actionnable en 1 à 2 phrases : où le plan est réaliste, où il doit être ajusté' }
+      takeaway: { type: 'string', description: 'Synthèse actionnable en 1 à 2 phrases : où le plan est réaliste, où il doit être ajusté' },
+      sources: {
+        type: 'array',
+        description: "3 à 5 sources RÉELLES et reconnues où aller vérifier/affiner ces ordres de grandeur soi-même (jamais une source inventée, jamais attribuée à une statistique précise citée plus haut — juste des références sectorielles sérieuses pour aller plus loin). Varie la sélection d'une génération à l'autre plutôt que de toujours citer les mêmes noms.",
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Nom de la source' },
+            url: { type: 'string', description: 'URL réelle et exacte du site (https://...)' }
+          },
+          required: ['name', 'url']
+        }
+      }
     },
     required: ['metrics', 'channels', 'takeaway']
   }
@@ -42,7 +54,7 @@ const BENCHMARKS_TOOL = {
 function systemPrompt(lang) {
   return lang === 'en'
     ? 'You produce realistic industry benchmarks to help a startup founder sanity-check their launch plan. Use plausible, category-specific ranges. Never invent precise fake statistics as if from a named study; give sensible typical ranges.'
-    : "Tu produis des benchmarks sectoriels réalistes pour aider un fondateur à valider son plan de lancement. Utilise des fourchettes plausibles et spécifiques à la catégorie. N'invente pas de statistiques précises attribuées à une étude nommée ; donne des fourchettes typiques raisonnables."
+    : "Tu produis des benchmarks sectoriels réalistes pour aider un fondateur à valider son plan de lancement. Utilise des fourchettes plausibles et spécifiques à la catégorie. N'invente pas de statistiques précises attribuées à une étude nommée ; donne des fourchettes typiques raisonnables. Pour \"sources\", ne référence que des sites réels et connus dont tu es certain de l'existence à l'URL donnée — n'invente jamais un domaine."
 }
 
 function buildUserPrompt(plan, lang) {

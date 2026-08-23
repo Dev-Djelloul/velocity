@@ -42,7 +42,9 @@ export function planToBlocks(plan, lang = 'fr') {
     if (v.signals?.length) { blocks.push(h3(_('Signaux', 'Signals'))); v.signals.forEach(x => blocks.push(bullet(x))) }
     if (v.opportunities?.length) { blocks.push(h3(_('Opportunités', 'Opportunities'))); v.opportunities.forEach(x => blocks.push(bullet(x))) }
     if (v.threats?.length) { blocks.push(h3(_('Menaces', 'Threats'))); v.threats.forEach(x => blocks.push(bullet(x))) }
-    if (v.sources?.length) blocks.push(p(`${_('Sources', 'Sources')} : ${v.sources.join(' · ')}`))
+    // "sources" est un tableau d'objets {name,url} depuis l'ajout des cartes de lien —
+    // Notion garde le nom (pas l'URL brute) pour rester lisible dans une simple ligne.
+    if (v.sources?.length) blocks.push(p(`${_('Sources', 'Sources')} : ${v.sources.map(s => typeof s === 'string' ? s : s.name).join(' · ')}`))
   }
 
   // Roadmap, calendrier éditorial et calendrier publicitaire sont rendus comme

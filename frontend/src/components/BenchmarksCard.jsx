@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { generateBenchmarks } from '../lib/serverStorage'
 import { generateBenchmarksFallback } from '../lib/benchmarksFallback'
-import { IconGauge, IconSparkle, IconRocket } from './Icons'
+import { IconGauge, IconSparkle, IconRocket, IconClipboard } from './Icons'
+import LinkCard from './LinkCard'
 import '../styles/BenchmarksCard.css'
 
 const CHANNEL_PALETTE = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#f472b6', '#eab308']
@@ -85,6 +86,15 @@ export default function BenchmarksCard({ plan, lang, onBenchmarksChange, userId 
 
           {benchmarks.takeaway && (
             <p className="benchmarks-takeaway"><IconSparkle width={14} height={14} /> {benchmarks.takeaway}</p>
+          )}
+
+          {benchmarks.sources?.length > 0 && (
+            <div className="benchmarks-sources">
+              <h4><IconClipboard width={15} height={15} /> {t(lang, 'benchmarks.sources')}</h4>
+              <div className="link-card-grid">
+                {benchmarks.sources.map((s, i) => <LinkCard key={i} url={s.url} label={s.name} />)}
+              </div>
+            </div>
           )}
 
           {benchmarks.source && (

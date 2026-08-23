@@ -264,7 +264,9 @@ export function exportCSV(plan, lang) {
     rows.push([t(lang, 'veille.signals'), ...(v.signals || [])])
     rows.push([t(lang, 'veille.opportunities'), ...(v.opportunities || [])])
     rows.push([t(lang, 'veille.threats'), ...(v.threats || [])])
-    rows.push([t(lang, 'veille.sources'), ...(v.sources || [])])
+    // "sources" est un tableau d'objets {name,url} depuis l'ajout des cartes de lien
+    // (retour utilisateur) — CSV garde juste le nom, pas l'URL, une colonne suffit ici.
+    rows.push([t(lang, 'veille.sources'), ...(v.sources || []).map(s => typeof s === 'string' ? s : s.name)])
   }
 
   if (plan.benchmarks) {
@@ -393,7 +395,7 @@ export async function exportPDF(plan, lang, branding) {
       { text: `${t(lang, 'veille.signals')}: ${(v.signals || []).join('; ')}`, margin: [0, 1, 0, 1] },
       { text: `${t(lang, 'veille.opportunities')}: ${(v.opportunities || []).join('; ')}`, margin: [0, 1, 0, 1] },
       { text: `${t(lang, 'veille.threats')}: ${(v.threats || []).join('; ')}`, margin: [0, 1, 0, 1] },
-      { text: `${t(lang, 'veille.sources')}: ${(v.sources || []).join('; ')}`, margin: [0, 1, 0, 1] }
+      { text: `${t(lang, 'veille.sources')}: ${(v.sources || []).map(s => typeof s === 'string' ? s : s.name).join('; ')}`, margin: [0, 1, 0, 1] }
     )
   }
 

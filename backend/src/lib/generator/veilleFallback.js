@@ -4,7 +4,6 @@
 export function generateVeilleFallback(plan, lang = 'fr') {
   const p = plan?.product || {}
   const m = plan?.market || {}
-  const name = p.name || (lang === 'en' ? 'your product' : 'votre produit')
   const segment = m.segment || (lang === 'en' ? 'your segment' : 'votre segment')
   const en = lang === 'en'
 
@@ -36,11 +35,11 @@ export function generateVeilleFallback(plan, lang = 'fr') {
         'Rising acquisition costs on saturated channels'
       ],
       sources: [
-        `Google Alerts on "${name}" and key competitors`,
-        'Product Hunt & Hacker News for your category',
-        'Competitor changelogs and pricing pages',
-        `Reddit / niche communities around ${segment}`,
-        'Industry newsletters and analyst briefs'
+        { name: 'Google Alerts', url: 'https://www.google.com/alerts' },
+        { name: 'Product Hunt', url: 'https://www.producthunt.com' },
+        { name: 'Hacker News', url: 'https://news.ycombinator.com' },
+        { name: 'Reddit', url: 'https://www.reddit.com' },
+        { name: 'G2', url: 'https://www.g2.com' }
       ]
     }
   }
@@ -72,11 +71,11 @@ export function generateVeilleFallback(plan, lang = 'fr') {
       "Hausse des coûts d'acquisition sur des canaux saturés"
     ],
     sources: [
-      `Google Alerts sur « ${name} » et les concurrents clés`,
-      'Product Hunt & Hacker News pour votre catégorie',
-      'Changelogs et pages de prix des concurrents',
-      `Reddit / communautés de niche autour du ${segment}`,
-      'Newsletters sectorielles et notes d\'analystes'
+      { name: 'Google Alerts', url: 'https://www.google.com/alerts' },
+      { name: 'Product Hunt', url: 'https://www.producthunt.com' },
+      { name: 'Hacker News', url: 'https://news.ycombinator.com' },
+      { name: 'Reddit', url: 'https://www.reddit.com' },
+      { name: 'G2', url: 'https://www.g2.com' }
     ]
   }
 }

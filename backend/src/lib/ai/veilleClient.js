@@ -23,7 +23,18 @@ const VEILLE_TOOL = {
       signals: { type: 'array', items: { type: 'string' }, description: '3 à 5 signaux ou déclencheurs concrets à guetter (annonces, levées, changements réglementaires...)' },
       opportunities: { type: 'array', items: { type: 'string' }, description: '2 à 4 opportunités à saisir' },
       threats: { type: 'array', items: { type: 'string' }, description: '2 à 4 menaces à anticiper' },
-      sources: { type: 'array', items: { type: 'string' }, description: '4 à 6 sources, publications ou mots-clés à suivre' }
+      sources: {
+        type: 'array',
+        description: "4 à 6 sources RÉELLES à suivre (publications, communautés, annuaires — jamais une source inventée), chacune avec son URL réelle et fonctionnelle. Varie la sélection d'une génération à l'autre plutôt que de toujours proposer les mêmes 4-5 noms : pioche parmi un éventail large et pertinent pour la catégorie (presse tech généraliste ou spécialisée, communautés/forums, annuaires de produits, réseaux sociaux professionnels, newsletters sectorielles connues).",
+        items: {
+          type: 'object',
+          properties: {
+            name: { type: 'string', description: 'Nom de la source' },
+            url: { type: 'string', description: 'URL réelle et exacte du site (https://...)' }
+          },
+          required: ['name', 'url']
+        }
+      }
     },
     required: ['competitors', 'trends', 'signals', 'opportunities', 'threats', 'sources']
   }
@@ -31,8 +42,8 @@ const VEILLE_TOOL = {
 
 function systemPrompt(lang) {
   return lang === 'en'
-    ? 'You produce a sharp, concrete competitive & market intelligence briefing for a startup founder. Every item must be specific and plausible for the described product and market — never generic filler.'
-    : "Tu produis une veille concurrentielle et marché nette et concrète pour un fondateur de startup. Chaque élément doit être spécifique et plausible pour le produit et le marché décrits — jamais du remplissage générique."
+    ? 'You produce a sharp, concrete competitive & market intelligence briefing for a startup founder. Every item must be specific and plausible for the described product and market — never generic filler. For "sources", only reference real, well-known websites you are confident actually exist at the given URL — never invent a domain.'
+    : "Tu produis une veille concurrentielle et marché nette et concrète pour un fondateur de startup. Chaque élément doit être spécifique et plausible pour le produit et le marché décrits — jamais du remplissage générique. Pour \"sources\", ne référence que des sites réels et connus dont tu es certain de l'existence à l'URL donnée — n'invente jamais un domaine."
 }
 
 function buildUserPrompt(plan, lang) {

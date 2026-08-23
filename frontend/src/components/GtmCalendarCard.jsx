@@ -4,7 +4,8 @@ import { formatMoney } from '../lib/currency'
 import { generateEditorial, generateAdvertising } from '../lib/serverStorage'
 import { generateEditorialFallback } from '../lib/editorialFallback'
 import { generateAdvertisingFallback } from '../lib/advertisingFallback'
-import { IconCalendar, IconSparkle, IconDownload, IconMegaphone } from './Icons'
+import { IconCalendar, IconSparkle, IconDownload, IconMegaphone, IconExternalLink } from './Icons'
+import { getChannelLink } from '../lib/channelLinks'
 import '../styles/GtmCalendarCard.css'
 
 function editorialToCsv(items, lang) {
@@ -192,7 +193,9 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
                   {(editorial?.items || []).filter(i => i.week === week).map((it, i) => (
                     <div key={i} className="gtm-item gtm-item-content">
                       <div className="gtm-item-top">
-                        <span className="gtm-item-channel">{it.channel}</span>
+                        <a href={getChannelLink(it.channel)} target="_blank" rel="noopener noreferrer" className="gtm-item-channel gtm-item-channel-link">
+                          {it.channel} <IconExternalLink width={11} height={11} />
+                        </a>
                         <span className="gtm-item-format">{it.format}</span>
                       </div>
                       <div className="gtm-item-title">{it.title}</div>
@@ -212,7 +215,9 @@ export default function GtmCalendarCard({ plan, lang, onEditorialChange, onAdver
                   {(advertising?.campaigns || []).filter(c => c.week === week).map((c, i) => (
                     <div key={i} className="gtm-item gtm-item-paid">
                       <div className="gtm-item-top">
-                        <span className="gtm-item-channel">{c.channel}</span>
+                        <a href={getChannelLink(c.channel)} target="_blank" rel="noopener noreferrer" className="gtm-item-channel gtm-item-channel-link">
+                          {c.channel} <IconExternalLink width={11} height={11} />
+                        </a>
                         <span className={`gtm-item-objective obj-${c.objective}`}>{t(lang, `advertising.objective.${c.objective}`) || c.objective}</span>
                       </div>
                       <div className="gtm-item-format">{c.format}</div>

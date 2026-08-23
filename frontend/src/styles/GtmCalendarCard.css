@@ -171,6 +171,21 @@
   color: #06b6d4;
 }
 
+/* Le canal devient un vrai lien vers la plateforme officielle (LinkedIn Ads, Google Ads...)
+   plutôt qu'un simple libellé — icône discrète, style de pastille inchangé. */
+.gtm-item-channel-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.15s ease;
+}
+
+.gtm-item-channel-link:hover {
+  filter: brightness(1.3);
+}
+
 .gtm-item-format {
   font-size: 0.74rem;
   color: var(--color-text-muted);

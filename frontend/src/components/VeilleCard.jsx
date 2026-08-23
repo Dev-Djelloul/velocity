@@ -3,6 +3,7 @@ import { t } from '../lib/i18n'
 import { generateVeille } from '../lib/serverStorage'
 import { generateVeilleFallback } from '../lib/veilleFallback'
 import { IconRadar, IconSparkle, IconTrendingUp, IconTarget, IconAlertTriangle, IconCompass, IconClipboard } from './Icons'
+import LinkCard from './LinkCard'
 import '../styles/VeilleCard.css'
 
 export default function VeilleCard({ plan, lang, onVeilleChange, userId }) {
@@ -75,8 +76,12 @@ export default function VeilleCard({ plan, lang, onVeilleChange, userId }) {
 
           <div className="veille-block">
             <h4><IconClipboard width={15} height={15} /> {t(lang, 'veille.sources')}</h4>
-            <div className="veille-sources">
-              {veille.sources?.map((x, i) => <span key={i} className="veille-source-chip">{x}</span>)}
+            <div className="link-card-grid">
+              {veille.sources?.map((x, i) => (
+                typeof x === 'string'
+                  ? <span key={i} className="veille-source-chip">{x}</span>
+                  : <LinkCard key={i} url={x.url} label={x.name} />
+              ))}
             </div>
           </div>
 
