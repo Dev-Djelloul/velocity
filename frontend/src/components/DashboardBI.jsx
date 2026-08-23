@@ -202,7 +202,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
         )}
 
         {workloadSegments.length > 0 && (
-          <div className="dashboard-bi-tile dashboard-bi-tile-full">
+          <div className="dashboard-bi-tile dashboard-bi-tile-half">
             <h4>{t(lang, 'dashboardBi.workloadByRole')}</h4>
             <Donut
               segments={workloadSegments}
@@ -213,7 +213,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
         )}
 
         {sprints.length > 0 && (
-          <div className="dashboard-bi-tile dashboard-bi-tile-full">
+          <div className="dashboard-bi-tile dashboard-bi-tile-half">
             <h4>{t(lang, 'dashboardBi.velocityBySprint')}</h4>
             <div className="velocity-bars">
               {sprints.map(sp => {

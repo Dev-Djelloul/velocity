@@ -38,6 +38,13 @@
   min-height: 0;
 }
 
+/* Charge par responsable / Vélocité par sprint côte à côte plutôt que chacun en pleine
+   largeur — span 2 des colonnes auto-fit du parent pour occuper la moitié de la ligne. */
+.dashboard-bi-tile-half {
+  grid-column: span 2;
+  min-height: 0;
+}
+
 .dashboard-bi-tile h4 {
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
