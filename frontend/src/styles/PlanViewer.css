@@ -328,6 +328,16 @@
 
 .plan-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
 
+/* Les trois boutons (galerie / export / enregistrer) ont des libellés de longueurs très
+   différentes ("Ajouter à la galerie" vs "Exporter") — sans largeur commune, ça donne trois
+   tailles visiblement différentes côte à côte. Une largeur minimale partagée, calée sur le
+   même gabarit que le bouton "Ajouter une couverture" du bandeau au-dessus, les aligne. */
+.plan-actions > .btn-secondary,
+.plan-actions > .plan-save-btn {
+  min-width: 148px;
+  justify-content: center;
+}
+
 .plan-save-btn {
   display: inline-flex;
   align-items: center;
