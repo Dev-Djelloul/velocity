@@ -26,8 +26,16 @@ function marketingWeekDate(generatedAt, week) {
   return start
 }
 
+// toISOString() convertit en UTC — mais `date` est ici toujours construit en heure LOCALE
+// (new Date(year, month, day), ou sprintStart/marketingWeekDate qui appellent .setHours(0)
+// en local, pas .setUTCHours). Pour un fuseau en avance sur UTC (France, UTC+1/+2), minuit
+// local se traduit en UTC par la VEILLE ~22h-23h : toISOString().slice(0,10) renvoyait donc
+// systématiquement la date de la veille, un jour plus tôt que celle affichée par
+// date.getDate() sur la même cellule (retour utilisateur : la story du 28 juillet
+// s'ouvrait sous l'étiquette "27 juillet"). Clé construite ici à partir des mêmes accesseurs
+// LOCAUX que l'affichage, pour que les deux s'accordent toujours.
 function dateKey(date) {
-  return date.toISOString().slice(0, 10)
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
 // Répartit les stories d'un sprint sur ses 14 jours, dans l'ordre, pour donner
@@ -105,7 +113,11 @@ export default function CalendarView({ plan, roadmap, lang, generatedAt, launchD
   for (let i = 0; i < startWeekday; i++) cells.push(null)
   for (let d = 1; d <= daysInMonth; d++) cells.push(new Date(year, month, d))
 
-  const launchKey = launchDate ? launchDate.split('T')[0] : null
+  // dateKey(new Date(...)), pas launchDate.split('T')[0] : ce dernier prenait la date telle
+  // qu'écrite dans le timestamp UTC stocké, alors que toutes les autres clés de ce fichier
+  // sont désormais en calendrier LOCAL — même décalage potentiel d'un jour que le bug
+  // dateKey() corrigé plus haut, ici sur le badge/mise en évidence du jour de lancement.
+  const launchKey = launchDate ? dateKey(new Date(launchDate)) : null
   const launchTitle = t(lang, 'calendar.launchEventTitle')(plan?.product?.name)
 
   const handleExportIcs = () => {

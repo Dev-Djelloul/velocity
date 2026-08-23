@@ -884,6 +884,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige le décalage d\'un jour des stories dans le calendrier de la Roadmap',
+            items: [
+              'Une story du 28 juillet s\'ouvrait sous l\'étiquette "27 juillet" en cliquant sur sa case : la clé de date du calendrier convertissait la date en UTC (toISOString) alors qu\'elle était construite en heure locale — pour un fuseau en avance sur UTC (France), minuit local tombe la veille en UTC, décalant systématiquement toutes les stories d\'un jour plus tôt que leur case visuelle',
+              'Même correctif appliqué à la mise en évidence du jour de lancement, qui utilisait la date telle qu\'écrite dans le timestamp stocké plutôt que le calendrier local affiché'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrige les info-bulles "?" invisibles et le popover calendrier qui dérivait au scroll',
             items: [
               'Les icônes "?" (Santé du portefeuille, "Par plan") n\'affichaient rien au survol : l\'attribut "title" posé directement sur un <svg> n\'est pas fiable pour l\'infobulle native des navigateurs — déplacé sur un <span> HTML autour de l\'icône',
@@ -2945,6 +2953,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed the one-day offset for stories on the Roadmap calendar',
+            items: [
+              'A July 28 story opened labeled "July 27" when clicking its cell: the calendar\'s date key converted the date to UTC (toISOString) while it was built in local time — for a timezone ahead of UTC (France), local midnight falls the day before in UTC, systematically shifting every story one day earlier than its visual cell',
+              'Same fix applied to the launch-day highlight, which used the date as written in the stored timestamp instead of the local calendar shown'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed invisible "?" tooltips and the calendar popover drifting on scroll',
