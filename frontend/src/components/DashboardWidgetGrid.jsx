@@ -48,8 +48,14 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, onDragStart, onDra
       draggable
       onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart(id) }}
       onDragEnd={onDragEnd}
-      onDragOver={(e) => e.preventDefault()}
-      onDragEnter={() => onDragEnter(id)}
+      // dragOver (pas seulement dragEnter) : sur un widget "Grand" (2x2), le pointeur passe
+      // par plusieurs enfants imbriqués en se déplaçant, ce qui redéclenche sans arrêt
+      // enter/leave et pouvait faire perdre la cible de dépôt en cours de route (retour
+      // utilisateur : le glisser-déposer "ne marche pas" entre deux cartes de tailles très
+      // différentes). dragOver se redéclenche en continu tant qu'on survole, bulle
+      // pareillement depuis les enfants, et ne se réinitialise jamais sur un simple survol
+      // d'un enfant interne — bien plus fiable ici que dragEnter/dragLeave.
+      onDragOver={(e) => { e.preventDefault(); onDragEnter(id) }}
       onDrop={(e) => { e.preventDefault(); onDrop(id) }}
       onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }) }}
     >
@@ -67,18 +73,30 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, onDragStart, onDra
 }
 
 // Grille de widgets déplaçables (glisser-déposer) et redimensionnables (clic droit → Petit/
-// Moyen/Grand) — même logique que le centre de notifications ou le bureau macOS, demandé
-// explicitement puisque le Dashboard combine déjà plusieurs cartes autonomes (calendrier,
-// échéances, activité, résumé Nova, reprise) qui s'y prêtent naturellement. `widgets` est
-// un objet { id: node } ; seuls les ids présents dans cet objet sont rendus, dans l'ordre
-// sauvegardé (ou par défaut) — un widget absent (ex: pas de plan Pro pour Nova) ne laisse
-// pas de trou dans la disposition.
-export default function DashboardWidgetGrid({ userId, lang, widgets }) {
-  const [layout, setLayout] = useState(() => loadWidgetLayout(userId))
+// Moyen/Grand) — même logique que le centre de notifications ou le bureau macOS. `widgets`
+// est un objet { id: node } ; seuls les ids présents dans cet objet sont rendus (un widget
+// absent, ex: pas de plan Pro pour Nova, ou une équipe supprimée, ne laisse pas de trou
+// dans la disposition). Cet objet est dynamique d'un rendu à l'autre (le nombre d'espaces
+// d'équipe change), donc la liste des ids connus est dérivée de ses clés à chaque rendu —
+// jamais figée en dur. `defaultOrder`/`defaultSizes` ne couvrent que les widgets fixes
+// (calendrier, échéances...) ; un id absent de ces deux objets (ex: une équipe) prend
+// simplement la taille "medium" et vient s'ajouter en fin d'ordre par défaut.
+export default function DashboardWidgetGrid({ userId, lang, widgets, defaultOrder, defaultSizes }) {
+  const allIds = Object.keys(widgets)
+  const idsKey = allIds.slice().sort().join(',')
+  const buildDefaults = () => ({
+    order: [...(defaultOrder || []).filter(id => allIds.includes(id)), ...allIds.filter(id => !(defaultOrder || []).includes(id))],
+    sizes: defaultSizes || {}
+  })
+
+  const [layout, setLayout] = useState(() => loadWidgetLayout(userId, allIds, buildDefaults()))
   const [draggingId, setDraggingId] = useState(null)
   const [dragOverId, setDragOverId] = useState(null)
 
-  useEffect(() => { setLayout(loadWidgetLayout(userId)) }, [userId])
+  useEffect(() => {
+    setLayout(loadWidgetLayout(userId, allIds, buildDefaults()))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, idsKey])
 
   const persist = (next) => {
     setLayout(next)

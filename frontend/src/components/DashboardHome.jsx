@@ -234,14 +234,22 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       </div>
 
       {/* Widgets façon macOS : déplaçables (glisser-déposer) et redimensionnables (clic
-          droit → Petit/Moyen/Grand), disposition mémorisée par utilisateur. Activité
-          toujours visible ; résumé Nova réservé Pro (même restriction que l'agrégation
-          cross-espaces dont ses statistiques dérivent) ; "Reprendre" seulement s'il existe
-          un dernier plan touché. */}
+          droit → Petit/Moyen/Grand), disposition mémorisée par utilisateur. Toute la page
+          est désormais composée de widgets — calendrier, échéances, activité, résumé Nova,
+          reprise, une carte par espace (personnel + équipes), "Créer une équipe",
+          "Historique" et "Galerie publique" — plutôt que seulement les cartes du haut
+          (retour utilisateur). Activité toujours visible ; résumé Nova réservé Pro (même
+          restriction que l'agrégation cross-espaces dont ses statistiques dérivent) ;
+          "Reprendre" seulement s'il existe un dernier plan touché. */}
       {userId && (
         <DashboardWidgetGrid
           userId={userId}
           lang={lang}
+          defaultOrder={['calendar', 'deadlines', 'activity', 'nova', 'resume', 'newTeam', 'history', 'gallery']}
+          defaultSizes={{
+            calendar: 'large', deadlines: 'medium', activity: 'medium', nova: 'medium',
+            resume: 'small', newTeam: 'medium', history: 'small', gallery: 'small'
+          }}
           widgets={{
             calendar: <DashboardCalendar lang={lang} deadlines={deadlines} plans={allPlans || activePlans} onOpenPlan={onLoadPlan} />,
             deadlines: (
@@ -307,102 +315,105 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   </span>
                 </button>
               )
-            } : {})
+            } : {}),
+
+            // Une carte d'espace = un widget (personnel + chaque équipe), plutôt qu'une
+            // grille séparée à part de la disposition déplaçable.
+            ...Object.fromEntries(spaces.map(space => {
+              const isCurrent = (team.teamId ?? null) === space.id
+              const stats = spaceStats(space.id)
+              return [`space:${space.id ?? 'personal'}`, (
+                <button
+                  className={`dashboard-space-card ${isCurrent ? 'is-current' : ''}`}
+                  onClick={() => onOpenSpace(space.id)}
+                >
+                  <div className="dashboard-space-card-media">
+                    {space.isTeam ? (
+                      <TeamAvatar id={space.id} name={space.name} imageUrl={space.avatar} className="dashboard-space-avatar" />
+                    ) : space.avatar ? (
+                      <img className="dashboard-space-avatar" src={space.avatar} alt="" />
+                    ) : (
+                      <span className="dashboard-space-avatar dashboard-space-avatar-personal">
+                        {isCurrent ? gradientIcon(<IconUser width={22} height={22} />) : <IconUser width={22} height={22} />}
+                      </span>
+                    )}
+                  </div>
+                  <div className="dashboard-space-card-body">
+                  <div className="dashboard-space-info">
+                    <span className="dashboard-space-name">
+                      <span className="dashboard-space-name-text">{space.name}</span>
+                      {isCurrent && <span className="dashboard-space-current-badge">{t(lang, 'dashboard.current')}</span>}
+                    </span>
+                    {stats.known ? (
+                      <>
+                        <span className="dashboard-space-meta">
+                          {stats.last && (
+                            <>
+                              {isCurrent ? gradientIcon(<IconClock width={12} height={12} />) : <IconClock width={12} height={12} />}
+                              {formatDateNumericShort(stats.last, lang)}
+                            </>
+                          )}
+                        </span>
+                        {!!stats.plans.length && (
+                          <div className="members-presence-row dashboard-space-plans-row">
+                            {stats.plans.slice(0, 6).map(p => (
+                              <span
+                                key={p.id}
+                                className="plans-preview-thumb avatar-tooltip"
+                                data-tooltip={`Plan : ${p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}`}
+                              >
+                                {p.coverImage
+                                  ? <img src={p.coverImage} alt="" />
+                                  : <span className="plans-preview-fallback" aria-hidden="true" />}
+                              </span>
+                            ))}
+                            {stats.plans.length > 6 && <span className="team-presence-more">+{stats.plans.length - 6}</span>}
+                          </div>
+                        )}
+                        <p className="dashboard-space-summary">
+                          {t(lang, space.isTeam ? 'dashboard.planSummaryTeam' : 'dashboard.planSummaryPersonal')(stats.count)}
+                        </p>
+                      </>
+                    ) : (
+                      <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.openSpace')}</span>
+                    )}
+                  </div>
+                  </div>
+                </button>
+              )]
+            })),
+
+            ...(!teamLimitReached ? {
+              newTeam: (
+                <button className="dashboard-space-card dashboard-space-card-new" onClick={onCreateTeam}>
+                  <div className="dashboard-space-card-media">
+                    <img className="dashboard-space-avatar" src={createTeamImage} alt="" />
+                  </div>
+                  <div className="dashboard-space-card-body">
+                  <div className="dashboard-space-info">
+                    <span className="dashboard-space-name">{t(lang, 'dashboard.createTeam')}</span>
+                    <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.createTeamDesc')}</span>
+                  </div>
+                  </div>
+                </button>
+              )
+            } : {}),
+
+            history: (
+              <button className="dashboard-widget-card dashboard-link-widget" onClick={onOpenAccount}>
+                <IconClipboard width={20} height={20} />
+                <span>{t(lang, 'dashboard.viewHistory')}</span>
+              </button>
+            ),
+            gallery: (
+              <button className="dashboard-widget-card dashboard-link-widget" onClick={onOpenGallery}>
+                <IconImage width={20} height={20} />
+                <span>{t(lang, 'dashboard.viewGallery')}</span>
+              </button>
+            )
           }}
         />
       )}
-
-      <div className="dashboard-home-grid">
-        {spaces.map(space => {
-          const isCurrent = (team.teamId ?? null) === space.id
-          const stats = spaceStats(space.id)
-          return (
-            <button
-              key={space.id ?? 'personal'}
-              className={`dashboard-space-card ${isCurrent ? 'is-current' : ''}`}
-              onClick={() => onOpenSpace(space.id)}
-            >
-              <div className="dashboard-space-card-media">
-                {space.isTeam ? (
-                  <TeamAvatar id={space.id} name={space.name} imageUrl={space.avatar} className="dashboard-space-avatar" />
-                ) : space.avatar ? (
-                  <img className="dashboard-space-avatar" src={space.avatar} alt="" />
-                ) : (
-                  <span className="dashboard-space-avatar dashboard-space-avatar-personal">
-                    {isCurrent ? gradientIcon(<IconUser width={22} height={22} />) : <IconUser width={22} height={22} />}
-                  </span>
-                )}
-              </div>
-              <div className="dashboard-space-card-body">
-              <div className="dashboard-space-info">
-                <span className="dashboard-space-name">
-                  <span className="dashboard-space-name-text">{space.name}</span>
-                  {isCurrent && <span className="dashboard-space-current-badge">{t(lang, 'dashboard.current')}</span>}
-                </span>
-                {stats.known ? (
-                  <>
-                    <span className="dashboard-space-meta">
-                      {stats.last && (
-                        <>
-                          {isCurrent ? gradientIcon(<IconClock width={12} height={12} />) : <IconClock width={12} height={12} />}
-                          {formatDateNumericShort(stats.last, lang)}
-                        </>
-                      )}
-                    </span>
-                    {!!stats.plans.length && (
-                      <div className="members-presence-row dashboard-space-plans-row">
-                        {stats.plans.slice(0, 6).map(p => (
-                          <span
-                            key={p.id}
-                            className="plans-preview-thumb avatar-tooltip"
-                            data-tooltip={`Plan : ${p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}`}
-                          >
-                            {p.coverImage
-                              ? <img src={p.coverImage} alt="" />
-                              : <span className="plans-preview-fallback" aria-hidden="true" />}
-                          </span>
-                        ))}
-                        {stats.plans.length > 6 && <span className="team-presence-more">+{stats.plans.length - 6}</span>}
-                      </div>
-                    )}
-                    <p className="dashboard-space-summary">
-                      {t(lang, space.isTeam ? 'dashboard.planSummaryTeam' : 'dashboard.planSummaryPersonal')(stats.count)}
-                    </p>
-                  </>
-                ) : (
-                  <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.openSpace')}</span>
-                )}
-              </div>
-              </div>
-            </button>
-          )
-        })}
-
-        {!teamLimitReached && (
-          <button className="dashboard-space-card dashboard-space-card-new" onClick={onCreateTeam}>
-            <div className="dashboard-space-card-media">
-              <img className="dashboard-space-avatar" src={createTeamImage} alt="" />
-            </div>
-            <div className="dashboard-space-card-body">
-            <div className="dashboard-space-info">
-              <span className="dashboard-space-name">{t(lang, 'dashboard.createTeam')}</span>
-              <span className="dashboard-space-meta dashboard-space-meta-muted">{t(lang, 'dashboard.createTeamDesc')}</span>
-            </div>
-            </div>
-          </button>
-        )}
-      </div>
-
-      <div className="dashboard-home-links">
-        <button className="dashboard-home-link" onClick={onOpenAccount}>
-          <span className="dashboard-home-link-icon"><IconClipboard width={13} height={13} /></span>
-          {t(lang, 'dashboard.viewHistory')}
-        </button>
-        <button className="dashboard-home-link" onClick={onOpenGallery}>
-          <span className="dashboard-home-link-icon"><IconImage width={13} height={13} /></span>
-          {t(lang, 'dashboard.viewGallery')}
-        </button>
-      </div>
       </div>
     </div>
   )

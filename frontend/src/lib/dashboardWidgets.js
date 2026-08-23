@@ -2,41 +2,35 @@
 // notifications macOS : déplaçables par glisser-déposer, redimensionnables via un clic
 // droit ("Petit"/"Moyen"/"Grand"). Persistée en localStorage, par utilisateur — purement
 // une préférence d'affichage locale, pas une donnée métier à synchroniser côté serveur.
+//
+// La liste des widgets n'est PAS figée : les espaces d'équipe (une carte = un widget) sont
+// dynamiques d'un utilisateur à l'autre et changent dans le temps (création d'une équipe).
+// `loadWidgetLayout` reçoit donc la liste des ids réellement affichés à cet instant
+// (`allIds`, dérivée par l'appelant de l'objet `widgets` qu'il rend) plutôt qu'une liste
+// figée ici — un id absent de la disposition sauvegardée (nouvelle équipe, nouveau widget
+// ajouté par une mise à jour du produit) est simplement ajouté à la fin.
 const STORAGE_PREFIX = 'plp_dashboard_widgets_'
-
-export const WIDGET_IDS = ['resume', 'activity', 'nova', 'calendar', 'deadlines']
-
-export const DEFAULT_LAYOUT = {
-  order: ['calendar', 'deadlines', 'activity', 'nova', 'resume'],
-  sizes: {
-    calendar: 'large',
-    deadlines: 'medium',
-    activity: 'medium',
-    nova: 'medium',
-    resume: 'small'
-  }
-}
 
 function key(userId) {
   return `${STORAGE_PREFIX}${userId}`
 }
 
-export function loadWidgetLayout(userId) {
-  if (!userId) return DEFAULT_LAYOUT
+export function loadWidgetLayout(userId, allIds, defaults) {
+  const fallback = { order: defaults?.order || allIds, sizes: defaults?.sizes || {} }
+  if (!userId) return fallback
   try {
     const raw = localStorage.getItem(key(userId))
-    if (!raw) return DEFAULT_LAYOUT
-    const parsed = JSON.parse(raw)
-    // Fusionne avec les valeurs par défaut plutôt que de faire confiance aveuglément au
-    // JSON stocké : un widget ajouté depuis la dernière visite (nouvelle fonctionnalité)
-    // doit apparaître même si l'utilisateur a déjà une disposition sauvegardée qui ne le
-    // connaît pas encore.
-    const order = [...(parsed.order || []).filter(id => WIDGET_IDS.includes(id))]
-    WIDGET_IDS.forEach(id => { if (!order.includes(id)) order.push(id) })
-    const sizes = { ...DEFAULT_LAYOUT.sizes, ...(parsed.sizes || {}) }
+    const parsed = raw ? JSON.parse(raw) : {}
+    const order = [...(parsed.order || []).filter(id => allIds.includes(id))]
+    // D'abord les ids par défaut manquants dans l'ordre attendu, puis tout id vraiment
+    // nouveau (ex: une équipe tout juste créée) — pour qu'un nouveau widget apparaisse à
+    // une position sensée plutôt que systématiquement en toute fin de grille.
+    ;(fallback.order || []).forEach(id => { if (allIds.includes(id) && !order.includes(id)) order.push(id) })
+    allIds.forEach(id => { if (!order.includes(id)) order.push(id) })
+    const sizes = { ...fallback.sizes, ...(parsed.sizes || {}) }
     return { order, sizes }
   } catch {
-    return DEFAULT_LAYOUT
+    return fallback
   }
 }
 
