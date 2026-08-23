@@ -182,6 +182,49 @@
   color: var(--color-text-muted);
 }
 
+.pace-compare {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-lg);
+  flex: 1;
+}
+
+.pace-compare-side {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  color: var(--color-text-muted);
+}
+
+.pace-compare-side svg { color: var(--color-accent); }
+
+.pace-compare-value {
+  font-size: 1.6rem;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  line-height: 1;
+}
+
+.pace-compare-label {
+  font-size: var(--font-size-xs);
+}
+
+.pace-compare-gap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pace-compare-gap-good { background: rgba(16, 185, 129, 0.16); color: rgb(16, 185, 129); }
+.pace-compare-gap-warning { background: rgba(250, 204, 21, 0.16); color: rgb(217, 119, 6); }
+.pace-compare-gap-danger { background: rgba(239, 68, 68, 0.16); color: rgb(220, 38, 38); }
+
 .dashboard-bi-kpis {
   display: flex;
   gap: var(--spacing-lg);

@@ -2,7 +2,7 @@ import { t } from '../lib/i18n'
 import { formatMoney } from '../lib/currency'
 import CircularGauge from './CircularGauge'
 import GaugeProgress from './GaugeProgress'
-import { IconBarChart } from './Icons'
+import { IconBarChart, IconClipboard, IconCalendar, IconChevronUp, IconChevronDown, IconMinus } from './Icons'
 import '../styles/DashboardBI.css'
 
 const DONUT_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6366f1', '#f472b6', '#a89fe8']
@@ -104,38 +104,52 @@ export default function DashboardBI({ plan, lang }) {
       </div>
 
       <div className="dashboard-bi-grid">
-        {allStories.length > 0 && (
-          <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
-            <div className="dashboard-bi-progress-wrap">
-              <CircularGauge
-                value={progressStoryEffort}
-                max={totalStoryEffort || 1}
-                label={t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, inProgressStoryCount, allStories.length)}
-              />
+        {allStories.length > 0 && (() => {
+          // Vert seulement si tout est vraiment terminé ; jaune dès qu'il y a du travail "en
+          // cours" (retour utilisateur : une story à moitié faite ne doit pas paraître aussi
+          // aboutie qu'une story terminée) ; neutre (vert) si rien n'a encore démarré, pour ne
+          // pas alarmer sur un plan qui n'a simplement pas commencé.
+          const allDone = doneStoryCount === allStories.length
+          const overallTone = allDone ? 'good' : inProgressStoryCount > 0 ? 'warning' : 'good'
+          return (
+            <div className="dashboard-bi-tile">
+              <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
+              <div className="dashboard-bi-progress-wrap">
+                <CircularGauge
+                  value={progressStoryEffort}
+                  max={totalStoryEffort || 1}
+                  tone={overallTone}
+                  label={t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, inProgressStoryCount, allStories.length)}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
 
         {schedulePacePct !== null && (() => {
           const workProgressPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
           const gap = workProgressPct - schedulePacePct
           // Seuil de 5 points avant de qualifier l'écart d'avance/retard réel — sous ce seuil,
-          // c'est du bruit de mesure, pas un signal (retour utilisateur : sans ce repère visuel,
-          // "15%" seul donnait l'impression que ça avançait, retard ou pas).
+          // c'est du bruit de mesure, pas un signal.
           const tone = gap >= 5 ? 'good' : gap <= -5 ? 'danger' : 'warning'
-          const verdictKey = gap >= 5 ? 'schedulePaceAhead' : gap <= -5 ? 'schedulePaceBehind' : 'schedulePaceOnTrack'
+          const GapIcon = gap >= 5 ? IconChevronUp : gap <= -5 ? IconChevronDown : IconMinus
           return (
             <div className="dashboard-bi-tile">
               <h4>{t(lang, 'dashboardBi.schedulePace')}</h4>
-              <p className="dashboard-bi-tile-hint">{t(lang, 'dashboardBi.schedulePaceHint')(schedulePacePct)}</p>
-              <div className="dashboard-bi-progress-wrap">
-                <CircularGauge
-                  value={workProgressPct}
-                  max={100}
-                  tone={tone}
-                  label={t(lang, `dashboardBi.${verdictKey}`)}
-                />
+              <div className="pace-compare">
+                <div className="pace-compare-side">
+                  <IconClipboard width={20} height={20} />
+                  <span className="pace-compare-value">{workProgressPct}%</span>
+                  <span className="pace-compare-label">{t(lang, 'dashboardBi.paceStories')}</span>
+                </div>
+                <div className={`pace-compare-gap pace-compare-gap-${tone}`}>
+                  <GapIcon width={22} height={22} />
+                </div>
+                <div className="pace-compare-side">
+                  <IconCalendar width={20} height={20} />
+                  <span className="pace-compare-value">{schedulePacePct}%</span>
+                  <span className="pace-compare-label">{t(lang, 'dashboardBi.paceCalendar')}</span>
+                </div>
               </div>
             </div>
           )
