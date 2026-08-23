@@ -13,7 +13,7 @@
 
 .generated-table-subtitle {
   color: var(--color-text-secondary);
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base);
   line-height: 1.5;
   margin-bottom: var(--spacing-lg);
 }

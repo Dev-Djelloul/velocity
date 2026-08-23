@@ -2,10 +2,22 @@ import { t } from '../lib/i18n'
 import { formatMoney } from '../lib/currency'
 import CircularGauge from './CircularGauge'
 import GaugeProgress from './GaugeProgress'
-import { IconBarChart, IconClipboard, IconCalendar, IconChevronUp, IconChevronDown, IconMinus } from './Icons'
+import { IconBarChart, IconClipboard, IconCalendar, IconChevronUp, IconChevronDown, IconMinus, IconHelpCircle } from './Icons'
 import '../styles/DashboardBI.css'
 
 const DONUT_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6366f1', '#f472b6', '#a89fe8']
+
+// Icône d'aide sur chaque titre de carte du Dashboard — avant, seule une poignée de cartes
+// expliquaient ce qu'elles montraient (retour utilisateur : ça s'arrêtait à quelques
+// éléments, il en manquait sur le reste). Même mécanisme de survol que les stats de la
+// carte d'identité du plan (plan-stat-tooltip), réutilisé ici pour rester cohérent.
+function CardHelp({ text }) {
+  return (
+    <span className="card-help-icon" data-tooltip={text} tabIndex={0}>
+      <IconHelpCircle width={13} height={13} />
+    </span>
+  )
+}
 
 function Donut({ segments, centerLabel, centerValue }) {
   const total = segments.reduce((s, seg) => s + seg.value, 0) || 1
@@ -173,7 +185,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
           const overallPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
           return (
             <div className="dashboard-bi-tile">
-              <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
+              <h4>{t(lang, 'dashboardBi.overallProgress')} <CardHelp text={t(lang, 'dashboardBi.overallProgressHelp')} /></h4>
               <div className="status-ring-wrap">
                 <div className="donut status-ring" style={{ background: `conic-gradient(${stops.join(', ')})` }}>
                   <div className="donut-center">
@@ -203,7 +215,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
           const GapIcon = gap >= 5 ? IconChevronUp : gap <= -5 ? IconChevronDown : IconMinus
           return (
             <div className="dashboard-bi-tile">
-              <h4>{t(lang, 'dashboardBi.schedulePace')}</h4>
+              <h4>{t(lang, 'dashboardBi.schedulePace')} <CardHelp text={t(lang, 'dashboardBi.schedulePaceCardHelp')} /></h4>
               <div className="pace-compare">
                 <div className="pace-compare-side">
                   <IconClipboard width={20} height={20} />
@@ -225,7 +237,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
         {financials && (
           <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
+            <h4>{t(lang, 'dashboardBi.costSplit')} <CardHelp text={t(lang, 'dashboardBi.costSplitHelp')} /></h4>
             <Donut
               segments={financials.costBreakdown.map(c => ({ name: c.category, value: c.amount, display: `${c.pct}%` }))}
               centerValue={formatMoney(financials.monthlyBurn)}
@@ -236,7 +248,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
         {budgetSegments.length > 0 && (
           <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.budgetByChannel')}</h4>
+            <h4>{t(lang, 'dashboardBi.budgetByChannel')} <CardHelp text={t(lang, 'dashboardBi.budgetByChannelHelp')} /></h4>
             <Donut
               segments={budgetSegments}
               centerValue={formatMoney(marketing.totalBudget)}
@@ -247,7 +259,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
         {workloadSegments.length > 0 && (
           <div className="dashboard-bi-tile dashboard-bi-tile-half">
-            <h4>{t(lang, 'dashboardBi.workloadByRole')}</h4>
+            <h4>{t(lang, 'dashboardBi.workloadByRole')} <CardHelp text={t(lang, 'dashboardBi.workloadByRoleHelp')} /></h4>
             <Donut
               segments={workloadSegments}
               centerValue={`${workloadSegments.reduce((s, seg) => s + seg.value, 0)}pts`}
@@ -258,7 +270,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
         {sprints.length > 0 && (
           <div className="dashboard-bi-tile dashboard-bi-tile-half">
-            <h4>{t(lang, 'dashboardBi.velocityBySprint')}</h4>
+            <h4>{t(lang, 'dashboardBi.velocityBySprint')} <CardHelp text={t(lang, 'dashboardBi.velocityBySprintHelp')} /></h4>
             <div className="velocity-bars">
               {sprints.map(sp => {
                 const total = sp.stories.reduce((s, x) => s + x.effort, 0)
@@ -302,7 +314,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
         {kpis?.length > 0 && (
           <div className="dashboard-bi-tile dashboard-bi-tile-full">
-            <h4>{t(lang, 'dashboardBi.kpiTargets')}</h4>
+            <h4>{t(lang, 'dashboardBi.kpiTargets')} <CardHelp text={t(lang, 'dashboardBi.kpiTargetsCardHelp')} /></h4>
             <p className="dashboard-bi-tile-hint">{t(lang, 'dashboardBi.kpiTargetsHint')}</p>
             <div className="dashboard-bi-kpis">
               {primaryKpi && (

@@ -18,9 +18,8 @@
 .marketing-scope-note {
   margin-top: 0.35rem;
   color: var(--color-text-muted, #9ca3af);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-base);
   line-height: 1.5;
-  max-width: 62ch;
 }
 
 .marketing-budget-control {

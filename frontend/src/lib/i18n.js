@@ -339,7 +339,14 @@ export const translations = {
       statusDone: 'Terminé',
       statusInProgress: 'En cours',
       statusTodo: 'Pas commencé',
-      statusOverdue: 'En retard'
+      statusOverdue: 'En retard',
+      overallProgressHelp: 'Avancement des stories par effort (points), pas par nombre : terminé compte plein, en cours compte à moitié. Le détail par couleur distingue terminé, en cours, pas commencé et en retard (sprint déjà censé être fini).',
+      schedulePaceCardHelp: 'Compare l\'avancement réel des stories au temps déjà écoulé entre la date de début et la date de lancement — pour voir si le plan avance plus vite ou plus lentement que prévu.',
+      costSplitHelp: 'Répartition du budget de lancement par poste de dépense (développement, design, infra, opérations, légal, réserve), avec le budget marketing ajouté à part — il ne fait pas partie du budget de lancement, il s\'y ajoute.',
+      budgetByChannelHelp: 'Répartition du budget marketing (séparé du budget de lancement) par canal d\'acquisition.',
+      workloadByRoleHelp: 'Points d\'effort par membre de l\'équipe réel. Le travail sans assignation nominative est réparti à parts égales entre tous les membres, faute de mieux.',
+      velocityBySprintHelp: 'Un segment coloré par responsable dans chaque barre de sprint (mêmes couleurs que "Charge par responsable"), avec un voile sombre sur la part encore non terminée.',
+      kpiTargetsCardHelp: 'Dernière valeur mesurée pour chaque KPI, comparée à son objectif — alimenté par les données saisies dans le Suivi post-lancement.'
     },
     sidebar: {
       title: 'Sommaire du plan',
@@ -2060,7 +2067,14 @@ export const translations = {
       statusDone: 'Done',
       statusInProgress: 'In progress',
       statusTodo: 'Not started',
-      statusOverdue: 'Overdue'
+      statusOverdue: 'Overdue',
+      overallProgressHelp: 'Story progress by effort (points), not by count: done counts in full, in progress counts as half. The color breakdown distinguishes done, in progress, not started and overdue (sprint already meant to be over).',
+      schedulePaceCardHelp: 'Compares actual story progress to the time already elapsed between the start date and the launch date — to see if the plan is moving faster or slower than planned.',
+      costSplitHelp: 'Launch budget breakdown by spending category (development, design, infra, operations, legal, reserve), with the marketing budget added separately — it\'s not part of the launch budget, it\'s added on top of it.',
+      budgetByChannelHelp: 'Marketing budget (separate from the launch budget) broken down by acquisition channel.',
+      workloadByRoleHelp: 'Effort points per real team member. Work without a named assignment is split evenly across all members, for lack of a better signal.',
+      velocityBySprintHelp: 'One colored segment per responsible person in each sprint bar (same colors as "Workload by role"), with a dark overlay over the portion not yet done.',
+      kpiTargetsCardHelp: 'Latest measured value for each KPI, compared to its target — fed by the data entered in post-launch tracking.'
     },
     sidebar: {
       title: 'Plan overview',

@@ -46,9 +46,54 @@
 }
 
 .dashboard-bi-tile h4 {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
   color: var(--color-text-primary);
   font-size: var(--font-size-sm);
   margin-bottom: var(--spacing-md);
+}
+
+.card-help-icon {
+  position: relative;
+  display: inline-flex;
+  color: var(--color-text-muted);
+  cursor: help;
+}
+
+.card-help-icon:hover,
+.card-help-icon:focus-visible {
+  color: var(--color-accent);
+  outline: none;
+}
+
+.card-help-icon::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 0;
+  width: 220px;
+  padding: 8px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary, #16161d);
+  color: var(--color-text-secondary);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-weight: var(--font-weight-regular, 400);
+  white-space: normal;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease;
+  z-index: 30;
+  pointer-events: none;
+}
+
+.card-help-icon:hover::after,
+.card-help-icon:focus-visible::after {
+  opacity: 1;
+  visibility: visible;
 }
 
 .dashboard-bi-tile-hint {
