@@ -3,10 +3,17 @@ import { getUserEmail } from '../clerk'
 
 const AUTH_BASE = 'https://auth.atlassian.com'
 const API_BASE = 'https://api.atlassian.com'
-// Scopes classiques 3LO (couvrent l'API REST v3) + offline_access pour le refresh token.
-// NB : l'API Agile (sprints natifs) exigerait une migration complète en scopes granulaires
-// — non retenue ; le regroupement par Phase (Epic) + label vl-sprint:N joue ce rôle.
-const SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access'
+// Scopes classiques 3LO (couvrent l'API REST v3) + offline_access pour le refresh token,
+// + scopes granulaires Jira Software pour l'API Agile (board/sprint natifs — retour
+// utilisateur : le panneau de détail Jira affichait "Sprint : Aucun" malgré le
+// regroupement par Phase/Epic + label vl-sprint:N). Mixer scopes classiques et granulaires
+// dans une même autorisation est accepté par Atlassian tant que l'appli déclarée sur
+// developer.atlassian.com a bien ces scopes granulaires activés dans ses permissions
+// ("Jira Software API" → Board/Sprint) — à vérifier/activer côté console développeur.
+// Un utilisateur déjà connecté AVANT cet ajout doit se reconnecter (son token actuel n'a
+// pas ces scopes) ; toutes les fonctions Agile ci-dessous sont best-effort et se taisent
+// silencieusement (repli sur le comportement précédent) tant que ce n'est pas fait.
+const SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access read:board-scope:jira-software read:sprint:jira-software write:sprint:jira-software'
 
 // --- OAuth ---
 
@@ -72,6 +79,82 @@ function jiraFetch(accessToken, cloudId, path, options = {}) {
       ...(options.headers || {})
     }
   })
+}
+
+function agileFetch(accessToken, cloudId, path, options = {}) {
+  return fetch(`${API_BASE}/ex/jira/${cloudId}/rest/agile/1.0${path}`, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    }
+  })
+}
+
+// Board Scrum du projet (seul type de board qui supporte des sprints natifs — un board
+// Kanban n'en a pas). Best-effort : renvoie null aussi bien si le projet n'a pas de board
+// scrum que si le token n'a pas encore les scopes Agile (utilisateur pas encore reconnecté
+// depuis l'ajout de cette fonctionnalité) — dans les deux cas l'export continue sans sprint
+// natif, exactement comme avant.
+async function findScrumBoardId(accessToken, cloudId, projectKey) {
+  try {
+    const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=50`)
+    if (!res.ok) return null
+    const data = await res.json()
+    const board = (data.values || []).find(b => b.type === 'scrum')
+    return board?.id ?? null
+  } catch { return null }
+}
+
+// Sprints déjà présents sur ce board, indexés par leur nom exact (voir sprintNameFor plus
+// bas) — pour ne pas recréer un sprint Jira à chaque resynchronisation du même plan.
+async function fetchExistingSprints(accessToken, cloudId, boardId) {
+  const map = {}
+  try {
+    let startAt = 0
+    for (;;) {
+      const res = await agileFetch(accessToken, cloudId, `/board/${boardId}/sprint?startAt=${startAt}&maxResults=50`)
+      if (!res.ok) break
+      const data = await res.json()
+      for (const s of data.values || []) map[s.name] = s.id
+      if (data.isLast || !data.values?.length) break
+      startAt += data.values.length
+    }
+  } catch { /* best-effort */ }
+  return map
+}
+
+async function createSprint(accessToken, cloudId, boardId, name, startDate, endDate) {
+  try {
+    const res = await agileFetch(accessToken, cloudId, '/sprint', {
+      method: 'POST',
+      body: JSON.stringify({
+        name,
+        originBoardId: boardId,
+        ...(startDate ? { startDate: `${startDate}T00:00:00.000Z` } : {}),
+        ...(endDate ? { endDate: `${endDate}T00:00:00.000Z` } : {})
+      })
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    return data.id ?? null
+  } catch { return null }
+}
+
+// Affecte des issues à un sprint natif Jira (l'API limite à 50 par appel — une phase
+// VelocityLaunch en compte rarement plus, mais on découpe par sécurité).
+async function addIssuesToSprint(accessToken, cloudId, sprintId, issueKeys) {
+  if (!issueKeys.length) return
+  try {
+    for (let i = 0; i < issueKeys.length; i += 50) {
+      await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
+        method: 'POST',
+        body: JSON.stringify({ issues: issueKeys.slice(i, i + 50) })
+      })
+    }
+  } catch { /* best-effort */ }
 }
 
 export async function listProjects(accessToken, cloudId) {
@@ -299,6 +382,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
   let updated = 0
   const links = {} // vlId -> { key, url }
   const epicKeyBySprint = {}
+  const storyKeysBySprint = {} // sprintId -> [issueKey, ...], pour l'affectation au sprint natif (étape 3)
 
   const browse = (key) => (siteUrl ? `${siteUrl}/browse/${key}` : null)
 
@@ -393,6 +477,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
         // de points constaté entre l'app et Jira sur des stories redécochées puis re-syncées).
         const { retryFields } = await updateIssue(accessToken, cloudId, existing, baseFields)
         links[story.id] = { key: existing, url: browse(existing) }
+        ;(storyKeysBySprint[sprint.sprintId] ||= []).push(existing)
         await transitionTo(accessToken, cloudId, existing, jiraCategoryFor(story.status), retryFields)
         updated++
         continue
@@ -405,6 +490,7 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
       try {
         const issue = await createIssue(accessToken, cloudId, createFields)
         links[story.id] = { key: issue.key, url: browse(issue.key) }
+        ;(storyKeysBySprint[sprint.sprintId] ||= []).push(issue.key)
         await transitionTo(accessToken, cloudId, issue.key, jiraCategoryFor(story.status))
         created++
       } catch (e) {
@@ -415,12 +501,36 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
         try {
           const issue = await createIssue(accessToken, cloudId, fallback)
           links[story.id] = { key: issue.key, url: browse(issue.key) }
+          ;(storyKeysBySprint[sprint.sprintId] ||= []).push(issue.key)
           await transitionTo(accessToken, cloudId, issue.key, jiraCategoryFor(story.status))
           created++
         } catch { /* on saute cette story sans casser l'export */ }
       }
     }
   }
+
+  // 3) Sprints natifs Jira (API Agile) : best-effort, entièrement silencieux si le projet n'a
+  // pas de board Scrum ou si le token n'a pas encore les scopes Agile (voir SCOPES plus haut) —
+  // dans ces cas le regroupement par Phase (Epic) + label vl-sprint:N (déjà posé ci-dessus)
+  // reste la seule information de "sprint" disponible, comme avant cet ajout.
+  try {
+    const boardId = await findScrumBoardId(accessToken, cloudId, projectKey)
+    if (boardId) {
+      const existingSprints = await fetchExistingSprints(accessToken, cloudId, boardId)
+      for (const sprint of plan.roadmap?.sprints || []) {
+        const keys = storyKeysBySprint[sprint.sprintId] || []
+        if (!keys.length) continue
+        // Nom incluant le produit du plan (pas juste "Phase N") : le board Jira est partagé
+        // par TOUS les plans synchronisés dans ce projet, et sprint.sprintId repart de 1 à
+        // chaque plan (même limite que epicLabel/vlLabel plus haut) — sans ça, "Phase 1" de
+        // deux plans différents partagerait le même sprint Jira.
+        const sprintName = `${plan.product?.name || (lang === 'en' ? 'Plan' : 'Plan')} · ${lang === 'en' ? 'Phase' : 'Phase'} ${sprint.sprintId}`.slice(0, 60)
+        let sprintId = existingSprints[sprintName]
+        if (!sprintId) sprintId = await createSprint(accessToken, cloudId, boardId, sprintName, sprintStart(sprint.sprintId), sprintDue(sprint.sprintId))
+        if (sprintId) await addIssuesToSprint(accessToken, cloudId, sprintId, keys)
+      }
+    }
+  } catch { /* API Agile indisponible : on garde le regroupement Epic + label existant */ }
 
   const boardUrl = resolveBoardUrl(siteUrl, projectKey, links)
   return { created, updated, links, boardUrl, projectKey, siteUrl }
