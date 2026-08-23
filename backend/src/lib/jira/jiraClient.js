@@ -178,23 +178,39 @@ async function createIssue(accessToken, cloudId, fields) {
   return res.json() // { key, id, self }
 }
 
+// Retourne { ok, retryFields } plutôt qu'un simple booléen — retryFields liste les champs
+// (priorité, assigné, points, start date...) retirés par le repli "sous-ensemble sûr" pour
+// que l'appelant puisse retenter de les poser via l'écran de transition (voir transitionTo)
+// plutôt que de les perdre silencieusement. Cas confirmé (retour utilisateur, capture à
+// l'appui, écart de 8 points constaté entre l'app et Jira) : un ticket déjà "Terminé" refuse
+// souvent l'édition directe de champs personnalisés (story points inclus) hors écran de
+// transition — cette voie PUT simple échouait alors systématiquement pour toute story qui
+// avait déjà été marquée Terminée lors d'une synchronisation précédente, silencieusement.
 async function updateIssue(accessToken, cloudId, key, fields) {
   const res = await jiraFetch(accessToken, cloudId, `/issue/${key}`, { method: 'PUT', body: JSON.stringify({ fields }) })
-  if (res.ok) return true
+  if (res.ok) return { ok: true, retryFields: null }
   // Certains champs (priorité, assigné, start date, story points) peuvent être refusés selon le projet.
   // On retente avec un sous-ensemble sûr pour ne jamais perdre la mise à jour.
   const { priority, assignee, ...safe } = fields
+  const retryFields = {}
+  if (priority !== undefined) retryFields.priority = priority
+  if (assignee !== undefined) retryFields.assignee = assignee
   const safe2 = { ...safe }
   for (const k of Object.keys(safe2)) {
-    if (/^customfield_/.test(k)) delete safe2[k]
+    if (/^customfield_/.test(k)) { retryFields[k] = safe2[k]; delete safe2[k] }
   }
   const res2 = await jiraFetch(accessToken, cloudId, `/issue/${key}`, { method: 'PUT', body: JSON.stringify({ fields: safe2 }) })
-  return res2.ok
+  return { ok: res2.ok, retryFields: Object.keys(retryFields).length ? retryFields : null }
 }
 
 // Transitionne un ticket vers une catégorie de statut donnée ('done' ou 'new'/'indeterminate').
 // Dans Jira le statut ne se met pas via un champ mais via une transition disponible.
-async function transitionTo(accessToken, cloudId, key, targetCategory) {
+// `retryFields` (optionnel) : champs qu'un PUT direct venait de refuser sur ce ticket (voir
+// updateIssue) — repassés ICI, dans le corps de la requête de transition elle-même. Jira
+// autorise l'édition de champs via l'écran de transition même quand une modification
+// directe est refusée sur un ticket déjà clôturé ("Terminé") — c'est le seul moyen de
+// récupérer des points/priorité/assigné qui viennent d'être silencieusement perdus.
+async function transitionTo(accessToken, cloudId, key, targetCategory, retryFields) {
   if (!targetCategory) return // statut VelocityLaunch absent/inconnu : ne pas toucher au ticket
   try {
     const res = await jiraFetch(accessToken, cloudId, `/issue/${key}/transitions`)
@@ -202,9 +218,11 @@ async function transitionTo(accessToken, cloudId, key, targetCategory) {
     const { transitions = [] } = await res.json()
     const match = transitions.find(tr => tr.to?.statusCategory?.key === targetCategory)
     if (!match) return
+    const body = { transition: { id: match.id } }
+    if (retryFields) body.fields = retryFields
     await jiraFetch(accessToken, cloudId, `/issue/${key}/transitions`, {
       method: 'POST',
-      body: JSON.stringify({ transition: { id: match.id } })
+      body: JSON.stringify(body)
     })
   } catch { /* transition best-effort */ }
 }
@@ -300,9 +318,18 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
       issuetype: { name: 'Epic' },
       labels: ['velocitylaunch', epicLabel]
     }, sprint.sprintId)
+    // Total des points de la phase reporté sur l'Epic elle-même (retour utilisateur : le
+    // panneau de détail Jira d'une Epic affichait "Story point estimate : Aucun" alors que
+    // chaque story enfant portait bien ses propres points). Best-effort : certains types
+    // "Epic" refusent ce champ selon la config du projet, updateIssue/createIssue gèrent déjà
+    // ce cas via leur repli sur un sous-ensemble de champs sûrs.
+    if (spField) {
+      const epicPoints = (sprint.stories || []).reduce((sum, s) => sum + (Number.isFinite(s.effort) ? s.effort : 0), 0)
+      if (epicPoints > 0) fields[spField] = epicPoints
+    }
     const existing = managed[epicLabel]
     if (existing) {
-      await updateIssue(accessToken, cloudId, existing, withDates({ summary: fields.summary }, sprint.sprintId))
+      await updateIssue(accessToken, cloudId, existing, withDates({ summary: fields.summary, ...(spField && fields[spField] != null ? { [spField]: fields[spField] } : {}) }, sprint.sprintId))
       epicKeyBySprint[sprint.sprintId] = existing
       updated++
     } else {
@@ -310,7 +337,18 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
         const issue = await createIssue(accessToken, cloudId, fields)
         epicKeyBySprint[sprint.sprintId] = issue.key
         created++
-      } catch { /* Epic peut être indisponible dans certains projets ; on continue sans parent */ }
+      } catch {
+        // Le champ story points sur une Epic est refusé par certains templates de projet
+        // (ex. projets "Business"/ITSM) : on retente sans lui plutôt que de perdre l'Epic entière.
+        if (spField && fields[spField] != null) {
+          try {
+            const { [spField]: _drop, ...withoutPoints } = fields
+            const issue = await createIssue(accessToken, cloudId, withoutPoints)
+            epicKeyBySprint[sprint.sprintId] = issue.key
+            created++
+          } catch { /* Epic peut être indisponible dans certains projets ; on continue sans parent */ }
+        }
+      }
     }
   }
 
@@ -349,9 +387,13 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
 
       const existing = managed[vlLabel]
       if (existing) {
-        await updateIssue(accessToken, cloudId, existing, baseFields)
+        // retryFields : champs (points, priorité, assigné…) qu'un ticket déjà "Terminé" a
+        // refusés en PUT direct — on les repasse via l'écran de transition juste après, seul
+        // moyen de les récupérer sans les perdre silencieusement (retour utilisateur : écart
+        // de points constaté entre l'app et Jira sur des stories redécochées puis re-syncées).
+        const { retryFields } = await updateIssue(accessToken, cloudId, existing, baseFields)
         links[story.id] = { key: existing, url: browse(existing) }
-        await transitionTo(accessToken, cloudId, existing, jiraCategoryFor(story.status))
+        await transitionTo(accessToken, cloudId, existing, jiraCategoryFor(story.status), retryFields)
         updated++
         continue
       }
