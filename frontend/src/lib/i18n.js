@@ -887,6 +887,13 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige la bulle de confirmation rognée dans le centre de notifications',
+            items: [
+              'La confirmation "Supprimer définitivement ?" se faisait couper par le défilement du panneau de notifications, mélangée à la liste derrière elle'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrige un bug important : l\'export GitHub pouvait écraser les issues d\'un plan précédent',
             items: [
               'Même cause que le bug déjà corrigé sur Jira/Linear : chaque plan généré repart de stories "US-001, US-002…", et l\'export GitHub ne les distinguait pas entre plans différents — synchroniser un nouveau plan dans le même dépôt pouvait mettre à jour (et écraser) les issues d\'un plan précédent partageant les mêmes numéros',
@@ -3034,6 +3041,13 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed a clipped confirmation bubble in the notification center',
+            items: [
+              'The "Delete all?" confirmation got cut off by the notification panel\'s scroll area, mixed in with the list behind it'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed a major bug: GitHub export could overwrite a previous plan\'s issues',
