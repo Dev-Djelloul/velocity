@@ -336,6 +336,14 @@ export default {
         try { await recordUsage(env) } catch { /* le suivi d'usage ne doit jamais faire échouer la génération */ }
       }
 
+      // planStartDate/launchDate : mêmes règles que le générateur frontend (planGenerator.js,
+      // filet de secours quand ce backend n'est pas joignable) — sans ça, ces deux champs
+      // restaient absents pour tout plan généré via ce endpoint, jusqu'à ce qu'on les fixe à
+      // la main dans l'onglet Suivi post-lancement (le compte à rebours ne pouvait alors
+      // jamais démarrer tout seul depuis les données du questionnaire).
+      const now = new Date()
+      const targetLaunchMs = now.getTime() + (generated.roadmap?.totalDuration || 0) * 7 * 24 * 60 * 60 * 1000
+
       return new Response(JSON.stringify({
         product: data.product,
         market: data.market,
@@ -343,7 +351,9 @@ export default {
         priorities: data.priorities,
         ...generated,
         language: lang,
-        generatedAt: new Date().toISOString(),
+        generatedAt: now.toISOString(),
+        planStartDate: now.toISOString(),
+        launchDate: new Date(targetLaunchMs).toISOString(),
         generatedBy: source
       }), { headers: CORS_HEADERS })
     } catch (error) {
