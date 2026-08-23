@@ -108,18 +108,30 @@
   text-align: left;
   padding: 0.6rem 1.6rem 0.6rem 0.9rem;
   border: none;
+  border-left: 3px solid transparent;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   background: transparent;
   color: var(--color-text-primary, #fff);
   cursor: pointer;
 }
 
+/* Non lu : nettement plus marqué qu'avant (fond très léger indiscernable de l'état lu,
+   retour utilisateur) — liseré cyan + fond teinté cyan pour distinguer d'un coup d'œil. */
 .notif-bell-item.is-unread {
-  background: rgba(145, 132, 217, 0.08);
+  background: rgba(6, 182, 212, 0.14);
+  border-left-color: #06b6d4;
+}
+
+.notif-bell-item.is-unread .notif-bell-item-title {
+  color: #67e8f9;
 }
 
 .notif-bell-item:hover {
   background: rgba(145, 132, 217, 0.14);
+}
+
+.notif-bell-item.is-unread:hover {
+  background: rgba(6, 182, 212, 0.22);
 }
 
 .notif-bell-item-title {
@@ -151,5 +163,5 @@
   position: absolute;
   top: 0.7rem;
   right: 0.6rem;
-  color: #9184d9;
+  color: #06b6d4;
 }
