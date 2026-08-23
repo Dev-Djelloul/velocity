@@ -890,7 +890,7 @@ export const translations = {
             title: 'Ajoute le vrai Sprint Jira natif (API Agile)',
             items: [
               'Jusqu\'ici le "sprint" n\'existait que via le regroupement par Phase (Epic) et un simple label — le panneau de détail d\'un ticket Jira affichait "Sprint : Aucun" malgré ce regroupement',
-              'L\'export crée maintenant (ou réutilise) un vrai sprint Jira par phase du plan sur le board Scrum du projet, et y affecte les tickets correspondants — nécessite de reconnecter Jira une fois si déjà connecté avant cette mise à jour'
+              'L\'export crée maintenant (ou réutilise) un vrai sprint Jira nommé "Sprint N" par phase du plan, sur le board du projet (compatible boards classiques et "nouvelle génération"), et y affecte les tickets correspondants — nécessite de reconnecter Jira une fois si déjà connecté avant cette mise à jour'
             ]
           },
           {
@@ -3006,7 +3006,7 @@ export const translations = {
             title: 'Added real native Jira Sprint support (Agile API)',
             items: [
               'Until now "sprint" only existed via the Phase (Epic) grouping and a plain label — a Jira ticket\'s detail panel showed "Sprint: None" despite that grouping',
-              'Export now creates (or reuses) a real Jira sprint per plan phase on the project\'s Scrum board and assigns the matching tickets to it — requires reconnecting Jira once if it was already connected before this update'
+              'Export now creates (or reuses) a real Jira sprint named "Sprint N" per plan phase, on the project\'s board (works with both classic and "next-gen" boards), and assigns the matching tickets to it — requires reconnecting Jira once if it was already connected before this update'
             ]
           },
           {
