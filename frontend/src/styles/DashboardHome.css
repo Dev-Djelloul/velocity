@@ -127,6 +127,13 @@
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
 }
 
+.dashboard-home-plan-status {
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-top: -0.5rem;
+  opacity: 0.92;
+}
+
 .dashboard-home-link {
   color: rgba(255, 255, 255, 0.85);
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
@@ -222,8 +229,17 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  width: 340px;
+  width: 400px;
   justify-self: end;
+}
+
+/* Le calendrier reste à la largeur pleine de la colonne (ses éléments d'en-tête —
+   mois + "Aujourd'hui" + flèches — débordaient sinon, retour utilisateur) ; "Prochaines
+   échéances" reste volontairement plus étroite et alignée à droite, pour que le calendrier
+   soit visiblement la carte la plus large des deux. */
+.dashboard-deadlines-card {
+  max-width: 340px;
+  align-self: flex-end;
 }
 
 .dashboard-widget-card {

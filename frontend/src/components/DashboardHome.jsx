@@ -162,6 +162,10 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       <div className="dashboard-home-header">
         <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
         <p>{t(lang, 'dashboard.subtitle')}</p>
+        {/* Petite phrase d'accroche sous le sous-titre, ton différent selon le plan — sympa et
+            engageante côté Pro ("tout est prêt, lance-toi") comme côté gratuit (pas de
+            reproche, juste une invitation à démarrer) — retour utilisateur. */}
+        <p className="dashboard-home-plan-status">{t(lang, pro ? 'dashboard.planStatusPro' : 'dashboard.planStatusFree')}</p>
         <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
           <IconPlus width={16} height={16} />
           {t(lang, 'dashboard.createPlan')}
