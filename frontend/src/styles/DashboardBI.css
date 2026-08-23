@@ -57,18 +57,29 @@
 .card-help-icon {
   position: relative;
   display: inline-flex;
-  color: var(--color-text-muted);
-  cursor: help;
 }
 
-.card-help-icon:hover,
-.card-help-icon:focus-visible {
+.card-help-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 2px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.card-help-trigger:hover,
+.card-help-trigger:focus-visible {
   color: var(--color-accent);
   outline: none;
 }
 
-.card-help-icon::after {
-  content: attr(data-tooltip);
+/* Popover réel (pas juste un ::after sur :hover) : basculé au clic/tap, donc utilisable
+   sur mobile où il n'y a pas de survol — le survol desktop reste possible en plus via
+   :hover ci-dessous, en confort. */
+.card-help-popover {
   position: absolute;
   bottom: calc(100% + 8px);
   left: 0;
@@ -90,8 +101,8 @@
   pointer-events: none;
 }
 
-.card-help-icon:hover::after,
-.card-help-icon:focus-visible::after {
+.card-help-popover.is-open,
+.card-help-icon:hover .card-help-popover {
   opacity: 1;
   visibility: visible;
 }
@@ -271,20 +282,29 @@
   color: var(--color-text-primary);
 }
 
-.status-ring-legend {
+.status-ring-list {
   display: flex;
-  gap: 0.7rem;
-  flex-wrap: wrap;
-  justify-content: center;
+  flex-direction: column;
+  gap: 0.35rem;
+  width: 100%;
+  align-self: stretch;
 }
 
-.status-ring-legend-item {
-  display: inline-flex;
+.status-ring-row {
+  display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.45rem;
   font-size: var(--font-size-xs);
+}
+
+.status-ring-row-label {
   color: var(--color-text-secondary);
-  cursor: help;
+}
+
+.status-ring-row-count {
+  margin-left: auto;
+  color: var(--color-text-primary);
+  font-weight: var(--font-weight-semibold);
 }
 
 .status-ring-dot {

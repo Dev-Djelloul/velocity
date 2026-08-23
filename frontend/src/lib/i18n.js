@@ -326,9 +326,7 @@ export const translations = {
       kpiTargetsHint: 'D\'après le suivi post-lancement',
       costSplit: 'Répartition des coûts',
       overallProgress: 'Avancement global',
-      storiesCompleted: (done, inProgress, total) => inProgress
-        ? `${done}/${total} stories terminées · ${inProgress} en cours`
-        : `${done}/${total} stories terminées`,
+      storyCount: (n) => n === 1 ? '1 story' : `${n} stories`,
       total: 'Total',
       totalEffort: 'Effort total',
       monthlyBurn: 'Burn mensuel',
@@ -2055,9 +2053,7 @@ export const translations = {
       kpiTargetsHint: 'From post-launch tracking',
       costSplit: 'Cost split',
       overallProgress: 'Overall progress',
-      storiesCompleted: (done, inProgress, total) => inProgress
-        ? `${done}/${total} stories done · ${inProgress} in progress`
-        : `${done}/${total} stories completed`,
+      storyCount: (n) => n === 1 ? '1 story' : `${n} stories`,
       total: 'Total',
       totalEffort: 'Total effort',
       monthlyBurn: 'Monthly burn',

@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { formatMoney } from '../lib/currency'
 import CircularGauge from './CircularGauge'
@@ -8,13 +9,38 @@ import '../styles/DashboardBI.css'
 const DONUT_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6366f1', '#f472b6', '#a89fe8']
 
 // Icône d'aide sur chaque titre de carte du Dashboard — avant, seule une poignée de cartes
-// expliquaient ce qu'elles montraient (retour utilisateur : ça s'arrêtait à quelques
-// éléments, il en manquait sur le reste). Même mécanisme de survol que les stats de la
-// carte d'identité du plan (plan-stat-tooltip), réutilisé ici pour rester cohérent.
+// expliquaient ce qu'elles montraient. Un pur ::after CSS sur :hover (même mécanisme que
+// plan-stat-tooltip) ne marche que sur desktop : sur mobile/tactile, il n'y a pas de survol,
+// donc "ça ne fonctionnait pas du tout" (retour utilisateur) — remplacé par un vrai bouton
+// qui bascule un petit popover au clic/tap, en plus de rester consultable au survol sur
+// desktop. Se ferme sur clic extérieur ou Échap.
 function CardHelp({ text }) {
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  useEffect(() => {
+    if (!open) return
+    const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false) }
+    const onKeyDown = (e) => { if (e.key === 'Escape') setOpen(false) }
+    document.addEventListener('mousedown', onDocClick)
+    document.addEventListener('keydown', onKeyDown)
+    return () => {
+      document.removeEventListener('mousedown', onDocClick)
+      document.removeEventListener('keydown', onKeyDown)
+    }
+  }, [open])
+
   return (
-    <span className="card-help-icon" data-tooltip={text} tabIndex={0}>
-      <IconHelpCircle width={13} height={13} />
+    <span className="card-help-icon" ref={ref}>
+      <button
+        type="button"
+        className="card-help-trigger"
+        onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }}
+        aria-expanded={open}
+      >
+        <IconHelpCircle width={13} height={13} />
+      </button>
+      <span className={`card-help-popover ${open ? 'is-open' : ''}`}>{text}</span>
     </span>
   )
 }
@@ -113,8 +139,6 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
   const allStories = sprints.flatMap(sp => sp.stories)
   const totalStoryEffort = allStories.reduce((s, x) => s + x.effort, 0)
-  const doneStoryCount = allStories.filter(s => s.status === 'done').length
-  const inProgressStoryCount = allStories.filter(s => s.status === 'in_progress').length
   // "Terminé" au sens strict sous-représentait l'avancement réel : une story "en cours"
   // valait 0, comme si elle n'avait pas été commencée (retour utilisateur). Elle compte
   // maintenant pour la moitié de son effort — done=100%, in_progress=50%, todo=0%.
@@ -146,14 +170,15 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
   const SPRINT_DAYS = 14
   const nowMs = Date.now()
   let doneEffort = 0, inProgressEffort = 0, overdueEffort = 0, todoEffort = 0
+  let doneCount = 0, inProgressCount = 0, overdueCount = 0, todoCount = 0
   sprints.forEach(sp => {
     const sprintEndMs = new Date(scheduleStart || nowMs).getTime() + sp.sprintId * SPRINT_DAYS * 86400000
     const sprintOverdue = sprintEndMs < nowMs
     sp.stories.forEach(s => {
-      if (s.status === 'done') doneEffort += s.effort
-      else if (sprintOverdue) overdueEffort += s.effort
-      else if (s.status === 'in_progress') inProgressEffort += s.effort
-      else todoEffort += s.effort
+      if (s.status === 'done') { doneEffort += s.effort; doneCount++ }
+      else if (sprintOverdue) { overdueEffort += s.effort; overdueCount++ }
+      else if (s.status === 'in_progress') { inProgressEffort += s.effort; inProgressCount++ }
+      else { todoEffort += s.effort; todoCount++ }
     })
   })
 
@@ -168,12 +193,13 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
 
       <div className="dashboard-bi-grid">
         {allStories.length > 0 && (() => {
-          const ringSegments = [
-            { key: 'done', labelKey: 'statusDone', color: '#4ade80', value: doneEffort },
-            { key: 'overdue', labelKey: 'statusOverdue', color: '#ef4444', value: overdueEffort },
-            { key: 'inProgress', labelKey: 'statusInProgress', color: '#facc15', value: inProgressEffort },
-            { key: 'todo', labelKey: 'statusTodo', color: 'rgba(255, 255, 255, 0.16)', value: todoEffort }
-          ].filter(seg => seg.value > 0)
+          const allRingSegments = [
+            { key: 'done', labelKey: 'statusDone', color: '#4ade80', value: doneEffort, count: doneCount },
+            { key: 'overdue', labelKey: 'statusOverdue', color: '#ef4444', value: overdueEffort, count: overdueCount },
+            { key: 'inProgress', labelKey: 'statusInProgress', color: '#facc15', value: inProgressEffort, count: inProgressCount },
+            { key: 'todo', labelKey: 'statusTodo', color: 'rgba(255, 255, 255, 0.16)', value: todoEffort, count: todoCount }
+          ]
+          const ringSegments = allRingSegments.filter(seg => seg.value > 0)
           const ringTotal = ringSegments.reduce((s, seg) => s + seg.value, 0) || 1
           let cursor = 0
           const stops = ringSegments.map(seg => {
@@ -192,16 +218,20 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
                     <span className="status-ring-value">{overallPct}%</span>
                   </div>
                 </div>
-                <div className="status-ring-legend">
+                {/* Une ligne par statut, avec le nombre de stories (pas les points, qui
+                    n'avaient de sens que pour dessiner l'anneau) — retour utilisateur : "2/12
+                    · 3 en cours" en une phrase ne disait rien sur le "pas commencé" ni le
+                    "en retard", il fallait tout détailler ligne par ligne. */}
+                <div className="status-ring-list">
                   {ringSegments.map(seg => (
-                    <span key={seg.key} className="status-ring-legend-item" title={t(lang, `dashboardBi.${seg.labelKey}`)}>
+                    <div key={seg.key} className="status-ring-row">
                       <i className="status-ring-dot" style={{ background: seg.color }} />
-                      {Math.round(seg.value)}
-                    </span>
+                      <span className="status-ring-row-label">{t(lang, `dashboardBi.${seg.labelKey}`)}</span>
+                      <span className="status-ring-row-count">{t(lang, 'dashboardBi.storyCount')(seg.count)}</span>
+                    </div>
                   ))}
                 </div>
               </div>
-              <p className="dashboard-bi-tile-hint">{t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, inProgressStoryCount, allStories.length)}</p>
             </div>
           )
         })()}
