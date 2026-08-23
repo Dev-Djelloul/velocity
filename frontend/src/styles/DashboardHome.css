@@ -74,7 +74,8 @@
      mérite de rester lisible en dessous plutôt que d'être noyée sous un voile sombre. */
   /* Nettement assombri (retour utilisateur) — les cartes du calendrier/échéances,
      translucides, se détachent mal sur un fond encore assez lumineux. */
-  filter: brightness(0.35) saturate(1.05);
+  /* Assombri au maximum (proche du noir), pour voir le rendu — retour utilisateur. */
+  filter: brightness(0.12) saturate(1.05);
 }
 
 @media (max-width: 768px) {
@@ -108,6 +109,10 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0.9rem;
+  /* Sans largeur maximale, une phrase d'accroche un peu longue étirait toute la colonne
+     gauche (grid-template-columns: auto 1fr) et débordait sur la colonne des widgets à
+     droite — retour utilisateur. */
+  max-width: 480px;
 }
 
 .dashboard-home-header h1 {
@@ -233,13 +238,11 @@
   justify-self: end;
 }
 
-/* Le calendrier reste à la largeur pleine de la colonne (ses éléments d'en-tête —
-   mois + "Aujourd'hui" + flèches — débordaient sinon, retour utilisateur) ; "Prochaines
-   échéances" reste volontairement plus étroite et alignée à droite, pour que le calendrier
-   soit visiblement la carte la plus large des deux. */
+/* Repassée à la pleine largeur de la colonne — la version plus étroite tronquait les noms
+   de plan et les libellés (retour utilisateur) ; la lisibilité prime sur la hiérarchie
+   visuelle avec le calendrier. */
 .dashboard-deadlines-card {
-  max-width: 340px;
-  align-self: flex-end;
+  width: 100%;
 }
 
 .dashboard-widget-card {
@@ -626,8 +629,8 @@
   display: flex;
   align-items: center;
   gap: 0.65rem;
-  font-size: 0.82rem;
-  padding: 0.55rem 0;
+  font-size: 0.74rem;
+  padding: 0.5rem 0;
 }
 
 /* Une ligne par échéance, séparées d'un filet plutôt qu'un simple espacement — plus lisible
@@ -676,14 +679,14 @@
 }
 
 .dashboard-deadline-kind {
-  font-size: 0.68rem;
+  font-size: 0.62rem;
   color: var(--color-text-muted, #9ca3af);
 }
 
 .dashboard-deadline-when {
   flex-shrink: 0;
   font-weight: 600;
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   padding: 0.2rem 0.55rem;
   border-radius: 999px;
   background: rgba(145, 132, 217, 0.14);
