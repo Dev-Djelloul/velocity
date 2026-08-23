@@ -887,6 +887,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Ajoute le vrai Sprint Jira natif (API Agile)',
+            items: [
+              'Jusqu\'ici le "sprint" n\'existait que via le regroupement par Phase (Epic) et un simple label — le panneau de détail d\'un ticket Jira affichait "Sprint : Aucun" malgré ce regroupement',
+              'L\'export crée maintenant (ou réutilise) un vrai sprint Jira par phase du plan sur le board Scrum du projet, et y affecte les tickets correspondants — nécessite de reconnecter Jira une fois si déjà connecté avant cette mise à jour'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Corrige la perte de story points Jira sur les tickets déjà Terminés',
             items: [
               'Un ticket Jira déjà "Terminé" refuse souvent la modification directe de ses champs personnalisés (story points inclus) hors écran de transition — la synchronisation échouait alors silencieusement sur ces champs et ne les récupérait jamais, causant un écart entre le total de points affiché dans l\'app et celui compté par Jira (ex. 50 points côté app contre 42 dans Jira après avoir redécoché plusieurs stories Terminées)',
@@ -2993,6 +3001,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Added real native Jira Sprint support (Agile API)',
+            items: [
+              'Until now "sprint" only existed via the Phase (Epic) grouping and a plain label — a Jira ticket\'s detail panel showed "Sprint: None" despite that grouping',
+              'Export now creates (or reuses) a real Jira sprint per plan phase on the project\'s Scrum board and assigns the matching tickets to it — requires reconnecting Jira once if it was already connected before this update'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed Jira story points being lost on already-Done tickets',
