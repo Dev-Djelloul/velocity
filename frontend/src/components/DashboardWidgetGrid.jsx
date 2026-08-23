@@ -59,7 +59,7 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, onDragStart, onDra
       onDrop={(e) => { e.preventDefault(); onDrop(id) }}
       onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }) }}
     >
-      {children}
+      <div className="dashboard-widget-slot-content">{children}</div>
       {menu && (
         <WidgetSizeMenu
           lang={lang}
@@ -117,27 +117,35 @@ export default function DashboardWidgetGrid({ userId, lang, widgets, defaultOrde
     persist({ ...layout, sizes: { ...layout.sizes, [id]: size } })
   }
 
-  const visibleOrder = layout.order.filter(id => widgets[id])
+  const visibleOrder = layout.order.filter(id => widgets[id] !== undefined)
 
   return (
     <div className="dashboard-widget-grid">
-      {visibleOrder.map(id => (
-        <WidgetSlot
-          key={id}
-          id={id}
-          lang={lang}
-          size={layout.sizes[id] || 'medium'}
-          isDragging={draggingId === id}
-          isDragOver={dragOverId === id && draggingId !== id}
-          onDragStart={setDraggingId}
-          onDragEnd={() => { setDraggingId(null); setDragOverId(null) }}
-          onDragEnter={setDragOverId}
-          onDrop={handleDrop}
-          onResize={handleResize}
-        >
-          {widgets[id]}
-        </WidgetSlot>
-      ))}
+      {visibleOrder.map(id => {
+        const size = layout.sizes[id] || 'medium'
+        // Un widget peut être une fonction (size) => node plutôt qu'un node statique,
+        // pour adapter son contenu à sa propre taille (ex: la galerie affiche plus de
+        // vignettes en Grand qu'en Petit) — sans ça, chaque widget devrait connaître sa
+        // taille par un autre biais.
+        const content = typeof widgets[id] === 'function' ? widgets[id](size) : widgets[id]
+        return (
+          <WidgetSlot
+            key={id}
+            id={id}
+            lang={lang}
+            size={size}
+            isDragging={draggingId === id}
+            isDragOver={dragOverId === id && draggingId !== id}
+            onDragStart={setDraggingId}
+            onDragEnd={() => { setDraggingId(null); setDragOverId(null) }}
+            onDragEnter={setDragOverId}
+            onDrop={handleDrop}
+            onResize={handleResize}
+          >
+            {content}
+          </WidgetSlot>
+        )
+      })}
     </div>
   )
 }

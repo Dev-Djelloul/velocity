@@ -190,6 +190,17 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     return [personal, ...teams]
   }, [personalSpace.name, personalSpace.avatar, teamIdsKey])
 
+  // Plans avec couverture (tous espaces confondus) pour le widget "Galerie publique" — le
+  // nombre de vignettes affichées suit la taille choisie par l'utilisateur pour ce widget
+  // (voir GALLERY_COUNT_BY_SIZE) plutôt qu'un nombre fixe qui gâcherait l'espace en Grand
+  // ou déborderait en Petit.
+  const galleryPlans = useMemo(() => (allPlans || activePlans).filter(p => p.coverImage), [allPlans, activePlans])
+
+  // Tous les plans par ordre de dernière activité, pour le widget "Voir tout l'historique"
+  // — même tri que "Reprendre" (byRecency) et même principe d'adapter le nombre de lignes
+  // à la taille du widget.
+  const recentPlans = useMemo(() => (allPlans || activePlans).slice().sort(byRecency), [allPlans, activePlans])
+
   const lastUsedPlanSpaceName = lastUsedPlan
     ? (spaces.find(s => s.id === (lastUsedPlan.team_id ?? lastUsedPlan.createdSpaceId ?? null))?.name || personalSpace.name)
     : null
@@ -399,18 +410,64 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
               )
             } : {}),
 
-            history: (
-              <button className="dashboard-widget-card dashboard-link-widget" onClick={onOpenAccount}>
-                <IconClipboard width={20} height={20} />
-                <span>{t(lang, 'dashboard.viewHistory')}</span>
-              </button>
-            ),
-            gallery: (
-              <button className="dashboard-widget-card dashboard-link-widget" onClick={onOpenGallery}>
-                <IconImage width={20} height={20} />
-                <span>{t(lang, 'dashboard.viewGallery')}</span>
-              </button>
-            )
+            // Fonctions plutôt que nœuds statiques : le contenu s'adapte à la taille
+            // choisie par l'utilisateur pour ce widget (voir DashboardWidgetGrid).
+            history: (size) => {
+              const rows = { small: 3, medium: 6, large: 10 }[size] || 6
+              return (
+                <div className="dashboard-widget-card dashboard-history-widget">
+                  <button className="dashboard-widget-header dashboard-widget-header-link" onClick={onOpenAccount}>
+                    <IconClipboard width={16} height={16} />
+                    <h3>{t(lang, 'dashboard.viewHistory')}</h3>
+                  </button>
+                  {recentPlans.length === 0 ? (
+                    <p className="dashboard-history-empty">{t(lang, 'dashboard.historyEmpty')}</p>
+                  ) : (
+                    <ul className="dashboard-history-list">
+                      {recentPlans.slice(0, rows).map(p => (
+                        <li key={p.id}>
+                          <button className="dashboard-history-row" onClick={() => onLoadPlan?.(p)}>
+                            <span className="dashboard-history-thumb">
+                              {p.coverImage
+                                ? <img src={p.coverImage} alt="" />
+                                : <span className="dashboard-history-thumb-fallback" aria-hidden="true" />}
+                            </span>
+                            <span className="dashboard-history-name">{p.product?.name || t(lang, 'plans.untitled')}</span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )
+            },
+            gallery: (size) => {
+              const count = { small: 4, medium: 8, large: 16 }[size] || 8
+              return (
+                <div className="dashboard-widget-card dashboard-gallery-widget">
+                  <button className="dashboard-widget-header dashboard-widget-header-link" onClick={onOpenGallery}>
+                    <IconImage width={16} height={16} />
+                    <h3>{t(lang, 'dashboard.viewGallery')}</h3>
+                  </button>
+                  {galleryPlans.length === 0 ? (
+                    <p className="dashboard-history-empty">{t(lang, 'dashboard.galleryEmpty')}</p>
+                  ) : (
+                    <div className="dashboard-gallery-grid">
+                      {galleryPlans.slice(0, count).map(p => (
+                        <button
+                          key={p.id}
+                          className="dashboard-gallery-thumb avatar-tooltip"
+                          data-tooltip={p.product?.name || t(lang, 'plans.untitled')}
+                          onClick={() => onLoadPlan?.(p)}
+                        >
+                          <img src={p.coverImage} alt="" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
           }}
         />
       )}

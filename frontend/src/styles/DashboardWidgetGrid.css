@@ -17,7 +17,12 @@
   transition: opacity 0.15s ease, transform 0.15s ease;
 }
 
-.dashboard-widget-slot > * {
+/* Cible le seul wrapper de contenu (pas ".widget-size-menu", qui est aussi un enfant
+   direct du slot une fois ouvert) : "> *" appliquait height:100% à TOUT enfant direct,
+   y compris le menu contextuel en position:fixed — pour lui, un pourcentage de hauteur se
+   résout contre la fenêtre entière, d'où le grand rectangle vide constaté sous le menu
+   "Taille" (retour utilisateur, capture à l'appui). */
+.dashboard-widget-slot-content {
   height: 100%;
 }
 
