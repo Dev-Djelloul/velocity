@@ -53,6 +53,12 @@
   gap: 0.45rem;
 }
 
+.fin-report-export-icon {
+  width: 16px;
+  height: 16px;
+  object-fit: contain;
+}
+
 .fin-report-export-btn:disabled {
   opacity: 0.6;
   cursor: default;

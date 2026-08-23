@@ -2,9 +2,9 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { formatMoney } from '../lib/currency'
 import { resolveBudgetAmount } from '../lib/budgetTiers'
-import { IconArrowLeft, IconCoin, IconTrendingUp, IconTarget, IconAlertTriangle, IconDownload } from './Icons'
+import { IconArrowLeft, IconCoin, IconTrendingUp, IconTarget, IconAlertTriangle } from './Icons'
 import { getExportBranding } from '../lib/exportBranding'
-import { exportFinancialReportPdf, exportFinancialReportDocx } from '../lib/financialReportExport'
+import { exportFinancialReportPdf, exportFinancialReportDocx, exportFinancialReportHtml } from '../lib/financialReportExport'
 import financialReportBackground from '../../assets/img/financial-plan-velocity.webp'
 import '../styles/TeamPage.css'
 import '../styles/PlanVersionsPage.css'
@@ -117,7 +117,7 @@ export default function PlanFinancialReportPage({ plan, lang, userId, onBack }) 
                 onClick={() => runExport('pdf', exportFinancialReportPdf)}
                 disabled={!!exporting}
               >
-                <IconDownload width={15} height={15} />
+                <img src="/assets/icons/icons8-pdf-100.png" alt="" className="fin-report-export-icon" />
                 {exporting === 'pdf' ? t(lang, 'planFinancialReport.exporting') : t(lang, 'planFinancialReport.exportPdf')}
               </button>
               <button
@@ -125,8 +125,16 @@ export default function PlanFinancialReportPage({ plan, lang, userId, onBack }) 
                 onClick={() => runExport('docx', exportFinancialReportDocx)}
                 disabled={!!exporting}
               >
-                <IconDownload width={15} height={15} />
+                <img src="/assets/icons/icons8-word-96.png" alt="" className="fin-report-export-icon" />
                 {exporting === 'docx' ? t(lang, 'planFinancialReport.exporting') : t(lang, 'planFinancialReport.exportDocx')}
+              </button>
+              <button
+                className="btn-secondary fin-report-export-btn"
+                onClick={() => runExport('html', exportFinancialReportHtml)}
+                disabled={!!exporting}
+              >
+                <img src="/assets/icons/icons8-html-100.png" alt="" className="fin-report-export-icon" />
+                {exporting === 'html' ? t(lang, 'planFinancialReport.exporting') : t(lang, 'planFinancialReport.exportHtml')}
               </button>
             </div>
           </div>

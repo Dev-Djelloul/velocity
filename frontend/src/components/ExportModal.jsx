@@ -366,20 +366,34 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
       <div className="modal card export-modal" onClick={e => e.stopPropagation()}>
         <h3>{t(lang, 'export.title')}</h3>
         <div className="modal-actions">
-          <button className="btn-primary" onClick={() => exportPDF(plan, lang, getExportBranding(userId))}>{t(lang, 'export.pdf')}</button>
+          <button className="btn-primary" onClick={() => exportPDF(plan, lang, getExportBranding(userId))}>
+            <img className="export-btn-icon" src="/assets/icons/icons8-pdf-100.png" alt="" aria-hidden="true" />
+            {t(lang, 'export.pdf')}
+          </button>
           <button
             className="btn-primary"
             onClick={() => isPro ? exportPPTX(plan, lang, getExportBranding(userId)) : onRequestUpgrade?.()}
           >
+            <img className="export-btn-icon" src="/assets/icons/icons8-pptx-64.png" alt="" aria-hidden="true" />
             {t(lang, 'export.pptx')} {!isPro && <span className="export-pro-badge">PRO</span>}
           </button>
-          <button className="btn-primary" onClick={() => exportCSV(plan, lang)}>{t(lang, 'export.csv')}</button>
-          <button className="btn-primary" onClick={() => exportJSON(plan)}>{t(lang, 'export.json')}</button>
-          <button className="btn-primary" onClick={() => exportImage(captureRef?.current, plan)}>{t(lang, 'export.image')}</button>
+          <button className="btn-primary" onClick={() => exportCSV(plan, lang)}>
+            <img className="export-btn-icon" src="/assets/icons/icons8-csv-96.png" alt="" aria-hidden="true" />
+            {t(lang, 'export.csv')}
+          </button>
+          <button className="btn-primary" onClick={() => exportJSON(plan)}>
+            <img className="export-btn-icon" src="/assets/icons/icons8-json-96.png" alt="" aria-hidden="true" />
+            {t(lang, 'export.json')}
+          </button>
+          <button className="btn-primary" onClick={() => exportImage(captureRef?.current, plan)}>
+            <img className="export-btn-icon" src="/assets/icons/icons8-png-96.png" alt="" aria-hidden="true" />
+            {t(lang, 'export.image')}
+          </button>
           <button
             className="btn-primary"
             onClick={() => isPro ? exportComplianceReport(plan, lang, getExportBranding(userId)) : onRequestUpgrade?.()}
           >
+            <img className="export-btn-icon" src="/assets/icons/icons8-gdpr-64.png" alt="" aria-hidden="true" />
             {t(lang, 'export.complianceReport')} {!isPro && <span className="export-pro-badge">PRO</span>}
           </button>
         </div>

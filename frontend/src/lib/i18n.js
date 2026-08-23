@@ -1613,6 +1613,7 @@ export const translations = {
       cashLegendBurn: (amount) => `Dépense mensuelle : ${amount}`,
       exportPdf: 'Exporter en PDF',
       exportDocx: 'Exporter en Word',
+      exportHtml: 'Exporter en HTML',
       exporting: 'Génération…'
     },
     planVersions: {
@@ -3383,6 +3384,7 @@ export const translations = {
       cashLegendBurn: (amount) => `Monthly burn: ${amount}`,
       exportPdf: 'Export as PDF',
       exportDocx: 'Export as Word',
+      exportHtml: 'Export as HTML',
       exporting: 'Generating…'
     },
     planVersions: {
