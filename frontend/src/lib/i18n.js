@@ -297,7 +297,10 @@ export const translations = {
       filterInProgress: 'En cours',
       filterDone: 'Terminé',
       filterAllAssignees: 'Tous les responsables',
-      empty: 'Aucune story ne correspond à ces filtres.'
+      empty: 'Aucune story ne correspond à ces filtres.',
+      jiraSync: 'Synchroniser vers Jira',
+      jiraSyncing: 'Synchronisation...',
+      jiraSyncNeedsExport: 'Reconnexion nécessaire — repasse par "Exporter le plan" → Jira',
     },
     burndown: {
       title: 'Burndown chart',
@@ -882,6 +885,13 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: '23 août 2026',
+            title: 'Resynchroniser vers Jira directement depuis le Backlog',
+            items: [
+              'Jusqu\'ici, pousser un simple changement de statut vers Jira obligeait à rouvrir la modale "Exporter le plan" en entier — un lien "Synchroniser vers Jira" apparaît maintenant directement dans le Backlog (à côté de celui vers Notion) dès qu\'un premier export a déjà été fait sur ce plan'
+            ]
+          },
           {
             date: '23 août 2026',
             title: 'Export Jira/Linear : assigne le vrai membre d\'équipe choisi dans le Backlog',
@@ -2393,7 +2403,10 @@ export const translations = {
       filterInProgress: 'In progress',
       filterDone: 'Done',
       filterAllAssignees: 'All assignees',
-      empty: 'No story matches these filters.'
+      empty: 'No story matches these filters.',
+      jiraSync: 'Sync to Jira',
+      jiraSyncing: 'Syncing...',
+      jiraSyncNeedsExport: 'Reconnection needed — use "Export plan" → Jira instead'
     },
     burndown: {
       title: 'Burndown chart',
@@ -2970,6 +2983,13 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Re-sync to Jira right from the Backlog',
+            items: [
+              'Pushing a simple status change to Jira used to require reopening the entire "Export plan" modal — a "Sync to Jira" link now shows up directly in the Backlog (next to the Notion one) once this plan has already been exported once'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Jira/Linear export: assigns the real team member chosen in the Backlog',

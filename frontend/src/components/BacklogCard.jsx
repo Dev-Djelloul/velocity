@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
 import { IconClipboard, IconCheckCircle, IconCircleDot, IconClock, IconUser, IconCoin, IconTarget } from './Icons'
-import { notionSyncStories, notionAuthorizeUrl, notionStatus } from '../lib/serverStorage'
+import { notionSyncStories, notionAuthorizeUrl, notionStatus, jiraExport } from '../lib/serverStorage'
 import { waitForConnection } from '../lib/oauthConnect'
 import { nextStoryStatus } from '../lib/storyStatus'
 import '../styles/BacklogCard.css'
@@ -9,7 +9,7 @@ import '../styles/BacklogCard.css'
 const STATUS_ICONS = { todo: IconCircleDot, in_progress: IconClock, done: IconCheckCircle }
 const STATUS_I18N_KEY = { todo: 'todo', in_progress: 'inProgress', done: 'done' }
 
-export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, isPro, onRequestUpgrade, onNotionStoriesSynced, teamMembers }) {
+export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan, userId, isPro, onRequestUpgrade, onNotionStoriesSynced, onJiraExported, teamMembers }) {
   const [statusFilter, setStatusFilter] = useState('all')
   const [assigneeFilter, setAssigneeFilter] = useState('all')
   const [myTasksOnly, setMyTasksOnly] = useState(false)
@@ -62,6 +62,37 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
   const notionSyncLabel = notionState === 'working' ? t(lang, 'export.notionSyncing')
     : notionState === 'connecting' ? t(lang, 'export.notionConnecting')
     : t(lang, 'export.notionSync')
+
+  // Resynchronisation Jira directement depuis le Backlog — retour utilisateur : jusqu'ici,
+  // pousser un simple changement de statut vers Jira obligeait à rouvrir la modale
+  // "Exporter le plan" en entier plutôt qu'un raccourci sur place. Ne couvre QUE le cas
+  // "déjà connecté" (au moins un lien Jira déjà enregistré sur ce plan, voir la condition
+  // d'affichage du bouton plus bas) — pas de flux OAuth/choix de projet ici, pour ne pas
+  // dupliquer cette UI déjà dans ExportModal.jsx ; si la connexion a expiré entre-temps, le
+  // message d'erreur renvoie explicitement vers l'export complet.
+  const [jiraSyncState, setJiraSyncState] = useState('idle') // idle | working | error
+  const [jiraSyncMsg, setJiraSyncMsg] = useState('')
+
+  const handleJiraSync = async () => {
+    if (!userId) return
+    setJiraSyncState('working'); setJiraSyncMsg('')
+    try {
+      const res = await jiraExport(userId, plan, lang)
+      if (res?.boardUrl !== undefined && res.error === undefined && !res.needsAuth && !res.needsProject) {
+        onJiraExported?.({ links: { ...(jira?.links || {}), ...(res.links || {}) }, boardUrl: res.boardUrl, projectKey: res.projectKey, siteUrl: res.siteUrl })
+        setJiraSyncState('idle')
+      } else {
+        setJiraSyncMsg(t(lang, 'backlog.jiraSyncNeedsExport'))
+        setJiraSyncState('error')
+      }
+    } catch {
+      setJiraSyncMsg(t(lang, 'backlog.jiraSyncNeedsExport'))
+      setJiraSyncState('error')
+    }
+  }
+
+  const jiraSyncLabel = jiraSyncState === 'working' ? t(lang, 'backlog.jiraSyncing') : t(lang, 'backlog.jiraSync')
+  const hasJiraLink = jira?.links && Object.keys(jira.links).length > 0
 
   if (!roadmap) return null
 
@@ -145,6 +176,18 @@ export default function BacklogCard({ roadmap, lang, onRoadmapChange, jira, plan
             <img src="/assets/icons/icons8-notion-32.png" alt="" width={12} height={12} /> {notionSyncLabel} {!isPro && <span className="export-pro-badge">PRO</span>}
           </button>
           {notionState === 'error' && notionMsg && <span className="backlog-notion-sync-error"> — {notionMsg}</span>}
+          {/* Uniquement si le plan a déjà été exporté vers Jira au moins une fois (connexion
+              + projet déjà choisis) — sinon on renvoie vers l'export complet plutôt que de
+              dupliquer ici le flux OAuth/choix de projet. */}
+          {hasJiraLink && (
+            <>
+              {' · '}
+              <button className="backlog-notion-sync-link" onClick={handleJiraSync} disabled={jiraSyncState === 'working'}>
+                <img src="/assets/icons/icons8-jira-32.png" alt="" width={12} height={12} /> {jiraSyncLabel}
+              </button>
+              {jiraSyncState === 'error' && jiraSyncMsg && <span className="backlog-notion-sync-error"> — {jiraSyncMsg}</span>}
+            </>
+          )}
         </p>
       </div>
 
