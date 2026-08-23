@@ -39,10 +39,10 @@ export default function DashboardWeeklySummary({ userId, lang, stats }) {
       {error && <p className="dashboard-nova-intro">{t(lang, 'dashboard.novaSummaryError')}</p>}
       {summary && <p className="dashboard-nova-summary">{summary}</p>}
 
-      <button className="btn-secondary dashboard-nova-btn" onClick={generate} disabled={loading}>
+      <button className="btn-ai-generate dashboard-nova-btn" onClick={generate} disabled={loading}>
         {loading
-          ? <><IconRotateCw width={14} height={14} className="dashboard-nova-spin" /> {t(lang, 'dashboard.novaSummaryLoading')}</>
-          : <><img src={NOVA_AVATAR} alt="" className="dashboard-nova-btn-avatar" /> {summary ? t(lang, 'dashboard.novaSummaryRegenerate') : t(lang, 'dashboard.novaSummaryCta')}</>}
+          ? <><IconRotateCw width={14} height={14} className="dashboard-nova-spin" /> <span className="btn-ai-generate-label">{t(lang, 'dashboard.novaSummaryLoading')}</span></>
+          : <><img src={NOVA_AVATAR} alt="" className="dashboard-nova-btn-avatar" /> <span className="btn-ai-generate-label">{summary ? t(lang, 'dashboard.novaSummaryRegenerate') : t(lang, 'dashboard.novaSummaryCta')}</span></>}
       </button>
     </div>
   )

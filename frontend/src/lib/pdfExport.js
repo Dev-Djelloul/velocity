@@ -1,4 +1,6 @@
 import { t } from './i18n'
+import { pickRgpdResources } from './rgpdResources'
+import { getChannelLink } from './channelLinks'
 
 // ---------- Aides partagées pour tout ce qui dessine des vraies cases à cocher AcroForm
 // en pdf-lib (rapport investisseurs ET section RGPD du plan complet) : pdfmake ne sait
@@ -157,7 +159,7 @@ async function createPdfLibDrawer(pdfDoc, rgb, StandardFonts) {
 // cocher, registre, recommandations, disclaimer) sur un drawer pdf-lib déjà positionné —
 // factorisé car utilisé à l'identique par exportComplianceReport et par la section RGPD
 // du plan complet (exportPDF).
-function drawRgpdSection(drawer, r, lang) {
+function drawRgpdSection(drawer, r, lang, resourceSeed) {
   const en = lang === 'en'
   drawer.drawSectionTitle(t(lang, 'rgpd.title'))
   drawer.drawParagraph(r.applicability, { f: drawer.fontItalic, gap: 5 })
@@ -185,6 +187,21 @@ function drawRgpdSection(drawer, r, lang) {
     drawer.state.y -= 14
     r.recommendations.forEach(rec => drawer.drawParagraph(`•  ${rec}`, { size: 9.5, gap: 4 }))
   }
+
+  // Ressources officielles (voir rgpdResources.js) — calculées à l'affichage, pas
+  // persistées dans plan.rgpd : recalculées ici avec le même tirage seedé par plan pour
+  // rester cohérentes avec ce que l'utilisateur voit dans l'app. pdf-lib ne sait pas
+  // produire de vraie annotation de lien cliquable ici (contrairement à la section
+  // pdfmake plus haut) — l'URL est donc imprimée en toutes lettres, copiable même si non
+  // cliquable, plutôt que silencieusement absente.
+  const resources = pickRgpdResources(lang, resourceSeed, 5)
+  if (resources.length) {
+    drawer.state.y -= 6
+    drawer.state.page.drawText(`${t(lang, 'rgpd.officialResources')}:`, { x: drawer.MARGIN, y: drawer.state.y, size: 10, font: drawer.fontBold, color: drawer.colors.BLACK })
+    drawer.state.y -= 14
+    resources.forEach(res => drawer.drawParagraph(`•  ${res.label} — ${res.url}`, { size: 9, gap: 4 }))
+  }
+
   drawer.drawParagraph(t(lang, 'rgpd.disclaimer'), { size: 8, f: drawer.fontItalic, color: drawer.colors.LIGHT_GRAY, before: 4 })
 }
 
@@ -264,9 +281,13 @@ export function exportCSV(plan, lang) {
     rows.push([t(lang, 'veille.signals'), ...(v.signals || [])])
     rows.push([t(lang, 'veille.opportunities'), ...(v.opportunities || [])])
     rows.push([t(lang, 'veille.threats'), ...(v.threats || [])])
-    // "sources" est un tableau d'objets {name,url} depuis l'ajout des cartes de lien
-    // (retour utilisateur) — CSV garde juste le nom, pas l'URL, une colonne suffit ici.
-    rows.push([t(lang, 'veille.sources'), ...(v.sources || []).map(s => typeof s === 'string' ? s : s.name)])
+    // "sources" est un tableau d'objets {name,url} depuis l'ajout des cartes de lien —
+    // une ligne par source (nom + URL en colonnes séparées) plutôt qu'un nom seul, pour
+    // que le lien reste exploitable une fois exporté (retour utilisateur).
+    if (v.sources?.length) {
+      rows.push([t(lang, 'veille.sources')])
+      v.sources.forEach(s => rows.push(['', typeof s === 'string' ? s : s.name, typeof s === 'string' ? '' : (s.url || '')]))
+    }
   }
 
   if (plan.benchmarks) {
@@ -276,20 +297,24 @@ export function exportCSV(plan, lang) {
     rows.push([t(lang, 'benchmarks.metric'), t(lang, 'benchmarks.industry'), t(lang, 'benchmarks.yours'), t(lang, 'benchmarks.verdictLabel')])
     ;(b.metrics || []).forEach(mrow => rows.push([mrow.metric, mrow.industry, mrow.yours, t(lang, `benchmarks.verdict.${mrow.verdict}`) || mrow.verdict]))
     if (b.takeaway) rows.push([b.takeaway])
+    if (b.sources?.length) {
+      rows.push([t(lang, 'benchmarks.sources')])
+      b.sources.forEach(s => rows.push(['', s.name, s.url || '']))
+    }
   }
 
   if (plan.editorial) {
     rows.push([])
     rows.push([t(lang, 'editorial.title')])
-    rows.push([t(lang, 'editorial.week'), t(lang, 'outputs.channel'), 'Format', t(lang, 'genTable.title'), 'Angle', t(lang, 'editorial.cta')])
-    ;(plan.editorial.items || []).forEach(it => rows.push([it.week, it.channel, it.format, it.title, it.angle, it.cta]))
+    rows.push([t(lang, 'editorial.week'), t(lang, 'outputs.channel'), 'Format', t(lang, 'genTable.title'), 'Angle', t(lang, 'editorial.cta'), t(lang, 'gtm.channelLink')])
+    ;(plan.editorial.items || []).forEach(it => rows.push([it.week, it.channel, it.format, it.title, it.angle, it.cta, getChannelLink(it.channel) || '']))
   }
 
   if (plan.advertising) {
     rows.push([])
     rows.push([t(lang, 'advertising.title')])
-    rows.push([t(lang, 'advertising.week'), t(lang, 'outputs.channel'), t(lang, 'advertising.objective.awareness'), 'Format', 'Audience', t(lang, 'outputs.estimatedCostEur'), 'KPI'])
-    ;(plan.advertising.campaigns || []).forEach(c => rows.push([c.week, c.channel, t(lang, `advertising.objective.${c.objective}`) || c.objective, c.format, c.audience, c.budget, c.kpi]))
+    rows.push([t(lang, 'advertising.week'), t(lang, 'outputs.channel'), t(lang, 'advertising.objective.awareness'), 'Format', 'Audience', t(lang, 'outputs.estimatedCostEur'), 'KPI', t(lang, 'gtm.channelLink')])
+    ;(plan.advertising.campaigns || []).forEach(c => rows.push([c.week, c.channel, t(lang, `advertising.objective.${c.objective}`) || c.objective, c.format, c.audience, c.budget, c.kpi, getChannelLink(c.channel) || '']))
   }
 
   if (plan.rgpd) {
@@ -299,9 +324,18 @@ export function exportCSV(plan, lang) {
     rows.push([r.applicability])
     rows.push([t(lang, 'rgpd.checklist')])
     ;(r.checklist || []).forEach(it => rows.push([it.done ? '[x]' : '[ ]', it.item, t(lang, `rgpd.priority.${it.priority}`) || it.priority]))
+    if (r.recommendations?.length) {
+      rows.push([t(lang, 'rgpd.recommendations')])
+      r.recommendations.forEach(x => rows.push(['', x]))
+    }
     rows.push([t(lang, 'rgpd.register')])
     rows.push([t(lang, 'rgpd.data'), t(lang, 'rgpd.purpose'), t(lang, 'rgpd.basis')])
     ;(r.register || []).forEach(reg => rows.push([reg.data, reg.purpose, reg.basis]))
+    // Ressources officielles (voir rgpdResources.js) — calculées à l'affichage, pas
+    // persistées dans plan.rgpd, donc recalculées ici avec le même tirage seedé par plan
+    // pour rester cohérentes avec ce que l'utilisateur voit dans l'app.
+    rows.push([t(lang, 'rgpd.officialResources')])
+    pickRgpdResources(lang, plan?.id || plan?.product?.name || plan?.generatedAt).forEach(res => rows.push(['', res.label, res.url]))
   }
 
   const blob = new Blob(['﻿' + toCSV(rows)], { type: 'text/csv;charset=utf-8' })
@@ -385,6 +419,20 @@ export async function exportPDF(plan, lang, branding) {
     )
   }
 
+  // Construit une ligne "Label1 · Label2 · ..." avec un vrai lien cliquable pdfmake par
+  // item (propriété `link` sur chaque run de texte) — plutôt qu'une simple chaîne jointe,
+  // qui faisait disparaître l'URL des sources générées (retour utilisateur).
+  const linkedLine = (label, items, getLabel, getUrl) => {
+    if (!items?.length) return null
+    const runs = [{ text: `${label} : `, bold: true }]
+    items.forEach((it, i) => {
+      if (i > 0) runs.push({ text: ' · ' })
+      const url = getUrl(it)
+      runs.push(url ? { text: getLabel(it), link: url, color: '#6366f1', decoration: 'underline' } : { text: getLabel(it) })
+    })
+    return { text: runs, margin: [0, 1, 0, 1] }
+  }
+
   if (plan.veille) {
     const v = plan.veille
     content.push(
@@ -395,7 +443,9 @@ export async function exportPDF(plan, lang, branding) {
       { text: `${t(lang, 'veille.signals')}: ${(v.signals || []).join('; ')}`, margin: [0, 1, 0, 1] },
       { text: `${t(lang, 'veille.opportunities')}: ${(v.opportunities || []).join('; ')}`, margin: [0, 1, 0, 1] },
       { text: `${t(lang, 'veille.threats')}: ${(v.threats || []).join('; ')}`, margin: [0, 1, 0, 1] },
-      { text: `${t(lang, 'veille.sources')}: ${(v.sources || []).map(s => typeof s === 'string' ? s : s.name).join('; ')}`, margin: [0, 1, 0, 1] }
+      ...(v.sources?.length
+        ? [linkedLine(t(lang, 'veille.sources'), v.sources, s => typeof s === 'string' ? s : s.name, s => typeof s === 'string' ? null : s.url)]
+        : [])
     )
   }
 
@@ -404,21 +454,36 @@ export async function exportPDF(plan, lang, branding) {
     content.push(
       { text: t(lang, 'benchmarks.title'), style: 'section' },
       ...(b.metrics || []).map(mrow => ({ text: `${mrow.metric}: ${t(lang, 'benchmarks.industry')} ${mrow.industry} — ${t(lang, 'benchmarks.yours')} ${mrow.yours} (${t(lang, `benchmarks.verdict.${mrow.verdict}`) || mrow.verdict})`, margin: [0, 1, 0, 1] })),
-      ...(b.takeaway ? [{ text: b.takeaway, margin: [0, 3, 0, 0], italics: true }] : [])
+      ...(b.takeaway ? [{ text: b.takeaway, margin: [0, 3, 0, 0], italics: true }] : []),
+      ...(b.sources?.length ? [linkedLine(t(lang, 'benchmarks.sources'), b.sources, s => s.name, s => s.url)] : [])
     )
   }
 
   if (plan.editorial) {
     content.push(
       { text: t(lang, 'editorial.title'), style: 'section' },
-      ...(plan.editorial.items || []).map(it => ({ text: `S${it.week} · ${it.channel} · ${it.format} — ${it.title} (${it.cta})`, margin: [0, 1, 0, 1] }))
+      ...(plan.editorial.items || []).map(it => ({
+        text: [
+          { text: `S${it.week} · ` },
+          { text: it.channel, link: getChannelLink(it.channel), color: '#6366f1', decoration: 'underline' },
+          { text: ` · ${it.format} — ${it.title} (${it.cta})` }
+        ],
+        margin: [0, 1, 0, 1]
+      }))
     )
   }
 
   if (plan.advertising) {
     content.push(
       { text: t(lang, 'advertising.title'), style: 'section' },
-      ...(plan.advertising.campaigns || []).map(c => ({ text: `S${c.week} · ${c.channel} · ${t(lang, `advertising.objective.${c.objective}`) || c.objective} — ${c.format} — ${c.budget} € (${c.kpi})`, margin: [0, 1, 0, 1] }))
+      ...(plan.advertising.campaigns || []).map(c => ({
+        text: [
+          { text: `S${c.week} · ` },
+          { text: c.channel, link: getChannelLink(c.channel), color: '#6366f1', decoration: 'underline' },
+          { text: ` · ${t(lang, `advertising.objective.${c.objective}`) || c.objective} — ${c.format} — ${c.budget} € (${c.kpi})` }
+        ],
+        margin: [0, 1, 0, 1]
+      }))
     )
   }
 
@@ -459,7 +524,7 @@ export async function exportPDF(plan, lang, branding) {
   const pdfDoc = await PDFDocument.load(pdfBytes)
   const drawer = await createPdfLibDrawer(pdfDoc, rgb, StandardFonts)
   drawer.newPage()
-  drawRgpdSection(drawer, plan.rgpd, lang)
+  drawRgpdSection(drawer, plan.rgpd, lang, plan?.id || plan?.product?.name || plan?.generatedAt)
   drawer.drawFooters('VelocityLaunch', pdfDoc.getPages())
 
   const finalBytes = await pdfDoc.save()
@@ -549,7 +614,7 @@ export async function exportComplianceReport(plan, lang, branding) {
 
   // ---------- Conformité RGPD ----------
   if (plan.rgpd) {
-    drawRgpdSection(drawer, plan.rgpd, lang)
+    drawRgpdSection(drawer, plan.rgpd, lang, plan?.id || plan?.product?.name || plan?.generatedAt)
   } else {
     drawer.drawSectionTitle(t(lang, 'rgpd.title'))
     drawer.drawParagraph(t(lang, 'export.complianceNoRgpd'), { f: fontItalic, color: colors.GRAY })

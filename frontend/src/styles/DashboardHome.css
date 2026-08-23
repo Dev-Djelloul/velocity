@@ -1162,7 +1162,7 @@
    (voir .dashboard-space-current-badge) : sans la réaffirmer ici, il hériterait du
    -webkit-text-fill-color transparent du parent et deviendrait invisible. */
 [data-theme="light"] .dashboard-space-card.is-current .dashboard-space-current-badge {
-  -webkit-text-fill-color: #0b0c10;
+  -webkit-text-fill-color: #fff;
 }
 
 /* Icônes (avatar personnel, symboles de la ligne "N plans · date") en dégradé — stroke
@@ -1247,7 +1247,7 @@
   padding: 0.1rem 0.4rem;
   border-radius: 999px;
   background: var(--wordmark-gradient);
-  color: #0b0c10;
+  color: #fff;
 }
 
 .dashboard-space-meta {

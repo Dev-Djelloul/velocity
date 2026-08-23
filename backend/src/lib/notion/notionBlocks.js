@@ -3,9 +3,27 @@
 
 const rt = (text) => [{ type: 'text', text: { content: String(text ?? '').slice(0, 1900) } }]
 
+// Variante de rt() pour une ligne "Label1 · Label2 · ..." où chaque item porte un vrai lien
+// Notion (rich_text.text.link.url) — items: [{ label, url }]. Un item sans url reste du
+// texte simple, pas un lien cassé. Utilisée pour les sources Veille/Benchmarks et les
+// ressources officielles RGPD, qui portaient jusqu'ici seulement le nom, jamais l'URL
+// (retour utilisateur : les liens web n'apparaissaient pas du tout dans l'export Notion).
+const rtLinks = (prefix, items) => {
+  const runs = [{ type: 'text', text: { content: `${prefix} : ` } }]
+  items.forEach((it, i) => {
+    if (i > 0) runs.push({ type: 'text', text: { content: ' · ' } })
+    runs.push({
+      type: 'text',
+      text: { content: String(it.label ?? '').slice(0, 1900), link: it.url ? { url: it.url } : null }
+    })
+  })
+  return runs
+}
+
 const h2 = (text) => ({ object: 'block', type: 'heading_2', heading_2: { rich_text: rt(text) } })
 const h3 = (text) => ({ object: 'block', type: 'heading_3', heading_3: { rich_text: rt(text) } })
 const p = (text) => ({ object: 'block', type: 'paragraph', paragraph: { rich_text: rt(text) } })
+const pLinks = (prefix, items) => ({ object: 'block', type: 'paragraph', paragraph: { rich_text: rtLinks(prefix, items) } })
 const bullet = (text) => ({ object: 'block', type: 'bulleted_list_item', bulleted_list_item: { rich_text: rt(text) } })
 const todo = (text, checked) => ({ object: 'block', type: 'to_do', to_do: { rich_text: rt(text), checked: !!checked } })
 const divider = () => ({ object: 'block', type: 'divider', divider: {} })
@@ -43,8 +61,9 @@ export function planToBlocks(plan, lang = 'fr') {
     if (v.opportunities?.length) { blocks.push(h3(_('Opportunités', 'Opportunities'))); v.opportunities.forEach(x => blocks.push(bullet(x))) }
     if (v.threats?.length) { blocks.push(h3(_('Menaces', 'Threats'))); v.threats.forEach(x => blocks.push(bullet(x))) }
     // "sources" est un tableau d'objets {name,url} depuis l'ajout des cartes de lien —
-    // Notion garde le nom (pas l'URL brute) pour rester lisible dans une simple ligne.
-    if (v.sources?.length) blocks.push(p(`${_('Sources', 'Sources')} : ${v.sources.map(s => typeof s === 'string' ? s : s.name).join(' · ')}`))
+    // chaque nom devient un vrai lien Notion cliquable (rich_text.link), pas juste un
+    // libellé (retour utilisateur : l'URL n'apparaissait nulle part dans l'export).
+    if (v.sources?.length) blocks.push(pLinks(_('Sources', 'Sources'), v.sources.map(s => typeof s === 'string' ? { label: s } : { label: s.name, url: s.url })))
   }
 
   // Roadmap, calendrier éditorial et calendrier publicitaire sont rendus comme
@@ -64,6 +83,7 @@ export function planToBlocks(plan, lang = 'fr') {
     blocks.push(h2(_('Benchmarks', 'Benchmarks')))
     ;(plan.benchmarks.metrics || []).forEach(m => blocks.push(bullet(`${m.metric}: ${_('secteur', 'industry')} ${m.industry} / ${_('vous', 'yours')} ${m.yours} (${m.verdict})`)))
     if (plan.benchmarks.takeaway) blocks.push(quote(plan.benchmarks.takeaway))
+    if (plan.benchmarks.sources?.length) blocks.push(pLinks(_('Pour aller plus loin', 'Go further'), plan.benchmarks.sources.map(s => ({ label: s.name, url: s.url }))))
   }
 
   if (plan.financials) {
@@ -91,6 +111,11 @@ export function planToBlocks(plan, lang = 'fr') {
     if (r.applicability) blocks.push(p(r.applicability))
     ;(r.checklist || []).forEach(it => blocks.push(todo(`${it.item} [${it.priority}]`, it.done)))
     if (r.recommendations?.length) { blocks.push(h3(_('Recommandations', 'Recommendations'))); r.recommendations.forEach(x => blocks.push(bullet(x))) }
+    // "resources" (ressources officielles CNIL/EDPB/...) n'est pas persisté dans plan.rgpd
+    // — calculé côté client à l'affichage (voir rgpdResources.js) — donc attaché ici par
+    // l'appelant juste avant l'export (voir ExportModal.jsx, runNotionExport) plutôt que
+    // recalculé côté serveur, qui n'a pas accès au pool i18n frontend.
+    if (r.resources?.length) blocks.push(pLinks(_('Ressources officielles', 'Official resources'), r.resources.map(res => ({ label: res.label, url: res.url }))))
   }
 
   return blocks

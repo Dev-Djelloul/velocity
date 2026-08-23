@@ -2,27 +2,10 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { generateRgpd } from '../lib/serverStorage'
 import { generateRgpdFallback } from '../lib/rgpdFallback'
+import { pickRgpdResources } from '../lib/rgpdResources'
 import { IconLock, IconSparkle, IconCheckCircle, IconAlertTriangle } from './Icons'
 import LinkCard from './LinkCard'
 import '../styles/RgpdCard.css'
-
-// Choisit un sous-ensemble stable mais différent d'un plan à l'autre dans le pool de
-// ressources RGPD (voir i18n.js, rgpd.resources) — sans ça, la section affiche
-// systématiquement les 4 mêmes liens en tête de liste, plan après plan (retour
-// utilisateur). Seedé par l'id du plan : stable pour CE plan (pas de re-tirage à chaque
-// re-rendu), mais différent d'un plan à l'autre.
-function pickResources(pool, seed, count = 5) {
-  const arr = [...pool]
-  let h = 0
-  const s = String(seed || '')
-  for (let i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0
-  for (let i = arr.length - 1; i > 0; i--) {
-    h = (h * 1103515245 + 12345) >>> 0
-    const j = h % (i + 1)
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
-  return arr.slice(0, count)
-}
 
 export default function RgpdCard({ plan, lang, onRgpdChange, userId }) {
   const [loading, setLoading] = useState(false)
@@ -48,8 +31,7 @@ export default function RgpdCard({ plan, lang, onRgpdChange, userId }) {
 
   const doneCount = rgpd ? (rgpd.checklist || []).filter(i => i.done).length : 0
   const total = rgpd ? (rgpd.checklist || []).length : 0
-  const resourcePool = t(lang, 'rgpd.resources')
-  const resources = pickResources(resourcePool, plan?.id || plan?.product?.name || plan?.generatedAt)
+  const resources = pickRgpdResources(lang, plan?.id || plan?.product?.name || plan?.generatedAt)
 
   return (
     <div className="rgpd-card card">

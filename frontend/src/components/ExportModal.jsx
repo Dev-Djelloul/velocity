@@ -10,6 +10,7 @@ import {
   googleCalendarExport, googleCalendarAuthorizeUrl, googleCalendarStatus, googleCalendarCalendars, googleCalendarSelect, googleCalendarDisconnect
 } from '../lib/serverStorage'
 import { waitForConnection } from '../lib/oauthConnect'
+import { pickRgpdResources } from '../lib/rgpdResources'
 import '../styles/ExportModal.css'
 
 // Logo Google officiel ("G" multicolore) — pas de fichier image dédié dans le repo, et un
@@ -62,7 +63,15 @@ export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrad
 
   // ---------- Notion ----------
   const runNotionExport = async () => {
-    const res = await notionExport(userId, plan, lang)
+    // Les ressources officielles RGPD (CNIL, EDPB...) ne sont pas persistées dans
+    // plan.rgpd — calculées à l'affichage seulement (voir RgpdCard.jsx / rgpdResources.js).
+    // Le backend Notion n'a pas accès au pool i18n frontend : on les calcule ici, avec le
+    // même tirage seedé par plan, et on les attache avant l'envoi (retour utilisateur :
+    // ces liens n'apparaissaient jamais dans la page Notion exportée).
+    const planForExport = plan.rgpd
+      ? { ...plan, rgpd: { ...plan.rgpd, resources: pickRgpdResources(lang, plan?.id || plan?.product?.name || plan?.generatedAt) } }
+      : plan
+    const res = await notionExport(userId, planForExport, lang)
     if (res?.url) {
       setNotionUrl(res.url); setNotionState('done'); window.open(res.url, '_blank', 'noopener'); return true
     }

@@ -446,7 +446,8 @@ export const translations = {
       exportGoogleAdsHint: 'Fichier au format d\'import CSV de Google Ads Editor (campagnes créées en pause — à vérifier et activer vous-même). Ne contient que les campagnes dont le canal mentionne "Google".',
       exportHintBoth: 'Deux exports, deux usages : le brief CSV est votre antisèche pour créer les campagnes vous-même (ou les confier à quelqu\'un) — noms, dates et budgets déjà calculés, prêts à copier-coller. Sur Google Ads en particulier ? Prenez plutôt "Exporter pour Google Ads Editor" : ce fichier-là s\'importe directement dans l\'outil et crée les campagnes pour vous, en pause, prêtes à vérifier puis activer.',
       totalPaidBudget: 'Budget média total',
-      budgetDrift: (liveBudget) => `Le budget simulé dans « Stratégie Marketing » a changé (${liveBudget.toLocaleString()} €) — régénère pour l'appliquer ici.`
+      budgetDrift: (liveBudget) => `Le budget simulé dans « Stratégie Marketing » a changé (${liveBudget.toLocaleString()} €) — régénère pour l'appliquer ici.`,
+      channelLink: 'Lien plateforme'
     },
     benchmarks: {
       title: 'Benchmarks',
@@ -881,6 +882,17 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: '23 août 2026',
+            title: 'Corrections UX : bouton Nova, badge "Actuel", centre de notifications, liens dans les exports',
+            items: [
+              'Bouton "Demander à Nova" (widget résumé de la semaine) : passe en bordure et texte dégradé violet-bleu-cyan, comme les autres boutons de génération IA',
+              'Badge "Actuel" sur la carte d\'espace personnel/équipe : texte repassé en blanc (illisible sur le dégradé dans certains cas)',
+              'Centre de notifications : panneau élargi (340px → 400px) et bulle de confirmation de suppression élargie (220px → 260px) — le bouton "Supprimer" et le texte de "Tout marquer comme lu" débordaient du cadre',
+              'Benchmarks : espace ajouté entre le titre "Pour aller plus loin" et les cartes de lien, qui étaient visuellement collés',
+              'Exports (CSV, PDF, Notion) : les liens web (sources Veille, sources Benchmarks, ressources officielles RGPD, plateformes du calendrier de contenu/publicité) étaient soit tronqués à leur seul libellé, soit absents de la section — les URLs apparaissent maintenant partout, cliquables en PDF et Notion'
+            ]
+          },
           {
             date: '23 août 2026',
             title: 'Bibliothèque de widgets façon macOS sur le Dashboard',
@@ -2340,7 +2352,8 @@ export const translations = {
       exportGoogleAdsHint: 'File in Google Ads Editor\'s CSV import format (campaigns created paused — review and enable them yourself). Only includes campaigns whose channel mentions "Google".',
       exportHintBoth: 'Two exports, two jobs: the campaign brief CSV is your cheat sheet for building campaigns yourself (or handing them off) — names, dates and budgets already worked out, ready to copy-paste. Running on Google Ads specifically? Grab "Export for Google Ads Editor" instead — that file imports straight into the tool and builds the campaigns for you, paused and ready to review before you flip them on.',
       totalPaidBudget: 'Total media budget',
-      budgetDrift: (liveBudget) => `The simulated budget in "Marketing Strategy" has changed (${liveBudget.toLocaleString()} €) — regenerate to apply it here.`
+      budgetDrift: (liveBudget) => `The simulated budget in "Marketing Strategy" has changed (${liveBudget.toLocaleString()} €) — regenerate to apply it here.`,
+      channelLink: 'Platform link'
     },
     benchmarks: {
       title: 'Benchmarks',
@@ -2770,6 +2783,17 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'UX fixes: Nova button, "Current" badge, notification center, links in exports',
+            items: [
+              '"Ask Nova" button (weekly summary widget): now has a gradient border and gradient text, matching other AI generation buttons',
+              '"Current" badge on personal/team space cards: text back to white (unreadable against the gradient in some cases)',
+              'Notification center: panel widened (340px → 400px) and the delete-confirmation bubble widened (220px → 260px) — the "Delete" button and "Mark all as read" text were overflowing the frame',
+              'Benchmarks: added spacing between the "Go further" title and the link cards, which were visually stuck together',
+              'Exports (CSV, PDF, Notion): web links (Market Watch sources, Benchmarks sources, official GDPR resources, content/advertising calendar platforms) were either trimmed to their label only or missing from the section entirely — URLs now show up everywhere, clickable in PDF and Notion'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'macOS-style widget library on the Dashboard',
