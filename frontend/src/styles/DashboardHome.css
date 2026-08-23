@@ -370,6 +370,25 @@
   visibility: hidden;
 }
 
+/* Toute la fenêtre d'un sprint actif (pas juste son jour de fin) est teintée — la "vue
+   globale" demandée : les jours qui appartiennent à un sprint en cours, tous plans
+   confondus, se voient d'un coup d'œil sur le mois plutôt qu'un seul point isolé par plan. */
+.dashboard-calendar-cell.has-sprint {
+  background: rgba(6, 182, 212, 0.14);
+}
+
+.dashboard-calendar-cell.is-clickable {
+  cursor: pointer;
+}
+
+.dashboard-calendar-cell.is-clickable:hover {
+  background: rgba(6, 182, 212, 0.24);
+}
+
+.dashboard-calendar-cell.is-today.has-sprint {
+  background: rgba(6, 182, 212, 0.22);
+}
+
 .dashboard-calendar-cell.is-today .dashboard-calendar-day-num {
   display: flex;
   align-items: center;
@@ -424,6 +443,117 @@
 
 .dashboard-calendar-legend .dashboard-calendar-dot {
   position: static;
+}
+
+.dashboard-calendar-sprint-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 3px;
+  background: rgba(6, 182, 212, 0.35);
+}
+
+/* Popover d'un jour du calendrier — même logique de clic/tap (pas de survol pur) que
+   CardHelp dans DashboardBI.jsx, pour rester utilisable sur mobile. Ancré au centre de la
+   cellule, largeur fixe, au-dessus du reste (z-index) puisque la carte parente n'a pas
+   d'overflow:hidden qui le couperait. */
+.dashboard-calendar-day-popover {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 50%;
+  transform: translateX(-50%);
+  width: 220px;
+  max-height: 280px;
+  overflow-y: auto;
+  padding: 0.7rem;
+  border-radius: 10px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary, #16161d);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.45);
+  z-index: 40;
+  text-align: left;
+  white-space: normal;
+  cursor: default;
+}
+
+.dashboard-calendar-day-popover-date {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  text-transform: capitalize;
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-calendar-day-popover-sprint + .dashboard-calendar-day-popover-sprint,
+.dashboard-calendar-day-popover-plan + .dashboard-calendar-day-popover-sprint {
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(145, 132, 217, 0.12);
+}
+
+.dashboard-calendar-day-popover-plan {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0.15rem 0;
+  text-align: left;
+  cursor: pointer;
+  color: var(--color-text-primary);
+}
+
+.dashboard-calendar-day-popover-plan:hover .dashboard-calendar-day-popover-plan-name {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+.dashboard-calendar-day-popover-plan-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.dashboard-calendar-day-popover-plan-tag {
+  flex-shrink: 0;
+  font-size: 0.62rem;
+  color: var(--color-text-muted, #9ca3af);
+}
+
+.dashboard-calendar-day-popover-stories {
+  list-style: none;
+  margin: 0.3rem 0 0;
+  padding: 0 0 0 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-calendar-day-popover-stories li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--color-text-secondary);
+}
+
+.dashboard-calendar-day-popover-stories li span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-calendar-story-status.is-done { color: #4ade80; }
+.dashboard-calendar-story-status.is-in_progress { color: #facc15; }
+.dashboard-calendar-story-status.is-todo { color: var(--color-text-muted, #9ca3af); }
+
+.dashboard-calendar-day-popover-more {
+  color: var(--color-text-muted, #9ca3af);
+  font-style: italic;
 }
 
 .dashboard-deadlines-empty {

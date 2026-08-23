@@ -54,7 +54,7 @@ function gradientIcon(icon) {
 // L'agrégation cross-espaces (compteurs de plans par équipe) est réservée Pro, comme
 // partout ailleurs dans l'app (voir AccountPage "Historique de tous les plans") — en
 // gratuit, chaque carte reste un simple raccourci sans statistiques.
-export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenAccount, onOpenGallery, onCreateTeam }) {
+export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenAccount, onOpenGallery, onCreateTeam, onLoadPlan }) {
   const team = useTeam()
   const { user } = useUser()
   const { userId } = useAuth()
@@ -262,7 +262,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       </div>
 
       <div className="dashboard-home-widgets">
-        <DashboardCalendar lang={lang} deadlines={deadlines} />
+        <DashboardCalendar lang={lang} deadlines={deadlines} plans={allPlans || activePlans} onOpenPlan={onLoadPlan} />
 
         <div className="dashboard-widget-card dashboard-deadlines-card">
           <div className="dashboard-widget-header">

@@ -1566,7 +1566,10 @@ export const translations = {
       calendarNext: 'Mois suivant',
       calendarToday: 'Aujourd\'hui',
       calendarLegendLaunch: 'Lancement',
-      calendarLegendSprint: 'Fin de sprint'
+      calendarLegendSprint: 'Fin de sprint',
+      calendarLegendActiveSprint: 'Sprint en cours',
+      calendarSprintLabel: (n) => `Sprint ${n}`,
+      calendarMoreStories: (n) => `+ ${n} autre${n > 1 ? 's' : ''}`
     },
     planVersions: {
       back: 'Retour au plan',
@@ -3289,7 +3292,10 @@ export const translations = {
       calendarNext: 'Next month',
       calendarToday: 'Today',
       calendarLegendLaunch: 'Launch',
-      calendarLegendSprint: 'Sprint end'
+      calendarLegendSprint: 'Sprint end',
+      calendarLegendActiveSprint: 'Active sprint',
+      calendarSprintLabel: (n) => `Sprint ${n}`,
+      calendarMoreStories: (n) => `+ ${n} more`
     },
     planVersions: {
       back: 'Back to plan',
