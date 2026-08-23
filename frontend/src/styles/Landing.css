@@ -786,6 +786,17 @@
   gap: 1.5rem;
 }
 
+/* Les 4 cartes sur une seule rangée à partir d'une largeur qui leur laisse assez de place
+   (retour utilisateur, capture à l'appui : sur un écran large mais pas immense, auto-fit
+   ne calculait de la place que pour 3 colonnes de 280px+ et repoussait la 4e carte, seule,
+   à la ligne suivante). Au-delà de ce seuil on force 4 colonnes égales plutôt que de
+   dépendre du calcul auto-fit. */
+@media (min-width: 1100px) {
+  .faq-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .faq-card {
   background: var(--color-bg-tertiary);
   border: 1px solid rgba(145, 132, 217, 0.15);
