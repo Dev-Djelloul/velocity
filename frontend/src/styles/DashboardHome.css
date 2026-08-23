@@ -375,12 +375,21 @@
 /* Ventilation "Par plan" du widget Santé du portefeuille (Moyen/Grand) — même recette
    visuelle que .dashboard-history-row (ligne cliquable, nom tronqué proprement). */
 .dashboard-widget-subhead {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
   margin: 0.6rem 0 0.3rem;
   font-size: 0.68rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.03em;
   color: var(--color-text-muted, #9ca3af);
+}
+
+.dashboard-widget-subhead svg {
+  flex-shrink: 0;
+  cursor: help;
+  opacity: 0.7;
 }
 
 .dashboard-health-plan-list {

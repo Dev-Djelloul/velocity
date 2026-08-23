@@ -54,6 +54,31 @@ export function computePlanHealth(plan, deadlines) {
   return computePortfolioHealth({ storiesDone, storiesInProgress, storiesTodo, planCount: 1, upcomingDeadlines })
 }
 
+// Découpe l'arc de la jauge (demi-cercle rayon 44, centre (50,50), viewBox 100x56 — même
+// géométrie que le tracé de fond en dur dans DashboardHome.jsx) en `count` segments égaux,
+// un par plan, avec un petit espace visuel entre segments adjacents — pour que la jauge
+// elle-même montre quels plans plombent le score plutôt qu'un seul arc uniforme (retour
+// utilisateur : "séparer la jauge par couleur et par plan concerné"). Chaque valeur
+// renvoyée est un `d` de <path> SVG prêt à l'emploi.
+export function computeGaugeSegments(count, gap = 0.06) {
+  if (!count || count <= 0) return []
+  const point = (theta) => ({
+    x: (50 + 44 * Math.cos(theta)).toFixed(2),
+    y: (50 - 44 * Math.sin(theta)).toFixed(2)
+  })
+  const segments = []
+  for (let i = 0; i < count; i++) {
+    const rawStart = Math.PI - (i / count) * Math.PI
+    const rawEnd = Math.PI - ((i + 1) / count) * Math.PI
+    const start = rawStart - (i === 0 ? 0 : gap / 2)
+    const end = rawEnd + (i === count - 1 ? 0 : gap / 2)
+    const p1 = point(start)
+    const p2 = point(end)
+    segments.push(`M ${p1.x} ${p1.y} A 44 44 0 0 1 ${p2.x} ${p2.y}`)
+  }
+  return segments
+}
+
 // Classe le niveau (bon/moyen/faible) ET la tendance (hausse/stable/baisse vs il y a ~7
 // jours) en un seul état météo — sans la tendance, "Météo business" n'était qu'un second
 // affichage du même score que la jauge de santé, sans rien y ajouter (retour utilisateur).

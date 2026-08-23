@@ -6,7 +6,7 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
-import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight, IconLayoutGrid, IconGauge, IconFlame, IconCloudSun } from './Icons'
+import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight, IconLayoutGrid, IconGauge, IconFlame, IconCloudSun, IconHelpCircle } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import DashboardCalendar from './DashboardCalendar'
 import DashboardActivityFeed from './DashboardActivityFeed'
@@ -18,7 +18,7 @@ import { loadWidgetLayout, saveWidgetLayout } from '../lib/dashboardWidgets'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, getPlanDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
-import { computePortfolioHealth, computePlanHealth, classifyWeather } from '../lib/portfolioHealth'
+import { computePortfolioHealth, computePlanHealth, computeGaugeSegments, classifyWeather } from '../lib/portfolioHealth'
 import { computeActivityStreaks, streakTier } from '../lib/activityStreak'
 import { recordAndGetTrend } from '../lib/portfolioHealthHistory'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
@@ -55,6 +55,10 @@ function IconGradientDefs() {
 function gradientIcon(icon) {
   return cloneElement(icon, { stroke: 'url(#dashboard-icon-gradient)' })
 }
+
+// Mêmes couleurs que .dashboard-legend-dot (DashboardHome.css) — un seul endroit pour les
+// trois niveaux de santé, réutilisé par les segments de jauge par plan.
+const LEVEL_COLORS = { good: '#22c55e', medium: '#f59e0b', low: '#ef4444' }
 
 // Accueil applicatif post-connexion : vue d'ensemble de tous les espaces (personnel +
 // équipes) plutôt que d'atterrir directement dans un seul espace ou sur "Mon compte" —
@@ -230,6 +234,12 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       .map(p => ({ plan: p, health: computePlanHealth(p, getPlanDeadlines(p)) }))
       .sort((a, b) => a.health.score - b.health.score)
   }, [allPlans, activePlans])
+
+  // Segments de la jauge "Santé du portefeuille" — un par plan, colorés selon son propre
+  // niveau (bon/moyen/faible), plutôt qu'un seul arc uniforme pour le score agrégé (retour
+  // utilisateur : "séparer la jauge par couleur et par plan concerné" pour repérer d'un
+  // coup d'œil, sans même survoler, quel(s) plan(s) plombent le portefeuille).
+  const gaugeSegments = useMemo(() => computeGaugeSegments(planHealthList.length), [planHealthList.length])
 
   // Tendance de la Santé du portefeuille vs il y a ~7 jours (widget "Météo business",
   // masqué par défaut) — sans historique, la météo n'était qu'un second affichage du même
@@ -595,14 +605,35 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   <div className={`dashboard-health-gauge is-${portfolioHealth.level}`}>
                     <svg viewBox="0 0 100 56" className="dashboard-health-gauge-svg">
                       <path d="M6 50a44 44 0 0 1 88 0" fill="none" stroke="currentColor" strokeOpacity="0.15" strokeWidth="10" strokeLinecap="round" />
-                      <path
-                        d="M6 50a44 44 0 0 1 88 0"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="10"
-                        strokeLinecap="round"
-                        strokeDasharray={`${(portfolioHealth.score / 100) * 138} 138`}
-                      />
+                      {planHealthList.length > 1 ? (
+                        // Un segment coloré par plan (retour utilisateur) plutôt qu'un seul
+                        // arc pour le score agrégé — <title> donne une vraie infobulle
+                        // native au survol de CHAQUE segment, pas seulement de la ligne
+                        // "Par plan" en dessous.
+                        planHealthList.map(({ plan, health }, i) => (
+                          <path
+                            key={plan.id}
+                            d={gaugeSegments[i]}
+                            fill="none"
+                            stroke={LEVEL_COLORS[health.level]}
+                            strokeWidth="10"
+                            strokeLinecap="round"
+                          >
+                            <title>
+                              {`${plan.product?.name || t(lang, 'plans.untitled')} — ${health.score}% : ${t(lang, 'dashboard.portfolioHealthDetail')(Math.round(health.doneRatio * 100), health.urgentCount, health.soonCount, health.urgentPenalty, health.soonPenalty)}`}
+                            </title>
+                          </path>
+                        ))
+                      ) : (
+                        <path
+                          d="M6 50a44 44 0 0 1 88 0"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="10"
+                          strokeLinecap="round"
+                          strokeDasharray={`${(portfolioHealth.score / 100) * 138} 138`}
+                        />
+                      )}
                     </svg>
                     <span className="dashboard-health-gauge-score">{portfolioHealth.score}%</span>
                   </div>
@@ -621,7 +652,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                           de l'attention. */}
                       {planHealthList.length > 0 && (
                         <div className="dashboard-health-by-plan">
-                          <h4 className="dashboard-widget-subhead">{t(lang, 'dashboard.portfolioHealthByPlan')}</h4>
+                          {/* Icône "?" : seul indice visuel qu'une info-bulle existe au
+                              survol (title natif, sans aucune affordance propre) — retour
+                              utilisateur : sans ce repère, personne ne devine qu'il faut
+                              survoler pour en savoir plus. */}
+                          <h4 className="dashboard-widget-subhead">
+                            {t(lang, 'dashboard.portfolioHealthByPlan')}
+                            <IconHelpCircle width={11} height={11} title={t(lang, 'dashboard.portfolioHealthHoverHint')} />
+                          </h4>
                           <ul className="dashboard-health-plan-list">
                             {planHealthList.slice(0, planRows).map(({ plan, health }) => (
                               <li key={plan.id}>

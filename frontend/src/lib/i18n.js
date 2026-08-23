@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Jauge de Santé du portefeuille segmentée par plan, indice d\'info-bulle',
+            items: [
+              'La jauge elle-même se divise maintenant en un segment coloré par plan (vert/orange/rouge selon son niveau) au lieu d\'un seul arc pour le score agrégé — on voit d\'un coup d\'œil, sans survoler, quel(s) plan(s) plombent le portefeuille',
+              'Chaque segment de la jauge a sa propre info-bulle native au survol (nom du plan + détail du calcul), en plus de celle déjà présente sur la liste "Par plan"',
+              'Ajoute une petite icône "?" à côté de "Par plan" : seul indice qu\'une info-bulle existe au survol, invisible jusque-là'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Clarté sur Santé du portefeuille, alignement du bouton Suivant, corrections diverses',
             items: [
               'Santé du portefeuille : la phrase de détail reformulée en vraies phrases ("62% des stories sont terminées. 2 échéances proches (-10 pts).") plutôt qu\'un format compact peu explicite ("62% terminé · -10 pts (2 bientôt)")',
@@ -1769,6 +1778,7 @@ export const translations = {
         low: '< 40% — Attention requise'
       },
       portfolioHealthByPlan: 'Par plan',
+      portfolioHealthHoverHint: 'Survole un plan (ou un segment de la jauge) pour voir le détail de son calcul',
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 jour' : `${n} jours`,
       streakSubtitle: "d'activité consécutifs",
@@ -2897,6 +2907,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Portfolio health gauge split by plan, tooltip discoverability hint',
+            items: [
+              'The gauge itself now splits into one colored segment per plan (green/orange/red by level) instead of a single arc for the aggregated score — spot at a glance, without hovering, which plan(s) are dragging the portfolio down',
+              'Each gauge segment has its own native tooltip on hover (plan name + calculation detail), in addition to the one already on the "By plan" list',
+              'Added a small "?" icon next to "By plan": the only hint that a tooltip exists on hover, invisible until now'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Clarity on Portfolio health, Next button alignment, misc fixes',
             items: [
               'Portfolio health: the detail sentence reworded into real sentences ("62% of stories are done. 2 deadlines coming up (-10 pts).") instead of a compact, not-very-explicit format ("62% done · -10 pts (2 soon)")',
@@ -3772,6 +3791,7 @@ export const translations = {
         low: '< 40% — Needs attention'
       },
       portfolioHealthByPlan: 'By plan',
+      portfolioHealthHoverHint: 'Hover a plan (or a gauge segment) to see its calculation detail',
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 day' : `${n} days`,
       streakSubtitle: 'consecutive active days',
