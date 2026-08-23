@@ -334,7 +334,8 @@ export const translations = {
       monthlyBurn: 'Burn mensuel',
       schedulePace: 'Rythme vs calendrier',
       paceStories: 'Stories',
-      paceCalendar: 'Calendrier'
+      paceCalendar: 'Calendrier',
+      pointsDone: 'terminés'
     },
     sidebar: {
       title: 'Sommaire du plan',
@@ -2050,7 +2051,8 @@ export const translations = {
       monthlyBurn: 'Monthly burn',
       schedulePace: 'Pace vs schedule',
       paceStories: 'Stories',
-      paceCalendar: 'Calendar'
+      paceCalendar: 'Calendar',
+      pointsDone: 'done'
     },
     sidebar: {
       title: 'Plan overview',

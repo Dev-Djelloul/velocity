@@ -169,19 +169,31 @@
 }
 
 .velocity-bar-total {
+  position: relative;
   width: 60%;
   margin: 0 auto;
   background: rgba(145, 132, 217, 0.18);
   border-radius: 4px 4px 0 0;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  overflow: hidden;
   min-height: 4px;
 }
 
-.velocity-bar-done {
+/* Un segment par responsable (même couleur que le donut "Charge par responsable"),
+   empilés du haut vers le bas dans le même ordre sur toutes les barres. */
+.velocity-bar-segment {
   width: 100%;
-  background: var(--color-cyan, #06b6d4);
-  border-radius: 4px 4px 0 0;
+}
+
+/* Voile sombre couvrant la part pas encore terminée du sprint, par-dessus les segments
+   colorés — laisse la couleur "qui" visible tout en indiquant "combien c'est fait". */
+.velocity-bar-undone {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background: rgba(10, 10, 18, 0.55);
 }
 
 .velocity-bar-label {

@@ -46,6 +46,31 @@ function latestTrackedValue(metricsHistory, idx) {
   return entries.reduce((latest, h) => (!latest || h.date > latest.date ? h : latest), null).value
 }
 
+// Regroupe un lot de stories par responsable — vrais membres d'équipe quand on en a
+// (story.assignedToId, le travail sans assignation nominative étant réparti à parts égales
+// entre eux), sinon repli sur le rôle générique de la story. Factorisé pour être réutilisé
+// à la fois par le donut "Charge par responsable" (toutes les stories) et par chaque barre
+// de "Vélocité par sprint" (stories du sprint), avec les mêmes couleurs pour les deux.
+function computeWorkloadSegments(stories, teamMembers) {
+  if (teamMembers?.length) {
+    const perMember = new Map(teamMembers.map(m => [m.id, { name: m.name, effort: 0 }]))
+    let unassignedEffort = 0
+    stories.forEach(s => {
+      const entry = s.assignedToId && perMember.get(s.assignedToId)
+      if (entry) entry.effort += s.effort
+      else unassignedEffort += s.effort
+    })
+    if (unassignedEffort > 0) {
+      const share = unassignedEffort / teamMembers.length
+      perMember.forEach(entry => { entry.effort += share })
+    }
+    return [...perMember.values()].map(({ name, effort }) => ({ name, value: Math.round(effort) }))
+  }
+  const map = {}
+  stories.forEach(s => { map[s.assignee] = (map[s.assignee] || 0) + s.effort })
+  return Object.entries(map).map(([name, value]) => ({ name, value }))
+}
+
 export default function DashboardBI({ plan, lang, teamMembers }) {
   if (!plan) return null
 
@@ -65,29 +90,11 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
   // un panier "rôle" fourre-tout. En espace personnel (pas de teamMembers), on retombe sur
   // le rôle générique de la story faute de mieux.
   const allRoadmapStories = (roadmap?.sprints || []).flatMap(sp => sp.stories)
-  let workloadSegments
-  if (teamMembers?.length) {
-    const perMember = new Map(teamMembers.map(m => [m.id, { name: m.name, effort: 0 }]))
-    let unassignedEffort = 0
-    allRoadmapStories.forEach(s => {
-      const entry = s.assignedToId && perMember.get(s.assignedToId)
-      if (entry) entry.effort += s.effort
-      else unassignedEffort += s.effort
-    })
-    if (unassignedEffort > 0) {
-      const share = unassignedEffort / teamMembers.length
-      perMember.forEach(entry => { entry.effort += share })
-    }
-    workloadSegments = [...perMember.values()].map(({ name, effort }) => ({
-      name, value: Math.round(effort), display: `${Math.round(effort)}pts`
-    }))
-  } else {
-    const workloadMap = {}
-    allRoadmapStories.forEach(s => { workloadMap[s.assignee] = (workloadMap[s.assignee] || 0) + s.effort })
-    workloadSegments = Object.entries(workloadMap).map(([name, value]) => ({
-      name, value, display: `${value}pts`
-    }))
-  }
+  const workloadSegments = computeWorkloadSegments(allRoadmapStories, teamMembers)
+    .map(seg => ({ ...seg, display: `${seg.value}pts` }))
+  // Même couleurs que le donut pour un responsable donné, réutilisées dans les barres de
+  // vélocité par sprint (retour utilisateur : les deux graphiques doivent se répondre).
+  const workloadColorMap = new Map(workloadSegments.map((seg, i) => [seg.name, DONUT_COLORS[i % DONUT_COLORS.length]]))
 
   const sprints = roadmap?.sprints || []
   const maxSprintEffort = Math.max(1, ...sprints.map(sp => sp.stories.reduce((s, x) => s + x.effort, 0)))
@@ -219,11 +226,33 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
               {sprints.map(sp => {
                 const total = sp.stories.reduce((s, x) => s + x.effort, 0)
                 const done = sp.stories.filter(s => s.status === 'done').reduce((s, x) => s + x.effort, 0)
+                // Mêmes couleurs par responsable que "Charge par responsable" (retour
+                // utilisateur : les deux graphiques doivent se répondre) — ordre fixé sur
+                // celui du donut global pour que la couleur d'un responsable donné reste la
+                // même d'une barre de sprint à l'autre. Le voile sombre en haut de la barre
+                // indique la part encore non terminée, la couleur en dessous indique qui.
+                const sprintValueByName = new Map(computeWorkloadSegments(sp.stories, teamMembers).map(seg => [seg.name, seg.value]))
                 return (
                   <div key={sp.sprintId} className="velocity-bar-col">
                     <div className="velocity-bar-track" style={{ height: '100%' }}>
-                      <div className="velocity-bar-total" style={{ height: `${(total / maxSprintEffort) * 100}%` }}>
-                        <div className="velocity-bar-done" style={{ height: total ? `${(done / total) * 100}%` : 0 }} />
+                      <div
+                        className="velocity-bar-total"
+                        style={{ height: `${(total / maxSprintEffort) * 100}%` }}
+                        title={`S${sp.sprintId} — ${done}/${total}pts ${t(lang, 'dashboardBi.pointsDone')}`}
+                      >
+                        {workloadSegments.map(seg => {
+                          const value = sprintValueByName.get(seg.name) || 0
+                          if (!value) return null
+                          return (
+                            <div
+                              key={seg.name}
+                              className="velocity-bar-segment"
+                              style={{ height: `${(value / total) * 100}%`, background: workloadColorMap.get(seg.name) }}
+                              title={`${seg.name} — ${Math.round(value)}pts`}
+                            />
+                          )
+                        })}
+                        <div className="velocity-bar-undone" style={{ height: total ? `${((total - done) / total) * 100}%` : 0 }} />
                       </div>
                     </div>
                     <span className="velocity-bar-label">S{sp.sprintId}</span>
