@@ -411,7 +411,8 @@
   color: var(--color-text-muted, #9ca3af);
 }
 
-.dashboard-widget-subhead svg {
+.dashboard-widget-subhead span {
+  display: inline-flex;
   flex-shrink: 0;
   cursor: help;
   opacity: 0.7;
@@ -692,6 +693,7 @@
 }
 
 .dashboard-widget-header-hint {
+  display: inline-flex;
   cursor: help;
   opacity: 0.6;
 }

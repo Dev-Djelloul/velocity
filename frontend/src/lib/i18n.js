@@ -884,6 +884,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige les info-bulles "?" invisibles et le popover calendrier qui dérivait au scroll',
+            items: [
+              'Les icônes "?" (Santé du portefeuille, "Par plan") n\'affichaient rien au survol : l\'attribut "title" posé directement sur un <svg> n\'est pas fiable pour l\'infobulle native des navigateurs — déplacé sur un <span> HTML autour de l\'icône',
+              'Corrige le popover d\'un jour du calendrier qui semblait "se déplacer dans toute la page" au défilement : rendu en position fixe (pour échapper à l\'overflow de la carte, voir le correctif précédent), il ne suivait pas le défilement de la page — il se ferme maintenant automatiquement dès qu\'on défile, plutôt que de rester figé à l\'écran'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Santé du portefeuille : icône d\'aide sur le titre, détail du calcul en puces',
             items: [
               'Ajoute une icône "?" à côté du titre "Santé du portefeuille" (visible à toutes les tailles, contrairement à la légende détaillée réservée à Moyen/Grand) : survole-la pour voir la formule complète en une phrase',
@@ -2937,6 +2945,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed invisible "?" tooltips and the calendar popover drifting on scroll',
+            items: [
+              'The "?" icons (Portfolio health, "By plan") showed nothing on hover: a "title" attribute set directly on an <svg> isn\'t reliable for the browser\'s native tooltip — moved onto an HTML <span> wrapping the icon',
+              'Fixed the calendar day popover appearing to "drift across the whole page" while scrolling: rendered in fixed position (to escape the card\'s overflow, see the previous fix), it didn\'t track page scrolling — it now closes automatically as soon as you scroll, instead of staying frozen on screen'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Portfolio health: help icon on the title, calculation detail as bullet points',

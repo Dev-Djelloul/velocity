@@ -608,7 +608,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                         réservée à Moyen/Grand faute de place) — retour utilisateur : "il
                         faut expliciter le plafonnement et l'attribution des points" même
                         en taille Petit. */}
-                    <IconHelpCircle width={12} height={12} className="dashboard-widget-header-hint" title={t(lang, 'dashboard.portfolioHealthExplain')} />
+                    {/* title posé sur un <span> (élément HTML), pas sur le <svg> lui-même
+                        — l'attribut "title" sur un <svg> n'est pas fiable pour déclencher
+                        l'infobulle native des navigateurs (le SVG définit <title> comme un
+                        ÉLÉMENT enfant, pas un attribut ; passé en attribut, la plupart des
+                        moteurs l'ignorent silencieusement), contrairement à un attribut
+                        "title" sur un élément HTML classique (retour utilisateur : rien ne
+                        s'affichait au survol). */}
+                    <span className="dashboard-widget-header-hint" title={t(lang, 'dashboard.portfolioHealthExplain')}>
+                      <IconHelpCircle width={12} height={12} />
+                    </span>
                   </div>
                   <div className={`dashboard-health-gauge is-${portfolioHealth.level}`}>
                     <svg viewBox="0 0 100 56" className="dashboard-health-gauge-svg">
@@ -671,7 +680,13 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                               survoler pour en savoir plus. */}
                           <h4 className="dashboard-widget-subhead">
                             {t(lang, 'dashboard.portfolioHealthByPlan')}
-                            <IconHelpCircle width={11} height={11} title={t(lang, 'dashboard.portfolioHealthHoverHint')} />
+                            {/* Même correctif que le "?" du titre : title sur un <span>
+                                HTML, pas sur le <svg> (attribut "title" non fiable sur un
+                                SVG pour l'infobulle native — retour utilisateur, rien ne
+                                s'affichait au survol). */}
+                            <span title={t(lang, 'dashboard.portfolioHealthHoverHint')}>
+                              <IconHelpCircle width={11} height={11} />
+                            </span>
                           </h4>
                           <ul className="dashboard-health-plan-list">
                             {planHealthList.slice(0, planRows).map(({ plan, health }) => (

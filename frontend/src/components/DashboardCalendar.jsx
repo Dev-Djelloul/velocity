@@ -46,11 +46,21 @@ function DayPopover({ date, lang, sprintEntries, launchEntries, onOpenPlan, onCl
   useEffect(() => {
     const onDocClick = (e) => { if (ref.current && !ref.current.contains(e.target)) onClose() }
     const onKeyDown = (e) => { if (e.key === 'Escape') onClose() }
+    // Fermer au scroll plutôt que de suivre : le popover est en position:fixed (voir plus
+    // haut, pour échapper à l'overflow de la carte de widget), donc il ne défile PAS avec
+    // la page — en le laissant ouvert, il restait figé à son ancien endroit à l'écran
+    // pendant que la page défilait sous lui, donnant l'impression qu'il "se déplaçait dans
+    // toute la page" (retour utilisateur, capture à l'appui). Un scroll d'un ascendant ne
+    // "bubble" pas en JS, mais la phase de capture sur window intercepte bien l'événement
+    // quel que soit le conteneur qui défile réellement.
+    const onScroll = () => onClose()
     document.addEventListener('mousedown', onDocClick)
     document.addEventListener('keydown', onKeyDown)
+    window.addEventListener('scroll', onScroll, { capture: true, passive: true })
     return () => {
       document.removeEventListener('mousedown', onDocClick)
       document.removeEventListener('keydown', onKeyDown)
+      window.removeEventListener('scroll', onScroll, { capture: true })
     }
   }, [onClose])
 
