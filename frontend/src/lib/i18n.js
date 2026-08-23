@@ -884,6 +884,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Dashboard en thème clair sans photo de fond, bibliothèque de widgets élargie',
+            items: [
+              'Dashboard, thème clair : la photo de fond assombrie est remplacée par un dégradé uni clair légèrement bleuté (tons violet/bleu/cyan très pâles) — elle jurait avec un thème clair quel que soit le niveau d\'assombrissement essayé. Le titre d\'accueil et le bouton "+" widgets retrouvent une couleur adaptée à un fond clair plutôt que le blanc forcé pensé pour la photo',
+              'Bibliothèque de widgets : panneau et champ "Chercher des widgets" élargis — le texte du champ dépassait encore légèrement du cadre'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Bibliothèque de widgets en verre dépoli, texte blanc sur Budget cumulé et Mon compte',
             items: [
               'Bibliothèque de widgets : aspect verre dépoli (fond translucide + flou) sur tout le panneau, cartes et barre latérale comprises, plutôt qu\'un fond plein opaque',
@@ -2802,6 +2810,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Dashboard light theme without background photo, wider widget library',
+            items: [
+              'Dashboard, light theme: the darkened background photo is replaced with a plain light gradient with a soft blue tint (very pale purple/blue/cyan) — it clashed with a light theme no matter how much it was darkened. The greeting title and the "+" widgets button now use colors suited to a light background instead of the white forced for the photo',
+              'Widget library: panel and "Search widgets" field widened — the field\'s text was still slightly overflowing its frame'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Frosted-glass widget library, white text on Combined budget and My account',

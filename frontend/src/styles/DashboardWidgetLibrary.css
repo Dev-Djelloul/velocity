@@ -19,7 +19,7 @@
 .widget-library-panel {
   display: flex;
   width: 100%;
-  max-width: 980px;
+  max-width: 1080px;
   height: 640px;
   max-height: 82vh;
   border-radius: 20px 20px 0 0;
@@ -55,7 +55,7 @@
 }
 
 .widget-library-sidebar {
-  width: 240px;
+  width: 300px;
   flex-shrink: 0;
   display: flex;
   flex-direction: column;

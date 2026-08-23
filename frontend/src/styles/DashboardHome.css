@@ -156,18 +156,21 @@
   opacity: 0.92;
 }
 
-[data-theme="light"] .dashboard-home-header h1,
-[data-theme="light"] .dashboard-home-header p {
-  color: #fff;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.55);
+/* Plus de photo du tout en mode clair (retour utilisateur : la photo assombrie jurait
+   avec un thème clair, quel que soit le niveau d'assombrissement) — un dégradé uni clair
+   légèrement bleuté à la place, dans les tons de marque (violet/bleu/cyan) mais très pâles.
+   Le titre n'a donc plus besoin d'être forcé en blanc ni ombré : il retrouve la couleur de
+   texte normale du thème clair, lisible nativement sur un fond uni. */
+[data-theme="light"] .dashboard-home-bg {
+  background-image: none;
+  background: linear-gradient(135deg, #eef0fb 0%, #e9f0fc 45%, #e8f6fa 100%);
+  filter: none;
 }
 
-/* Assombri aussi en mode clair (retour utilisateur : quasi netteté à 0.98 rendait la photo
-   trop présente/dominante sur un fond de page clair) — le titre et les liens restent en
-   blanc forcé quel que soit le thème (voir plus haut), ils ont donc besoin d'un fond
-   suffisamment sombre en dessous pour rester lisibles, pas seulement en mode sombre. */
-[data-theme="light"] .dashboard-home-bg {
-  filter: brightness(0.4) saturate(1.05);
+[data-theme="light"] .dashboard-home-header h1,
+[data-theme="light"] .dashboard-home-header p {
+  color: var(--color-text-primary);
+  text-shadow: none;
 }
 
 .dashboard-home-header p {
@@ -226,6 +229,20 @@
 .dashboard-widgets-btn:hover {
   background: rgba(255, 255, 255, 0.22);
   transform: scale(1.04);
+}
+
+/* Le verre blanc translucide ci-dessus supposait un fond photo sombre en dessous — sur le
+   nouveau fond uni clair du Dashboard en thème clair (voir .dashboard-home-bg), un bouton
+   quasi blanc sur quasi blanc devient illisible. Teinte violette à la place, cohérente
+   avec le reste des accents de marque. */
+[data-theme="light"] .dashboard-widgets-btn {
+  border-color: rgba(99, 102, 241, 0.35);
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--color-text-primary);
+}
+
+[data-theme="light"] .dashboard-widgets-btn:hover {
+  background: rgba(99, 102, 241, 0.18);
 }
 
 /* Widget "Santé du portefeuille" — jauge en demi-cercle façon compteur, même dégradé de
