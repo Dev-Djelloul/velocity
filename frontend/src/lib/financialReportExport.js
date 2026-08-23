@@ -73,7 +73,7 @@ export async function exportFinancialReportPdf(plan, lang, branding) {
   if (plan?.coverImage) {
     try {
       const coverDataUrl = await toDataUrl(plan.coverImage)
-      content.push({ image: coverDataUrl, width: 515, margin: [0, 0, 0, 14] })
+      content.push({ image: coverDataUrl, width: 515, margin: [0, 0, 0, 24] })
     } catch { /* image indisponible : on continue sans bannière */ }
   }
 
@@ -275,7 +275,7 @@ export async function exportFinancialReportDocx(plan, lang, branding) {
       const { width: iw, height: ih } = await imagePixelSize(bytes, type)
       const targetW = 600
       const targetH = Math.round((ih / iw) * targetW)
-      children.push(new Paragraph({ children: [new ImageRun({ data: bytes, type, transformation: { width: targetW, height: targetH } })], spacing: { after: 200 } }))
+      children.push(new Paragraph({ children: [new ImageRun({ data: bytes, type, transformation: { width: targetW, height: targetH } })], spacing: { after: 400 } }))
     } catch { /* image indisponible ou format non supporté : on continue sans bannière */ }
   }
 

@@ -323,7 +323,7 @@ export async function exportPDF(plan, lang, branding) {
   if (plan.coverImage) {
     try {
       const coverDataUrl = await toDataUrl(plan.coverImage)
-      content.push({ image: coverDataUrl, width: 515, margin: [0, 0, 0, 14] })
+      content.push({ image: coverDataUrl, width: 515, margin: [0, 0, 0, 24] })
     } catch { /* image indisponible : on continue sans bannière */ }
   }
   if (branding?.enabled && branding.logo) {
@@ -491,7 +491,9 @@ export async function exportComplianceReport(plan, lang, branding) {
       const cover = await embedPdfLibImage(pdfDoc, plan.coverImage)
       const h = (cover.height / cover.width) * CONTENT_W
       state.page.drawImage(cover, { x: MARGIN, y: state.y - h, width: CONTENT_W, height: h })
-      state.y -= h + 14
+      // Marge nettement plus généreuse qu'un simple interligne (28pt) : l'image collait
+      // directement au titre en dessous (retour utilisateur, capture à l'appui).
+      state.y -= h + 28
     } catch { /* image indisponible ou format non supporté (webp) : on continue sans bannière */ }
   }
 

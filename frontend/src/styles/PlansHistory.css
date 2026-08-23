@@ -88,15 +88,19 @@
 .plan-item {
   position: relative;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 16px;
+  /* Colonne plutôt que ligne : depuis que la miniature occupe la moitié de la carte
+     (retour utilisateur, elle ne faisait que 16% avant), aligner texte et actions sur une
+     même ligne dans la moitié restante les aurait serrés l'un contre l'autre — empilés,
+     chacun garde toute la largeur disponible. */
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
   /* Le padding gauche laisse la place à la miniature en bandeau (voir .plan-item-thumb,
      positionnée en absolu par-dessus) au lieu de la pousser comme un simple bloc de plus
      dans le flux — c'est ce qui lui permet de coller aux bords de la carte plutôt que de
      flotter comme une vignette isolée. */
-  padding: 10px 16px 10px calc(16% + 16px);
-  min-height: 76px;
+  padding: 16px 20px 16px calc(50% + 20px);
+  min-height: 168px;
   border: 1.5px solid transparent;
   border-radius: var(--radius-lg);
   background:
@@ -117,16 +121,16 @@
   min-width: 0;
 }
 
-/* Bandeau plein cadre (100% de la hauteur de la carte, ~20% de sa largeur) collé au bord
-   gauche, plutôt qu'une vignette carrée flottant avec sa propre marge à l'intérieur — le
-   padding-left de .plan-item ci-dessus réserve la place pour que le texte ne passe jamais
-   dessous. */
+/* Bandeau plein cadre (100% de la hauteur de la carte, la moitié de sa largeur) collé au
+   bord gauche, plutôt qu'une vignette carrée flottant avec sa propre marge à l'intérieur —
+   le padding-left de .plan-item ci-dessus réserve la place pour que le texte ne passe
+   jamais dessous. */
 .plan-item-thumb {
   position: absolute;
   left: 0;
   top: 0;
-  width: 16%;
-  min-width: 64px;
+  width: 50%;
+  min-width: 140px;
   height: 100%;
   border-radius: 0;
   object-fit: cover;
@@ -214,6 +218,7 @@
 .plan-actions {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
   flex-shrink: 0;
 }
 
@@ -303,9 +308,26 @@
 }
 
 @media (max-width: 640px) {
+  /* En dessous de 640px, la miniature à moitié largeur en fond absolu laisserait trop peu
+     de place au texte à côté d'elle — repli sur une image pleine largeur en bandeau du
+     haut, contenu texte/actions en dessous plutôt qu'à côté. */
   .plan-item {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
+    padding: 0 0 14px;
+    min-height: 0;
+  }
+
+  .plan-item-thumb {
+    position: static;
+    width: 100%;
+    height: 140px;
+  }
+
+  .plan-item-lead,
+  .plan-actions {
+    padding-left: 16px;
+    padding-right: 16px;
   }
 
   .plan-actions {

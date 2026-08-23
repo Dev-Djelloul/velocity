@@ -34,25 +34,18 @@
   border-radius: var(--border-radius);
   margin-bottom: 1.25rem;
   animation: plan-confirmation-in 0.5s ease;
+  /* Plus de fond dégradé plein (retour utilisateur) — seule la bordure reste en
+     dégradé, même recette que .plan-header.card juste en dessous : un fond neutre qui
+     suit le thème (padding-box) sous une bordure dégradée (border-box). */
+  border: 1.5px solid transparent;
+  background:
+    linear-gradient(var(--color-bg-secondary), var(--color-bg-secondary)) padding-box,
+    linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%) border-box;
 }
 
 @keyframes plan-confirmation-in {
   from { opacity: 0; transform: translateY(-12px); }
   to { opacity: 1; transform: translateY(0); }
-}
-
-/* Fond quasi opaque (au lieu d'un simple voile à 15-20%) : posé sur un fond de page
-   personnalisable désormais (voir plan-page-bg), sa lisibilité ne doit plus dépendre des
-   couleurs de l'image en dessous. Le texte est fixé en blanc (ci-dessous) plutôt que
-   suivre le thème, cohérent avec un fond toujours coloré/vif quel que soit le thème. */
-.plan-confirmation.just-generated {
-  background: linear-gradient(135deg, rgba(114, 99, 199, 0.94), rgba(79, 82, 219, 0.92) 50%, rgba(4, 145, 170, 0.9));
-  border: 1px solid rgba(145, 132, 217, 0.45);
-}
-
-.plan-confirmation.loaded {
-  background: linear-gradient(135deg, rgba(101, 87, 179, 0.94), rgba(70, 73, 196, 0.92) 50%, rgba(4, 130, 153, 0.9));
-  border: 1px solid rgba(145, 132, 217, 0.4);
 }
 
 .plan-confirmation-icon {
@@ -85,13 +78,16 @@
 
 .plan-confirmation-text h3 {
   font-size: var(--font-size-lg);
-  color: #fff;
   margin-bottom: 0.2rem;
+  background: linear-gradient(135deg, #9184d9 0%, #6366f1 55%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .plan-confirmation-text p {
   font-size: var(--font-size-sm);
-  color: rgba(255, 255, 255, 0.85);
+  color: var(--color-text-secondary);
   margin: 0;
 }
 

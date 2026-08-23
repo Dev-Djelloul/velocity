@@ -204,8 +204,8 @@
 }
 
 .btn-notion-icon {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -218,8 +218,8 @@
 }
 
 .export-btn-icon {
-  width: 16px;
-  height: 16px;
+  width: 22px;
+  height: 22px;
   object-fit: contain;
   flex-shrink: 0;
 }

@@ -6,7 +6,7 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
-import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar } from './Icons'
+import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import DashboardCalendar from './DashboardCalendar'
 import { getDailyTip } from '../lib/dailyTips'
@@ -114,6 +114,15 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   const deadlines = useMemo(() => getUpcomingDeadlines(allPlans || activePlans), [allPlans, activePlans])
 
+  // Dernier plan touché, tous espaces confondus (personnel + équipes, quand l'agrégation
+  // Pro est disponible ; sinon juste l'espace actif) — pour la carte "Reprendre" qui évite
+  // à l'utilisateur de rouvrir son espace puis chercher le bon plan dans la liste.
+  const lastUsedPlan = useMemo(() => {
+    const pool = allPlans || activePlans
+    if (!pool.length) return null
+    return pool.slice().sort(byRecency)[0]
+  }, [allPlans, activePlans])
+
   // La phrase d'accroche distingue "tu as déjà des plans, reprends-les" de "tu n'en as
   // encore aucun, lance le premier" — plutôt qu'une seule formule fixe qui ignorait si
   // l'utilisateur avait déjà quelque chose en cours (personnel ou équipe, peu importe).
@@ -160,6 +169,10 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     return [personal, ...teams]
   }, [personalSpace.name, personalSpace.avatar, teamIdsKey])
 
+  const lastUsedPlanSpaceName = lastUsedPlan
+    ? (spaces.find(s => s.id === (lastUsedPlan.team_id ?? lastUsedPlan.createdSpaceId ?? null))?.name || personalSpace.name)
+    : null
+
   return (
     <div className="dashboard-home-outer">
       <IconGradientDefs />
@@ -198,6 +211,22 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
           {t(lang, 'dashboard.createPlan')}
         </button>
       </div>
+
+      {lastUsedPlan && (
+        <button className="dashboard-resume-card" onClick={() => onLoadPlan?.(lastUsedPlan)}>
+          <div className="dashboard-resume-card-media">
+            {lastUsedPlan.coverImage
+              ? <img src={lastUsedPlan.coverImage} alt="" />
+              : <span className="dashboard-resume-card-fallback" aria-hidden="true"><IconClipboard width={22} height={22} /></span>}
+          </div>
+          <div className="dashboard-resume-card-body">
+            <span className="dashboard-resume-card-label">{t(lang, 'dashboard.resumeLabel')}</span>
+            <span className="dashboard-resume-card-name">{lastUsedPlan.product?.name || t(lang, 'plans.untitled')}</span>
+            <span className="dashboard-resume-card-space">{lastUsedPlanSpaceName}</span>
+          </div>
+          <IconChevronRight width={18} height={18} className="dashboard-resume-card-arrow" />
+        </button>
+      )}
 
       <div className="dashboard-home-grid">
         {spaces.map(space => {

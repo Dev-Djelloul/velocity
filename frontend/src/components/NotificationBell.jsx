@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { fetchNotificationFeed, markNotificationFeedRead, markAllNotificationFeedRead, deleteAllNotificationFeed } from '../lib/serverStorage'
-import { IconBell, IconCheckCircle, IconTrash } from './Icons'
+import { IconBell, IconCheckCircle, IconTrash, IconAlertTriangle } from './Icons'
 import '../styles/NotificationBell.css'
 
 const POLL_MS = 8000
@@ -18,6 +18,7 @@ export default function NotificationBell({ userId, lang, onOpen }) {
   const [items, setItems] = useState([])
   const [unread, setUnread] = useState(0)
   const [open, setOpen] = useState(false)
+  const [confirmingDeleteAll, setConfirmingDeleteAll] = useState(false)
   const pollRef = useRef(null)
   const rootRef = useRef(null)
 
@@ -62,9 +63,13 @@ export default function NotificationBell({ userId, lang, onOpen }) {
     await markAllNotificationFeedRead(userId)
   }
 
-  const deleteAll = async (e) => {
+  const askDeleteAll = (e) => {
     e.stopPropagation()
-    if (!window.confirm(t(lang, 'notifCenter.confirmDeleteAll'))) return
+    setConfirmingDeleteAll(true)
+  }
+
+  const confirmDeleteAll = async () => {
+    setConfirmingDeleteAll(false)
     setItems([])
     setUnread(0)
     await deleteAllNotificationFeed(userId)
@@ -83,7 +88,7 @@ export default function NotificationBell({ userId, lang, onOpen }) {
             <div className="notif-bell-header-actions">
               {unread > 0 && <button className="notif-bell-markall" onClick={markAllRead}>{t(lang, 'notifCenter.markAllRead')}</button>}
               {items.length > 0 && (
-                <button className="notif-bell-delete-all" onClick={deleteAll} title={t(lang, 'notifCenter.deleteAll')}>
+                <button className="notif-bell-delete-all" onClick={askDeleteAll} title={t(lang, 'notifCenter.deleteAll')}>
                   <IconTrash width={14} height={14} />
                 </button>
               )}
@@ -99,6 +104,20 @@ export default function NotificationBell({ userId, lang, onOpen }) {
                 {!item.read && <IconCheckCircle width={12} height={12} className="notif-bell-item-dot" />}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {confirmingDeleteAll && (
+        <div className="confirm-modal-backdrop" onClick={() => setConfirmingDeleteAll(false)}>
+          <div className="confirm-modal" onClick={e => e.stopPropagation()}>
+            <div className="confirm-modal-icon"><IconAlertTriangle width={22} height={22} /></div>
+            <h3>{t(lang, 'notifCenter.deleteAll')}</h3>
+            <p>{t(lang, 'notifCenter.confirmDeleteAll')}</p>
+            <div className="confirm-modal-actions">
+              <button className="btn-secondary" onClick={() => setConfirmingDeleteAll(false)}>{t(lang, 'plans.cancel')}</button>
+              <button className="btn-danger" onClick={confirmDeleteAll}>{t(lang, 'notifCenter.deleteAll')}</button>
+            </div>
           </div>
         </div>
       )}
