@@ -1,5 +1,180 @@
 import { t } from './i18n'
 
+// ---------- Aides partagées pour tout ce qui dessine des vraies cases à cocher AcroForm
+// en pdf-lib (rapport investisseurs ET section RGPD du plan complet) : pdfmake ne sait
+// produire que du texte statique, jamais des champs de formulaire cochables. ----------
+const PDFLIB_PAGE_W = 595.28
+const PDFLIB_PAGE_H = 841.89
+const PDFLIB_MARGIN = 50
+const PDFLIB_CONTENT_W = PDFLIB_PAGE_W - PDFLIB_MARGIN * 2
+
+function hexToRgbLib(rgbFn, h) {
+  const n = parseInt(h, 16)
+  return rgbFn(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255)
+}
+
+// Fabrique un petit "curseur de dessin" pdf-lib (pagination auto, retour à la ligne,
+// tableaux sans bordures verticales, cases à cocher réelles) réutilisable aussi bien pour
+// générer un PDF pdf-lib de zéro que pour continuer à écrire sur un PDF pdfmake déjà
+// rendu puis rechargé (voir exportPDF : le plan complet reste en pdfmake, seule la
+// section RGPD est ajoutée en pdf-lib après coup).
+async function createPdfLibDrawer(pdfDoc, rgb, StandardFonts) {
+  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
+  const fontItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique)
+  const form = pdfDoc.getForm()
+
+  const hex = (h) => hexToRgbLib(rgb, h)
+  const VIOLET = hex('9184D9')
+  const GRAY = hex('6B7280')
+  const LIGHT_GRAY = hex('9CA3AF')
+  const RULE = hex('E5E7EB')
+  const BLACK = rgb(0.06, 0.08, 0.12)
+
+  const state = { page: null, y: 0, pages: [] }
+  const newPage = () => {
+    state.page = pdfDoc.addPage([PDFLIB_PAGE_W, PDFLIB_PAGE_H])
+    state.y = PDFLIB_PAGE_H - PDFLIB_MARGIN
+    state.pages.push(state.page)
+  }
+  const ensureSpace = (needed) => { if (state.y - needed < 70) newPage() }
+
+  const wrapText = (text, f, size, maxWidth) => {
+    const words = String(text ?? '').split(/\s+/).filter(Boolean)
+    const lines = []
+    let cur = ''
+    for (const w of words) {
+      const test = cur ? `${cur} ${w}` : w
+      if (cur && f.widthOfTextAtSize(test, size) > maxWidth) { lines.push(cur); cur = w }
+      else cur = test
+    }
+    if (cur) lines.push(cur)
+    return lines.length ? lines : ['']
+  }
+
+  const drawParagraph = (text, { size = 10, f = font, color = BLACK, gap = 4, maxWidth = PDFLIB_CONTENT_W, before = 0 } = {}) => {
+    if (before) state.y -= before
+    for (const line of wrapText(text, f, size, maxWidth)) {
+      ensureSpace(size + gap)
+      state.page.drawText(line, { x: PDFLIB_MARGIN, y: state.y, size, font: f, color })
+      state.y -= size + gap
+    }
+  }
+
+  const drawSectionTitle = (text) => {
+    ensureSpace(28)
+    state.y -= 14
+    state.page.drawText(text, { x: PDFLIB_MARGIN, y: state.y, size: 13, font: fontBold, color: VIOLET })
+    state.y -= 16
+  }
+
+  const drawTable = (headers, rows, widths) => {
+    const lineH = 12
+    const colX = []
+    let acc = PDFLIB_MARGIN
+    for (const w of widths) { colX.push(acc); acc += w }
+
+    ensureSpace(lineH + 6)
+    headers.forEach((h, i) => state.page.drawText(h, { x: colX[i], y: state.y, size: 9, font: fontBold, color: GRAY }))
+    state.y -= 6
+    state.page.drawLine({ start: { x: PDFLIB_MARGIN, y: state.y }, end: { x: PDFLIB_MARGIN + PDFLIB_CONTENT_W, y: state.y }, thickness: 1, color: RULE })
+    state.y -= 10
+
+    for (const row of rows) {
+      const cellLines = row.map((cell, i) => wrapText(cell, font, 9.5, widths[i] - 8))
+      const rowLines = Math.max(...cellLines.map(l => l.length))
+      ensureSpace(rowLines * lineH + 6)
+      cellLines.forEach((lines, i) => {
+        lines.forEach((line, li) => {
+          state.page.drawText(line, { x: colX[i], y: state.y - li * lineH, size: 9.5, font, color: BLACK })
+        })
+      })
+      state.y -= rowLines * lineH + 4
+      state.page.drawLine({ start: { x: PDFLIB_MARGIN, y: state.y }, end: { x: PDFLIB_MARGIN + PDFLIB_CONTENT_W, y: state.y }, thickness: 0.5, color: RULE })
+      state.y -= 10
+    }
+  }
+
+  const drawChecklistItem = (label, checked, id) => {
+    const BOX = 11
+    const textX = PDFLIB_MARGIN + BOX + 8
+    const lines = wrapText(label, font, 9.5, PDFLIB_CONTENT_W - BOX - 8)
+    const lineH = 13
+    ensureSpace(lines.length * lineH + 6)
+
+    const boxTop = state.y + 2
+    state.page.drawRectangle({
+      x: PDFLIB_MARGIN, y: boxTop - BOX, width: BOX, height: BOX,
+      borderColor: VIOLET, borderWidth: 1, color: rgb(1, 1, 1)
+    })
+    try {
+      const checkbox = form.createCheckBox(id)
+      checkbox.addToPage(state.page, { x: PDFLIB_MARGIN, y: boxTop - BOX, width: BOX, height: BOX, borderColor: VIOLET, borderWidth: 1 })
+      if (checked) checkbox.check()
+    } catch { /* champ dupliqué ou police de coche indisponible : le carré dessiné ci-dessus reste visible */ }
+
+    lines.forEach((line, i) => {
+      state.page.drawText(line, { x: textX, y: state.y - i * lineH, size: 9.5, font, color: BLACK })
+    })
+    state.y -= lines.length * lineH + 6
+  }
+
+  // `pages` par défaut = seulement les pages créées par ce drawer (state.pages). Un appelant
+  // qui a rechargé un PDF pdfmake existant (exportPDF) passe explicitement TOUTES les pages
+  // du document final (pdfDoc.getPages()) pour que la numérotation compte aussi les pages
+  // d'origine, sans quoi le total affiché serait celui d'avant fusion.
+  const drawFooters = (label = 'VelocityLaunch', pages = state.pages) => {
+    pages.forEach((page, i) => {
+      page.drawText(label, { x: PDFLIB_MARGIN, y: 30, size: 8, font: fontBold, color: VIOLET })
+      const pageLabel = `${i + 1} / ${pages.length}`
+      const w = font.widthOfTextAtSize(pageLabel, 8)
+      page.drawText(pageLabel, { x: PDFLIB_PAGE_W - PDFLIB_MARGIN - w, y: 30, size: 8, font, color: LIGHT_GRAY })
+    })
+  }
+
+  return {
+    state, font, fontBold, fontItalic, form,
+    colors: { VIOLET, GRAY, LIGHT_GRAY, RULE, BLACK },
+    newPage, ensureSpace, wrapText, drawParagraph, drawSectionTitle, drawTable, drawChecklistItem, drawFooters,
+    MARGIN: PDFLIB_MARGIN, CONTENT_W: PDFLIB_CONTENT_W, PAGE_W: PDFLIB_PAGE_W, PAGE_H: PDFLIB_PAGE_H
+  }
+}
+
+// Rend la section "Conformité RGPD" (titre, applicabilité, checklist à vraies cases à
+// cocher, registre, recommandations, disclaimer) sur un drawer pdf-lib déjà positionné —
+// factorisé car utilisé à l'identique par exportComplianceReport et par la section RGPD
+// du plan complet (exportPDF).
+function drawRgpdSection(drawer, r, lang) {
+  const en = lang === 'en'
+  drawer.drawSectionTitle(t(lang, 'rgpd.title'))
+  drawer.drawParagraph(r.applicability, { f: drawer.fontItalic, gap: 5 })
+  drawer.state.y -= 4
+  drawer.state.page.drawText(`${t(lang, 'rgpd.checklist')}:`, { x: drawer.MARGIN, y: drawer.state.y, size: 10, font: drawer.fontBold, color: drawer.colors.BLACK })
+  drawer.state.y -= 16
+  ;(r.checklist || []).forEach((it, i) => {
+    const priority = t(lang, `rgpd.priority.${it.priority}`) || it.priority
+    drawer.drawChecklistItem(`${it.item} — ${priority}`, !!it.done, `rgpd_check_${i}_${Math.random().toString(36).slice(2, 8)}`)
+  })
+
+  if (r.register?.length) {
+    drawer.state.y -= 6
+    drawer.state.page.drawText(`${t(lang, 'rgpd.register')}:`, { x: drawer.MARGIN, y: drawer.state.y, size: 10, font: drawer.fontBold, color: drawer.colors.BLACK })
+    drawer.state.y -= 14
+    drawer.drawTable(
+      [t(lang, 'rgpd.data'), t(lang, 'rgpd.purpose'), t(lang, 'rgpd.basis')],
+      r.register.map(reg => [reg.data, reg.purpose, reg.basis]),
+      [drawer.CONTENT_W / 3, drawer.CONTENT_W / 3, drawer.CONTENT_W / 3]
+    )
+  }
+  if (r.recommendations?.length) {
+    drawer.state.y -= 6
+    drawer.state.page.drawText(en ? 'Recommendations:' : 'Recommandations:', { x: drawer.MARGIN, y: drawer.state.y, size: 10, font: drawer.fontBold, color: drawer.colors.BLACK })
+    drawer.state.y -= 14
+    r.recommendations.forEach(rec => drawer.drawParagraph(`•  ${rec}`, { size: 9.5, gap: 4 }))
+  }
+  drawer.drawParagraph(t(lang, 'rgpd.disclaimer'), { size: 8, f: drawer.fontItalic, color: drawer.colors.LIGHT_GRAY, before: 4 })
+}
+
 export function exportJSON(plan) {
   const blob = new Blob([JSON.stringify(plan, null, 2)], { type: 'application/json' })
   downloadBlob(blob, `${slug(plan.product?.name)}-launch-plan.json`)
@@ -222,33 +397,48 @@ export async function exportPDF(plan, lang, branding) {
     )
   }
 
-  if (plan.rgpd) {
-    const r = plan.rgpd
-    content.push(
-      { text: t(lang, 'rgpd.title'), style: 'section' },
-      { text: r.applicability, margin: [0, 0, 0, 3], italics: true },
-      { text: `${t(lang, 'rgpd.checklist')}:`, bold: true, margin: [0, 2, 0, 1] },
-      ...(r.checklist || []).map(it => ({ text: `${it.done ? '[x]' : '[ ]'} ${it.item} [${t(lang, `rgpd.priority.${it.priority}`) || it.priority}]`, margin: [0, 1, 0, 1] })),
-      { text: t(lang, 'rgpd.disclaimer'), margin: [0, 3, 0, 0], italics: true, fontSize: 8 }
-    )
+  // La section RGPD n'est plus mise en page ici : elle est ajoutée après coup en pdf-lib
+  // (voir plus bas) pour porter de vraies cases à cocher AcroForm sur la checklist,
+  // impossibles à produire avec pdfmake (retour utilisateur, même correction déjà faite
+  // sur exportComplianceReport).
+
+  const styles = {
+    header: { fontSize: 20, bold: true, color: '#6366f1' },
+    subheader: { fontSize: 12, color: '#6b7280', margin: [0, 0, 0, 10] },
+    section: { fontSize: 14, bold: true, color: '#9184d9', margin: [0, 12, 0, 6] }
   }
 
-  const docDefinition = {
-    content,
-    styles: {
-      header: { fontSize: 20, bold: true, color: '#6366f1' },
-      subheader: { fontSize: 12, color: '#6b7280', margin: [0, 0, 0, 10] },
-      section: { fontSize: 14, bold: true, color: '#9184d9', margin: [0, 12, 0, 6] }
-    },
-    footer: (currentPage, pageCount) => ({
-      columns: [
-        { text: 'VelocityLaunch', margin: [40, 0, 0, 0], fontSize: 8, color: '#9184d9', bold: true },
-        { text: `${currentPage} / ${pageCount}`, alignment: 'right', margin: [0, 0, 40, 0], fontSize: 8, color: '#9ca3af' }
-      ]
-    })
+  if (!plan.rgpd) {
+    const docDefinition = {
+      content,
+      styles,
+      footer: (currentPage, pageCount) => ({
+        columns: [
+          { text: 'VelocityLaunch', margin: [40, 0, 0, 0], fontSize: 8, color: '#9184d9', bold: true },
+          { text: `${currentPage} / ${pageCount}`, alignment: 'right', margin: [0, 0, 40, 0], fontSize: 8, color: '#9ca3af' }
+        ]
+      })
+    }
+    pdfMake.createPdf(docDefinition).download(`${slug(plan.product?.name)}-launch-plan.pdf`)
+    return
   }
 
-  pdfMake.createPdf(docDefinition).download(`${slug(plan.product?.name)}-launch-plan.pdf`)
+  // Le plan complet reste généré en pdfmake (mise en page riche déjà en place pour toutes
+  // les autres sections) ; seule la section RGPD est ajoutée après coup en rechargeant les
+  // octets dans pdf-lib, la seule bibliothèque des deux capable de poser de vrais champs
+  // de formulaire cochables sur un PDF. Pas de `footer` pdfmake ici : le total de pages
+  // qu'il calculerait serait faux une fois les pages RGPD ajoutées — le pied de page est
+  // entièrement redessiné ensuite, en pdf-lib, sur la totalité du document fusionné.
+  const pdfBytes = await new Promise(resolve => pdfMake.createPdf({ content, styles }).getBuffer(resolve))
+  const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib')
+  const pdfDoc = await PDFDocument.load(pdfBytes)
+  const drawer = await createPdfLibDrawer(pdfDoc, rgb, StandardFonts)
+  drawer.newPage()
+  drawRgpdSection(drawer, plan.rgpd, lang)
+  drawer.drawFooters('VelocityLaunch', pdfDoc.getPages())
+
+  const finalBytes = await pdfDoc.save()
+  downloadBlob(new Blob([finalBytes], { type: 'application/pdf' }), `${slug(plan.product?.name)}-launch-plan.pdf`)
 }
 
 // Document dédié aux investisseurs/due diligence : synthèse financière + conformité RGPD
@@ -261,120 +451,13 @@ export async function exportPDF(plan, lang, branding) {
 // texte statique (retour utilisateur : "une vraie case à cocher que je puisse cocher").
 export async function exportComplianceReport(plan, lang, branding) {
   const { PDFDocument, StandardFonts, rgb } = await import('pdf-lib')
-
-  const PAGE_W = 595.28
-  const PAGE_H = 841.89
-  const MARGIN = 50
-  const CONTENT_W = PAGE_W - MARGIN * 2
-
-  const hex = (h) => {
-    const n = parseInt(h, 16)
-    return rgb(((n >> 16) & 255) / 255, ((n >> 8) & 255) / 255, (n & 255) / 255)
-  }
+  const hex = (h) => hexToRgbLib(rgb, h)
   const INDIGO = hex('6366F1')
-  const VIOLET = hex('9184D9')
-  const GRAY = hex('6B7280')
-  const LIGHT_GRAY = hex('9CA3AF')
-  const RULE = hex('E5E7EB')
-  const BLACK = rgb(0.06, 0.08, 0.12)
 
   const pdfDoc = await PDFDocument.create()
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica)
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold)
-  const fontItalic = await pdfDoc.embedFont(StandardFonts.HelveticaOblique)
-  const form = pdfDoc.getForm()
-
-  const state = { page: null, y: 0, pages: [] }
-  const newPage = () => {
-    state.page = pdfDoc.addPage([PAGE_W, PAGE_H])
-    state.y = PAGE_H - MARGIN
-    state.pages.push(state.page)
-  }
-  const ensureSpace = (needed) => { if (state.y - needed < 70) newPage() }
-  newPage()
-
-  const wrapText = (text, f, size, maxWidth) => {
-    const words = String(text ?? '').split(/\s+/).filter(Boolean)
-    const lines = []
-    let cur = ''
-    for (const w of words) {
-      const test = cur ? `${cur} ${w}` : w
-      if (cur && f.widthOfTextAtSize(test, size) > maxWidth) { lines.push(cur); cur = w }
-      else cur = test
-    }
-    if (cur) lines.push(cur)
-    return lines.length ? lines : ['']
-  }
-
-  const drawParagraph = (text, { size = 10, f = font, color = BLACK, gap = 4, maxWidth = CONTENT_W, before = 0 } = {}) => {
-    if (before) state.y -= before
-    for (const line of wrapText(text, f, size, maxWidth)) {
-      ensureSpace(size + gap)
-      state.page.drawText(line, { x: MARGIN, y: state.y, size, font: f, color })
-      state.y -= size + gap
-    }
-  }
-
-  const drawSectionTitle = (text) => {
-    ensureSpace(28)
-    state.y -= 14
-    state.page.drawText(text, { x: MARGIN, y: state.y, size: 13, font: fontBold, color: VIOLET })
-    state.y -= 16
-  }
-
-  // Table sans bordures verticales (juste un filet clair sous l'en-tête et entre les
-  // lignes) — même esprit visuel que le layout 'lightHorizontalLines' de pdfmake utilisé
-  // jusqu'ici, avec un support propre du retour à la ligne cellule par cellule.
-  const drawTable = (headers, rows, widths) => {
-    const lineH = 12
-    const colX = []
-    let acc = MARGIN
-    for (const w of widths) { colX.push(acc); acc += w }
-
-    ensureSpace(lineH + 6)
-    headers.forEach((h, i) => state.page.drawText(h, { x: colX[i], y: state.y, size: 9, font: fontBold, color: GRAY }))
-    state.y -= 6
-    state.page.drawLine({ start: { x: MARGIN, y: state.y }, end: { x: MARGIN + CONTENT_W, y: state.y }, thickness: 1, color: RULE })
-    state.y -= 10
-
-    for (const row of rows) {
-      const cellLines = row.map((cell, i) => wrapText(cell, font, 9.5, widths[i] - 8))
-      const rowLines = Math.max(...cellLines.map(l => l.length))
-      ensureSpace(rowLines * lineH + 6)
-      cellLines.forEach((lines, i) => {
-        lines.forEach((line, li) => {
-          state.page.drawText(line, { x: colX[i], y: state.y - li * lineH, size: 9.5, font, color: BLACK })
-        })
-      })
-      state.y -= rowLines * lineH + 4
-      state.page.drawLine({ start: { x: MARGIN, y: state.y }, end: { x: MARGIN + CONTENT_W, y: state.y }, thickness: 0.5, color: RULE })
-      state.y -= 10
-    }
-  }
-
-  const drawChecklistItem = (label, checked, id) => {
-    const BOX = 11
-    const textX = MARGIN + BOX + 8
-    const lines = wrapText(label, font, 9.5, CONTENT_W - BOX - 8)
-    const lineH = 13
-    ensureSpace(lines.length * lineH + 6)
-
-    const boxTop = state.y + 2
-    state.page.drawRectangle({
-      x: MARGIN, y: boxTop - BOX, width: BOX, height: BOX,
-      borderColor: VIOLET, borderWidth: 1, color: rgb(1, 1, 1)
-    })
-    try {
-      const checkbox = form.createCheckBox(id)
-      checkbox.addToPage(state.page, { x: MARGIN, y: boxTop - BOX, width: BOX, height: BOX, borderColor: VIOLET, borderWidth: 1 })
-      if (checked) checkbox.check()
-    } catch { /* champ dupliqué ou police de coche indisponible : le carré dessiné ci-dessus reste visible */ }
-
-    lines.forEach((line, i) => {
-      state.page.drawText(line, { x: textX, y: state.y - i * lineH, size: 9.5, font, color: BLACK })
-    })
-    state.y -= lines.length * lineH + 6
-  }
+  const drawer = await createPdfLibDrawer(pdfDoc, rgb, StandardFonts)
+  const { state, font, fontBold, fontItalic, colors, MARGIN, CONTENT_W } = drawer
+  drawer.newPage()
 
   // ---------- En-tête ----------
   const en = lang === 'en'
@@ -397,80 +480,47 @@ export async function exportComplianceReport(plan, lang, branding) {
 
   state.page.drawText(t(lang, 'export.complianceReport'), { x: MARGIN, y: state.y, size: 20, font: fontBold, color: INDIGO })
   state.y -= 24
-  state.page.drawText(plan.product?.name || 'Launch Plan', { x: MARGIN, y: state.y, size: 13, font: fontBold, color: GRAY })
+  state.page.drawText(plan.product?.name || 'Launch Plan', { x: MARGIN, y: state.y, size: 13, font: fontBold, color: colors.GRAY })
   state.y -= 18
-  state.page.drawText(en ? `Generated on ${genDate}` : `Généré le ${genDate}`, { x: MARGIN, y: state.y, size: 9, font, color: LIGHT_GRAY })
+  state.page.drawText(en ? `Generated on ${genDate}` : `Généré le ${genDate}`, { x: MARGIN, y: state.y, size: 9, font, color: colors.LIGHT_GRAY })
   state.y -= 16
 
-  if (plan.product?.pitch) drawParagraph(plan.product.pitch, { f: fontItalic, gap: 5 })
+  if (plan.product?.pitch) drawer.drawParagraph(plan.product.pitch, { f: fontItalic, gap: 5 })
 
   // ---------- Synthèse financière ----------
-  drawSectionTitle(t(lang, 'outputs.financials.title'))
+  drawer.drawSectionTitle(t(lang, 'outputs.financials.title'))
   if (plan.financials) {
     const f = plan.financials
-    drawTable(
+    drawer.drawTable(
       [t(lang, 'outputs.financials.monthlyBurn'), t(lang, 'outputs.financials.runway'), t(lang, 'outputs.financials.breakEven')],
       [[`${f.monthlyBurn} €`, `${f.runwayMonths} ${t(lang, 'outputs.financials.months')}`, `${f.breakEvenUsers} ${t(lang, 'outputs.financials.clients')}`]],
       [CONTENT_W / 3, CONTENT_W / 3, CONTENT_W / 3]
     )
     if (f.costBreakdown?.length) {
       state.y -= 6
-      state.page.drawText(t(lang, 'outputs.financials.breakdown'), { x: MARGIN, y: state.y, size: 10, font: fontBold, color: BLACK })
+      state.page.drawText(t(lang, 'outputs.financials.breakdown'), { x: MARGIN, y: state.y, size: 10, font: fontBold, color: colors.BLACK })
       state.y -= 14
-      drawTable(
+      drawer.drawTable(
         [t(lang, 'outputs.category'), t(lang, 'outputs.estimatedCostEur'), '%'],
         f.costBreakdown.map(line => [line.category, `${line.amount} €`, `${line.pct}%`]),
         [CONTENT_W * 0.5, CONTENT_W * 0.3, CONTENT_W * 0.2]
       )
     }
-    if (f.arpuRationale) drawParagraph(f.arpuRationale, { size: 9, f: fontItalic, color: GRAY })
+    if (f.arpuRationale) drawer.drawParagraph(f.arpuRationale, { size: 9, f: fontItalic, color: colors.GRAY })
   } else {
-    drawParagraph(t(lang, 'export.complianceNoFinancials'), { f: fontItalic, color: GRAY })
+    drawer.drawParagraph(t(lang, 'export.complianceNoFinancials'), { f: fontItalic, color: colors.GRAY })
   }
 
   // ---------- Conformité RGPD ----------
-  drawSectionTitle(t(lang, 'rgpd.title'))
   if (plan.rgpd) {
-    const r = plan.rgpd
-    drawParagraph(r.applicability, { f: fontItalic, gap: 5 })
-    state.y -= 4
-    state.page.drawText(`${t(lang, 'rgpd.checklist')}:`, { x: MARGIN, y: state.y, size: 10, font: fontBold, color: BLACK })
-    state.y -= 16
-    ;(r.checklist || []).forEach((it, i) => {
-      const priority = t(lang, `rgpd.priority.${it.priority}`) || it.priority
-      drawChecklistItem(`${it.item} — ${priority}`, !!it.done, `rgpd_check_${i}`)
-    })
-
-    if (r.register?.length) {
-      state.y -= 6
-      state.page.drawText(`${t(lang, 'rgpd.register')}:`, { x: MARGIN, y: state.y, size: 10, font: fontBold, color: BLACK })
-      state.y -= 14
-      drawTable(
-        [t(lang, 'rgpd.data'), t(lang, 'rgpd.purpose'), t(lang, 'rgpd.basis')],
-        r.register.map(reg => [reg.data, reg.purpose, reg.basis]),
-        [CONTENT_W / 3, CONTENT_W / 3, CONTENT_W / 3]
-      )
-    }
-    if (r.recommendations?.length) {
-      state.y -= 6
-      state.page.drawText(en ? 'Recommendations:' : 'Recommandations:', { x: MARGIN, y: state.y, size: 10, font: fontBold, color: BLACK })
-      state.y -= 14
-      r.recommendations.forEach(rec => drawParagraph(`•  ${rec}`, { size: 9.5, gap: 4 }))
-    }
-    drawParagraph(t(lang, 'rgpd.disclaimer'), { size: 8, f: fontItalic, color: LIGHT_GRAY, before: 4 })
+    drawRgpdSection(drawer, plan.rgpd, lang)
   } else {
-    drawParagraph(t(lang, 'export.complianceNoRgpd'), { f: fontItalic, color: GRAY })
+    drawer.drawSectionTitle(t(lang, 'rgpd.title'))
+    drawer.drawParagraph(t(lang, 'export.complianceNoRgpd'), { f: fontItalic, color: colors.GRAY })
   }
 
-  drawParagraph(t(lang, 'export.complianceDisclaimer'), { size: 8, f: fontItalic, color: LIGHT_GRAY, before: 16 })
-
-  // ---------- Pied de page (marque + numérotation) sur chaque page générée ----------
-  state.pages.forEach((page, i) => {
-    page.drawText('VelocityLaunch', { x: MARGIN, y: 30, size: 8, font: fontBold, color: VIOLET })
-    const label = `${i + 1} / ${state.pages.length}`
-    const w = font.widthOfTextAtSize(label, 8)
-    page.drawText(label, { x: PAGE_W - MARGIN - w, y: 30, size: 8, font, color: LIGHT_GRAY })
-  })
+  drawer.drawParagraph(t(lang, 'export.complianceDisclaimer'), { size: 8, f: fontItalic, color: colors.LIGHT_GRAY, before: 16 })
+  drawer.drawFooters()
 
   const bytes = await pdfDoc.save()
   downloadBlob(new Blob([bytes], { type: 'application/pdf' }), `${slug(plan.product?.name)}-compliance-report.pdf`)
