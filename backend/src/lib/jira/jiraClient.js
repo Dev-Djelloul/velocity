@@ -99,29 +99,32 @@ function agileFetch(accessToken, cloudId, path, options = {}) {
   })
 }
 
-// Board Scrum du projet (seul type de board qui supporte des sprints natifs — un board
-// Kanban n'en a pas). Best-effort : renvoie null aussi bien si le projet n'a pas de board
-// scrum que si le token n'a pas encore les scopes Agile (utilisateur pas encore reconnecté
-// depuis l'ajout de cette fonctionnalité) — dans les deux cas l'export continue sans sprint
-// natif, exactement comme avant.
+// Board du projet capable de sprints natifs. Un board Kanban classique (projet "géré par
+// l'équipe" classique) n'en a pas — mais un projet "nouvelle génération" (team-managed, cas
+// le plus courant à la création rapide d'un projet Jira) expose son board sous le type
+// "simple", MÊME quand les sprints y sont activés : l'API Agile ne le classe jamais "scrum"
+// (constaté en debug live : board { type: "simple" } sur un projet SCRUM avec sprints actifs).
+// On accepte donc "scrum" (projets classiques) et "simple" (team-managed), en excluant
+// explicitement "kanban" qui lui n'a réellement jamais de sprint. Best-effort : renvoie null
+// si aucun board compatible, ou si le token n'a pas encore les scopes Agile (utilisateur pas
+// encore reconnecté) — dans ces deux cas l'export continue sans sprint natif, comme avant.
 async function findScrumBoardId(accessToken, cloudId, projectKey) {
   try {
     const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=50`)
-    if (!res.ok) {
-      console.error('[jira-sprint] board fetch failed', res.status, await res.text())
-      return null
-    }
+    if (!res.ok) return null
     const data = await res.json()
-    const board = (data.values || []).find(b => b.type === 'scrum')
+    const board = (data.values || []).find(b => b.type === 'scrum') || (data.values || []).find(b => b.type === 'simple')
     return board?.id ?? null
-  } catch (e) {
-    console.error('[jira-sprint] board fetch threw', e?.message)
-    return null
-  }
+  } catch { return null }
 }
 
-// Sprints déjà présents sur ce board, indexés par leur nom exact (voir sprintNameFor plus
-// bas) — pour ne pas recréer un sprint Jira à chaque resynchronisation du même plan.
+// Sprints déjà présents sur ce board, indexés par leur "goal" (champ objectif, invisible
+// dans le backlog) plutôt que par leur nom affiché — le nom reste un simple "Sprint N"
+// conventionnel (retour utilisateur : préfère ça à "Nom du plan · Phase N"), mais le board
+// est partagé par TOUS les plans synchronisés dans ce projet Jira, et sprint.sprintId
+// repart de 1 à chaque plan (même limite que epicLabel/vlLabel plus haut) — sans un
+// identifiant caché pour les distinguer, "Sprint 1" d'un nouveau plan réutiliserait à tort
+// le "Sprint 1" JIRA d'un plan précédent.
 async function fetchExistingSprints(accessToken, cloudId, boardId) {
   const map = {}
   try {
@@ -130,7 +133,7 @@ async function fetchExistingSprints(accessToken, cloudId, boardId) {
       const res = await agileFetch(accessToken, cloudId, `/board/${boardId}/sprint?startAt=${startAt}&maxResults=50`)
       if (!res.ok) break
       const data = await res.json()
-      for (const s of data.values || []) map[s.name] = s.id
+      for (const s of data.values || []) { if (s.goal) map[s.goal] = s.id }
       if (data.isLast || !data.values?.length) break
       startAt += data.values.length
     }
@@ -138,12 +141,13 @@ async function fetchExistingSprints(accessToken, cloudId, boardId) {
   return map
 }
 
-async function createSprint(accessToken, cloudId, boardId, name, startDate, endDate) {
+async function createSprint(accessToken, cloudId, boardId, name, goal, startDate, endDate) {
   try {
     const res = await agileFetch(accessToken, cloudId, '/sprint', {
       method: 'POST',
       body: JSON.stringify({
         name,
+        goal,
         originBoardId: boardId,
         ...(startDate ? { startDate: `${startDate}T00:00:00.000Z` } : {}),
         ...(endDate ? { endDate: `${endDate}T00:00:00.000Z` } : {})
@@ -541,13 +545,13 @@ export async function exportPlanToJira(accessToken, target, plan, lang, env) {
       for (const sprint of plan.roadmap?.sprints || []) {
         const keys = storyKeysBySprint[sprint.sprintId] || []
         if (!keys.length) continue
-        // Nom incluant le produit du plan (pas juste "Phase N") : le board Jira est partagé
-        // par TOUS les plans synchronisés dans ce projet, et sprint.sprintId repart de 1 à
-        // chaque plan (même limite que epicLabel/vlLabel plus haut) — sans ça, "Phase 1" de
-        // deux plans différents partagerait le même sprint Jira.
-        const sprintName = `${plan.product?.name || (lang === 'en' ? 'Plan' : 'Plan')} · ${lang === 'en' ? 'Phase' : 'Phase'} ${sprint.sprintId}`.slice(0, 60)
-        let sprintId = existingSprints[sprintName]
-        if (!sprintId) sprintId = await createSprint(accessToken, cloudId, boardId, sprintName, sprintStart(sprint.sprintId), sprintDue(sprint.sprintId))
+        // Nom conventionnel "Sprint N" (retour utilisateur : préfère ça à "Nom du plan ·
+        // Phase N") — l'unicité entre plans repose sur le "goal" caché (vl-sprint:<planScope>-N),
+        // jamais affiché dans le backlog, voir fetchExistingSprints ci-dessus.
+        const sprintName = `${lang === 'en' ? 'Sprint' : 'Sprint'} ${sprint.sprintId}`
+        const sprintGoal = `vl-sprint:${planScope}-${sprint.sprintId}`
+        let sprintId = existingSprints[sprintGoal]
+        if (!sprintId) sprintId = await createSprint(accessToken, cloudId, boardId, sprintName, sprintGoal, sprintStart(sprint.sprintId), sprintDue(sprint.sprintId))
         if (sprintId) await addIssuesToSprint(accessToken, cloudId, sprintId, keys)
       }
     }
