@@ -887,6 +887,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige la perte de story points Jira sur les tickets déjà Terminés',
+            items: [
+              'Un ticket Jira déjà "Terminé" refuse souvent la modification directe de ses champs personnalisés (story points inclus) hors écran de transition — la synchronisation échouait alors silencieusement sur ces champs et ne les récupérait jamais, causant un écart entre le total de points affiché dans l\'app et celui compté par Jira (ex. 50 points côté app contre 42 dans Jira après avoir redécoché plusieurs stories Terminées)',
+              'Ces champs sont maintenant automatiquement repassés via l\'écran de transition, seule voie que Jira autorise pour les éditer sur un ticket déjà clôturé',
+              'Le total de points de chaque phase est aussi désormais reporté sur l\'Epic Jira correspondante, qui n\'affichait jusqu\'ici aucune estimation malgré des stories enfants correctement chiffrées'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Resynchroniser vers Jira directement depuis le Backlog',
             items: [
               'Jusqu\'ici, pousser un simple changement de statut vers Jira obligeait à rouvrir la modale "Exporter le plan" en entier — un lien "Synchroniser vers Jira" apparaît maintenant directement dans le Backlog (à côté de celui vers Notion) dès qu\'un premier export a déjà été fait sur ce plan'
@@ -2983,6 +2992,15 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed Jira story points being lost on already-Done tickets',
+            items: [
+              'A Jira ticket already marked "Done" often rejects direct edits to its custom fields (story points included) outside of a transition screen — sync used to fail silently on these fields and never recovered them, causing a mismatch between the app\'s point total and Jira\'s (e.g. 50 points in the app vs. 42 in Jira after unchecking several Done stories)',
+              'These fields are now automatically re-applied through the transition screen — the only way Jira allows editing them on an already-closed ticket',
+              'Each phase\'s point total is now also rolled up onto its Jira Epic, which previously showed no estimate at all despite correctly-sized child stories'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Re-sync to Jira right from the Backlog',
