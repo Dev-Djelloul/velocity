@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Météo business avec une vraie tendance, Streak basé sur l\'activité réelle',
+            items: [
+              'Météo business : jusqu\'ici un simple re-habillage visuel de la Santé du portefeuille (même score, juste une icône différente) — compare désormais le score à celui d\'il y a 7 jours (historique local) pour afficher une vraie tendance ("En amélioration +12 pts", "En recul -8 pts"...)',
+              'Streak : ne compte plus juste le fait d\'avoir ouvert le Dashboard, mais un vrai jour d\'activité (plan créé, sauvegardé ou modifié) — dérivé des horodatages des plans, donc identique quel que soit l\'appareil utilisé, contrairement à l\'ancien compteur local',
+              'Les trois widgets (Santé du portefeuille, Streak, Météo business) affichent maintenant une ligne "comment c\'est calculé" directement dans leur carte'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Dashboard en thème clair sans photo de fond, bibliothèque de widgets élargie',
             items: [
               'Dashboard, thème clair : la photo de fond assombrie est remplacée par un dégradé uni clair légèrement bleuté (tons violet/bleu/cyan très pâles) — elle jurait avec un thème clair quel que soit le niveau d\'assombrissement essayé. Le titre d\'accueil et le bouton "+" widgets retrouvent une couleur adaptée à un fond clair plutôt que le blanc forcé pensé pour la photo',
@@ -1702,17 +1711,37 @@ export const translations = {
         history: { title: 'Historique des plans', desc: 'Tes plans les plus récents, un clic pour les rouvrir.' },
         gallery: { title: 'Galerie publique', desc: 'Mosaïque des couvertures de tes plans partagés.' },
         portfolioHealth: { title: 'Santé du portefeuille', desc: 'Jauge d\'avancement global de tes plans en cours.' },
-        streak: { title: 'Streak', desc: 'Nombre de jours consécutifs d\'activité sur VelocityLaunch.' },
-        businessWeather: { title: 'Météo business', desc: 'Dynamique récente de tes plans, en un coup d\'œil.' }
+        streak: { title: 'Streak', desc: 'Jours consécutifs avec au moins un plan créé ou modifié.' },
+        businessWeather: { title: 'Météo business', desc: 'Santé du portefeuille comparée à il y a 7 jours.' }
       },
       portfolioHealthTitle: 'Santé du portefeuille',
       portfolioHealthLevel: { good: 'Au beau fixe', medium: 'À surveiller', low: 'Attention requise' },
       portfolioHealthUrgent: (n) => n === 0 ? 'Aucune échéance urgente' : n === 1 ? '1 échéance urgente' : `${n} échéances urgentes`,
+      portfolioHealthExplain: 'Score = % de stories terminées, moins des points par échéance proche.',
+      portfolioHealthDetail: (doneRatio, urgentCount, soonCount) => {
+        const parts = [`${doneRatio}% terminé`]
+        if (urgentCount > 0) parts.push(`-${urgentCount * 12} pts (${urgentCount} urgente${urgentCount > 1 ? 's' : ''})`)
+        if (soonCount > 0) parts.push(`-${soonCount * 4} pts (${soonCount} bientôt)`)
+        return parts.join(' · ')
+      },
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 jour' : `${n} jours`,
       streakSubtitle: "d'activité consécutifs",
+      streakExplain: 'Un jour compte dès qu\'un plan a été créé, sauvegardé ou modifié — pas juste ouvert l\'app.',
+      streakEmpty: 'Crée ou modifie un plan pour démarrer ton streak.',
       businessWeatherTitle: 'Météo business',
-      businessWeatherLevel: { good: 'Grand soleil', medium: 'Quelques nuages', low: 'Ciel orageux' },
+      businessWeatherExplain: 'Même score que Santé du portefeuille, comparé à il y a 7 jours.',
+      businessWeatherTrend: {
+        up: (n) => `En amélioration (+${n} pts vs il y a 7 j)`,
+        down: (n) => `En recul (${n} pts vs il y a 7 j)`,
+        flat: 'Stable vs il y a 7 jours',
+        none: 'Pas encore assez d\'historique'
+      },
+      businessWeatherLevel: {
+        good_up: 'Grand soleil', good_flat: 'Grand soleil', good_down: 'Éclaircies',
+        medium_up: 'Ça se dégage', medium_flat: 'Quelques nuages', medium_down: 'Nuages qui s\'épaississent',
+        low_up: 'Éclaircie après l\'orage', low_flat: 'Ciel orageux', low_down: 'Tempête qui s\'intensifie'
+      },
       activityTitle: 'Activité récente',
       activityEmpty: 'Rien à signaler pour le moment.',
       novaSummaryTitle: 'Résumé de la semaine',
@@ -2812,6 +2841,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Business weather gets a real trend, Streak based on actual activity',
+            items: [
+              'Business weather: used to be a plain re-skin of Portfolio health (same score, just a different icon) — now compares the score to 7 days ago (local history) to show a real trend ("Improving +12 pts", "Declining -8 pts"...)',
+              'Streak: no longer counts just opening the Dashboard, but a real day of activity (plan created, saved, or edited) — derived from plan timestamps, so it\'s the same regardless of device, unlike the old local counter',
+              'All three widgets (Portfolio health, Streak, Business weather) now show a "how it\'s calculated" line right in their card'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Dashboard light theme without background photo, wider widget library',
             items: [
               'Dashboard, light theme: the darkened background photo is replaced with a plain light gradient with a soft blue tint (very pale purple/blue/cyan) — it clashed with a light theme no matter how much it was darkened. The greeting title and the "+" widgets button now use colors suited to a light background instead of the white forced for the photo',
@@ -3620,17 +3658,37 @@ export const translations = {
         history: { title: 'Plan history', desc: 'Your most recent plans, one click to reopen.' },
         gallery: { title: 'Public gallery', desc: 'A mosaic of your shared plan covers.' },
         portfolioHealth: { title: 'Portfolio health', desc: 'Overall progress gauge for your active plans.' },
-        streak: { title: 'Streak', desc: 'Number of consecutive active days on VelocityLaunch.' },
-        businessWeather: { title: 'Business weather', desc: 'Recent momentum of your plans, at a glance.' }
+        streak: { title: 'Streak', desc: 'Consecutive days with at least one plan created or edited.' },
+        businessWeather: { title: 'Business weather', desc: 'Portfolio health compared to 7 days ago.' }
       },
       portfolioHealthTitle: 'Portfolio health',
       portfolioHealthLevel: { good: 'Smooth sailing', medium: 'Worth watching', low: 'Needs attention' },
       portfolioHealthUrgent: (n) => n === 0 ? 'No urgent deadlines' : n === 1 ? '1 urgent deadline' : `${n} urgent deadlines`,
+      portfolioHealthExplain: 'Score = % of stories done, minus points for deadlines coming up soon.',
+      portfolioHealthDetail: (doneRatio, urgentCount, soonCount) => {
+        const parts = [`${doneRatio}% done`]
+        if (urgentCount > 0) parts.push(`-${urgentCount * 12} pts (${urgentCount} urgent)`)
+        if (soonCount > 0) parts.push(`-${soonCount * 4} pts (${soonCount} soon)`)
+        return parts.join(' · ')
+      },
       streakTitle: 'Streak',
       streakDays: (n) => n === 1 ? '1 day' : `${n} days`,
       streakSubtitle: 'consecutive active days',
+      streakExplain: 'A day counts once a plan has been created, saved, or edited — not just opening the app.',
+      streakEmpty: 'Create or edit a plan to start your streak.',
       businessWeatherTitle: 'Business weather',
-      businessWeatherLevel: { good: 'Clear skies', medium: 'A few clouds', low: 'Stormy' },
+      businessWeatherExplain: 'Same score as Portfolio health, compared to 7 days ago.',
+      businessWeatherTrend: {
+        up: (n) => `Improving (+${n} pts vs 7 days ago)`,
+        down: (n) => `Declining (${n} pts vs 7 days ago)`,
+        flat: 'Stable vs 7 days ago',
+        none: 'Not enough history yet'
+      },
+      businessWeatherLevel: {
+        good_up: 'Clear skies', good_flat: 'Clear skies', good_down: 'Sunny spells',
+        medium_up: 'Clearing up', medium_flat: 'A few clouds', medium_down: 'Clouds gathering',
+        low_up: 'Clearing after the storm', low_flat: 'Stormy', low_down: 'Storm intensifying'
+      },
       planStatusProEmpty: 'Pro plan active 🚀 — you\'ve got everything you need, all that\'s left is a first plan to launch.',
       planStatusProActive: 'Pro plan active 🚀 — pick up right where you left off on your plans in progress, personal or team.',
       planStatusFreeEmpty: 'Free plan active ✨ — plenty to get started with, launch your very first plan.',

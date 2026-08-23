@@ -18,8 +18,9 @@ import { loadWidgetLayout, saveWidgetLayout } from '../lib/dashboardWidgets'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
-import { computePortfolioHealth } from '../lib/portfolioHealth'
-import { recordVisitAndGetStreak } from '../lib/streakTracker'
+import { computePortfolioHealth, classifyWeather } from '../lib/portfolioHealth'
+import { computeActivityStreak } from '../lib/activityStreak'
+import { recordAndGetTrend } from '../lib/portfolioHealthHistory'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
 import createTeamImage from '../../assets/img/hiw-hero-tablets-purple.webp'
@@ -210,13 +211,23 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     ? (spaces.find(s => s.id === (lastUsedPlan.team_id ?? lastUsedPlan.createdSpaceId ?? null))?.name || personalSpace.name)
     : null
 
-  // Streak de jours d'activité consécutifs (widget "Streak", masqué par défaut — voir
-  // WIDGET_DEFAULT_HIDDEN) — un seul enregistrement par ouverture du Dashboard, aucun appel
-  // serveur.
-  const [streak, setStreak] = useState({ count: 0 })
-  useEffect(() => { if (userId) setStreak(recordVisitAndGetStreak(userId)) }, [userId])
+  // Streak de jours consécutifs avec une vraie action sur un plan (widget "Streak", masqué
+  // par défaut) — dérivé des horodatages des plans eux-mêmes (activityStreak.js), donc
+  // identique quel que soit l'appareil, contrairement à un simple compteur "j'ai ouvert le
+  // Dashboard" en localStorage.
+  const streakCount = useMemo(() => computeActivityStreak(allPlans || activePlans), [allPlans, activePlans])
 
   const portfolioHealth = useMemo(() => computePortfolioHealth(weeklyStats), [weeklyStats])
+
+  // Tendance de la Santé du portefeuille vs il y a ~7 jours (widget "Météo business",
+  // masqué par défaut) — sans historique, la météo n'était qu'un second affichage du même
+  // score sans rien y ajouter (retour utilisateur). Purement local par appareil (voir
+  // portfolioHealthHistory.js) : la seule limite de cette tendance est qu'elle ne se
+  // construit qu'au fil des ouvertures du Dashboard sur CET appareil.
+  const [healthTrend, setHealthTrend] = useState({ trend: null, previousScore: null })
+  useEffect(() => {
+    if (userId) setHealthTrend(recordAndGetTrend(userId, portfolioHealth.score))
+  }, [userId, portfolioHealth.score])
 
   const [libraryOpen, setLibraryOpen] = useState(false)
 
@@ -543,7 +554,9 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             // Trois nouveaux widgets (voir widgetCatalog.js) : masqués par défaut, ajoutés
             // via la bibliothèque de widgets ("+"). Dérivés des mêmes statistiques déjà
             // agrégées pour le résumé Nova / les échéances — aucune donnée ni appel
-            // supplémentaire.
+            // supplémentaire. Chacun affiche une ligne "Comment c'est calculé" dans sa
+            // propre carte (retour utilisateur) plutôt que de laisser deviner ce que le
+            // chiffre représente.
             portfolioHealth: (
               <div className="dashboard-widget-card dashboard-portfolio-health-widget">
                 <div className="dashboard-widget-header">
@@ -566,6 +579,10 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 </div>
                 <p className="dashboard-health-label">{t(lang, `dashboard.portfolioHealthLevel.${portfolioHealth.level}`)}</p>
                 <p className="dashboard-health-sub">{t(lang, 'dashboard.portfolioHealthUrgent')(portfolioHealth.urgentCount)}</p>
+                <p className="dashboard-widget-detail">
+                  {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount)}
+                </p>
+                <p className="dashboard-widget-explain">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
               </div>
             ),
             streak: (
@@ -576,23 +593,36 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 </div>
                 <div className="dashboard-streak-body">
                   {gradientIcon(<IconFlame width={32} height={32} />)}
-                  <span className="dashboard-streak-count">{t(lang, 'dashboard.streakDays')(streak.count)}</span>
+                  <span className="dashboard-streak-count">{t(lang, 'dashboard.streakDays')(streakCount)}</span>
                 </div>
-                <p className="dashboard-health-sub">{t(lang, 'dashboard.streakSubtitle')}</p>
+                <p className="dashboard-health-sub">
+                  {streakCount > 0 ? t(lang, 'dashboard.streakSubtitle') : t(lang, 'dashboard.streakEmpty')}
+                </p>
+                <p className="dashboard-widget-explain">{t(lang, 'dashboard.streakExplain')}</p>
               </div>
             ),
-            businessWeather: (
-              <div className={`dashboard-widget-card dashboard-weather-widget is-${portfolioHealth.level}`}>
-                <div className="dashboard-widget-header">
-                  {gradientIcon(<IconCloudSun width={16} height={16} />)}
-                  <h3>{t(lang, 'dashboard.businessWeatherTitle')}</h3>
+            businessWeather: (() => {
+              const weather = classifyWeather(portfolioHealth.level, healthTrend.trend)
+              const trendText = healthTrend.trend == null
+                ? t(lang, 'dashboard.businessWeatherTrend.none')
+                : weather.trendDir === 'flat'
+                  ? t(lang, 'dashboard.businessWeatherTrend.flat')
+                  : t(lang, `dashboard.businessWeatherTrend.${weather.trendDir}`)(healthTrend.trend)
+              return (
+                <div className={`dashboard-widget-card dashboard-weather-widget is-${portfolioHealth.level}`}>
+                  <div className="dashboard-widget-header">
+                    {gradientIcon(<IconCloudSun width={16} height={16} />)}
+                    <h3>{t(lang, 'dashboard.businessWeatherTitle')}</h3>
+                  </div>
+                  <div className="dashboard-weather-body">
+                    {gradientIcon(<IconCloudSun width={32} height={32} />)}
+                    <span className="dashboard-weather-label">{t(lang, `dashboard.businessWeatherLevel.${weather.key}`)}</span>
+                  </div>
+                  <p className={`dashboard-widget-detail dashboard-weather-trend is-${weather.trendDir}`}>{trendText}</p>
+                  <p className="dashboard-widget-explain">{t(lang, 'dashboard.businessWeatherExplain')}</p>
                 </div>
-                <div className="dashboard-weather-body">
-                  {gradientIcon(<IconCloudSun width={32} height={32} />)}
-                  <span className="dashboard-weather-label">{t(lang, `dashboard.businessWeatherLevel.${portfolioHealth.level}`)}</span>
-                </div>
-              </div>
-            )
+              )
+            })()
           }}
         />
       )}

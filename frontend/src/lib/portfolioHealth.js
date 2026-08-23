@@ -15,5 +15,16 @@ export function computePortfolioHealth(weeklyStats) {
   score = Math.max(0, Math.min(100, score))
 
   const level = score >= 70 ? 'good' : score >= 40 ? 'medium' : 'low'
-  return { score, level, urgentCount, soonCount }
+  return { score, level, doneRatio, urgentCount, soonCount }
+}
+
+// Classe le niveau (bon/moyen/faible) ET la tendance (hausse/stable/baisse vs il y a ~7
+// jours) en un seul état météo — sans la tendance, "Météo business" n'était qu'un second
+// affichage du même score que la jauge de santé, sans rien y ajouter (retour utilisateur).
+// `trend` est un delta de score (ou null si aucun historique encore disponible pour cet
+// appareil — voir portfolioHealthHistory.js) ; ±5 points sert de seuil de "stable" pour
+// ignorer le bruit d'un score qui oscille de 1-2 points d'une visite à l'autre.
+export function classifyWeather(level, trend) {
+  const trendDir = trend == null ? 'flat' : trend > 5 ? 'up' : trend < -5 ? 'down' : 'flat'
+  return { level, trendDir, key: `${level}_${trendDir}` }
 }
