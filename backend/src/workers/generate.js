@@ -2,6 +2,7 @@ import { generateRoadmap, reconcileRoadmapCosts } from '../lib/generator/roadmap
 import { generateMarketingStrategy } from '../lib/generator/marketingStrategyGenerator'
 import { calculateKPIs } from '../lib/generator/kpiCalculator'
 import { generateFinancials, generateStrategyToolkit, generateExecutiveSummary, reconcileFinancialsWithMarketing } from '../lib/generator/extendedGenerator'
+import { BUDGET } from '../lib/generator/budgetTiers'
 import { generatePersona, classifyProduct, classificationLabel } from '../lib/engine'
 import { generatePlanWithAI } from '../lib/ai/client'
 import { recordUsage } from '../lib/ai/usageTracker'
@@ -323,7 +324,8 @@ export default {
         // prévisionnel et le coût des stories cohérents avec le budget déclaré, mais une
         // instruction de prompt n'est jamais une garantie — recalés après coup.
         if (generated.financials && generated.marketing?.totalBudget != null) {
-          generated = { ...generated, financials: reconcileFinancialsWithMarketing(generated.financials, generated.marketing.totalBudget) }
+          const launchBudget = BUDGET[data.resources?.totalBudget] ?? BUDGET[data.resources?.budgetEur] ?? 5000
+          generated = { ...generated, financials: reconcileFinancialsWithMarketing(generated.financials, generated.marketing.totalBudget, launchBudget) }
         }
         if (generated.roadmap) {
           generated = { ...generated, roadmap: reconcileRoadmapCosts(generated.roadmap, data.resources) }

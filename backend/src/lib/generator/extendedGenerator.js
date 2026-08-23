@@ -7,6 +7,35 @@ import { BUDGET } from './budgetTiers'
 const TIMELINE_WEEKS = { w2: 2, w4: 4, w8: 8, w12: 12, w16: 16, w26: 26, w36: 36, w52: 52 }
 const ARPU_BY_MODEL = { b2b: 99, b2c: 15, hybrid: 40 }
 
+// Postes de dépense du budget de lancement (hors marketing, additif — voir generateFinancials)
+// — les poids somment à 1 et pilotent la répartition détaillée demandée en retour utilisateur
+// (avant : seulement Développement/Opérations, jugé trop grossier).
+const COST_CATEGORY_LABELS_FR = {
+  product: 'Développement produit', design: 'Design & UX', infra: 'Infrastructure & outils',
+  ops: 'Opérations & support', legal: 'Légal & conformité', reserve: 'Réserve pour imprévus', marketing: 'Marketing'
+}
+const COST_CATEGORY_LABELS_EN = {
+  product: 'Product development', design: 'Design & UX', infra: 'Infrastructure & tools',
+  ops: 'Operations & support', legal: 'Legal & compliance', reserve: 'Contingency reserve', marketing: 'Marketing'
+}
+const COST_WEIGHTS = [
+  { key: 'product', w: 0.45 },
+  { key: 'design', w: 0.10 },
+  { key: 'infra', w: 0.10 },
+  { key: 'ops', w: 0.20 },
+  { key: 'legal', w: 0.05 },
+  { key: 'reserve', w: 0.10 }
+]
+
+// Répartit `amount` selon des poids qui somment à 1, en assignant l'écart d'arrondi à la
+// première catégorie (la plus grosse) pour que la somme retombe exactement sur `amount`.
+function distributeByWeights(amount, weights) {
+  const amounts = weights.map(x => Math.round(amount * x.w))
+  const diff = amount - amounts.reduce((s, a) => s + a, 0)
+  amounts[0] += diff
+  return amounts
+}
+
 const MODEL_LABEL = {
   fr: { b2b: 'B2B (vente à d\'autres entreprises)', b2c: 'B2C (vente directe aux particuliers)', hybrid: 'hybride B2B/B2C' },
   en: { b2b: 'B2B (selling to other businesses)', b2c: 'B2C (direct-to-consumer)', hybrid: 'hybrid B2B/B2C' }
@@ -33,17 +62,22 @@ export function generateFinancials(resources, market, lang = 'fr', marketingBudg
   const breakEvenUsers = Math.ceil(monthlyBurn / assumedArpu)
   const breakEvenMonthlyRevenue = breakEvenUsers * assumedArpu
 
-  // Le marketing de la Répartition du budget doit correspondre exactement au budget
-  // marketing réel (passé par l'appelant), pas à une part fixe de 35% du budget total
-  // calculée indépendamment — sinon les deux budgets marketing affichés divergent.
-  const marketing = Math.min(marketingBudget ?? Math.round(budget * 0.35), budget)
-  const remainder = Math.max(0, budget - marketing)
-  const product = Math.round(remainder * (0.5 / 0.65))
-  const ops = Math.max(0, remainder - product)
+  // Le marketing s'AJOUTE au budget de lancement, il n'en fait pas partie (même convention
+  // que le tableau de bord équipe : budget cumulé = budget de lancement + budget marketing,
+  // voir SpacePage.jsx) — avant ce correctif, la Répartition du budget affichait le marketing
+  // comme une part DU budget total, ce qui gonflait artificiellement les 100% affichés et
+  // sous-évaluait développement/opérations (retour utilisateur, capture à l'appui).
+  const marketing = Math.max(0, marketingBudget ?? Math.round(budget * 0.35))
+  const grandTotal = budget + marketing
+  const labels = lang === 'en' ? COST_CATEGORY_LABELS_EN : COST_CATEGORY_LABELS_FR
+  const amounts = distributeByWeights(budget, COST_WEIGHTS)
   const costBreakdown = [
-    { category: 'Développement', amount: product, pct: budget ? Math.round((product / budget) * 100) : 0 },
-    { category: 'Marketing', amount: marketing, pct: budget ? Math.round((marketing / budget) * 100) : 0 },
-    { category: 'Opérations', amount: ops, pct: budget ? Math.round((ops / budget) * 100) : 0 }
+    ...COST_WEIGHTS.map((entry, i) => ({
+      category: labels[entry.key],
+      amount: amounts[i],
+      pct: grandTotal ? Math.round((amounts[i] / grandTotal) * 100) : 0
+    })),
+    { category: labels.marketing, amount: marketing, pct: grandTotal ? Math.round((marketing / grandTotal) * 100) : 0 }
   ]
 
   const arpuRationale = arpuRationaleFor(market?.b2bVsB2c, assumedArpu, lang)
@@ -52,26 +86,28 @@ export function generateFinancials(resources, market, lang = 'fr', marketingBudg
 }
 
 // Filet de sécurité pour le plan généré par IA (planSchema.js demande déjà explicitement à
-// l'IA de garder la ligne "Marketing" cohérente avec marketing.totalBudget, mais une
-// instruction de prompt reste indicative, pas garantie) — recale costBreakdown après coup
-// pour que la ligne Marketing corresponde À COUP SÛR au budget marketing réel, quelle que
-// soit la sortie du modèle. Le reste (dev/ops) est redistribué au prorata de ce qu'il
-// avait déjà proposé, pour rester proche de sa répartition plutôt que de l'écraser.
-export function reconcileFinancialsWithMarketing(financials, marketingBudget) {
+// l'IA de garder la ligne "Marketing" cohérente avec marketing.totalBudget et de traiter le
+// marketing comme additif au budget de lancement, mais une instruction de prompt reste
+// indicative, pas garantie) — recale costBreakdown après coup pour que : (1) la ligne
+// Marketing corresponde À COUP SÛR au budget marketing réel, (2) les autres lignes somment
+// exactement au budget de lancement déclaré (launchBudget) plutôt qu'à "total - marketing",
+// qui présupposait à tort que le marketing faisait partie du budget total (retour
+// utilisateur — le marketing s'ajoute au budget de lancement, il n'en fait pas partie).
+export function reconcileFinancialsWithMarketing(financials, marketingBudget, launchBudget) {
   if (!financials?.costBreakdown?.length || marketingBudget == null) return financials
-  const total = financials.costBreakdown.reduce((s, l) => s + (l.amount || 0), 0)
   const marketingLine = financials.costBreakdown.find(l => /marketing/i.test(l.category))
-  if (!marketingLine || !total) return financials
-  const marketing = Math.min(marketingBudget, total)
   const others = financials.costBreakdown.filter(l => l !== marketingLine)
+  if (!marketingLine || !others.length) return financials
+  const marketing = Math.max(0, marketingBudget)
   const othersTotal = others.reduce((s, l) => s + (l.amount || 0), 0) || 1
-  const remainder = Math.max(0, total - marketing)
+  const targetOthers = launchBudget != null ? launchBudget : othersTotal
+  const grandTotal = targetOthers + marketing
   const nextCostBreakdown = financials.costBreakdown.map(line => {
     if (line === marketingLine) {
-      return { ...line, amount: marketing, pct: total ? Math.round((marketing / total) * 100) : 0 }
+      return { ...line, amount: marketing, pct: grandTotal ? Math.round((marketing / grandTotal) * 100) : 0 }
     }
-    const amount = Math.round(remainder * ((line.amount || 0) / othersTotal))
-    return { ...line, amount, pct: total ? Math.round((amount / total) * 100) : 0 }
+    const amount = Math.round(targetOthers * ((line.amount || 0) / othersTotal))
+    return { ...line, amount, pct: grandTotal ? Math.round((amount / grandTotal) * 100) : 0 }
   })
   return { ...financials, costBreakdown: nextCostBreakdown }
 }

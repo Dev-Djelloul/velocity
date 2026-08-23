@@ -99,7 +99,7 @@ const COST_LINE_SCHEMA = {
 
 const FINANCIALS_SCHEMA = {
   type: 'object',
-  description: 'Prévisionnel financier simplifié, chiffré à partir du BUDGET TOTAL du lancement déclaré (tous postes confondus — voir "budget total du lancement" dans le prompt), pas du budget marketing seul, et du modèle économique déclaré',
+  description: 'Prévisionnel financier simplifié, chiffré à partir du BUDGET TOTAL du lancement déclaré (voir "budget total du lancement" dans le prompt — le marketing est un budget séparé et additif, pas une part de celui-ci) et du modèle économique déclaré',
   properties: {
     monthlyBurn: { type: 'integer', description: 'Dépense mensuelle moyenne en euros sur la durée du plan, calculée à partir du budget total' },
     runwayMonths: { type: 'number', description: 'Nombre de mois que couvre le budget total déclaré à ce rythme de dépense' },
@@ -107,7 +107,7 @@ const FINANCIALS_SCHEMA = {
     arpuRationale: { type: 'string', description: 'Une phrase justifiant ce montant d\'ARPU : sur quoi il se base (modèle économique, comparables du secteur, prix perçu du marché)' },
     breakEvenUsers: { type: 'integer', description: 'Nombre de clients payants nécessaires pour couvrir le burn mensuel, au prix (ARPU) supposé' },
     breakEvenMonthlyRevenue: { type: 'integer', description: 'Revenu mensuel correspondant au seuil de rentabilité, en euros' },
-    costBreakdown: { type: 'array', items: COST_LINE_SCHEMA, description: 'Répartition du BUDGET TOTAL du lancement par poste (ex: Développement, Marketing, Opérations) — les montants doivent sommer exactement au budget total déclaré, pas au budget marketing seul ; la ligne "Marketing" doit rester cohérente avec le budget marketing déclaré séparément et avec marketing.totalBudget' }
+    costBreakdown: { type: 'array', minItems: 5, items: COST_LINE_SCHEMA, description: 'Répartition détaillée du budget par poste, au moins 5-6 lignes distinctes (ex: Développement produit, Design & UX, Infrastructure & outils, Opérations & support, Légal & conformité, Réserve pour imprévus, Marketing) — pas seulement "Développement/Marketing/Opérations". Le MARKETING S\'AJOUTE au budget de lancement, il n\'en fait PAS partie : les lignes hors Marketing doivent sommer exactement au budget total du lancement déclaré (tous postes hors marketing confondus), et la ligne "Marketing" est une ligne EN PLUS, cohérente avec le budget marketing déclaré séparément (marketing.totalBudget) ; chaque pct se calcule sur la somme budget de lancement + budget marketing (le grand total, pas le budget de lancement seul)' }
   },
   required: ['monthlyBurn', 'runwayMonths', 'assumedArpu', 'arpuRationale', 'breakEvenUsers', 'breakEvenMonthlyRevenue', 'costBreakdown']
 }

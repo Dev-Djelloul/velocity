@@ -6,9 +6,35 @@ import { TIMELINE_WEEKS } from './timelineTiers'
 
 const ARPU_BY_MODEL = { b2b: 99, b2c: 15, hybrid: 40 }
 
+// Postes de dépense du budget de lancement (hors marketing, additif — voir generateFinancials)
+// — les poids somment à 1 et pilotent la répartition détaillée demandée en retour utilisateur
+// (avant : seulement Développement/Opérations, jugé trop grossier).
 const COST_CATEGORY_LABELS = {
-  fr: { product: 'Développement', marketing: 'Marketing', ops: 'Opérations' },
-  en: { product: 'Development', marketing: 'Marketing', ops: 'Operations' }
+  fr: {
+    product: 'Développement produit', design: 'Design & UX', infra: 'Infrastructure & outils',
+    ops: 'Opérations & support', legal: 'Légal & conformité', reserve: 'Réserve pour imprévus', marketing: 'Marketing'
+  },
+  en: {
+    product: 'Product development', design: 'Design & UX', infra: 'Infrastructure & tools',
+    ops: 'Operations & support', legal: 'Legal & compliance', reserve: 'Contingency reserve', marketing: 'Marketing'
+  }
+}
+const COST_WEIGHTS = [
+  { key: 'product', w: 0.45 },
+  { key: 'design', w: 0.10 },
+  { key: 'infra', w: 0.10 },
+  { key: 'ops', w: 0.20 },
+  { key: 'legal', w: 0.05 },
+  { key: 'reserve', w: 0.10 }
+]
+
+// Répartit `amount` selon des poids qui somment à 1, en assignant l'écart d'arrondi à la
+// première catégorie (la plus grosse) pour que la somme retombe exactement sur `amount`.
+function distributeByWeights(amount, weights) {
+  const amounts = weights.map(x => Math.round(amount * x.w))
+  const diff = amount - amounts.reduce((s, a) => s + a, 0)
+  amounts[0] += diff
+  return amounts
 }
 
 const MODEL_LABEL = {
@@ -39,20 +65,21 @@ export function generateFinancials(resources, market, lang, marketingBudget) {
   const breakEvenMonthlyRevenue = breakEvenUsers * assumedArpu
 
   const labels = COST_CATEGORY_LABELS[lang] || COST_CATEGORY_LABELS.fr
-  // Le marketing de la "Répartition du budget" doit être LE MÊME chiffre que le budget
-  // marketing réel (slider Stratégie marketing / carte Budget & Délai), pas une part fixe
-  // de 35% inventée indépendamment — sinon les deux budgets marketing affichés dans le
-  // plan divergent (retour utilisateur, capture à l'appui). Le reste (dev + ops) se
-  // répartit sur ce qu'il reste du budget total, dans le même ratio relatif qu'avant
-  // (50/15, soit environ 77%/23% de ce qui reste une fois le marketing retiré).
-  const marketing = Math.min(marketingBudget ?? Math.round(budget * 0.35), budget)
-  const remainder = Math.max(0, budget - marketing)
-  const product = Math.round(remainder * (0.5 / 0.65))
-  const ops = Math.max(0, remainder - product)
+  // Le marketing s'AJOUTE au budget de lancement, il n'en fait pas partie (même convention
+  // que le tableau de bord équipe : budget cumulé = budget de lancement + budget marketing,
+  // voir SpacePage.jsx) — avant ce correctif, la Répartition du budget affichait le marketing
+  // comme une part DU budget total, ce qui gonflait artificiellement les 100% affichés et
+  // sous-évaluait développement/opérations (retour utilisateur, capture à l'appui).
+  const marketing = Math.max(0, marketingBudget ?? Math.round(budget * 0.35))
+  const grandTotal = budget + marketing
+  const amounts = distributeByWeights(budget, COST_WEIGHTS)
   const costBreakdown = [
-    { category: labels.product, amount: product, pct: budget ? Math.round((product / budget) * 100) : 0 },
-    { category: labels.marketing, amount: marketing, pct: budget ? Math.round((marketing / budget) * 100) : 0 },
-    { category: labels.ops, amount: ops, pct: budget ? Math.round((ops / budget) * 100) : 0 }
+    ...COST_WEIGHTS.map((entry, i) => ({
+      category: labels[entry.key],
+      amount: amounts[i],
+      pct: grandTotal ? Math.round((amounts[i] / grandTotal) * 100) : 0
+    })),
+    { category: labels.marketing, amount: marketing, pct: grandTotal ? Math.round((marketing / grandTotal) * 100) : 0 }
   ]
 
   const arpuRationale = arpuRationaleFor(market?.b2bVsB2c, assumedArpu, lang)

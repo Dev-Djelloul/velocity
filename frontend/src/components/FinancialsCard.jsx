@@ -3,7 +3,7 @@ import { formatMoney } from '../lib/currency'
 import { IconCoin, IconTrendingUp, IconTarget } from './Icons'
 import '../styles/FinancialsCard.css'
 
-const COST_PALETTE = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#f472b6']
+const COST_PALETTE = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#f472b6', '#facc15', '#60a5fa']
 
 export default function FinancialsCard({ financials, lang }) {
   if (!financials) return null
