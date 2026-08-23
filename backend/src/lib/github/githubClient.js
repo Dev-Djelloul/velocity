@@ -95,10 +95,16 @@ function isoDatePlusWeeks(baseIso, weeks) {
 // aucune échéance visible sur les issues GitHub, contrairement à Jira/Notion) ; posée aussi
 // en toutes lettres dans le corps de chaque issue (storyBody) pour qu'elle soit visible sans
 // avoir à ouvrir le milestone.
-async function ensureMilestone(accessToken, owner, repo, title, dueOn, cache) {
-  if (cache.has(title)) return cache.get(title)
+// `hiddenKey` (vl-sprint:<planScope>-N) sert à matcher le bon milestone dans la description
+// plutôt que par titre : le titre reste "Sprint N" pour l'affichage, mais deux plans
+// DIFFÉRENTS synchronisés dans le même dépôt partagent tous les deux un "Sprint 1" — sans
+// cet identifiant caché, le second plan mettrait à jour (mauvaise échéance, mélange
+// d'issues) le milestone du premier au lieu d'en créer un nouveau, même bug que corrigé
+// plus tôt pour les sprints natifs Jira.
+async function ensureMilestone(accessToken, owner, repo, title, hiddenKey, dueOn, cache) {
+  if (cache.has(hiddenKey)) return cache.get(hiddenKey)
   const list = await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones?state=all&per_page=100`)
-  const existing = list.ok ? (await list.json()).find(m => m.title === title) : null
+  const existing = list.ok ? (await list.json()).find(m => (m.description || '').includes(hiddenKey)) : null
   const dueOnIso = dueOn ? `${dueOn}T00:00:00Z` : undefined
   if (existing) {
     if (dueOnIso && existing.due_on !== dueOnIso) {
@@ -107,16 +113,16 @@ async function ensureMilestone(accessToken, owner, repo, title, dueOn, cache) {
         body: JSON.stringify({ due_on: dueOnIso })
       }).catch(() => {})
     }
-    cache.set(title, existing.number)
+    cache.set(hiddenKey, existing.number)
     return existing.number
   }
   const created = await ghFetch(accessToken, `/repos/${owner}/${repo}/milestones`, {
     method: 'POST',
-    body: JSON.stringify({ title, ...(dueOnIso ? { due_on: dueOnIso } : {}) })
+    body: JSON.stringify({ title, description: hiddenKey, ...(dueOnIso ? { due_on: dueOnIso } : {}) })
   })
-  if (!created.ok) { cache.set(title, null); return null }
+  if (!created.ok) { cache.set(hiddenKey, null); return null }
   const num = (await created.json()).number
-  cache.set(title, num)
+  cache.set(hiddenKey, num)
   return num
 }
 
@@ -155,6 +161,11 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
   // planStartDate (pas seulement generatedAt) : même correctif que jiraClient.js/notionClient.js
   // — c'est le champ que "Modifier la date de démarrage" (RoadmapCard) met à jour.
   const base = plan.planStartDate || plan.generatedAt
+  // Identifiant qui distingue CE plan dans le label vl-id: (voir plus bas) — même correctif
+  // que jiraClient.js/linearClient.js : story.id ("US-001"…) repart de 1 à CHAQUE plan
+  // généré, donc sans ce préfixe, un nouveau plan synchronisé dans le MÊME dépôt écraserait
+  // les issues d'un plan précédent partageant les mêmes numéros.
+  const planScope = String(plan.id || plan.generatedAt || 'plan').replace(/[^a-zA-Z0-9-]/g, '')
 
   await ensureLabel(accessToken, owner, repo, 'velocitylaunch', '9184D9')
 
@@ -164,11 +175,13 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
 
   for (const sprint of plan.roadmap?.sprints || []) {
     const milestoneTitle = `${lang === 'en' ? 'Sprint' : 'Sprint'} ${sprint.sprintId}`
+    const milestoneKey = `vl-sprint:${planScope}-${sprint.sprintId}`
     const dueOn = isoDatePlusWeeks(base, sprint.sprintId * 2)
-    const milestoneNumber = await ensureMilestone(accessToken, owner, repo, milestoneTitle, dueOn, milestoneCache)
+    const milestoneNumber = await ensureMilestone(accessToken, owner, repo, milestoneTitle, milestoneKey, dueOn, milestoneCache)
 
     for (const story of sprint.stories || []) {
-      const vlLabel = `vl-id:${story.id}`
+      const vlId = `${planScope}-${story.id}`
+      const vlLabel = `vl-id:${vlId}`
       await ensureLabel(accessToken, owner, repo, vlLabel, 'C2C3C9')
 
       const labels = ['velocitylaunch', vlLabel, `sprint-${sprint.sprintId}`, story.assignee].filter(Boolean)
@@ -179,7 +192,7 @@ export async function exportPlanToGithub(accessToken, target, plan, lang) {
         ...(milestoneNumber ? { milestone: milestoneNumber } : {})
       }
 
-      const existingNumber = managed[story.id]
+      const existingNumber = managed[vlId]
       if (existingNumber) {
         const res = await ghFetch(accessToken, `/repos/${owner}/${repo}/issues/${existingNumber}`, {
           method: 'PATCH',
