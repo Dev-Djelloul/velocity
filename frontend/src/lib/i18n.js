@@ -890,7 +890,8 @@ export const translations = {
             title: 'Corrige un bug important : l\'export GitHub pouvait écraser les issues d\'un plan précédent',
             items: [
               'Même cause que le bug déjà corrigé sur Jira/Linear : chaque plan généré repart de stories "US-001, US-002…", et l\'export GitHub ne les distinguait pas entre plans différents — synchroniser un nouveau plan dans le même dépôt pouvait mettre à jour (et écraser) les issues d\'un plan précédent partageant les mêmes numéros',
-              'Même correctif sur les Milestones GitHub, jusqu\'ici partagés par erreur entre plans dès qu\'ils portaient le même nom "Sprint N"'
+              'Même correctif sur les Milestones GitHub, jusqu\'ici partagés par erreur entre plans dès qu\'ils portaient le même nom "Sprint N"',
+              'Migration en douceur pour les plans déjà synchronisés avant ce correctif : leurs anciennes issues et Milestones sont reconnus et mis à jour au prochain sync plutôt que dupliqués'
             ]
           },
           {
@@ -1494,7 +1495,7 @@ export const translations = {
           {
             label: 'Intégrations & automatisation',
             items: [
-              'Intégrations Notion, Jira (épics, sprints natifs, story points et statuts synchronisés, assignation par membre réel), GitHub, Linear (assignation par membre réel, statuts synchronisés) et Google Calendar',
+              'Intégrations Notion, Jira (épics, sprints natifs, story points et statuts synchronisés, assignation par membre réel), GitHub (issues avec échéance via Milestone, description et date de début), Linear (assignation par membre réel, statuts synchronisés) et Google Calendar',
               "Notifications email (Resend) et Slack : génération terminée, rappel d'inactivité, résumé hebdomadaire",
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in'
             ]
@@ -1537,7 +1538,7 @@ export const translations = {
               'Centre de notifications persistant (cloche du header) pour agents IA, mentions et collaboration, avec contenu détaillé et navigation directe vers la section concernée',
               'Présence d\'équipe en temps réel : qui a un plan de l\'équipe ouvert en ce moment, visible dans le tableau de bord (carte Membres) et le menu de bascule d\'espace',
               'Tarification à 3 offres (Gratuit / Pro / Entreprise), abonnement Stripe',
-              'Intégrations Notion, Jira (épics, sprints natifs, story points et statuts synchronisés, assignation par membre réel), GitHub, Linear (assignation par membre réel, statuts synchronisés) et Google Calendar',
+              'Intégrations Notion, Jira (épics, sprints natifs, story points et statuts synchronisés, assignation par membre réel), GitHub (issues avec échéance via Milestone, description et date de début), Linear (assignation par membre réel, statuts synchronisés) et Google Calendar',
               'Notifications email (Resend) et Slack : génération terminée, rappel d\'inactivité, résumé hebdomadaire',
               'Webhooks sortants (Zapier-compatible), modèles de plan par duplication, galerie publique opt-in',
               'Export PDF, PPTX (pitch deck personnalisable), CSV, PNG, JSON, rapport de conformité investisseurs (RGPD + financier), partage par lien ou image Open Graph',
@@ -3038,7 +3039,8 @@ export const translations = {
             title: 'Fixed a major bug: GitHub export could overwrite a previous plan\'s issues',
             items: [
               'Same root cause as the bug already fixed for Jira/Linear: every generated plan restarts its stories at "US-001, US-002…", and the GitHub export never distinguished between different plans — syncing a new plan into the same repo could update (and overwrite) a previous plan\'s issues sharing the same numbers',
-              'Same fix applied to GitHub Milestones, previously shared by mistake between plans whenever they had the same "Sprint N" name'
+              'Same fix applied to GitHub Milestones, previously shared by mistake between plans whenever they had the same "Sprint N" name',
+              'Smooth migration for plans already synced before this fix: their existing issues and Milestones are recognized and updated on the next sync instead of being duplicated'
             ]
           },
           {
@@ -3642,7 +3644,7 @@ export const translations = {
           {
             label: 'Integrations & automation',
             items: [
-              'Notion, Jira (epics, native sprints, synced story points and statuses, real-member assignment), GitHub, Linear (real-member assignment, synced statuses) and Google Calendar integrations',
+              'Notion, Jira (epics, native sprints, synced story points and statuses, real-member assignment), GitHub (issues with due dates via Milestones, description and start date), Linear (real-member assignment, synced statuses) and Google Calendar integrations',
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery'
             ]
@@ -3685,7 +3687,7 @@ export const translations = {
               'Persistent notification center (header bell) for AI agents, mentions and collaboration, with detailed content and direct navigation to the relevant section',
               'Real-time team presence: who has a team plan open right now, shown in the dashboard (Members card) and the space switcher menu',
               '3-tier pricing (Free / Pro / Enterprise), Stripe subscription',
-              'Notion, Jira (epics, native sprints, synced story points and statuses, real-member assignment), GitHub, Linear (real-member assignment, synced statuses) and Google Calendar integrations',
+              'Notion, Jira (epics, native sprints, synced story points and statuses, real-member assignment), GitHub (issues with due dates via Milestones, description and start date), Linear (real-member assignment, synced statuses) and Google Calendar integrations',
               'Email (Resend) and Slack notifications: generation done, inactivity reminder, weekly digest',
               'Outbound webhooks (Zapier-compatible), plan templates via duplication, opt-in public gallery',
               'PDF, PPTX (customizable pitch deck), CSV, PNG, JSON export, investor compliance report (GDPR + financials), link sharing or dedicated Open Graph image',
