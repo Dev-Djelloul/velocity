@@ -887,6 +887,14 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Corrige les dates Jira/Notion figées à la génération initiale du plan',
+            items: [
+              'Modifier la date de démarrage du plan (RoadmapCard) met à jour un champ dédié déjà utilisé partout ailleurs (Calendrier, Gantt, Burndown) — mais les exports Jira et Notion continuaient de calculer les dates de sprints/stories à partir de la date de génération d\'origine, jamais mise à jour',
+              'Confirmé par un changement de date de démarrage passé du 22 août au 3 juin, bien reflété dans le calendrier de l\'app mais totalement ignoré à chaque synchronisation Jira'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Ajoute le vrai Sprint Jira natif (API Agile)',
             items: [
               'Jusqu\'ici le "sprint" n\'existait que via le regroupement par Phase (Epic) et un simple label — le panneau de détail d\'un ticket Jira affichait "Sprint : Aucun" malgré ce regroupement',
@@ -3001,6 +3009,14 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 23, 2026',
+            title: 'Fixed Jira/Notion dates stuck at the plan\'s original generation date',
+            items: [
+              'Changing the plan\'s start date (RoadmapCard) updates a dedicated field already used everywhere else (Calendar, Gantt, Burndown) — but Jira and Notion exports kept computing sprint/story dates from the original generation date, which never gets updated',
+              'Confirmed by moving the start date from August 22 to June 3, correctly reflected in the app\'s calendar but completely ignored on every Jira sync'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Added real native Jira Sprint support (Agile API)',
