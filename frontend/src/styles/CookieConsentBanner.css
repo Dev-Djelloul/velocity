@@ -339,6 +339,11 @@
    normal de .cookie-consent-wrap, au-dessus du bandeau — même carte, un simple séparateur
    fin marque la jointure au lieu d'un bord/ombre/rayon complet qui l'aurait fait paraître
    détachée. Pas de fond ni de flou propres : elle hérite du verre dépoli de l'enveloppe. */
+/* Plafond de hauteur + défilement interne dans TOUTES les largeurs, pas seulement sous
+   900px (retour utilisateur, capture à l'appui sur un MacBook Air 14" : la bannière
+   dépassait le haut de l'écran une fois "Paramètres" ouvert) — la bannière est ancrée en
+   bas (.cookie-consent, position:fixed bottom), donc rien ne l'empêchait de grandir plus
+   haut que le viewport une fois les 4 catégories affichées au-dessus du bandeau principal. */
 .cookie-consent-settings {
   display: flex;
   flex-direction: column;
@@ -346,6 +351,8 @@
   padding: 1.3rem 1.4rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   animation: cookieConsentSlideIn 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  max-height: min(50vh, 420px);
+  overflow-y: auto;
 }
 
 .cookie-consent-settings-head h4 {
