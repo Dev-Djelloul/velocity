@@ -1575,6 +1575,12 @@ export const translations = {
       calendarSprintLabel: (n) => `Sprint ${n}`,
       calendarMoreStories: (n) => `+ ${n} autre${n > 1 ? 's' : ''}`
     },
+    planFinancialReport: {
+      title: (name) => `Rapport financier — ${name}`,
+      grandTotal: 'Budget total (lancement + marketing)',
+      launchBudget: 'Budget de lancement',
+      marketingBudget: 'Budget marketing'
+    },
     planVersions: {
       back: 'Retour au plan',
       title: 'Bibliothèque de versions',
@@ -3304,6 +3310,12 @@ export const translations = {
       calendarLegendActiveSprint: 'Active sprint',
       calendarSprintLabel: (n) => `Sprint ${n}`,
       calendarMoreStories: (n) => `+ ${n} more`
+    },
+    planFinancialReport: {
+      title: (name) => `Financial report — ${name}`,
+      grandTotal: 'Total budget (launch + marketing)',
+      launchBudget: 'Launch budget',
+      marketingBudget: 'Marketing budget'
     },
     planVersions: {
       back: 'Back to plan',

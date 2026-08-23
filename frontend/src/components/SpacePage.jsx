@@ -11,6 +11,7 @@ import { teamColor } from './TeamAvatar'
 import { MembersPresenceRow } from './TeamPresenceAvatars'
 import AvatarPicker from './AvatarPicker'
 import InfoModal from './InfoModal'
+import PlanFinancialReportModal from './PlanFinancialReportModal'
 import teamSpaceBackground from '../../assets/img/hiw-step2-dashboard.webp'
 import teamSpaceBackgroundMobile from '../../assets/img/hiw-step2-dashboard-mobile.webp'
 import personalSpaceBackground from '../../assets/img/my-velocity-space-bg.webp'
@@ -48,6 +49,7 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [showEditPersonal, setShowEditPersonal] = useState(false)
   const [showVersionsPicker, setShowVersionsPicker] = useState(false)
   const [showBudgetDetail, setShowBudgetDetail] = useState(false)
+  const [financialReportPlan, setFinancialReportPlan] = useState(null)
   const [showPersonalAvatarPicker, setShowPersonalAvatarPicker] = useState(false)
   const [editName, setEditName] = useState('')
 
@@ -409,8 +411,8 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
         >
           <p className="unsaved-changes-body">
             {lang === 'fr'
-              ? 'Le budget total (développement, marketing, opérations) et le budget marketing (une part du budget total) de chaque plan de cet espace.'
-              : "Each plan's total budget (development, marketing, operations) and marketing budget (a share of the total) in this space."}
+              ? 'Le budget total (développement, marketing, opérations) et le budget marketing (une part du budget total) de chaque plan de cet espace — cliquez un plan pour son rapport financier détaillé.'
+              : "Each plan's total budget (development, marketing, operations) and marketing budget (a share of the total) in this space — click a plan for its detailed financial report."}
           </p>
           <div className="account-list space-detail-grid">
             {plans.map(p => {
@@ -418,7 +420,13 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
               const planMarketingBudget = p.marketing?.totalBudget || 0
               return (
                 <div key={p.id} className="account-list-item space-detail-item">
-                  <div className="account-list-item-main has-thumb space-detail-thumb-top">
+                  {/* Ouvre un rapport financier détaillé, façon feuille de finance
+                      investisseurs, plutôt que de rester une simple liste statique — retour
+                      utilisateur explicite. */}
+                  <button
+                    className="account-list-item-main has-thumb space-detail-thumb-top"
+                    onClick={() => { setShowBudgetDetail(false); setFinancialReportPlan(p) }}
+                  >
                     {p.coverImage
                       ? <img src={p.coverImage} alt="" className="account-list-item-thumb" />
                       : <div className="account-list-item-thumb account-list-item-thumb-placeholder" aria-hidden="true" />}
@@ -430,12 +438,20 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
                           : `${planLaunchBudget.toLocaleString('en-US')}€ total budget · ${planMarketingBudget.toLocaleString('en-US')}€ marketing`}
                       </span>
                     </div>
-                  </div>
+                  </button>
                 </div>
               )
             })}
           </div>
         </InfoModal>
+      )}
+
+      {financialReportPlan && (
+        <PlanFinancialReportModal
+          plan={financialReportPlan}
+          lang={lang}
+          onClose={() => setFinancialReportPlan(null)}
+        />
       )}
 
       {deleteFailed && (
