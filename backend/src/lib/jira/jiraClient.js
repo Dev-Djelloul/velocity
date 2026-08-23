@@ -10,10 +10,16 @@ const API_BASE = 'https://api.atlassian.com'
 // dans une même autorisation est accepté par Atlassian tant que l'appli déclarée sur
 // developer.atlassian.com a bien ces scopes granulaires activés dans ses permissions
 // ("Jira Software API" → Board/Sprint) — à vérifier/activer côté console développeur.
+// `read:project:jira` est INDISPENSABLE en plus de read:board-scope:jira-software : sans
+// lui, /rest/agile/1.0/board renvoie 401 "Unauthorized; scope does not match" MÊME si le
+// token contient bien read:board-scope:jira-software (confirmé en debug live : le scope
+// apparaissait dans /oauth/token/accessible-resources mais l'appel échouait quand même —
+// cause identifiée via le forum développeur Atlassian, l'API Agile exige ce scope
+// supplémentaire non documenté à côté du scope "board").
 // Un utilisateur déjà connecté AVANT cet ajout doit se reconnecter (son token actuel n'a
 // pas ces scopes) ; toutes les fonctions Agile ci-dessous sont best-effort et se taisent
 // silencieusement (repli sur le comportement précédent) tant que ce n'est pas fait.
-const SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access read:board-scope:jira-software read:sprint:jira-software write:sprint:jira-software'
+const SCOPES = 'read:jira-work write:jira-work read:jira-user offline_access read:board-scope:jira-software read:sprint:jira-software write:sprint:jira-software read:project:jira'
 
 // --- OAuth ---
 
@@ -101,11 +107,17 @@ function agileFetch(accessToken, cloudId, path, options = {}) {
 async function findScrumBoardId(accessToken, cloudId, projectKey) {
   try {
     const res = await agileFetch(accessToken, cloudId, `/board?projectKeyOrId=${encodeURIComponent(projectKey)}&maxResults=50`)
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.error('[jira-sprint] board fetch failed', res.status, await res.text())
+      return null
+    }
     const data = await res.json()
     const board = (data.values || []).find(b => b.type === 'scrum')
     return board?.id ?? null
-  } catch { return null }
+  } catch (e) {
+    console.error('[jira-sprint] board fetch threw', e?.message)
+    return null
+  }
 }
 
 // Sprints déjà présents sur ce board, indexés par leur nom exact (voir sprintNameFor plus
@@ -137,10 +149,16 @@ async function createSprint(accessToken, cloudId, boardId, name, startDate, endD
         ...(endDate ? { endDate: `${endDate}T00:00:00.000Z` } : {})
       })
     })
-    if (!res.ok) return null
+    if (!res.ok) {
+      console.error('[jira-sprint] createSprint failed', res.status, await res.text())
+      return null
+    }
     const data = await res.json()
     return data.id ?? null
-  } catch { return null }
+  } catch (e) {
+    console.error('[jira-sprint] createSprint threw', e?.message)
+    return null
+  }
 }
 
 // Affecte des issues à un sprint natif Jira (l'API limite à 50 par appel — une phase
@@ -149,12 +167,15 @@ async function addIssuesToSprint(accessToken, cloudId, sprintId, issueKeys) {
   if (!issueKeys.length) return
   try {
     for (let i = 0; i < issueKeys.length; i += 50) {
-      await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
+      const res = await agileFetch(accessToken, cloudId, `/sprint/${sprintId}/issue`, {
         method: 'POST',
         body: JSON.stringify({ issues: issueKeys.slice(i, i + 50) })
       })
+      if (!res.ok) console.error('[jira-sprint] addIssuesToSprint failed', sprintId, res.status, await res.text())
     }
-  } catch { /* best-effort */ }
+  } catch (e) {
+    console.error('[jira-sprint] addIssuesToSprint threw', e?.message)
+  }
 }
 
 export async function listProjects(accessToken, cloudId) {
