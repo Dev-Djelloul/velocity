@@ -70,8 +70,29 @@ export default function DashboardBI({ plan, lang }) {
 
   const allStories = sprints.flatMap(sp => sp.stories)
   const totalStoryEffort = allStories.reduce((s, x) => s + x.effort, 0)
-  const doneStoryEffort = allStories.filter(s => s.status === 'done').reduce((s, x) => s + x.effort, 0)
   const doneStoryCount = allStories.filter(s => s.status === 'done').length
+  const inProgressStoryCount = allStories.filter(s => s.status === 'in_progress').length
+  // "Terminé" au sens strict sous-représentait l'avancement réel : une story "en cours"
+  // valait 0, comme si elle n'avait pas été commencée (retour utilisateur). Elle compte
+  // maintenant pour la moitié de son effort — done=100%, in_progress=50%, todo=0%.
+  const progressStoryEffort = allStories.reduce((s, x) => {
+    const weight = x.status === 'done' ? 1 : x.status === 'in_progress' ? 0.5 : 0
+    return s + x.effort * weight
+  }, 0)
+
+  // Rythme réel (avancement des stories) vs rythme attendu (position dans le calendrier
+  // entre date de début et date de lancement) — permet de voir en un coup d'œil si le plan
+  // avance plus vite ou plus lentement que prévu, pas seulement "où on en est".
+  const scheduleStart = plan.planStartDate || plan.generatedAt
+  const scheduleEnd = plan.launchDate
+  let schedulePacePct = null
+  if (scheduleStart && scheduleEnd) {
+    const startMs = new Date(scheduleStart).getTime()
+    const endMs = new Date(scheduleEnd).getTime()
+    if (!Number.isNaN(startMs) && !Number.isNaN(endMs) && endMs > startMs) {
+      schedulePacePct = Math.round(Math.max(0, Math.min(100, ((Date.now() - startMs) / (endMs - startMs)) * 100)))
+    }
+  }
 
   const primaryKpi = kpis?.[0]
 
@@ -121,13 +142,32 @@ export default function DashboardBI({ plan, lang }) {
             <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
             <div className="dashboard-bi-progress-wrap">
               <CircularGauge
-                value={doneStoryEffort}
+                value={progressStoryEffort}
                 max={totalStoryEffort || 1}
-                label={t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, allStories.length)}
+                label={t(lang, 'dashboardBi.storiesCompleted')(doneStoryCount, inProgressStoryCount, allStories.length)}
               />
             </div>
           </div>
         )}
+
+        {schedulePacePct !== null && (() => {
+          const workProgressPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
+          const gap = workProgressPct - schedulePacePct
+          const verdictKey = gap >= 5 ? 'schedulePaceAhead' : gap <= -5 ? 'schedulePaceBehind' : 'schedulePaceOnTrack'
+          return (
+            <div className="dashboard-bi-tile">
+              <h4>{t(lang, 'dashboardBi.schedulePace')}</h4>
+              <p className="dashboard-bi-tile-hint">{t(lang, 'dashboardBi.schedulePaceHint')(schedulePacePct)}</p>
+              <div className="dashboard-bi-progress-wrap">
+                <CircularGauge
+                  value={workProgressPct}
+                  max={100}
+                  label={t(lang, `dashboardBi.${verdictKey}`)}
+                />
+              </div>
+            </div>
+          )
+        })()}
 
         {sprints.length > 0 && (
           <div className="dashboard-bi-tile dashboard-bi-tile-full">

@@ -326,10 +326,17 @@ export const translations = {
       kpiTargetsHint: 'D\'après le suivi post-lancement',
       costSplit: 'Répartition des coûts',
       overallProgress: 'Avancement global',
-      storiesCompleted: (done, total) => `${done}/${total} stories terminées`,
+      storiesCompleted: (done, inProgress, total) => inProgress
+        ? `${done}/${total} terminées · ${inProgress} en cours`
+        : `${done}/${total} stories terminées`,
       total: 'Total',
       totalEffort: 'Effort total',
-      monthlyBurn: 'Burn mensuel'
+      monthlyBurn: 'Burn mensuel',
+      schedulePace: 'Rythme vs calendrier',
+      schedulePaceHint: (calendarPct) => `${calendarPct}% du temps écoulé entre le début et le lancement`,
+      schedulePaceAhead: 'En avance sur le calendrier',
+      schedulePaceOnTrack: 'Dans les temps',
+      schedulePaceBehind: 'En retard sur le calendrier'
     },
     sidebar: {
       title: 'Sommaire du plan',
@@ -2037,10 +2044,17 @@ export const translations = {
       kpiTargetsHint: 'From post-launch tracking',
       costSplit: 'Cost split',
       overallProgress: 'Overall progress',
-      storiesCompleted: (done, total) => `${done}/${total} stories completed`,
+      storiesCompleted: (done, inProgress, total) => inProgress
+        ? `${done}/${total} done · ${inProgress} in progress`
+        : `${done}/${total} stories completed`,
       total: 'Total',
       totalEffort: 'Total effort',
-      monthlyBurn: 'Monthly burn'
+      monthlyBurn: 'Monthly burn',
+      schedulePace: 'Pace vs schedule',
+      schedulePaceHint: (calendarPct) => `${calendarPct}% of the time elapsed between start and launch`,
+      schedulePaceAhead: 'Ahead of schedule',
+      schedulePaceOnTrack: 'On track',
+      schedulePaceBehind: 'Behind schedule'
     },
     sidebar: {
       title: 'Plan overview',
