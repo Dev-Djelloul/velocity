@@ -74,7 +74,7 @@ function statusLabel(status, en) {
   return en ? 'To do' : 'À faire'
 }
 
-// Date = base (generatedAt) décalée de N semaines, au format YYYY-MM-DD (pour vues calendrier/timeline).
+// Date = base (planStartDate/generatedAt) décalée de N semaines, au format YYYY-MM-DD (pour vues calendrier/timeline).
 function isoDatePlusWeeks(baseIso, weeks) {
   const d = baseIso ? new Date(baseIso) : new Date()
   if (isNaN(d.getTime())) return null
@@ -147,7 +147,10 @@ async function createDatabaseWithRows(accessToken, parentPageId, titleText, prop
 async function buildDatabases(accessToken, parentPageId, plan, lang) {
   const en = lang === 'en'
   const _ = (fr, eng) => (en ? eng : fr)
-  const base = plan.generatedAt
+  // planStartDate (pas seulement generatedAt) : même correctif que jiraClient.js — c'est le
+  // champ que "Modifier la date de démarrage" (RoadmapCard) met à jour, jamais generatedAt
+  // qui ne change plus après la génération initiale du plan.
+  const base = plan.planStartDate || plan.generatedAt
 
   // Roadmap → base de tâches (Date = début du sprint : 2 semaines/sprint)
   if (plan.roadmap?.sprints?.length) {
