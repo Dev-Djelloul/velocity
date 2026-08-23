@@ -104,39 +104,6 @@ export default function DashboardBI({ plan, lang }) {
       </div>
 
       <div className="dashboard-bi-grid">
-        {budgetSegments.length > 0 && (
-          <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.budgetByChannel')}</h4>
-            <Donut
-              segments={budgetSegments}
-              centerValue={formatMoney(marketing.totalBudget)}
-              centerLabel={t(lang, 'dashboardBi.total')}
-            />
-          </div>
-        )}
-
-        {workloadSegments.length > 0 && (
-          <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.workloadByRole')}</h4>
-            <Donut
-              segments={workloadSegments}
-              centerValue={`${Object.values(workloadMap).reduce((a, b) => a + b, 0)}pts`}
-              centerLabel={t(lang, 'dashboardBi.totalEffort')}
-            />
-          </div>
-        )}
-
-        {financials && (
-          <div className="dashboard-bi-tile">
-            <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
-            <Donut
-              segments={financials.costBreakdown.map(c => ({ name: c.category, value: c.amount, display: `${c.pct}%` }))}
-              centerValue={formatMoney(financials.monthlyBurn)}
-              centerLabel={t(lang, 'dashboardBi.monthlyBurn')}
-            />
-          </div>
-        )}
-
         {allStories.length > 0 && (
           <div className="dashboard-bi-tile">
             <h4>{t(lang, 'dashboardBi.overallProgress')}</h4>
@@ -173,6 +140,39 @@ export default function DashboardBI({ plan, lang }) {
             </div>
           )
         })()}
+
+        {workloadSegments.length > 0 && (
+          <div className="dashboard-bi-tile">
+            <h4>{t(lang, 'dashboardBi.workloadByRole')}</h4>
+            <Donut
+              segments={workloadSegments}
+              centerValue={`${Object.values(workloadMap).reduce((a, b) => a + b, 0)}pts`}
+              centerLabel={t(lang, 'dashboardBi.totalEffort')}
+            />
+          </div>
+        )}
+
+        {financials && (
+          <div className="dashboard-bi-tile">
+            <h4>{t(lang, 'dashboardBi.costSplit')}</h4>
+            <Donut
+              segments={financials.costBreakdown.map(c => ({ name: c.category, value: c.amount, display: `${c.pct}%` }))}
+              centerValue={formatMoney(financials.monthlyBurn)}
+              centerLabel={t(lang, 'dashboardBi.monthlyBurn')}
+            />
+          </div>
+        )}
+
+        {budgetSegments.length > 0 && (
+          <div className="dashboard-bi-tile">
+            <h4>{t(lang, 'dashboardBi.budgetByChannel')}</h4>
+            <Donut
+              segments={budgetSegments}
+              centerValue={formatMoney(marketing.totalBudget)}
+              centerLabel={t(lang, 'dashboardBi.total')}
+            />
+          </div>
+        )}
 
         {sprints.length > 0 && (
           <div className="dashboard-bi-tile dashboard-bi-tile-full">
