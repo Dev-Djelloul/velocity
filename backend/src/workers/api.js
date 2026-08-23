@@ -16,6 +16,7 @@ import { generateRgpdFallback } from '../lib/generator/rgpdFallback'
 import { AGENT_RUNNERS } from '../lib/ai/agentClient'
 import { runCopilotChat } from '../lib/ai/copilotClient'
 import { generateDailyTip } from '../lib/ai/dailyTipClient'
+import { generateWeeklySummary } from '../lib/ai/weeklySummaryClient'
 import { buildAuthorizeUrl, exchangeCode, createPlanPage, syncStoriesToNotion } from '../lib/notion/notionClient'
 import * as jira from '../lib/jira/jiraClient'
 import * as linear from '../lib/linear/linearClient'
@@ -200,6 +201,23 @@ export async function handleApi(request, env, url) {
     } catch (err) {
       if (cached) return json(cached)
       return json({ error: 'tip_generation_failed' }, 502)
+    }
+  }
+
+  // Résumé hebdomadaire cross-plans pour la carte "Nova" du Dashboard principal (voir
+  // dashboard.resumeSquare / DashboardWeeklySummary.jsx) — Pro uniquement, comme
+  // l'agrégation cross-espaces elle-même (fetchAllPlansAggregated côté client, dont ces
+  // stats sont dérivées) : en gratuit il n'y a de toute façon qu'un seul espace visible.
+  if (pathname === '/weekly-summary' && method === 'POST') {
+    const body = await request.json().catch(() => ({}))
+    const { userId, lang, stats } = body
+    if (!userId) return json({ error: 'userId required' }, 400)
+    if (!(await db.getCredits(env, userId)).isPro) return json({ error: 'pro_required' }, 403)
+    try {
+      const result = await generateWeeklySummary(env, { stats, lang })
+      return json({ summary: result.summary })
+    } catch {
+      return json({ error: 'weekly_summary_failed' }, 502)
     }
   }
 

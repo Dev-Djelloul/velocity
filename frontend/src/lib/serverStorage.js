@@ -81,6 +81,17 @@ export function fetchDailyTip() {
   return safeFetch('/tip-of-the-day')
 }
 
+// Résumé hebdomadaire cross-plans (carte Nova du Dashboard) — envoie uniquement des
+// statistiques déjà agrégées côté client, jamais les plans complets (voir
+// weeklySummaryClient.js côté backend).
+export function fetchWeeklySummary(userId, lang, stats) {
+  return safeFetch('/weekly-summary', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ userId, lang, stats })
+  })
+}
+
 // Historique multi-fils du copilote Nova (voir CopilotChat.jsx) — un fil par conversation
 // distincte, contrairement à l'ancien plan.copilotHistory qui n'en gardait qu'une seule.
 export function fetchCopilotConversations(planId) {

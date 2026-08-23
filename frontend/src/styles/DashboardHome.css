@@ -203,6 +203,119 @@
   transform: scale(1.04);
 }
 
+/* Rangée des nouveaux widgets (activité + résumé Nova), tout en haut de la page — avant
+   même "Bonjour X" — pour qu'ils soient la première chose vue en arrivant, plutôt que
+   noyés plus bas dans la colonne calendrier. */
+.dashboard-top-widgets {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+@media (max-width: 860px) {
+  .dashboard-top-widgets {
+    grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-activity-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.dashboard-activity-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1.4rem 0.5rem 0.6rem;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-text-primary);
+  cursor: pointer;
+}
+
+.dashboard-activity-item:hover {
+  background: rgba(145, 132, 217, 0.1);
+}
+
+.dashboard-activity-item.is-unread {
+  background: rgba(6, 182, 212, 0.1);
+  border-left: 2px solid #06b6d4;
+}
+
+.dashboard-activity-item-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.dashboard-activity-item-detail {
+  font-size: 0.7rem;
+  color: var(--color-text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-activity-item-date {
+  font-size: 0.66rem;
+  color: var(--color-text-muted);
+}
+
+.dashboard-activity-item-dot {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.5rem;
+  color: #06b6d4;
+}
+
+.dashboard-activity-empty {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.dashboard-nova-card {
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-nova-intro,
+.dashboard-nova-summary {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+  flex: 1;
+}
+
+.dashboard-nova-summary {
+  color: var(--color-text-primary);
+}
+
+.dashboard-nova-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.75rem;
+  margin-top: auto;
+}
+
+.dashboard-nova-spin {
+  animation: dashboard-nova-spin 1s linear infinite;
+}
+
+@keyframes dashboard-nova-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Rangée maître : titre + cartes d'espace à gauche, widgets (calendrier, échéances) à
    droite — demandé explicitement pour que la colonne widgets démarre au même niveau que le
    titre "Bonjour" tout en haut, pas seulement au niveau des cartes d'espace en dessous (le
@@ -290,9 +403,14 @@
     linear-gradient(135deg, rgba(145, 132, 217, 0.25) 0%, rgba(99, 102, 241, 0.25) 55%, rgba(6, 182, 212, 0.25) 100%) border-box;
 }
 
+/* 0.42 d'opacité était calibré pour l'ancien fond de page en mode clair, presque pas
+   assombri (brightness 0.98) — depuis qu'il l'est nettement plus (cf. .dashboard-home-bg
+   ci-dessus), ce voile trop transparent laissait passer le fond sombre en dessous et
+   rendait les chiffres du calendrier quasi illisibles (retour utilisateur). Bien plus
+   opaque désormais, pour rester lisible quelle que soit l'image en dessous. */
 [data-theme="light"] .dashboard-calendar-card {
   background:
-    linear-gradient(rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0.42)) padding-box,
+    linear-gradient(rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0.88)) padding-box,
     linear-gradient(135deg, rgba(145, 132, 217, 0.25) 0%, rgba(99, 102, 241, 0.25) 55%, rgba(6, 182, 212, 0.25) 100%) border-box;
 }
 

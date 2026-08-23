@@ -1194,6 +1194,7 @@ export default function App() {
             onOpenGallery={() => { setCurrentPage('gallery'); window.scrollTo(0, 0) }}
             onCreateTeam={() => setShowCreateTeam(true)}
             onLoadPlan={handleOpenPlanFromHistory}
+            onOpenActivity={handleOpenNotification}
           />
         )}
         {currentPage === 'account' && isSignedIn && (

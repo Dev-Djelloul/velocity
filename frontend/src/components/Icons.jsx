@@ -102,6 +102,23 @@ export function IconTrendingUp(props) {
   )
 }
 
+export function IconRotateCw(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M21 12a9 9 0 1 1-3-6.7" />
+      <path d="M21 4v5h-5" />
+    </svg>
+  )
+}
+
+export function IconActivity(props) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M3 12h4l2 8 4-16 2 8h6" />
+    </svg>
+  )
+}
+
 export function IconSparkle(props) {
   return (
     <svg {...base} {...props}>

@@ -9,6 +9,8 @@ import { formatDateNumericShort } from '../lib/dateFormat'
 import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import DashboardCalendar from './DashboardCalendar'
+import DashboardActivityFeed from './DashboardActivityFeed'
+import DashboardWeeklySummary from './DashboardWeeklySummary'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
 import { fetchDailyTip } from '../lib/serverStorage'
@@ -54,7 +56,7 @@ function gradientIcon(icon) {
 // L'agrégation cross-espaces (compteurs de plans par équipe) est réservée Pro, comme
 // partout ailleurs dans l'app (voir AccountPage "Historique de tous les plans") — en
 // gratuit, chaque carte reste un simple raccourci sans statistiques.
-export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenAccount, onOpenGallery, onCreateTeam, onLoadPlan }) {
+export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenAccount, onOpenGallery, onCreateTeam, onLoadPlan, onOpenActivity }) {
   const team = useTeam()
   const { user } = useUser()
   const { userId } = useAuth()
@@ -113,6 +115,32 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   const dailyTip = aiTip ? (lang === 'en' ? aiTip.tipEn : aiTip.tipFr) : getDailyTip(lang)
 
   const deadlines = useMemo(() => getUpcomingDeadlines(allPlans || activePlans), [allPlans, activePlans])
+
+  // Statistiques agrégées envoyées à Nova pour le résumé hebdomadaire (voir
+  // DashboardWeeklySummary.jsx) — jamais les plans complets, seulement des chiffres déjà
+  // disponibles côté client (comptage de stories par statut, échéances déjà calculées).
+  const weeklyStats = useMemo(() => {
+    const pool = allPlans || activePlans
+    let done = 0, inProgress = 0, todo = 0
+    pool.forEach(p => {
+      (p.roadmap?.sprints || []).forEach(sp => {
+        (sp.stories || []).forEach(s => {
+          if (s.status === 'done') done++
+          else if (s.status === 'in_progress') inProgress++
+          else todo++
+        })
+      })
+    })
+    return {
+      planCount: pool.length,
+      storiesDone: done,
+      storiesInProgress: inProgress,
+      storiesTodo: todo,
+      upcomingDeadlines: deadlines.slice(0, 5).map(d => ({
+        name: d.name, kind: d.kind, daysUntil: daysUntil(d.date)
+      }))
+    }
+  }, [allPlans, activePlans, deadlines])
 
   // Dernier plan touché, tous espaces confondus (personnel + équipes, quand l'agrégation
   // Pro est disponible ; sinon juste l'espace actif) — pour la carte "Reprendre" qui évite
@@ -197,6 +225,16 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
         aria-hidden="true"
       />
       <div className="dashboard-home">
+      {/* Nouveaux widgets tout en haut de page, avant même le "Bonjour X" — c'est la
+          première chose vue en arrivant sur le dashboard, avant de dérouler vers les
+          espaces et le calendrier. Activité toujours visible ; résumé Nova réservé Pro
+          (même restriction que l'agrégation cross-espaces dont ses statistiques dérivent). */}
+      {userId && (
+        <div className="dashboard-top-widgets">
+          <DashboardActivityFeed userId={userId} lang={lang} onOpen={onOpenActivity} />
+          {pro && <DashboardWeeklySummary userId={userId} lang={lang} stats={weeklyStats} />}
+        </div>
+      )}
       <div className="dashboard-home-row">
       <div className="dashboard-home-left">
       <div className="dashboard-home-header">
