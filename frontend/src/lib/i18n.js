@@ -883,6 +883,17 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Cartes de lien avec favicon sur Veille, Benchmarks, RGPD et le calendrier GTM',
+            items: [
+              'Ces quatre sections générées par IA ne pointaient vers aucun vrai lien externe (RGPD réutilisait une liste statique de 4 liens strictement identique à chaque plan) — remplacé par de vraies cartes de lien (favicon + titre + domaine) vers des sites réels, différentes à chaque génération',
+              'RGPD : le pool de ressources officielles passe de 4 à 10 (CNIL, EDPB, EUR-Lex, IAPP, ANSSI...), dont 5 sont tirées différemment selon le plan',
+              'Veille : le champ "sources" devient de vrais liens cliquables plutôt que de simples étiquettes de texte',
+              'Benchmarks : nouvelle section "Pour aller plus loin" avec 3 à 5 références sectorielles réelles',
+              'Calendrier GTM (éditorial + publicitaire) : le nom du canal (LinkedIn, Google Ads, TikTok Ads...) devient un lien cliquable vers la plateforme officielle'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Dashboard en widgets déplaçables et redimensionnables façon macOS',
             items: [
               'Le Dashboard principal passe entièrement en widgets indépendants — calendrier, prochaines échéances, activité récente, résumé Nova, "Reprendre", une carte par espace (personnel + équipes), "Créer une équipe", "Voir tout l\'historique" et "Galerie publique" : glisser-déposer pour réordonner, clic droit → Petit/Moyen/Grand pour redimensionner — même interaction que le centre de notifications ou le bureau macOS. Disposition mémorisée par utilisateur, qui s\'adapte automatiquement si le nombre d\'équipes change.',
@@ -1241,7 +1252,7 @@ export const translations = {
               'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
               'Carte "Budget & Délai" : budget total et délai de lancement éditables, source unique qui pilote le prévisionnel financier, le plafond du budget marketing et la carte d\'identité du plan, avec reconstruction possible de la roadmap depuis le nouveau délai',
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
-              'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
+              'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique et de vraies cartes de lien vers des sources externes (favicon inclus), différentes à chaque plan',
               'Suivi post-lancement & simulateur budget/timeline en direct',
               'Rapport financier par plan façon feuille investisseurs (depuis "Budget cumulé" en espace d\'équipe) : budgets clés en en-tête, burn/runway, seuil de rentabilité avec justification ARPU, répartition des coûts par poste, export dédié en PDF, Word et HTML',
               'Rapport investisseurs (export PDF du plan complet) : checklist RGPD avec de vraies cases à cocher interactives (cochables dans Acrobat/Preview), pas de simples symboles'
@@ -1296,7 +1307,7 @@ export const translations = {
               'Collaboration en temps réel sur la roadmap et le backlog (fusion automatique des éditions concurrentes, présence de qui a le plan ouvert)',
               'Budget marketing et budget total du lancement distincts, prévisionnel financier associé',
               'Stratégie marketing, KPIs personnalisés, dashboard BI et tableaux générés par IA',
-              'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique',
+              'Veille, benchmarks, calendriers éditorial/pub et conformité RGPD générés à la demande, avec veille hebdomadaire automatique et de vraies cartes de lien vers des sources externes (favicon inclus), différentes à chaque plan',
               'Suivi post-lancement & simulateur budget/timeline en direct',
               'Agents IA asynchrones (brief d\'exécution, recalcul KPIs, analyse des risques, optimisation budgétaire, auto-scheduling dynamique, priorisation par signaux externes)',
               'Espaces d\'équipe (Clerk Organizations), commentaires avec @mentions, fil d\'activité par plan, tags transversaux',
@@ -2717,6 +2728,17 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Favicon link cards on Market Watch, Benchmarks, GDPR and the GTM calendar',
+            items: [
+              'These four AI-generated sections never linked to any real external site (GDPR reused a static list of 4 links, strictly identical on every plan) — replaced with real link cards (favicon + title + domain) to real websites, different on every generation',
+              'GDPR: the official resource pool grows from 4 to 10 (CNIL, EDPB, EUR-Lex, IAPP, ANSSI...), 5 of which are drawn differently per plan',
+              'Market watch: the "sources" field becomes real clickable links instead of plain text tags',
+              'Benchmarks: new "Go further" section with 3 to 5 real industry references',
+              'GTM calendar (editorial + advertising): the channel name (LinkedIn, Google Ads, TikTok Ads...) becomes a clickable link to the official platform'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Dashboard as movable, resizable macOS-style widgets',
             items: [
               'The main Dashboard moves entirely to independent widgets — calendar, upcoming deadlines, recent activity, Nova summary, "Resume", one card per space (personal + teams), "Create a team", "View full history" and "Public gallery": drag and drop to reorder, right-click → Small/Medium/Large to resize — the same interaction as the macOS notification center or desktop. Layout saved per user, adapting automatically as the number of teams changes.',
@@ -3075,7 +3097,7 @@ export const translations = {
               'Distinct marketing budget and total launch budget, with an associated financial forecast',
               '"Budget & Timeline" card: editable total budget and launch timeline, single source driving the financial forecast, the marketing budget cap and the plan\'s identity card, with an option to rebuild the roadmap from the new timeline',
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
-              'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
+              'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch and real link cards to external sources (favicon included), different for every plan',
               'Post-launch tracking & live budget/timeline simulator',
               'Per-plan financial report in investor-sheet style (from "Combined budget" in team spaces): key budgets up top, burn/runway, break-even with ARPU rationale, cost breakdown by category, dedicated PDF, Word and HTML export',
               'Investor report (full-plan PDF export): GDPR checklist with real interactive checkboxes (checkable in Acrobat/Preview), not plain symbols'
@@ -3130,7 +3152,7 @@ export const translations = {
               'Real-time collaboration on the roadmap and backlog (concurrent edits merge automatically, presence shows who has the plan open)',
               'Distinct marketing budget and total launch budget, with an associated financial forecast',
               'Marketing strategy, custom KPIs, BI dashboard and AI-generated tables',
-              'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch',
+              'On-demand AI-generated market watch, benchmarks, editorial/ad calendars and GDPR compliance, with automatic weekly market watch and real link cards to external sources (favicon included), different for every plan',
               'Post-launch tracking & live budget/timeline simulator',
               'Asynchronous AI agents (execution brief, KPI recalculation, risk analysis, budget optimization, dynamic auto-scheduling, external signal prioritization)',
               'Team spaces (Clerk Organizations), comments with @mentions, per-plan activity feed, cross-cutting tags',
