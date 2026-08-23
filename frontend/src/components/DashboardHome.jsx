@@ -580,7 +580,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 <p className="dashboard-health-label">{t(lang, `dashboard.portfolioHealthLevel.${portfolioHealth.level}`)}</p>
                 <p className="dashboard-health-sub">{t(lang, 'dashboard.portfolioHealthUrgent')(portfolioHealth.urgentCount)}</p>
                 <p className="dashboard-widget-detail">
-                  {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount)}
+                  {t(lang, 'dashboard.portfolioHealthDetail')(Math.round(portfolioHealth.doneRatio * 100), portfolioHealth.urgentCount, portfolioHealth.soonCount, portfolioHealth.urgentPenalty, portfolioHealth.soonPenalty)}
                 </p>
                 <p className="dashboard-widget-explain">{t(lang, 'dashboard.portfolioHealthExplain')}</p>
               </div>

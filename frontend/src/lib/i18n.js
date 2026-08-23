@@ -884,6 +884,15 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
+            title: 'Santé du portefeuille : pénalité d\'échéance proportionnelle au nombre de plans',
+            items: [
+              'La pénalité retirée pour une échéance urgente/proche était un forfait fixe (-12/-4 pts par échéance), identique qu\'on ait 1 seul plan en cours ou un portefeuille de 10 — 2 échéances urgentes suffisaient à écraser un score autrement excellent',
+              'Devient proportionnelle au nombre de plans (échéances / plans, plafonné), avec un budget de points max par catégorie plutôt qu\'un montant fixe : 1 urgence sur 1 plan reste sévèrement pénalisée, la même urgence sur 10 plans beaucoup moins',
+              'Le détail affiché dans la carte reflète maintenant les points réellement retirés, pas le forfait fixe d\'avant'
+            ]
+          },
+          {
+            date: '23 août 2026',
             title: 'Météo business avec une vraie tendance, Streak basé sur l\'activité réelle',
             items: [
               'Météo business : jusqu\'ici un simple re-habillage visuel de la Santé du portefeuille (même score, juste une icône différente) — compare désormais le score à celui d\'il y a 7 jours (historique local) pour afficher une vraie tendance ("En amélioration +12 pts", "En recul -8 pts"...)',
@@ -1717,11 +1726,11 @@ export const translations = {
       portfolioHealthTitle: 'Santé du portefeuille',
       portfolioHealthLevel: { good: 'Au beau fixe', medium: 'À surveiller', low: 'Attention requise' },
       portfolioHealthUrgent: (n) => n === 0 ? 'Aucune échéance urgente' : n === 1 ? '1 échéance urgente' : `${n} échéances urgentes`,
-      portfolioHealthExplain: 'Score = % de stories terminées, moins des points par échéance proche.',
-      portfolioHealthDetail: (doneRatio, urgentCount, soonCount) => {
+      portfolioHealthExplain: 'Score = % de stories terminées, moins des points par échéance proche (pénalité proportionnelle au nombre de plans).',
+      portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
         const parts = [`${doneRatio}% terminé`]
-        if (urgentCount > 0) parts.push(`-${urgentCount * 12} pts (${urgentCount} urgente${urgentCount > 1 ? 's' : ''})`)
-        if (soonCount > 0) parts.push(`-${soonCount * 4} pts (${soonCount} bientôt)`)
+        if (urgentPenalty > 0) parts.push(`-${urgentPenalty} pts (${urgentCount} urgente${urgentCount > 1 ? 's' : ''})`)
+        if (soonPenalty > 0) parts.push(`-${soonPenalty} pts (${soonCount} bientôt)`)
         return parts.join(' · ')
       },
       streakTitle: 'Streak',
@@ -2841,6 +2850,15 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
+            title: 'Portfolio health: deadline penalty now scales with your number of plans',
+            items: [
+              'The points removed for an urgent/upcoming deadline used to be a flat amount (-12/-4 pts per deadline), the same whether you had 1 plan in progress or a 10-plan portfolio — 2 urgent deadlines were enough to crush an otherwise excellent score',
+              'Now scales with your number of plans (deadlines / plans, capped), with a max point budget per category instead of a flat amount per deadline: 1 urgent deadline on 1 plan still hits hard, the same urgency across 10 plans much less so',
+              'The detail shown in the card now reflects the points actually removed, not the old flat amount'
+            ]
+          },
+          {
+            date: 'August 23, 2026',
             title: 'Business weather gets a real trend, Streak based on actual activity',
             items: [
               'Business weather: used to be a plain re-skin of Portfolio health (same score, just a different icon) — now compares the score to 7 days ago (local history) to show a real trend ("Improving +12 pts", "Declining -8 pts"...)',
@@ -3664,11 +3682,11 @@ export const translations = {
       portfolioHealthTitle: 'Portfolio health',
       portfolioHealthLevel: { good: 'Smooth sailing', medium: 'Worth watching', low: 'Needs attention' },
       portfolioHealthUrgent: (n) => n === 0 ? 'No urgent deadlines' : n === 1 ? '1 urgent deadline' : `${n} urgent deadlines`,
-      portfolioHealthExplain: 'Score = % of stories done, minus points for deadlines coming up soon.',
-      portfolioHealthDetail: (doneRatio, urgentCount, soonCount) => {
+      portfolioHealthExplain: 'Score = % of stories done, minus points for deadlines coming up soon (penalty scaled to your number of plans).',
+      portfolioHealthDetail: (doneRatio, urgentCount, soonCount, urgentPenalty, soonPenalty) => {
         const parts = [`${doneRatio}% done`]
-        if (urgentCount > 0) parts.push(`-${urgentCount * 12} pts (${urgentCount} urgent)`)
-        if (soonCount > 0) parts.push(`-${soonCount * 4} pts (${soonCount} soon)`)
+        if (urgentPenalty > 0) parts.push(`-${urgentPenalty} pts (${urgentCount} urgent)`)
+        if (soonPenalty > 0) parts.push(`-${soonPenalty} pts (${soonCount} soon)`)
         return parts.join(' · ')
       },
       streakTitle: 'Streak',
