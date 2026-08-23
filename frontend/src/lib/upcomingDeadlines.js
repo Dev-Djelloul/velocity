@@ -32,17 +32,21 @@ export function getUpcomingDeadlines(plans, limit = 5) {
 
   for (const p of plans || []) {
     const name = p.product?.name || null
+    // coverImage transmise pour que le dashboard puisse afficher une vignette par échéance
+    // (retour utilisateur : sans repère visuel, une liste de plusieurs plans se ressemble
+    // trop pour distinguer lequel est lequel d'un coup d'œil).
+    const coverImage = p.coverImage || null
 
     if (p.launchDate) {
       const time = new Date(p.launchDate).getTime()
       if (Number.isFinite(time) && time >= now) {
-        items.push({ id: `${p.id}:launch`, kind: 'launch', name, date: p.launchDate, time })
+        items.push({ id: `${p.id}:launch`, kind: 'launch', name, coverImage, date: p.launchDate, time })
       }
     }
 
     const sprint = nextSprint(p)
     if (sprint) {
-      items.push({ id: `${p.id}:sprint`, kind: 'sprint', name, sprintId: sprint.sprintId, date: sprint.end.toISOString(), time: sprint.end.getTime() })
+      items.push({ id: `${p.id}:sprint`, kind: 'sprint', name, coverImage, sprintId: sprint.sprintId, date: sprint.end.toISOString(), time: sprint.end.getTime() })
     }
   }
 

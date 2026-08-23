@@ -45,12 +45,24 @@ export default function DashboardCalendar({ lang, deadlines }) {
 
   const goPrev = () => setViewDate(v => new Date(v.getFullYear(), v.getMonth() - 1, 1))
   const goNext = () => setViewDate(v => new Date(v.getFullYear(), v.getMonth() + 1, 1))
+  const goToday = () => setViewDate(new Date(today.getFullYear(), today.getMonth(), 1))
+  const isCurrentMonth = viewDate.getFullYear() === today.getFullYear() && viewDate.getMonth() === today.getMonth()
 
   return (
     <div className="dashboard-widget-card dashboard-calendar-card">
       <div className="dashboard-calendar-header">
         <h3 className="dashboard-calendar-month">{monthLabel}</h3>
         <div className="dashboard-calendar-nav">
+          {/* Repère "aujourd'hui" cliquable — ramène directement au mois courant sans avoir à
+              cliquer plusieurs fois sur les flèches si on a navigué loin (retour utilisateur). */}
+          <button
+            type="button"
+            className="dashboard-calendar-today-btn"
+            onClick={goToday}
+            disabled={isCurrentMonth}
+          >
+            {t(lang, 'dashboard.calendarToday')}
+          </button>
           <button type="button" onClick={goPrev} aria-label={t(lang, 'dashboard.calendarPrev')}>
             <IconChevronLeft width={14} height={14} />
           </button>

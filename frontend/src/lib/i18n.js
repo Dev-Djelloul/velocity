@@ -1564,6 +1564,7 @@ export const translations = {
       calendarWeekdays: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
       calendarPrev: 'Mois précédent',
       calendarNext: 'Mois suivant',
+      calendarToday: 'Aujourd\'hui',
       calendarLegendLaunch: 'Lancement',
       calendarLegendSprint: 'Fin de sprint'
     },
@@ -3286,6 +3287,7 @@ export const translations = {
       calendarWeekdays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
       calendarPrev: 'Previous month',
       calendarNext: 'Next month',
+      calendarToday: 'Today',
       calendarLegendLaunch: 'Launch',
       calendarLegendSprint: 'Sprint end'
     },

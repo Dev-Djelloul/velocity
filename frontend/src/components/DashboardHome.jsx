@@ -192,7 +192,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
               <div className="dashboard-space-card-body">
               <div className="dashboard-space-info">
                 <span className="dashboard-space-name">
-                  {space.name}
+                  <span className="dashboard-space-name-text">{space.name}</span>
                   {isCurrent && <span className="dashboard-space-current-badge">{t(lang, 'dashboard.current')}</span>}
                 </span>
                 {stats.known ? (
@@ -275,6 +275,15 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
             <ul className="dashboard-deadlines-list">
               {deadlines.map(d => (
                 <li key={d.id}>
+                  {/* Vignette discrète du plan (quand il en a une) pour distinguer les
+                      échéances entre plusieurs plans d'un coup d'œil, sans avoir à lire le
+                      nom en entier — même logique que les aperçus de plans des cartes
+                      d'espace juste au-dessus. */}
+                  <span className="dashboard-deadline-thumb">
+                    {d.coverImage
+                      ? <img src={d.coverImage} alt="" />
+                      : <span className="dashboard-deadline-thumb-fallback" aria-hidden="true" />}
+                  </span>
                   <span className="dashboard-deadline-info">
                     <span className="dashboard-deadline-name">{d.name || t(lang, 'dashboard.deadlinesUntitled')}</span>
                     <span className="dashboard-deadline-kind">{deadlineKind(d)}</span>

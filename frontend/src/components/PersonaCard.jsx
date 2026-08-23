@@ -2,12 +2,16 @@ import { t } from '../lib/i18n'
 import { IconUser, IconAlertTriangle, IconTarget, IconCompass, IconSparkle } from './Icons'
 import femaleAvatar1 from '../assets/persona-avatars/female-1.png'
 import femaleAvatar2 from '../assets/persona-avatars/female-2.png'
+import femaleAvatar3 from '../assets/persona-avatars/female-3.png'
+import femaleAvatar4 from '../assets/persona-avatars/female-4.png'
 import maleAvatar1 from '../assets/persona-avatars/male-1.png'
+import maleAvatar2 from '../assets/persona-avatars/male-2.png'
+import maleAvatar3 from '../assets/persona-avatars/male-3.png'
 import '../styles/PersonaCard.css'
 
 const AVATARS_BY_GENDER = {
-  female: [femaleAvatar1, femaleAvatar2],
-  male: [maleAvatar1]
+  female: [femaleAvatar1, femaleAvatar2, femaleAvatar3, femaleAvatar4],
+  male: [maleAvatar1, maleAvatar2, maleAvatar3]
 }
 
 // Choix déterministe (basé sur le prénom) parmi les photos disponibles pour ce genre,
