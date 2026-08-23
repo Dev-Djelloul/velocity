@@ -114,6 +114,14 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
 
   const deadlines = useMemo(() => getUpcomingDeadlines(allPlans || activePlans), [allPlans, activePlans])
 
+  // La phrase d'accroche distingue "tu as déjà des plans, reprends-les" de "tu n'en as
+  // encore aucun, lance le premier" — plutôt qu'une seule formule fixe qui ignorait si
+  // l'utilisateur avait déjà quelque chose en cours (personnel ou équipe, peu importe).
+  const hasAnyPlans = (allPlans || activePlans).length > 0
+  const planStatusKey = pro
+    ? (hasAnyPlans ? 'dashboard.planStatusProActive' : 'dashboard.planStatusProEmpty')
+    : (hasAnyPlans ? 'dashboard.planStatusFreeActive' : 'dashboard.planStatusFreeEmpty')
+
   const deadlineWhen = (isoDate) => {
     const n = daysUntil(isoDate)
     if (n === 0) return t(lang, 'dashboard.deadlinesToday')
@@ -162,10 +170,10 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
       <div className="dashboard-home-header">
         <h1>{firstName ? t(lang, 'dashboard.greeting')(firstName) : t(lang, 'dashboard.greetingGeneric')}</h1>
         <p>{t(lang, 'dashboard.subtitle')}</p>
-        {/* Petite phrase d'accroche sous le sous-titre, ton différent selon le plan — sympa et
-            engageante côté Pro ("tout est prêt, lance-toi") comme côté gratuit (pas de
-            reproche, juste une invitation à démarrer) — retour utilisateur. */}
-        <p className="dashboard-home-plan-status">{t(lang, pro ? 'dashboard.planStatusPro' : 'dashboard.planStatusFree')}</p>
+        {/* Petite phrase d'accroche sous le sous-titre, ton différent selon le plan (Pro vs
+            gratuit) ET selon qu'il y a déjà des plans en cours (continuer) ou aucun (lancer
+            le premier) — retour utilisateur : la formule ne devait pas ignorer l'existant. */}
+        <p className="dashboard-home-plan-status">{t(lang, planStatusKey)}</p>
         <button className="btn-primary dashboard-home-cta" onClick={onCreatePlan}>
           <IconPlus width={16} height={16} />
           {t(lang, 'dashboard.createPlan')}
