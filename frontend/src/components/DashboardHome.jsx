@@ -13,6 +13,7 @@ import DashboardActivityFeed from './DashboardActivityFeed'
 import DashboardWeeklySummary from './DashboardWeeklySummary'
 import DashboardWidgetGrid from './DashboardWidgetGrid'
 import DashboardWidgetLibrary from './DashboardWidgetLibrary'
+import HoverTooltip from './HoverTooltip'
 import { loadWidgetLayout, saveWidgetLayout } from '../lib/dashboardWidgets'
 import { getDailyTip } from '../lib/dailyTips'
 import { getUpcomingDeadlines, daysUntil } from '../lib/upcomingDeadlines'
@@ -437,15 +438,15 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                         {!!stats.plans.length && (
                           <div className="members-presence-row dashboard-space-plans-row">
                             {stats.plans.slice(0, 6).map(p => (
-                              <span
+                              <HoverTooltip
                                 key={p.id}
-                                className="plans-preview-thumb avatar-tooltip"
-                                data-tooltip={`Plan : ${p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}`}
+                                className="plans-preview-thumb"
+                                label={`Plan : ${p.product?.name || (lang === 'fr' ? 'Sans titre' : 'Untitled')}`}
                               >
                                 {p.coverImage
                                   ? <img src={p.coverImage} alt="" />
                                   : <span className="plans-preview-fallback" aria-hidden="true" />}
-                              </span>
+                              </HoverTooltip>
                             ))}
                             {stats.plans.length > 6 && <span className="team-presence-more">+{stats.plans.length - 6}</span>}
                           </div>
@@ -523,14 +524,15 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                   ) : (
                     <div className="dashboard-gallery-grid">
                       {galleryPlans.slice(0, count).map(p => (
-                        <button
+                        <HoverTooltip
+                          as="button"
                           key={p.id}
-                          className="dashboard-gallery-thumb avatar-tooltip"
-                          data-tooltip={p.product?.name || t(lang, 'plans.untitled')}
+                          className="dashboard-gallery-thumb"
+                          label={p.product?.name || t(lang, 'plans.untitled')}
                           onClick={() => onLoadPlan?.(p)}
                         >
                           <img src={p.coverImage} alt="" />
-                        </button>
+                        </HoverTooltip>
                       ))}
                     </div>
                   )}

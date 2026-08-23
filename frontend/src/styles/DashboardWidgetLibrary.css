@@ -149,28 +149,41 @@
 }
 
 .widget-library-card-title {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  min-width: 0;
+  display: block;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--color-text-primary);
+  /* Titre sur deux lignes maximum plutôt qu'une seule tronquée trop court — les badges
+     vivent maintenant dans leur propre colonne (.widget-library-card-side), le titre a
+     donc toute la largeur du corps de carte pour lui (retour utilisateur : un badge
+     "NOUVEAUTÉS" inséré dans la ligne de titre l'écrasait à 1-2 caractères). */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-/* Le titre seul se tronque avec ellipsis, jamais les badges à côté — sans le min-width:0
-   + ellipsis ici, un titre + badge "NOUVEAUTÉS" dépassaient la largeur de la carte et
-   venaient se superposer au bouton Ajouter à droite (retour utilisateur, capture à
-   l'appui) : par défaut, un enfant flex ne peut pas rétrécir sous sa largeur de contenu. */
-.widget-library-card-title-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  min-width: 0;
+/* Colonne à droite : badges empilés au-dessus du bouton Ajouter/Ajouté, jamais côte à
+   côte avec eux — c'est ce qui provoquait le chevauchement visible sur les captures. */
+.widget-library-card-side {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.4rem;
+  max-width: 40%;
+}
+
+.widget-library-badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.3rem;
 }
 
 .widget-library-badge {
   flex-shrink: 0;
+  white-space: nowrap;
   font-size: 0.6rem;
   font-weight: 700;
   text-transform: uppercase;

@@ -88,26 +88,35 @@ export default function DashboardWidgetLibrary({ lang, availableIds, hidden, pro
                 <div key={w.id} className={`widget-library-card ${w.visible ? 'is-added' : ''}`}>
                   <div className="widget-library-card-icon"><Icon width={20} height={20} /></div>
                   <div className="widget-library-card-body">
-                    <span className="widget-library-card-title">
-                      <span className="widget-library-card-title-text">{w.title}</span>
-                      {w.isNew && <span className="widget-library-badge widget-library-badge-new">{t(lang, 'dashboard.widgetLibrary.categories.insights')}</span>}
-                      {w.proOnly && <span className="widget-library-badge">{t(lang, 'dashboard.widgetLibrary.proOnly')}</span>}
-                    </span>
+                    <span className="widget-library-card-title">{w.title}</span>
                     <p className="widget-library-card-desc">{w.desc}</p>
                   </div>
-                  {w.mandatory ? (
-                    <span className="widget-library-status">{t(lang, 'dashboard.widgetLibrary.alwaysShown')}</span>
-                  ) : w.visible ? (
-                    <button className="widget-library-action is-remove" onClick={() => onRemove(w.id)}>
-                      <IconCheck width={14} height={14} />
-                      {t(lang, 'dashboard.widgetLibrary.added')}
-                    </button>
-                  ) : (
-                    <button className="widget-library-action" onClick={() => onAdd(w.id)}>
-                      <IconPlus width={14} height={14} />
-                      {t(lang, 'dashboard.widgetLibrary.add')}
-                    </button>
-                  )}
+                  {/* Colonne à droite, badges au-dessus du bouton plutôt qu'à côté du titre
+                      (retour utilisateur, capture à l'appui) : sur "NOUVEAUTÉS" notamment,
+                      un badge inséré dans la ligne de titre forçait le titre à se tronquer à
+                      1-2 caractères pour laisser de la place, et débordait par-dessus le
+                      bouton "Ajouter" une fois le titre entièrement écrasé. */}
+                  <div className="widget-library-card-side">
+                    {(w.isNew || w.proOnly) && (
+                      <span className="widget-library-badges">
+                        {w.isNew && <span className="widget-library-badge widget-library-badge-new">{t(lang, 'dashboard.widgetLibrary.categories.insights')}</span>}
+                        {w.proOnly && <span className="widget-library-badge">{t(lang, 'dashboard.widgetLibrary.proOnly')}</span>}
+                      </span>
+                    )}
+                    {w.mandatory ? (
+                      <span className="widget-library-status">{t(lang, 'dashboard.widgetLibrary.alwaysShown')}</span>
+                    ) : w.visible ? (
+                      <button className="widget-library-action is-remove" onClick={() => onRemove(w.id)}>
+                        <IconCheck width={14} height={14} />
+                        {t(lang, 'dashboard.widgetLibrary.added')}
+                      </button>
+                    ) : (
+                      <button className="widget-library-action" onClick={() => onAdd(w.id)}>
+                        <IconPlus width={14} height={14} />
+                        {t(lang, 'dashboard.widgetLibrary.add')}
+                      </button>
+                    )}
+                  </div>
                 </div>
               )
             })}

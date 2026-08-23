@@ -1,0 +1,29 @@
+/* Rendue en position:fixed via portail (voir HoverTooltip.jsx) — n'est donc jamais rognée
+   par l'overflow:hidden ou overflow-y:auto d'une carte de widget ancêtre. Même habillage
+   visuel que l'ancienne infobulle CSS pure (.avatar-tooltip::after) pour rester cohérente
+   avec les infobulles qui n'ont pas ce problème (TeamPresenceAvatars, SpacePage). */
+.hover-tooltip {
+  position: fixed;
+  transform: translate(-50%, calc(-100% - 8px));
+  z-index: 3000;
+  width: max-content;
+  max-width: 220px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(145, 132, 217, 0.25);
+  background: var(--color-bg-secondary, #16161d);
+  color: var(--color-text-secondary, #d1d5db);
+  font-size: 0.72rem;
+  line-height: 1.4;
+  font-weight: 400;
+  text-align: center;
+  white-space: normal;
+  pointer-events: none;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+  animation: hover-tooltip-in 0.1s ease;
+}
+
+@keyframes hover-tooltip-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

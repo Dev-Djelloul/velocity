@@ -884,10 +884,11 @@ export const translations = {
         entries: [
           {
             date: '23 août 2026',
-            title: 'Bibliothèque de widgets : panneau ancré en bas façon macOS, badge "Nouveautés" corrigé',
+            title: 'Bibliothèque de widgets : panneau ancré en bas façon macOS, badge "Nouveautés" et infobulles corrigés',
             items: [
               'Le panneau de la bibliothèque de widgets ("+") ne flotte plus au centre de l\'écran : il glisse depuis le bas et reste ancré au bord inférieur, coins arrondis en haut seulement — comme le centre de widgets macOS',
-              'Corrige le badge "Nouveautés" qui se superposait au bouton "Ajouter" sur les cartes Santé du portefeuille/Streak/Météo business : le titre tronque proprement avec "…" au lieu de déborder sur le bouton'
+              'Badge "Nouveautés" repensé : déplacé au-dessus du bouton Ajouter/Ajouté (colonne dédiée) au lieu d\'être accolé au titre, qui se retrouvait écrasé à 1-2 caractères et le badge finissait par chevaucher le bouton',
+              'Infobulles au survol (aperçus de plans des cartes d\'espace, galerie publique) : rognées par le cadre arrondi de leur widget dès qu\'elles apparaissaient près d\'un bord — rendues maintenant hors de la carte (comme le menu "Taille"), elles ne sont plus jamais coupées'
             ]
           },
           {
@@ -2793,10 +2794,11 @@ export const translations = {
         entries: [
           {
             date: 'August 23, 2026',
-            title: 'Widget library: bottom-docked panel like macOS, fixed "New" badge overlap',
+            title: 'Widget library: bottom-docked panel like macOS, fixed "New" badge and tooltips',
             items: [
               'The widget library panel ("+") no longer floats centered on screen: it slides up from the bottom and stays docked to the bottom edge, rounded corners on top only — like the macOS widget gallery',
-              'Fixed the "New" badge overlapping the "Add" button on the Portfolio health/Streak/Business weather cards: the title now truncates cleanly with "…" instead of spilling over the button'
+              '"New" badge redesigned: moved above the Add/Added button (its own column) instead of sitting next to the title, which used to get crushed down to 1-2 characters with the badge eventually overlapping the button',
+              'Hover tooltips (plan previews on space cards, public gallery): were clipped by their widget\'s rounded frame whenever they appeared near an edge — now rendered outside the card (like the "Size" menu), so they\'re never cut off again'
             ]
           },
           {
