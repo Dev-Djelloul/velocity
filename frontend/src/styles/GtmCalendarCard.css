@@ -243,13 +243,20 @@
   color: var(--color-text-muted);
 }
 
+/* Grille plutôt que flex : des libellés de longueurs très différentes ("Exporter le
+   contenu (CSV)" vs "Exporter pour Google Ads Editor") donnaient des boutons de tailles
+   visiblement inégales côte à côte — chaque bouton remplit maintenant sa colonne. */
 .gtm-actions {
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 0.6rem;
-  flex-wrap: wrap;
   padding-top: 0.6rem;
   border-top: 1px solid rgba(145, 132, 217, 0.1);
+}
+
+.gtm-actions > button {
+  width: 100%;
+  justify-content: center;
 }
 
 .gtm-export-hint {
