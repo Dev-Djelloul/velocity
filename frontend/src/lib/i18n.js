@@ -875,9 +875,9 @@ export const translations = {
             date: '23 août 2026',
             title: 'Dashboard en widgets déplaçables et redimensionnables façon macOS',
             items: [
-              'Le Dashboard principal passe en widgets indépendants (calendrier, prochaines échéances, activité récente, résumé Nova, "Reprendre") : glisser-déposer pour réordonner, clic droit → Petit/Moyen/Grand pour redimensionner — même interaction que le centre de notifications ou le bureau macOS. Disposition mémorisée par utilisateur.',
-              '"Bonjour X" repositionné tout en haut de la page, avant les widgets, réécrit en un seul message continu (nom, aperçu du jour, rappel du plan Pro/Gratuit, encouragement) plutôt que plusieurs phrases séparées',
-              'Cartes d\'espace repassées en flux pleine largeur sous les widgets plutôt que coincées dans une colonne étroite héritée de l\'ancienne mise en page'
+              'Le Dashboard principal passe entièrement en widgets indépendants — calendrier, prochaines échéances, activité récente, résumé Nova, "Reprendre", une carte par espace (personnel + équipes), "Créer une équipe", "Voir tout l\'historique" et "Galerie publique" : glisser-déposer pour réordonner, clic droit → Petit/Moyen/Grand pour redimensionner — même interaction que le centre de notifications ou le bureau macOS. Disposition mémorisée par utilisateur, qui s\'adapte automatiquement si le nombre d\'équipes change.',
+              'Corrige le glisser-déposer qui échouait parfois entre deux widgets de tailles très différentes',
+              '"Bonjour X" repositionné tout en haut de la page, avant les widgets, réécrit en un seul message continu (nom, aperçu du jour, rappel du plan Pro/Gratuit, encouragement) plutôt que plusieurs phrases séparées'
             ]
           },
           {
@@ -2696,9 +2696,9 @@ export const translations = {
             date: 'August 23, 2026',
             title: 'Dashboard as movable, resizable macOS-style widgets',
             items: [
-              'The main Dashboard moves to independent widgets (calendar, upcoming deadlines, recent activity, Nova summary, "Resume"): drag and drop to reorder, right-click → Small/Medium/Large to resize — the same interaction as the macOS notification center or desktop. Layout saved per user.',
-              '"Hi X" moved to the very top of the page, before the widgets, rewritten as a single continuous message (name, day overview, Pro/Free plan reminder, encouragement) instead of several separate lines',
-              'Space cards moved back to a full-width flow below the widgets instead of being squeezed into a narrow column inherited from the old layout'
+              'The main Dashboard moves entirely to independent widgets — calendar, upcoming deadlines, recent activity, Nova summary, "Resume", one card per space (personal + teams), "Create a team", "View full history" and "Public gallery": drag and drop to reorder, right-click → Small/Medium/Large to resize — the same interaction as the macOS notification center or desktop. Layout saved per user, adapting automatically as the number of teams changes.',
+              'Fixed drag-and-drop occasionally failing between two widgets of very different sizes',
+              '"Hi X" moved to the very top of the page, before the widgets, rewritten as a single continuous message (name, day overview, Pro/Free plan reminder, encouragement) instead of several separate lines'
             ]
           },
           {
