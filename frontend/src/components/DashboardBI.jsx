@@ -10,12 +10,98 @@ const DONUT_COLORS = ['#9184d9', '#06b6d4', '#4ade80', '#fb923c', '#ef4444', '#6
 
 // Deux nuances (claire/sombre) par statut de story — alternées d'une story à l'autre sur la
 // couronne extérieure de "Avancement global" pour que deux stories voisines du même statut
-// restent visuellement deux parts distinctes plutôt qu'un seul bloc continu.
+// restent visuellement deux parts distinctes plutôt qu'un seul bloc continu. "En cours" en
+// orange (pas jaune) — retour utilisateur : l'échelle attendue est vert/orange/rouge (+ gris
+// sombre pour "pas commencé"), et l'orange #f59e0b est aussi celui déjà utilisé pour ce même
+// statut dans le Backlog/la Roadmap du plan et les puces du calendrier — cohérence garantie.
 const TICK_COLORS = {
   done: ['#4ade80', '#22c55e'],
   overdue: ['#f87171', '#dc2626'],
-  inProgress: ['#fde047', '#eab308'],
+  inProgress: ['#fb923c', '#f59e0b'],
   todo: ['rgba(255, 255, 255, 0.26)', 'rgba(255, 255, 255, 0.12)']
+}
+
+const STATUS_LABEL_KEYS = { done: 'statusDone', overdue: 'statusOverdue', inProgress: 'statusInProgress', todo: 'statusTodo' }
+
+function polarPoint(cx, cy, r, angleDeg) {
+  const rad = ((angleDeg - 90) * Math.PI) / 180
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }
+}
+
+// Chemin SVG d'une part d'anneau (donut wedge) entre deux rayons et deux angles.
+function donutWedgePath(cx, cy, rOuter, rInner, startAngle, endAngle) {
+  const large = endAngle - startAngle > 180 ? 1 : 0
+  const a0 = polarPoint(cx, cy, rOuter, endAngle)
+  const a1 = polarPoint(cx, cy, rOuter, startAngle)
+  const b0 = polarPoint(cx, cy, rInner, startAngle)
+  const b1 = polarPoint(cx, cy, rInner, endAngle)
+  return `M ${a0.x} ${a0.y} A ${rOuter} ${rOuter} 0 ${large} 0 ${a1.x} ${a1.y} L ${b0.x} ${b0.y} A ${rInner} ${rInner} 0 ${large} 1 ${b1.x} ${b1.y} Z`
+}
+
+// Répartit une liste de {value, ...} sur 360°, avec un petit espace vide entre les parts.
+function layoutRing(segments, gapDeg) {
+  const total = segments.reduce((s, seg) => s + seg.value, 0) || 1
+  let angle = 0
+  return segments.map(seg => {
+    const sweep = (seg.value / total) * 360
+    const start = angle + gapDeg / 2
+    const end = Math.max(start, angle + sweep - gapDeg / 2)
+    angle += sweep
+    return { ...seg, start, end }
+  })
+}
+
+// Anneau interactif en SVG (pas un simple conic-gradient CSS) — retour utilisateur : "quand
+// je parlais de survol, je voulais dire sur le camembert lui-même", donc chaque part doit
+// être un vrai élément survolable avec sa propre info-bulle, pas juste une icône (?) à côté.
+// Deux couronnes concentriques : l'extérieure (une part par story) et l'intérieure (le %
+// agrégé par statut), avec un pourcentage au centre.
+function StatusDonut({ outerSegments, innerSegments, centerLabel, size = 160 }) {
+  const [tooltip, setTooltip] = useState(null)
+  const wrapRef = useRef(null)
+  const cx = size / 2
+  const cy = size / 2
+  const outerR2 = size / 2 - 2
+  const outerR1 = outerR2 - 11
+  const innerR2 = outerR1 - 7
+  const innerR1 = innerR2 - 26
+
+  const outerWedges = layoutRing(outerSegments, outerSegments.length > 24 ? 1 : 2.2)
+  const innerWedges = layoutRing(innerSegments, 2.5)
+
+  const showTooltip = (e, text) => {
+    const rect = wrapRef.current.getBoundingClientRect()
+    setTooltip({ x: e.clientX - rect.left, y: e.clientY - rect.top, text })
+  }
+
+  return (
+    <div className="status-donut" ref={wrapRef} onMouseLeave={() => setTooltip(null)}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {outerWedges.map((seg, i) => (
+          <path
+            key={`o-${i}`}
+            d={donutWedgePath(cx, cy, outerR2, outerR1, seg.start, seg.end)}
+            fill={seg.color}
+            className="status-donut-wedge"
+            onMouseMove={(e) => showTooltip(e, seg.tooltip)}
+          />
+        ))}
+        {innerWedges.map((seg, i) => (
+          <path
+            key={`i-${i}`}
+            d={donutWedgePath(cx, cy, innerR2, innerR1, seg.start, seg.end)}
+            fill={seg.color}
+            className="status-donut-wedge"
+            onMouseMove={(e) => showTooltip(e, seg.tooltip)}
+          />
+        ))}
+      </svg>
+      <div className="status-donut-center">{centerLabel}</div>
+      {tooltip && (
+        <div className="status-donut-tooltip" style={{ left: tooltip.x, top: tooltip.y }}>{tooltip.text}</div>
+      )}
+    </div>
+  )
 }
 
 // Icône d'aide sur chaque titre de carte du Dashboard — avant, seule une poignée de cartes
@@ -187,6 +273,7 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
     const sprintOverdue = sprintEndMs < nowMs
     return sp.stories.map(s => ({
       effort: s.effort,
+      title: s.title,
       status: s.status === 'done' ? 'done' : sprintOverdue ? 'overdue' : s.status === 'in_progress' ? 'inProgress' : 'todo'
     }))
   })
@@ -213,18 +300,10 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
           const allRingSegments = [
             { key: 'done', labelKey: 'statusDone', color: '#4ade80', value: doneEffort, count: doneCount },
             { key: 'overdue', labelKey: 'statusOverdue', color: '#ef4444', value: overdueEffort, count: overdueCount },
-            { key: 'inProgress', labelKey: 'statusInProgress', color: '#facc15', value: inProgressEffort, count: inProgressCount },
+            { key: 'inProgress', labelKey: 'statusInProgress', color: '#f59e0b', value: inProgressEffort, count: inProgressCount },
             { key: 'todo', labelKey: 'statusTodo', color: 'rgba(255, 255, 255, 0.16)', value: todoEffort, count: todoCount }
           ]
           const ringSegments = allRingSegments.filter(seg => seg.value > 0)
-          const ringTotal = ringSegments.reduce((s, seg) => s + seg.value, 0) || 1
-          let cursor = 0
-          const stops = ringSegments.map(seg => {
-            const pct = (seg.value / ringTotal) * 100
-            const stop = `${seg.color} ${cursor}% ${cursor + pct}%`
-            cursor += pct
-            return stop
-          })
           const overallPct = Math.round((progressStoryEffort / (totalStoryEffort || 1)) * 100)
 
           // Couronne extérieure : une part par story (pas par effort) — retour utilisateur :
@@ -232,36 +311,29 @@ export default function DashboardBI({ plan, lang, teamMembers }) {
           // du même statut fusionnaient en un seul bloc de couleur continu. Chaque part est
           // ici discrète (petit espace vide entre deux) et alterne deux nuances de sa couleur
           // de statut (claire/sombre) pour rester distincte de sa voisine même de même statut.
-          const tickCount = storyStatuses.length
-          const tickStops = []
-          if (tickCount > 0) {
-            const slot = 100 / tickCount
-            const gap = Math.min(slot * 0.22, 1.4)
-            storyStatuses.forEach((s, i) => {
-              const start = i * slot
-              const end = start + slot - gap
-              const color = TICK_COLORS[s.status][i % 2]
-              tickStops.push(`${color} ${start}%`, `${color} ${end}%`, `transparent ${end}%`, `transparent ${start + slot}%`)
-            })
-          }
+          // Chaque part (des deux couronnes) est un vrai <path> SVG survolable, avec sa
+          // propre info-bulle — retour utilisateur : le survol devait porter sur le
+          // camembert lui-même, pas seulement sur l'icône (?) à côté du titre.
+          const outerDonutSegments = storyStatuses.map((s, i) => ({
+            value: 1,
+            color: TICK_COLORS[s.status][i % 2],
+            tooltip: `${s.title} — ${t(lang, `dashboardBi.${STATUS_LABEL_KEYS[s.status]}`)}`
+          }))
+          const innerDonutSegments = ringSegments.map(seg => ({
+            value: seg.value,
+            color: seg.color,
+            tooltip: `${t(lang, `dashboardBi.${seg.labelKey}`)} — ${t(lang, 'dashboardBi.storyCount')(seg.count)}`
+          }))
 
           return (
             <div className="dashboard-bi-tile">
               <h4>{t(lang, 'dashboardBi.overallProgress')} <CardHelp text={t(lang, 'dashboardBi.overallProgressHelp')} /></h4>
               <div className="status-ring-wrap">
-                <div
-                  className="status-ring-outer"
-                  style={{ background: tickCount ? `conic-gradient(${tickStops.join(', ')})` : 'none' }}
-                  title={t(lang, 'dashboardBi.storyCount')(tickCount)}
-                >
-                  <div className="status-ring-outer-mask">
-                    <div className="donut status-ring" style={{ background: `conic-gradient(${stops.join(', ')})` }}>
-                      <div className="donut-center">
-                        <span className="status-ring-value">{overallPct}%</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <StatusDonut
+                  outerSegments={outerDonutSegments}
+                  innerSegments={innerDonutSegments}
+                  centerLabel={`${overallPct}%`}
+                />
                 {/* Une ligne par statut, avec le nombre de stories (pas les points, qui
                     n'avaient de sens que pour dessiner l'anneau intérieur) — retour
                     utilisateur : "2/12 · 3 en cours" en une phrase ne disait rien sur le "pas

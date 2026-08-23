@@ -272,43 +272,51 @@
   justify-content: center;
 }
 
-/* Couronne extérieure (une part par story) + anneau intérieur (le %) imbriqués en cercles
-   concentriques, même technique de "trou" que .donut : un cercle plein masqué en son centre
-   par un cercle de la couleur du fond, laissant juste l'anneau visible. */
-.status-ring-outer {
+/* Couronne extérieure (une part par story) + anneau intérieur (le %) en SVG — chaque part
+   est un vrai <path> survolable avec sa propre info-bulle (voir StatusDonut dans
+   DashboardBI.jsx), pas un simple dégradé CSS non interactif. */
+.status-donut {
+  position: relative;
   width: 160px;
   height: 160px;
-  border-radius: 50%;
   flex-shrink: 0;
+}
+
+.status-donut-wedge {
+  cursor: default;
+  transition: opacity 0.12s ease;
+}
+
+.status-donut-wedge:hover {
+  opacity: 0.8;
+}
+
+.status-donut-center {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.status-ring-outer-mask {
-  width: 138px;
-  height: 138px;
-  border-radius: 50%;
-  background: var(--color-bg-primary);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.status-ring {
-  width: 130px;
-  height: 130px;
-}
-
-.status-ring .donut-center {
-  width: 84px;
-  height: 84px;
-}
-
-.status-ring-value {
   font-size: 1.35rem;
   font-weight: var(--font-weight-semibold);
   color: var(--color-text-primary);
+  pointer-events: none;
+}
+
+.status-donut-tooltip {
+  position: absolute;
+  transform: translate(-50%, -115%);
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: var(--color-bg-secondary, #16161d);
+  border: 1px solid rgba(145, 132, 217, 0.3);
+  color: var(--color-text-primary);
+  font-size: 0.68rem;
+  font-weight: 500;
+  white-space: nowrap;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  z-index: 20;
 }
 
 .status-ring-list {
