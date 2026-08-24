@@ -640,4 +640,40 @@
     box-sizing: border-box;
     padding: 0.85rem 1.25rem;
   }
+
+  /* Harmonise la taille des champs sur mobile : le padding généreux (1rem/1.25rem, pensé
+     pour desktop) combiné à un min-height:100px sur la textarea créait un fort déséquilibre
+     visuel entre un champ texte compact et une textarea presque deux fois plus haute juste
+     en dessous — d'où l'impression de champs "disproportionnés" en s'enchaînant
+     verticalement (retour utilisateur). Padding resserré et uniforme, gap réduit entre
+     label et champ, textarea nettement moins haute par défaut. */
+  .field input[type="text"],
+  .field select {
+    padding: 0.75rem 0.9rem;
+    font-size: var(--font-size-sm);
+  }
+
+  .field select {
+    padding-right: 2.5rem;
+    background-position: right 0.9rem center;
+  }
+
+  .field textarea {
+    padding: 0.75rem 0.9rem;
+    font-size: var(--font-size-sm);
+    min-height: 72px;
+  }
+
+  .field {
+    gap: 0.45rem;
+  }
+
+  .field span {
+    font-size: 0.8rem;
+  }
+
+  .chip {
+    padding: 0.55rem 0.95rem;
+    font-size: 0.8rem;
+  }
 }
