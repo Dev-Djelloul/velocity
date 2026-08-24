@@ -503,12 +503,28 @@
     padding: 1rem;
   }
 
+  /* En colonne unique (voir grid ci-dessous), les 4 catégories empilées + le bandeau
+     principal dépassaient encore légèrement le haut de l'écran malgré le plafond de
+     100vh - 12rem hérité du palier 900px — pas assez de marge réservée une fois le
+     bandeau principal lui-même passé sur plusieurs lignes à cette largeur (retour
+     utilisateur, capture à l'appui). Réserve plus d'espace et resserre le padding et
+     l'espacement interne pour un panneau plus compact. */
   .cookie-consent-settings {
-    padding: 1.1rem;
+    padding: 0.9rem 1rem;
+    gap: 0.7rem;
+    max-height: calc(100vh - 15rem);
   }
 
   .cookie-consent-settings-grid {
     grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+
+  .cookie-consent-category {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.6rem 0.75rem;
   }
 
   .cookie-consent-settings-actions {
