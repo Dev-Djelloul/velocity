@@ -454,6 +454,12 @@ export default function App() {
     if (!isLoaded) return
     if (currentPage === 'result' && isSharedView) return // lien de partage : consultable sans compte
     if (AUTH_ONLY_PAGES.includes(currentPage) && !isSignedIn) {
+      // Une entrée directe sur l'outil interne doit survivre à la redirection OAuth :
+      // après la connexion, l'effet de transition reprend cette destination.
+      if (currentPage === 'admin-signups') {
+        goToAuth('signin', 'admin-signups')
+        return
+      }
       setCurrentPage('landing')
     }
     if (currentPage === 'auth' && isSignedIn) {
