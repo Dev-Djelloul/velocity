@@ -19,3 +19,14 @@ dist-ssr/
 *.pem
 *.key
 credentials*.json
+
+# Projet Android TWA (Google Play) — clé de signature et artefacts de build générés,
+# jamais le code source du projet lui-même (twa-manifest.json, build.gradle...).
+android-twa/*.keystore
+android-twa/build/
+android-twa/app/build/
+android-twa/.gradle/
+android-twa/*.apk
+android-twa/*.aab
+android-twa/local.properties
+android-twa/KEYSTORE_CREDENTIALS.txt

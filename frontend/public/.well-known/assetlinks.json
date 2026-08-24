@@ -1,0 +1,8 @@
+[{
+  "relation": ["delegate_permission/common.handle_all_urls"],
+  "target": {
+    "namespace": "android_app",
+    "package_name": "com.digitalblueskye.velocitylaunch",
+    "sha256_cert_fingerprints": ["78:79:03:7F:1F:65:7C:DE:22:D6:5F:73:47:4A:09:EB:5D:11:90:80:C9:43:BF:9A:9D:2D:33:64:F5:F7:F7:42"]
+  }
+}]
