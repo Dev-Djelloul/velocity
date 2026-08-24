@@ -463,7 +463,15 @@ export default function App() {
       setCurrentPage('landing')
     }
     if (currentPage === 'auth' && isSignedIn) {
-      setCurrentPage('dashboard')
+      // Après un retour OAuth, Clerk peut déjà avoir restauré la session au premier rendu.
+      // Dans ce cas l'effet de transition signed-out -> signed-in ne s'exécute pas : on
+      // reprend donc l'intention persistée ici plutôt que de forcer le tableau de bord.
+      const destination = authIntent || sessionStorage.getItem('plp_auth_intent')
+      setCurrentPage(destination || 'dashboard')
+      if (destination) {
+        setAuthIntent(null)
+        sessionStorage.removeItem('plp_auth_intent')
+      }
     }
     // Une fois connecté, "/" (landing marketing) n'a plus de raison d'être affiché — évite
     // de mélanger le produit d'entrée (démo, pitch, pricing) avec le produit une fois
