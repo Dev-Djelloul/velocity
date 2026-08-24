@@ -886,6 +886,25 @@ export const translations = {
         title: 'Changelog',
         entries: [
           {
+            date: '24 août 2026',
+            title: 'Grand audit responsive Mobile & tablette',
+            items: [
+              'Verrouille le scroll de l\'arrière-plan sur toutes les modales et panneaux (bibliothèque de widgets, comptes, espace, galerie, notifications, historique des plans…) — un swipe faisait défiler la page derrière la modale au lieu du panneau lui-même',
+              'Corrige la grille de widgets du Dashboard, restée impossible à faire défiler jusqu\'au bout une fois le scroll de fond verrouillé',
+              'Corrige le choix de taille des widgets (Petit/Moyen/Grand), qui ne s\'appliquait jamais au tactile — un geste de glisser-déposer natif interceptait le tap avant qu\'il n\'atteigne le menu',
+              'Corrige le bouton de réglage du widget Calendrier, superposé au bouton "mois suivant"',
+              'Élargit le champ webhook Slack (Notifications), devenu illisible partagé avec le bouton "Enregistrer" sur un écran étroit',
+              'Réorganise et aligne toutes les lignes de paramètres (interrupteurs ancrés à droite, séparateurs entre chaque ligne)',
+              'Corrige un débordement horizontal qui décalait le bouton du copilote IA et "retour en haut" hors du cadre visible',
+              'Élargit le résumé exécutif du plan généré à toute la largeur de la carte',
+              'Compacte la modale des paramètres cookies, qui dépassait encore légèrement le haut de l\'écran',
+              'Corrige les sélecteurs "Avant/Après" de la bibliothèque de versions, qui débordaient du panneau',
+              'Corrige "Ma galerie", qui n\'affichait qu\'un sous-ensemble des plans épinglés selon l\'espace actif au lieu de les regrouper tous (Pro)',
+              'Corrige le widget Galerie du Dashboard, qui ne montrait pas le même nombre de plans que la page complète',
+              'Corrige de nombreux débordements et éléments mal proportionnés sur mobile : bannière cookies, dashboard, Roadmap, budget/timeline, résumé exécutif, formulaire du questionnaire, export, stratégie SWOT, tableaux générés'
+            ]
+          },
+          {
             date: '23 août 2026',
             title: 'Corrige la bulle de confirmation rognée dans le centre de notifications',
             items: [
@@ -3041,6 +3060,25 @@ export const translations = {
       changelog: {
         title: 'Changelog',
         entries: [
+          {
+            date: 'August 24, 2026',
+            title: 'Major Mobile & tablet responsive audit',
+            items: [
+              'Locks background scroll on every modal and panel (widget library, account, space, gallery, notifications, plan history…) — a swipe used to scroll the page behind the modal instead of the panel itself',
+              'Fixed the Dashboard widget grid, which stayed impossible to scroll to the end once background scroll got locked',
+              'Fixed widget size picking (Small/Medium/Large), which never applied on touch — a native drag gesture intercepted the tap before it reached the menu',
+              'Fixed the Calendar widget\'s settings button, overlapping the "next month" button',
+              'Widened the Slack webhook field (Notifications), unreadable once squeezed next to the "Save" button on a narrow screen',
+              'Reorganized and aligned every settings row (switches anchored right, dividers between each row)',
+              'Fixed a horizontal overflow that pushed the AI copilot and "back to top" buttons out of the visible frame',
+              'Widened the generated plan\'s executive summary to the card\'s full width',
+              'Compacted the cookie settings modal, which still slightly overflowed the top of the screen',
+              'Fixed the version library\'s "Before/After" selectors, which overflowed their panel',
+              'Fixed "My gallery", which only showed a subset of pinned plans depending on the active space instead of aggregating them all (Pro)',
+              'Fixed the Dashboard Gallery widget, which showed a different plan count than the full page',
+              'Fixed numerous overflows and ill-proportioned elements on mobile: cookie banner, dashboard, Roadmap, budget/timeline, executive summary, questionnaire form, export, SWOT strategy, generated tables'
+            ]
+          },
           {
             date: 'August 23, 2026',
             title: 'Fixed a clipped confirmation bubble in the notification center',
