@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { t } from '../lib/i18n'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconBriefcase, IconShoppingBag, IconSmartphone, IconSparkle } from './Icons'
 import '../styles/DemoModal.css'
 
 export default function DemoModal({ onClose, onLoadDemo, lang }) {
+  useBodyScrollLock()
   const [selectedDemo, setSelectedDemo] = useState(null)
 
   const demos = [

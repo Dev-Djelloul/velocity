@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useUpdateAvatar } from '../lib/auth'
 import { t } from '../lib/i18n'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconUpload } from './Icons'
 import '../styles/AvatarPicker.css'
 
@@ -40,6 +41,7 @@ function renderAvatarBlob(emoji, bg) {
 // personnalisé permet de réutiliser exactement le même sélecteur pour autre chose que le
 // compte — l'espace personnel par exemple (voir SpacePage), qui n'a pas d'avatar Clerk.
 export default function AvatarPicker({ lang, onClose, onSave, title }) {
+  useBodyScrollLock()
   const updateAccountAvatar = useUpdateAvatar()
   const save = onSave || updateAccountAvatar
   const [saving, setSaving] = useState(null)

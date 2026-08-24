@@ -7,6 +7,7 @@ import { formatFullDateTime } from '../lib/dateFormat'
 import { collectRecentComments, fetchRecentComments } from '../lib/notifications'
 import { getReadIds, markCommentsRead, getDismissedIds, dismissComments } from '../lib/commentReads'
 import { getPersonalSpace } from '../lib/personalSpace'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconArrowLeft, IconMessageCircle, IconRocket, IconAlertTriangle, IconX } from './Icons'
 import PricingCards from './PricingCards'
 import { ContactModal } from './CompanyModals'
@@ -34,6 +35,8 @@ export default function NotificationsPage({ lang, onBack, onOpenNotification }) 
   const [showContact, setShowContact] = useState(false)
   const [checkoutLoading, setCheckoutLoading] = useState(false)
   const [checkoutError, setCheckoutError] = useState(false)
+
+  useBodyScrollLock(showUpgrade || showClearNotifs)
 
   const readIds = getReadIds(userId)
   const dismissedIds = getDismissedIds(userId)

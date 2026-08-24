@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
 import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil, IconSearch } from './Icons'
 import PlanTags from './PlanTags'
 import galleryCover from '../../assets/img/hiw-gallery-presentation.webp'
@@ -22,6 +23,8 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTag, setActiveTag] = useState(null)
   const menuRef = useRef(null)
+
+  useBodyScrollLock(!!renameTarget || !!deleteTarget)
 
   useEffect(() => {
     setPlans(getAllPlans())

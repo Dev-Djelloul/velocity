@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { t } from '../lib/i18n'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { WIDGET_CATALOG, WIDGET_CATEGORIES } from '../lib/widgetCatalog'
 import {
   IconSearch, IconCheck, IconPlus, IconCalendar, IconClock, IconActivity,
@@ -30,16 +31,7 @@ export default function DashboardWidgetLibrary({ lang, availableIds, hidden, pro
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
 
-  // Sans verrouillage du scroll du body, un swipe sur mobile pouvait faire défiler la page
-  // du dashboard derrière ce panneau plein écran au lieu de faire défiler la grille de
-  // widgets elle-même (retour utilisateur : "la fenêtre des widgets ne se scroll pas,
-  // c'est l'arrière de l'écran qui se scroll"). Restauré à la fermeture, y compris si le
-  // composant est démonté sans passer par onClose (changement de route).
-  useEffect(() => {
-    const previous = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => { document.body.style.overflow = previous }
-  }, [])
+  useBodyScrollLock()
 
   const entries = useMemo(() => {
     return WIDGET_CATALOG

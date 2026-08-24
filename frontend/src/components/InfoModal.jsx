@@ -1,4 +1,5 @@
 import { cloneElement } from 'react'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import '../styles/InfoModal.css'
 
 // Dégradé partagé par toutes les icônes de carte (même formule que --wordmark-gradient,
@@ -20,6 +21,7 @@ function IconGradientDefs() {
 }
 
 export default function InfoModal({ icon, title, onClose, children, wide, banner }) {
+  useBodyScrollLock()
   // stroke="currentColor" est posé sur la balise <svg> elle-même (voir Icons.jsx, objet
   // `base`) et hérité par tous les <path> enfants sans qu'ils la redéfinissent — la
   // remplacer une seule fois ici par l'URL du gradient suffit donc à colorer l'icône

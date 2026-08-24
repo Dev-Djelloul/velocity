@@ -6,6 +6,7 @@ import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace, savePersonalSpace, blobToDataUrl } from '../lib/personalSpace'
 import { resolveBudgetAmount } from '../lib/budgetTiers'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconArrowLeft, IconUsers, IconUser, IconClipboard, IconCoin, IconClock, IconPlus, IconTrash, IconSettings, IconAlertTriangle, IconSave, IconPencil, IconCopy, IconImage } from './Icons'
 import { teamColor } from './TeamAvatar'
 import { MembersPresenceRow } from './TeamPresenceAvatars'
@@ -44,6 +45,8 @@ export default function SpacePage({ lang, onBack, onLoadPlan, onLoadDraft, onCre
   const [deleteDraftTarget, setDeleteDraftTarget] = useState(null)
   const [renameDraftTarget, setRenameDraftTarget] = useState(null)
   const [draftEditValue, setDraftEditValue] = useState('')
+
+  useBodyScrollLock(!!deleteTarget || !!renameDraftTarget || !!deleteDraftTarget)
   const [personalSpace, setPersonalSpace] = useState(() => getPersonalSpace(userId, lang))
   const [showEditPersonal, setShowEditPersonal] = useState(false)
   const [showVersionsPicker, setShowVersionsPicker] = useState(false)

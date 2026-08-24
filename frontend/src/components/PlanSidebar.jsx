@@ -5,6 +5,7 @@ import InfoModal from './InfoModal'
 import { sectionLabel } from '../lib/changeDescriptions'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getReadIds, markCommentsRead } from '../lib/commentReads'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import {
   IconChevronDown, IconChevronLeft, IconChevronRight, IconBarChart, IconUser, IconClipboard,
   IconCircleDot, IconCalendar, IconTrendingUp, IconClock, IconRocket,
@@ -110,6 +111,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
     window.addEventListener('resize', onResize)
     return () => window.removeEventListener('resize', onResize)
   }, [])
+  useBodyScrollLock(isMobile && !collapsed)
   const [width, setWidth] = useState(() => Number(localStorage.getItem('plp_sidebar_width')) || DEFAULT_WIDTH)
   const [activeId, setActiveId] = useState(FIRST_ID)
   const [resizing, setResizing] = useState(false)

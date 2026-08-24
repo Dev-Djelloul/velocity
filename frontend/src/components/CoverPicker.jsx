@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { t } from '../lib/i18n'
 import { resizeImageToDataUrl } from '../lib/imageResize'
 import { searchPexels } from '../lib/serverStorage'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconUpload, IconLink, IconTrash, IconSearch } from './Icons'
 import '../styles/CoverPicker.css'
 
@@ -50,6 +51,7 @@ function renderSwatch(css) {
 }
 
 export default function CoverPicker({ lang, onChange, onClose, hasCover, title, removeLabel }) {
+  useBodyScrollLock()
   const [tab, setTab] = useState('gallery')
   const [linkInput, setLinkInput] = useState('')
   const [uploading, setUploading] = useState(false)

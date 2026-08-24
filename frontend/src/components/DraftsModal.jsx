@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react'
 import { getAllDrafts, deleteDraft, renameDraft } from '../lib/draftStorage'
 import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconPencil } from './Icons'
 import '../styles/DraftsModal.css'
 
 export default function DraftsModal({ lang, onLoadDraft, onClose }) {
+  useBodyScrollLock()
   const [drafts, setDrafts] = useState([])
   const [editingId, setEditingId] = useState(null)
   const [editingName, setEditingName] = useState('')

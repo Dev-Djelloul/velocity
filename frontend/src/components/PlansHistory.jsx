@@ -4,6 +4,7 @@ import { t } from '../lib/i18n'
 import { formatDateTime } from '../lib/dateFormat'
 import InfoModal from './InfoModal'
 import PlanTags from './PlanTags'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconClipboard, IconDownload, IconCheckCircle, IconAlertTriangle, IconCopy, IconPencil, IconSearch, IconX } from './Icons'
 import '../styles/PlansHistory.css'
 
@@ -16,6 +17,8 @@ export default function PlansHistory({ lang, onLoadPlan, onClose }) {
   const [editValue, setEditValue] = useState('')
   const [searchQuery, setSearchQuery] = useState('')
   const [activeTag, setActiveTag] = useState(null)
+
+  useBodyScrollLock(!!deleteTarget)
 
   useEffect(() => {
     setPlans(getAllPlans())

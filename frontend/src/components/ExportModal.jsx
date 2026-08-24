@@ -11,6 +11,7 @@ import {
 } from '../lib/serverStorage'
 import { waitForConnection } from '../lib/oauthConnect'
 import { pickRgpdResources } from '../lib/rgpdResources'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import '../styles/ExportModal.css'
 
 // Logo Google officiel ("G" multicolore) — pas de fichier image dédié dans le repo, et un
@@ -27,6 +28,7 @@ function GoogleGIcon(props) {
 }
 
 export default function ExportModal({ plan, lang, userId, isPro, onRequestUpgrade, onClose, captureRef, onJiraExported, onGithubExported, onLinearExported, onGoogleCalendarExported }) {
+  useBodyScrollLock()
   // Notion (export page complète)
   const [notionState, setNotionState] = useState('idle')
   const [notionUrl, setNotionUrl] = useState(null)

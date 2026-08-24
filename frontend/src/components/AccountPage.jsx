@@ -6,6 +6,7 @@ import { FREE_PLAN_LIMIT, getUsedCredits, isPro, remainingCredits } from '../lib
 import { createCheckoutSession, isServerConfigured } from '../lib/serverStorage'
 import { formatFullDateTime } from '../lib/dateFormat'
 import { getPersonalSpace } from '../lib/personalSpace'
+import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconUser, IconClipboard, IconRocket, IconArrowLeft, IconTrash, IconShield, IconProviderGoogle, IconProviderApple, IconProviderSlack, IconAlertTriangle, IconX, IconBarChart, IconCrown } from './Icons'
 
 const PROVIDER_ICONS = {
@@ -43,6 +44,8 @@ export default function AccountPage({ lang, onBack, onLoadPlan, onCreateTeam, pe
   const [deletePlanTarget, setDeletePlanTarget] = useState(null)
   const [deletePlanFailed, setDeletePlanFailed] = useState(false)
   const [movePlanTarget, setMovePlanTarget] = useState(null)
+
+  useBodyScrollLock(showUpgrade || !!deletePlanTarget || !!movePlanTarget)
 
   const pro = isPro(userId)
 
