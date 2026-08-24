@@ -11,10 +11,7 @@ export default defineConfig({
       // plusieurs fois par jour, mieux vaut que les utilisateurs récupèrent le dernier build
       // au prochain chargement plutôt que de rester bloqués sur une version en cache.
       registerType: 'autoUpdate',
-      // L'enregistrement est géré dans main.jsx pour pouvoir recharger la page lorsqu'un
-      // nouveau worker prend le contrôle. Le script généré par défaut met à jour le worker,
-      // mais laisse l'onglet courant exécuter l'ancien bundle jusqu'au rechargement suivant.
-      injectRegister: false,
+      injectRegister: 'auto',
       // Aucune règle runtimeCaching pour /api/* : les appels au backend (auth, plans,
       // Copilote IA...) doivent toujours repartir sur le réseau, jamais servis depuis un
       // cache qui rendrait une session ou des données périmées. Seuls les fichiers statiques
