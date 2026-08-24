@@ -87,7 +87,6 @@ const PATH_TO_PAGE = {
   '/fonctionnalités': 'features',
   '/fonctionnalites': 'features',
   '/confidentialite': 'privacy',
-  '/confidentialité': 'privacy',
   '/connexion': 'auth',
   '/inscription': 'auth',
   '/questionnaire': 'questionnaire',
