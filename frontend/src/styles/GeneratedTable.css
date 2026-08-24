@@ -255,4 +255,16 @@
   .gt-chart-row {
     grid-template-columns: 80px 1fr auto;
   }
+
+  /* Le champ de saisie et le bouton "Generate" (icône + texte, white-space:nowrap) se
+     battaient pour la même largeur étroite sur mobile — le champ se retrouvait écrasé à
+     quelques caractères et le bouton réduit à un trait vertical (retour utilisateur,
+     capture à l'appui). Empilés verticalement, chacun profite de toute la largeur. */
+  .generated-table-form {
+    flex-direction: column;
+  }
+
+  .generated-table-form button {
+    justify-content: center;
+  }
 }

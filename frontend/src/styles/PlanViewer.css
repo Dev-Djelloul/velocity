@@ -646,7 +646,11 @@
   flex-shrink: 0;
 }
 
-.executive-summary-body { flex: 1; }
+/* Sans min-width:0, un enfant flex ne rétrécit jamais sous la largeur de son mot le plus
+   long — dans une carte étroite (mobile), le paragraphe se retrouvait écrasé à cette
+   largeur minimale, forçant un retour à la ligne sur chaque mot (retour utilisateur,
+   capture à l'appui). Même bug que .roadmap-issue-message. */
+.executive-summary-body { flex: 1; min-width: 0; }
 
 .executive-summary-title {
   font-size: 1.3rem;
