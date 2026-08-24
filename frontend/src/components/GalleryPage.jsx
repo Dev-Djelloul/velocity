@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
-import { getAllPlans, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
+import { getAllPlans, fetchAllPlansAggregated, toggleFavorite, savePlan, createShareLink, duplicatePlan, deletePlan } from '../lib/planStorage'
+import { useAuth, useTeam } from '../lib/auth'
+import { isPro } from '../lib/creditTracker'
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { IconClipboard, IconSparkle, IconExternalLink, IconLink, IconCopy, IconTrash, IconX, IconAlertTriangle, IconPencil, IconSearch } from './Icons'
 import PlanTags from './PlanTags'
@@ -11,9 +13,20 @@ import '../styles/PlansHistory.css'
 // Galerie privée : vue en grille des plans que l'utilisateur a explicitement épinglés
 // (plan.inGallery, bouton "Ajouter à la galerie" dans PlanViewer) — opt-in, pas une liste
 // automatique de tous ses plans (voir "Mes plans"/PlansHistory pour ça). Aucune donnée
-// n'est exposée publiquement, tout passe par getAllPlans(), scopée par utilisateur+espace
-// côté planStorage.
+// n'est exposée publiquement.
+//
+// Agrège tous les espaces (personnel + équipes) en Pro, comme "Historique de tous les
+// plans" dans Mon compte — sans ça, un plan épinglé depuis un autre espace que celui
+// actuellement actif restait invisible ici (retour utilisateur : "3 plans ajoutés, un
+// seul s'affiche"), alors que "Ma galerie" est pensée comme une vue globale des favoris,
+// pas un tableau de bord scopé à un seul espace. En gratuit, reste scopé au seul espace
+// actif (getAllPlans), même restriction que PlansHistory.
 export default function GalleryPage({ lang, onOpenPlan }) {
+  const { userId } = useAuth()
+  const team = useTeam()
+  const pro = isPro(userId)
+  const teamIdsKey = (team.myTeams || []).map(tm => tm.id).join(',')
+
   const [plans, setPlans] = useState(() => getAllPlans())
   const [contextMenu, setContextMenu] = useState(null) // { plan, x, y }
   const [deleteTarget, setDeleteTarget] = useState(null)
@@ -26,9 +39,16 @@ export default function GalleryPage({ lang, onOpenPlan }) {
 
   useBodyScrollLock(!!renameTarget || !!deleteTarget)
 
+  const refreshPlans = () => {
+    if (!pro) { setPlans(getAllPlans()); return }
+    const teamIds = teamIdsKey ? teamIdsKey.split(',') : []
+    fetchAllPlansAggregated(userId, teamIds).then(setPlans)
+  }
   useEffect(() => {
-    setPlans(getAllPlans())
-  }, [])
+    if (!userId) return
+    refreshPlans()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userId, teamIdsKey, pro])
 
   const galleryPlans = useMemo(() => {
     return plans.filter(p => p.inGallery).sort((a, b) => {
@@ -117,7 +137,7 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const handleToggleFavorite = (e, plan) => {
     e.stopPropagation()
     toggleFavorite(plan)
-    setPlans(getAllPlans())
+    refreshPlans()
   }
 
   const closeMenu = () => setContextMenu(null)
@@ -136,19 +156,19 @@ export default function GalleryPage({ lang, onOpenPlan }) {
   const handleDuplicate = (plan) => {
     closeMenu()
     duplicatePlan(plan, lang)
-    setPlans(getAllPlans())
+    refreshPlans()
     setToast(t(lang, 'gallery.duplicated'))
   }
 
   const handleRemoveFromGallery = (plan) => {
     closeMenu()
     savePlan({ ...plan, inGallery: false })
-    setPlans(getAllPlans())
+    refreshPlans()
   }
 
   const confirmDelete = () => {
     deletePlan(deleteTarget.id)
-    setPlans(getAllPlans())
+    refreshPlans()
     setDeleteTarget(null)
   }
 
@@ -167,7 +187,7 @@ export default function GalleryPage({ lang, onOpenPlan }) {
     const trimmed = editValue.trim()
     if (trimmed && trimmed !== renameTarget.product?.name) {
       savePlan({ ...renameTarget, product: { ...renameTarget.product, name: trimmed } })
-      setPlans(getAllPlans())
+      refreshPlans()
     }
     setRenameTarget(null)
   }
