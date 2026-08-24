@@ -8,6 +8,7 @@
 import { renderToString } from 'react-dom/server'
 import Landing from './components/Landing'
 import HowItWorksPage from './components/HowItWorksPage'
+import PrivacyPage from './components/PrivacyPage'
 import Footer from './components/Footer'
 import Wordmark from './components/Wordmark'
 import './styles/design-system.css'
@@ -45,6 +46,10 @@ const ROUTES = {
   '/comment-ca-marche': {
     Component: HowItWorksPage,
     props: (lang) => ({ lang, onStartClick: noop })
+  },
+  '/confidentialite': {
+    Component: PrivacyPage,
+    props: (lang) => ({ lang, onBack: null })
   }
 }
 

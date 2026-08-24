@@ -47,7 +47,7 @@ export default function Footer({ lang, onOpenModal }) {
         <div className="footer-section">
           <h4>{t(lang, 'footer.legal')}</h4>
           <ul>
-            <li><button className="footer-link" onClick={() => onOpenModal('privacy')}>{t(lang, 'footer.privacy')}</button></li>
+            <li><a className="footer-link" href="/confidentialite">{t(lang, 'footer.privacy')}</a></li>
             <li><button className="footer-link" onClick={() => onOpenModal('terms')}>{t(lang, 'footer.terms')}</button></li>
             <li><button className="footer-link" onClick={() => onOpenModal('cookies')}>{t(lang, 'footer.cookies')}</button></li>
             <li><button className="footer-link" onClick={() => onOpenModal('security')}><IconLock width={13} height={13} /> {t(lang, 'footer.security')}</button></li>

@@ -29,6 +29,11 @@ const PAGES = {
     outFile: 'comment-ca-marche/index.html',
     title: 'Comment ça marche - VelocityLaunch',
     description: "3 étapes simples pour transformer vos réponses en plan de lancement complet : répondez au questionnaire, laissez le générateur créer votre stratégie, exportez et lancez."
+  },
+  '/confidentialite': {
+    outFile: 'confidentialite/index.html',
+    title: 'Politique de confidentialité - VelocityLaunch',
+    description: "Comment VelocityLaunch collecte, utilise et protège vos données : compte, plans générés par IA, intégrations tierces, paiement, et vos droits RGPD."
   }
 }
 

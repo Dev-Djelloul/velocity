@@ -27,6 +27,7 @@ android-twa/build/
 android-twa/app/build/
 android-twa/.gradle/
 android-twa/*.apk
+android-twa/*.apk.idsig
 android-twa/*.aab
 android-twa/local.properties
 android-twa/KEYSTORE_CREDENTIALS.txt

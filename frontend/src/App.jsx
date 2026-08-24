@@ -14,6 +14,7 @@ import PlansHistory from './components/PlansHistory'
 import DraftsModal from './components/DraftsModal'
 import SecurityPage from './components/SecurityPage'
 import HowItWorksPage from './components/HowItWorksPage'
+import PrivacyPage from './components/PrivacyPage'
 import GalleryPage from './components/GalleryPage'
 import AccountPage from './components/AccountPage'
 import NotificationsPage from './components/NotificationsPage'
@@ -62,6 +63,7 @@ const PAGE_TO_PATH = {
   landing: '/',
   dashboard: '/accueil',
   howItWorks: '/comment-ca-marche',
+  privacy: '/confidentialite',
   questionnaire: '/questionnaire',
   result: '/mon-plan',
   'plan-versions': '/mon-plan/versions',
@@ -78,6 +80,7 @@ const PATH_TO_PAGE = {
   '/': 'landing',
   '/accueil': 'dashboard',
   '/comment-ca-marche': 'howItWorks',
+  '/confidentialite': 'privacy',
   '/connexion': 'auth',
   '/inscription': 'auth',
   '/questionnaire': 'questionnaire',
@@ -687,6 +690,14 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  // Retour vers l'accueil plutôt que le Dashboard : cette page est publique (URL requise
+  // par les stores d'apps pour la politique de confidentialité), visitée aussi bien par un
+  // robot de vérification que par un visiteur non connecté.
+  const handleBackFromLegal = () => {
+    setCurrentPage('landing')
+    window.scrollTo(0, 0)
+  }
+
   const goToAccount = () => {
     setCurrentPage('account')
     window.scrollTo(0, 0)
@@ -1137,6 +1148,9 @@ export default function App() {
         )}
         {currentPage === 'howItWorks' && (
           <HowItWorksPage lang={lang} onStartClick={handleStartClick} />
+        )}
+        {currentPage === 'privacy' && (
+          <PrivacyPage lang={lang} onBack={handleBackFromLegal} />
         )}
         {currentPage === 'gallery' && isSignedIn && (
           <GalleryPage key={dataVersion} lang={lang} onOpenPlan={handleLoadFromHistory} />
