@@ -1,6 +1,7 @@
 name = "velocity-launch"
 main = "src/workers/generate.js"
 compatibility_date = "2024-01-01"
+workers_dev = true
 
 [vars]
 OPENROUTER_MODEL = "openai/gpt-5.6-luna"
