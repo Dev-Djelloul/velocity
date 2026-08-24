@@ -176,7 +176,14 @@
   font-weight: 600;
 }
 
+/* width:100% + min-width:0 : un <select> natif prend sinon la largeur intrinsèque de son
+   option la plus longue (ex. "Mon 2e plan d'équipe — dimanche 23 août 2026 à 19:10") sans
+   jamais rétrécir sous cette largeur, même dans un label flex étiré à 100% — il débordait
+   du panneau "Avant"/"Après" hors cadre sur mobile (retour utilisateur, capture à l'appui).
+   Même piège que min-width:0 sur les enfants flex, mais côté élément de formulaire natif. */
 .plan-versions-picker select {
+  width: 100%;
+  min-width: 0;
   padding: 0.55rem 0.7rem;
   border-radius: var(--radius-md, 8px);
   border: 1px solid rgba(145, 132, 217, 0.25);
