@@ -26,7 +26,15 @@
 }
 
 @media (max-width: 480px) {
-  .swot-grid { aspect-ratio: auto; }
+  /* Les 4 quadrants du SWOT restaient sur 2 colonnes fixes quelle que soit la largeur —
+     seul le ratio d'aspect était retiré, la grille elle-même ne repassait jamais à une
+     seule colonne, d'où le texte tronqué sur "Weaknesses"/"Threats" à droite (retour
+     utilisateur, capture à l'appui). */
+  .swot-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+    aspect-ratio: auto;
+  }
 }
 
 .swot-quadrant {

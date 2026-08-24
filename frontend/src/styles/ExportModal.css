@@ -46,6 +46,19 @@
   grid-template-columns: repeat(2, 1fr);
 }
 
+/* .export-modal impose une largeur fixe de 640px, plus large que n'importe quel écran de
+   téléphone — ça débordait purement et simplement de l'écran (retour utilisateur, capture
+   à l'appui), sans même parler de la grille à 2 colonnes des boutons d'export en dessous. */
+@media (max-width: 680px) {
+  .export-modal {
+    width: 100%;
+  }
+
+  .export-modal .modal-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Boutons "primaires" (PDF, PPTX, CSV) : fond dégradé plein */
 .export-modal .modal-actions .btn-primary {
   background: var(--vl-gradient);
