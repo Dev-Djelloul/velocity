@@ -19,6 +19,7 @@ import GalleryPage from './components/GalleryPage'
 import AccountPage from './components/AccountPage'
 import NotificationsPage from './components/NotificationsPage'
 import IntegrationsPage from './components/IntegrationsPage'
+import AdminSignupsPage from './components/AdminSignupsPage'
 import TeamPage from './components/TeamPage'
 import PlanVersionsPage from './components/PlanVersionsPage'
 import PlanFinancialReportPage from './components/PlanFinancialReportPage'
@@ -52,7 +53,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['dashboard', 'questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations']
+const AUTH_ONLY_PAGES = ['dashboard', 'questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations', 'admin-signups']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -75,7 +76,8 @@ const PAGE_TO_PATH = {
   gallery: '/ma-galerie',
   settings: '/parametres',
   notifications: '/notifications',
-  integrations: '/integrations'
+  integrations: '/integrations',
+  'admin-signups': '/admin/inscrits'
 }
 const PATH_TO_PAGE = {
   '/': 'landing',
@@ -94,7 +96,8 @@ const PATH_TO_PAGE = {
   '/ma-galerie': 'gallery',
   '/notifications': 'notifications',
   '/parametres': 'settings',
-  '/integrations': 'integrations'
+  '/integrations': 'integrations',
+  '/admin/inscrits': 'admin-signups'
 }
 
 // URL "jolie" pour le partage (/s/:shareId) — interceptée côté Cloudflare Pages Functions
@@ -1282,6 +1285,14 @@ export default function App() {
           <IntegrationsPage
             lang={lang}
             userId={userId}
+            onBack={() => setCurrentPage('dashboard')}
+          />
+        )}
+        {/* Jamais liée dans la nav — outil interne accessible uniquement en tapant
+            /admin/inscrits, protégé par ADMIN_SECRET (voir AdminSignupsPage.jsx). */}
+        {currentPage === 'admin-signups' && isSignedIn && (
+          <AdminSignupsPage
+            lang={lang}
             onBack={() => setCurrentPage('dashboard')}
           />
         )}
