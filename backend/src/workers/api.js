@@ -234,6 +234,16 @@ export async function handleApi(request, env, url) {
     return json({ ok: true, userId: body.userId, isPro: body.isPro !== false })
   }
 
+  // Consultation du canal d'acquisition des inscriptions (voir /webhooks/clerk plus bas) —
+  // même protection que /admin/grant-pro, en GET puisqu'il n'y a rien à modifier ici.
+  if (pathname === '/admin/attribution' && method === 'GET') {
+    if (!env.ADMIN_SECRET) return json({ error: 'admin_not_configured' }, 501)
+    if (searchParams.get('secret') !== env.ADMIN_SECRET) return json({ error: 'unauthorized' }, 401)
+    const userId = searchParams.get('userId')
+    if (userId) return json(await db.getSignupAttribution(env, userId))
+    return json(await db.listSignupAttribution(env))
+  }
+
   if (pathname === '/plan-versions' && method === 'GET') {
     const planId = searchParams.get('planId')
     if (!planId) return json({ error: 'planId required' }, 400)
@@ -1107,6 +1117,21 @@ export async function handleApi(request, env, url) {
     }
 
     const event = JSON.parse(payload)
+
+    // Canal d'acquisition (utm_*/referrer, voir frontend/src/lib/attribution.js) transmis
+    // en unsafeMetadata au moment de l'inscription (AuthPage.jsx <SignUp unsafeMetadata=.../>)
+    // — c'est le seul moment où on peut le relier à un user_id, Clerk ne le redonne pas
+    // ailleurs (retour utilisateur : impossible de savoir après coup d'où vient un testeur).
+    if (event.type === 'user.created') {
+      const meta = event.data.unsafe_metadata || {}
+      if (meta.utmSource || meta.referrer) {
+        try {
+          await db.saveSignupAttribution(env, event.data.id, meta)
+        } catch (err) {
+          console.error('clerk webhook: saveSignupAttribution failed', err)
+        }
+      }
+    }
 
     if (event.type === 'organization.created') {
       const org = event.data

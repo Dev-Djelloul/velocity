@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { SignIn, SignUp } from '@clerk/clerk-react'
 import { t } from '../lib/i18n'
 import { isMockAuth, useAuthProviders } from '../lib/auth'
+import { getAttribution } from '../lib/attribution'
 import Wordmark from './Wordmark'
 import { IconArrowLeft } from './Icons'
 import ForgotPasswordFlow from './ForgotPasswordFlow'
@@ -102,7 +103,11 @@ export default function AuthPage({ mode, onSwitchMode, onBack, lang, theme, onOp
               ) : (
                 <div className="auth-clerk-widget">
                   {isSignUp
-                    ? <SignUp routing="virtual" appearance={clerkAppearance} />
+                    // unsafeMetadata : canal d'acquisition capturé à la première visite
+                    // (lib/attribution.js), transmis à notre webhook Clerk (user.created)
+                    // pour savoir d'où vient chaque inscription (retour utilisateur : aucun
+                    // moyen de le savoir après coup pour les testeurs déjà inscrits).
+                    ? <SignUp routing="virtual" appearance={clerkAppearance} unsafeMetadata={getAttribution()} />
                     : <SignIn routing="virtual" appearance={clerkAppearance} />}
                 </div>
               )}

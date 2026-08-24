@@ -362,6 +362,37 @@ export async function setPro(env, userId, isPro, stripeCustomerId) {
   ).bind(userId, isPro ? 1 : 0, stripeCustomerId || null).run()
 }
 
+// Canal d'acquisition capturé à l'inscription (voir /webhooks/clerk, event user.created) —
+// écrit une seule fois, jamais mis à jour ensuite (une inscription n'a qu'une seule origine).
+export async function saveSignupAttribution(env, userId, attribution) {
+  const a = attribution || {}
+  await env.DB.prepare(
+    `INSERT INTO signup_attribution (user_id, utm_source, utm_medium, utm_campaign, utm_content, utm_term, referrer, landing_page)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+     ON CONFLICT(user_id) DO NOTHING`
+  ).bind(
+    userId,
+    a.utmSource || null,
+    a.utmMedium || null,
+    a.utmCampaign || null,
+    a.utmContent || null,
+    a.utmTerm || null,
+    a.referrer || null,
+    a.landingPage || null
+  ).run()
+}
+
+export async function getSignupAttribution(env, userId) {
+  return await env.DB.prepare('SELECT * FROM signup_attribution WHERE user_id = ?').bind(userId).first()
+}
+
+export async function listSignupAttribution(env, limit = 100) {
+  const { results } = await env.DB.prepare(
+    'SELECT * FROM signup_attribution ORDER BY created_at DESC LIMIT ?'
+  ).bind(limit).all()
+  return results
+}
+
 // --- Jetons OAuth Notion ---
 
 export async function saveNotionToken(env, userId, { accessToken, workspaceName, workspaceId, botId }) {

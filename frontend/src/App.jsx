@@ -40,6 +40,7 @@ import { setActiveUser as setDraftActiveUser, syncDraftsFromServer } from './lib
 import { getTimezone, setTimezone as persistTimezone } from './lib/dateFormat'
 import { hasPreferencesConsent } from './lib/cookieConsent'
 import { PREFERENCES_GRANTED_EVENT } from './lib/preferenceStorage'
+import { captureAttribution } from './lib/attribution'
 import { useUser, useAuth, useTeam } from './lib/auth'
 import { canGenerate, consumeCredit, remainingCredits, isPro, syncCreditsFromServer } from './lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from './lib/pricingTiers'
@@ -182,6 +183,12 @@ export default function App() {
   const [pendingNotificationAnchor, setPendingNotificationAnchor] = useState(null)
   const [newTeamName, setNewTeamName] = useState('')
   const headerMenuRef = useRef(null)
+
+  // Capture le canal d'acquisition (utm_*/referrer) au tout premier chargement, avant même
+  // que l'utilisateur n'atteigne le formulaire d'inscription — voir lib/attribution.js.
+  useEffect(() => {
+    captureAttribution()
+  }, [])
 
   useEffect(() => {
     if (!openHeaderMenu) return
