@@ -863,3 +863,23 @@
 .notif-slack-input-row .btn-secondary {
   flex-shrink: 0;
 }
+
+@media (max-width: 560px) {
+  /* Sur mobile, l'input et le bouton "Enregistrer" se partageaient une largeur de carte
+     déjà réduite — l'input se retrouvait comprimé à quelques pixels, illisible et
+     impossible à remplir (retour utilisateur, capture à l'appui). Empilés verticalement,
+     chacun profite de toute la largeur de la carte. */
+  .notif-slack-input-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .notif-slack-input-row input {
+    width: 100%;
+  }
+
+  .notif-slack-input-row .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+}
