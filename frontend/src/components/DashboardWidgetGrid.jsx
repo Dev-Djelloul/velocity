@@ -54,7 +54,12 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, removable, onDragS
   return (
     <div
       className={`dashboard-widget-slot size-${size} ${isDragging ? 'is-dragging' : ''} ${isDragOver ? 'is-drag-over' : ''}`}
-      draggable
+      // draggable désactivé tant que le menu "Taille" est ouvert : sur tactile, un attribut
+      // draggable="true" sur cet ancêtre intercepte le geste de tap comme un début de
+      // glisser-déposer natif avant qu'il n'atteigne les boutons du menu (rendu en position
+      // fixe, mais toujours un descendant DOM de ce div) — aucun choix de taille ne
+      // s'appliquait alors au tactile (retour utilisateur).
+      draggable={!menu}
       onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart(id) }}
       onDragEnd={onDragEnd}
       // dragOver (pas seulement dragEnter) : sur un widget "Grand" (2x2), le pointeur passe

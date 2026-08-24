@@ -765,6 +765,11 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.5rem;
+  /* Le bouton engrenage (redimensionner/retirer) est toujours affiché en position:absolute
+     dans le coin haut-droit du widget (voir DashboardWidgetGrid.jsx), par-dessus le
+     padding de la carte — sans marge dédiée ici, il se superposait au bouton "mois suivant"
+     qui vient s'appuyer contre ce même coin (retour utilisateur, capture à l'appui). */
+  padding-right: 1.75rem;
 }
 
 .dashboard-calendar-month {
