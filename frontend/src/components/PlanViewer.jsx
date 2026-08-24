@@ -999,14 +999,14 @@ export default function PlanViewer({ plan: initialPlan, justGenerated, onReset, 
 
       {plan.executiveSummary && (
         <div className="executive-summary card">
-          <div className="executive-summary-icon"><IconSparkle width={18} height={18} /></div>
-          <div className="executive-summary-body">
+          <div className="executive-summary-header">
+            <div className="executive-summary-icon"><IconSparkle width={18} height={18} /></div>
             <h3 className="executive-summary-title">{t(lang, 'outputs.executiveSummaryTitle')}</h3>
-            <p>{plan.executiveSummary}</p>
+            <button className="executive-summary-copy" onClick={copySummary} title={t(lang, 'outputs.copySummary')}>
+              {summaryCopied ? <IconCheckCircle width={16} height={16} /> : <IconCopy width={16} height={16} />}
+            </button>
           </div>
-          <button className="executive-summary-copy" onClick={copySummary} title={t(lang, 'outputs.copySummary')}>
-            {summaryCopied ? <IconCheckCircle width={16} height={16} /> : <IconCopy width={16} height={16} />}
-          </button>
+          <p className="executive-summary-text">{plan.executiveSummary}</p>
         </div>
       )}
 

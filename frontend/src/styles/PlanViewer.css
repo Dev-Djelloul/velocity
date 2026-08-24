@@ -617,8 +617,8 @@
 
 .executive-summary.card {
   display: flex;
-  align-items: flex-start;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.85rem;
   margin-bottom: 1rem;
   padding: 1.5rem 1.75rem;
   border-radius: var(--border-radius-sm);
@@ -634,6 +634,17 @@
   box-shadow: 0 0 40px rgba(99, 102, 241, 0.1);
 }
 
+/* Icône, titre et bouton copier forment désormais un bandeau d'en-tête à part, et le
+   texte du résumé vit sur sa propre ligne juste en dessous — plutôt que de partager sa
+   largeur avec l'icône et le bouton sur toute sa hauteur (retour utilisateur, capture à
+   l'appui) : le paragraphe profite ainsi de toute la largeur de la carte au lieu d'être
+   comprimé entre deux colonnes fixes. */
+.executive-summary-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .executive-summary-icon {
   display: flex;
   align-items: center;
@@ -646,13 +657,9 @@
   flex-shrink: 0;
 }
 
-/* Sans min-width:0, un enfant flex ne rétrécit jamais sous la largeur de son mot le plus
-   long — dans une carte étroite (mobile), le paragraphe se retrouvait écrasé à cette
-   largeur minimale, forçant un retour à la ligne sur chaque mot (retour utilisateur,
-   capture à l'appui). Même bug que .roadmap-issue-message. */
-.executive-summary-body { flex: 1; min-width: 0; }
-
 .executive-summary-title {
+  flex: 1;
+  min-width: 0;
   font-size: 1.3rem;
   font-weight: 800;
   letter-spacing: -0.01em;
@@ -660,10 +667,9 @@
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  margin-bottom: 0.5rem;
 }
 
-.executive-summary p {
+.executive-summary-text {
   background: var(--wordmark-gradient);
   background-clip: text;
   -webkit-background-clip: text;

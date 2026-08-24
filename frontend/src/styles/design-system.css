@@ -130,6 +130,16 @@
   box-sizing: border-box;
 }
 
+/* overflow-x:hidden en filet de sécurité : un élément qui déborde ponctuellement de son
+   parent ailleurs dans l'app (un mot trop long, une carte mal contrainte) élargissait tout
+   le document au-delà du viewport, ce qui décalait visiblement les boutons position:fixed
+   ancrés en "right" (copilote IA, retour en haut) hors cadre au lieu de les garder collés
+   au vrai bord droit visible (retour utilisateur, capture à l'appui). Coupe le débordement
+   plutôt que de le corriger un par un à la source à chaque fois qu'il réapparaît. */
+html, body {
+  overflow-x: hidden;
+}
+
 html, body, #root {
   background-color: var(--color-bg-primary);
   color: var(--color-text-primary);
