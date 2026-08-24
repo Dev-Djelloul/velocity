@@ -162,7 +162,22 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
     return () => observer.disconnect()
   }, [groupOf])
 
+  // Suspend le recentrage automatique tant que l'utilisateur scrolle le sommaire lui-même
+  // (molette/tactile à l'intérieur de .plan-sidebar-nav) — sans ça, l'IntersectionObserver
+  // ci-dessus continue de se déclencher sur le contenu principal pendant qu'on parcourt la
+  // liste, et scrollIntoView ramenait le panneau à la section active en pleine tentative de
+  // défilement manuel, rendant impossible d'atteindre les dernières entrées (retour
+  // utilisateur : "impossible de scroller en bas, ça remonte automatiquement").
+  const userScrollingNavRef = useRef(false)
+  const userScrollingNavTimeoutRef = useRef(null)
+  const markUserScrollingNav = useCallback(() => {
+    userScrollingNavRef.current = true
+    clearTimeout(userScrollingNavTimeoutRef.current)
+    userScrollingNavTimeoutRef.current = setTimeout(() => { userScrollingNavRef.current = false }, 1000)
+  }, [])
+
   useEffect(() => {
+    if (userScrollingNavRef.current) return
     itemRefs.current[activeId]?.scrollIntoView({ block: 'nearest', behavior: 'smooth' })
   }, [activeId])
 
@@ -535,7 +550,7 @@ export default function PlanSidebar({ lang, onNewPlan, changeLog, onClearHistory
         </div>
       )}
 
-      <nav className="plan-sidebar-nav">
+      <nav className="plan-sidebar-nav" onWheel={markUserScrollingNav} onTouchMove={markUserScrollingNav}>
         {collapsed
           ? GROUPS.flatMap(g => g.sections).map(renderItem)
           : GROUPS.map(group => {
