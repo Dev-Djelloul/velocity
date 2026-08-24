@@ -80,20 +80,23 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, removable, onDragS
       <div className="dashboard-widget-slot-content">{children}</div>
       {/* Le clic droit n'existe pas au tactile (mobile/tablette) — sans cet équivalent
           visible, il n'y avait aucun moyen de redimensionner ou retirer un widget sur ces
-          appareils (retour utilisateur). Toujours affiché plutôt que révélé au survol,
-          pour rester découvrable au tactile où il n'y a pas de "survol". */}
-      <button
-        type="button"
-        className="dashboard-widget-slot-menu-btn"
-        aria-label={t(lang, 'dashboard.widgetSizeLabel')}
-        onClick={(e) => {
-          e.stopPropagation()
-          const rect = e.currentTarget.getBoundingClientRect()
-          setMenu({ x: rect.right, y: rect.bottom })
-        }}
-      >
-        <IconSettings width={14} height={14} />
-      </button>
+          appareils (retour utilisateur). Réservé au tactile (IS_TOUCH_DEVICE) : sur desktop,
+          le clic droit habituel (onContextMenu ci-dessus) suffit déjà, cette roue n'y a pas
+          sa place (retour utilisateur : ne pas l'afficher en mode desktop). */}
+      {IS_TOUCH_DEVICE && (
+        <button
+          type="button"
+          className="dashboard-widget-slot-menu-btn"
+          aria-label={t(lang, 'dashboard.widgetSizeLabel')}
+          onClick={(e) => {
+            e.stopPropagation()
+            const rect = e.currentTarget.getBoundingClientRect()
+            setMenu({ x: rect.right, y: rect.bottom })
+          }}
+        >
+          <IconSettings width={14} height={14} />
+        </button>
+      )}
       {menu && (
         <WidgetSizeMenu
           lang={lang}

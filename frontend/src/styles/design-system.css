@@ -135,8 +135,13 @@
    le document au-delà du viewport, ce qui décalait visiblement les boutons position:fixed
    ancrés en "right" (copilote IA, retour en haut) hors cadre au lieu de les garder collés
    au vrai bord droit visible (retour utilisateur, capture à l'appui). Coupe le débordement
-   plutôt que de le corriger un par un à la source à chaque fois qu'il réapparaît. */
-html, body {
+   plutôt que de le corriger un par un à la source à chaque fois qu'il réapparaît.
+   Uniquement sur html, jamais sur body : overflow-x (même juste sur cet axe) sur body en
+   fait un conteneur de scroll à part entière, ce qui casse position:sticky pour tous ses
+   descendants (bug connu de Chrome/Firefox) — c'est ce qui réduisait le sommaire latéral du
+   plan (.plan-sidebar, sticky + height:100vh) à une hauteur ratatinée au lieu de suivre le
+   défilement sur toute la hauteur de la page jusqu'au footer (retour utilisateur). */
+html {
   overflow-x: hidden;
 }
 

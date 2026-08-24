@@ -1,10 +1,13 @@
 const STORAGE_KEY = 'plp_signup_attribution'
 
-// Attribution "first-touch" : capturée à la première visite porteuse d'un signal
-// (utm_* ou un referrer externe), puis jamais réécrite ensuite — un visiteur qui revient
-// plus tard en direct (favori, lien copié) ne doit pas effacer le canal qui l'a réellement
-// amené la première fois. Persistée en localStorage (pas sessionStorage) : rien n'oblige
-// l'inscription à se faire dans la foulée du premier clic.
+// Attribution "first-touch" : capturée à la première visite, puis jamais réécrite ensuite —
+// un visiteur qui revient plus tard en direct (favori, lien copié) ne doit pas effacer le
+// canal qui l'a réellement amené la première fois. Persistée en localStorage (pas
+// sessionStorage) : rien n'oblige l'inscription à se faire dans la foulée du premier clic.
+// Enregistrée même sans utm_*/referrer (visite directe — favori, URL tapée à la main) :
+// sans ça, ces inscriptions "organiques" n'apparaissaient jamais dans /admin/attribution,
+// impossible de savoir même juste QUI s'était inscrit (retour utilisateur, table vide alors
+// que 3 comptes existaient bien côté Clerk).
 export function captureAttribution() {
   if (typeof window === 'undefined') return
   try {
@@ -19,9 +22,6 @@ export function captureAttribution() {
       referrer: document.referrer || undefined,
       landingPage: window.location.pathname
     }
-    // Rien à capturer sur une visite directe sans UTM (favori, saisie manuelle de l'URL) —
-    // ne pas polluer le storage avec un objet vide.
-    if (!data.utmSource && !data.referrer) return
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data))
   } catch { /* localStorage indisponible : tant pis, pas de suivi cette visite */ }
 }

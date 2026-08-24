@@ -1,6 +1,6 @@
 import * as db from '../lib/db'
 import { createCheckoutSession, verifyWebhookSignature } from '../lib/stripe'
-import { verifyClerkWebhook, listUserOrganizationMemberships, deleteOrganization, TEAM_SPACE_LIMITS } from '../lib/clerk'
+import { verifyClerkWebhook, listUserOrganizationMemberships, deleteOrganization, TEAM_SPACE_LIMITS, getUserEmail } from '../lib/clerk'
 import { generateTableWithAI } from '../lib/ai/tableClient'
 import { generateTableFromPrompt } from '../lib/generator/tableFallback'
 import { generateVeilleWithAI } from '../lib/ai/veilleClient'
@@ -240,8 +240,20 @@ export async function handleApi(request, env, url) {
     if (!env.ADMIN_SECRET) return json({ error: 'admin_not_configured' }, 501)
     if (searchParams.get('secret') !== env.ADMIN_SECRET) return json({ error: 'unauthorized' }, 401)
     const userId = searchParams.get('userId')
-    if (userId) return json(await db.getSignupAttribution(env, userId))
-    return json(await db.listSignupAttribution(env))
+    if (userId) {
+      const entry = await db.getSignupAttribution(env, userId)
+      if (entry && env.CLERK_SECRET_KEY) entry.email = await getUserEmail(env, entry.user_id)
+      return json(entry)
+    }
+    const entries = await db.listSignupAttribution(env)
+    // Enrichit avec l'email Clerk (jamais stocké localement, voir getUserEmail) : sans ça
+    // la liste ne montre que des user_id Clerk opaques, illisibles pour savoir "qui" s'est
+    // inscrit par quel canal (retour utilisateur). Best-effort, en parallèle plutôt qu'en
+    // série vu le nombre d'entrées potentiel (jusqu'à 100).
+    if (env.CLERK_SECRET_KEY) {
+      await Promise.all(entries.map(async e => { e.email = await getUserEmail(env, e.user_id) }))
+    }
+    return json(entries)
   }
 
   if (pathname === '/plan-versions' && method === 'GET') {
@@ -1122,14 +1134,16 @@ export async function handleApi(request, env, url) {
     // en unsafeMetadata au moment de l'inscription (AuthPage.jsx <SignUp unsafeMetadata=.../>)
     // — c'est le seul moment où on peut le relier à un user_id, Clerk ne le redonne pas
     // ailleurs (retour utilisateur : impossible de savoir après coup d'où vient un testeur).
+    // Enregistré même sans utm_*/referrer (inscription directe) : sinon ces comptes
+    // n'apparaissent jamais dans /admin/attribution, impossible de savoir même juste QUI
+    // s'est inscrit (retour utilisateur, table vide alors que des comptes existaient bien
+    // côté Clerk).
     if (event.type === 'user.created') {
       const meta = event.data.unsafe_metadata || {}
-      if (meta.utmSource || meta.referrer) {
-        try {
-          await db.saveSignupAttribution(env, event.data.id, meta)
-        } catch (err) {
-          console.error('clerk webhook: saveSignupAttribution failed', err)
-        }
+      try {
+        await db.saveSignupAttribution(env, event.data.id, meta)
+      } catch (err) {
+        console.error('clerk webhook: saveSignupAttribution failed', err)
       }
     }
 
