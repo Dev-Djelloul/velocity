@@ -65,7 +65,6 @@ const PAGE_TO_PATH = {
   landing: '/',
   dashboard: '/accueil',
   howItWorks: '/comment-ca-marche',
-  features: '/fonctionnalités',
   privacy: '/confidentialite',
   questionnaire: '/questionnaire',
   result: '/mon-plan',
@@ -84,8 +83,6 @@ const PATH_TO_PAGE = {
   '/': 'landing',
   '/accueil': 'dashboard',
   '/comment-ca-marche': 'howItWorks',
-  '/fonctionnalités': 'features',
-  '/fonctionnalites': 'features',
   '/confidentialite': 'privacy',
   '/connexion': 'auth',
   '/inscription': 'auth',
@@ -101,17 +98,6 @@ const PATH_TO_PAGE = {
   '/parametres': 'settings',
   '/integrations': 'integrations',
   '/admin/inscrits': 'admin-signups'
-}
-
-// location.pathname encode les accents (ex. /fonctionnalit%C3%A9s) dans certains
-// navigateurs. On décode avant de résoudre la route afin que l'URL publique fonctionne
-// aussi bien quand elle est saisie que lorsqu'elle est partagée.
-function pageFromPath(pathname) {
-  try {
-    return PATH_TO_PAGE[decodeURIComponent(pathname)] || PATH_TO_PAGE[pathname] || 'landing'
-  } catch {
-    return PATH_TO_PAGE[pathname] || 'landing'
-  }
 }
 
 // URL "jolie" pour le partage (/s/:shareId) — interceptée côté Cloudflare Pages Functions
@@ -142,7 +128,7 @@ export default function App() {
   const [dateFormat, setDateFormat] = useState(() => localStorage.getItem('plp_date_format') || 'auto')
   const [currency, setCurrency] = useState(() => localStorage.getItem('plp_currency') || 'EUR')
   const [currentPage, setCurrentPage] = useState(() => (
-    parsePrettyShareUrl(window.location.pathname) ? 'result' : pageFromPath(window.location.pathname)
+    parsePrettyShareUrl(window.location.pathname) ? 'result' : (PATH_TO_PAGE[window.location.pathname] || 'landing')
   ))
   const [plan, setPlan] = useState(null)
   const [novaToggle, setNovaToggle] = useState(0)
@@ -353,7 +339,7 @@ export default function App() {
 
   // Reflète l'URL dans currentPage/authMode (bouton précédent/suivant, lien direct, refresh).
   useEffect(() => {
-    const page = parsePrettyShareUrl(location.pathname) ? 'result' : pageFromPath(location.pathname)
+    const page = parsePrettyShareUrl(location.pathname) ? 'result' : (PATH_TO_PAGE[location.pathname] || 'landing')
     if (page !== currentPage) setCurrentPage(page)
     if (page === 'auth') {
       const mode = location.pathname === '/connexion' ? 'signin' : 'signup'
@@ -1181,7 +1167,7 @@ export default function App() {
       )}
 
       <main>
-        {(currentPage === 'landing' || currentPage === 'features') && (
+        {currentPage === 'landing' && (
           <Landing lang={lang} onStartClick={handleStartClick} onOpenDemo={() => setShowDemo(true)} onDiscoverClick={handleShowHowItWorks} />
         )}
         {currentPage === 'howItWorks' && (
@@ -1327,7 +1313,7 @@ export default function App() {
       </main>
 
       {currentPage !== 'auth' && (
-        <Footer lang={lang} onOpenModal={setActiveModal} onNavigateFeatures={() => setCurrentPage('features')} />
+        <Footer lang={lang} onOpenModal={setActiveModal} />
       )}
 
       <ScrollToTop />
@@ -1381,15 +1367,7 @@ export default function App() {
       )}
       {activeModal === 'changelog' && <ChangelogModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'roadmap' && <RoadmapModal lang={lang} onClose={() => setActiveModal(null)} />}
-      {(activeModal === 'features' || currentPage === 'features') && (
-        <FeaturesModal
-          lang={lang}
-          onClose={() => {
-            setActiveModal(null)
-            if (currentPage === 'features') setCurrentPage('landing')
-          }}
-        />
-      )}
+      {activeModal === 'features' && <FeaturesModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'privacy' && <PrivacyModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'terms' && <TermsModal lang={lang} onClose={() => setActiveModal(null)} />}
       {activeModal === 'cookies' && <CookiesModal lang={lang} onClose={() => setActiveModal(null)} />}
