@@ -23,6 +23,7 @@ import { computeActivityStreaks, streakTier } from '../lib/activityStreak'
 import { recordAndGetTrend } from '../lib/portfolioHealthHistory'
 import dashboardBackground from '../../assets/img/dashboard-home-bg.webp'
 import dashboardBackgroundMobile from '../../assets/img/dashboard-home-bg-mobile.webp'
+import galleryCover from '../../assets/img/hiw-gallery-presentation.webp'
 import createTeamImage from '../../assets/img/hiw-hero-tablets-purple.webp'
 import '../styles/TeamPresenceAvatars.css'
 import '../styles/DashboardHome.css'
@@ -212,7 +213,12 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   // nombre de vignettes affichées suit la taille choisie par l'utilisateur pour ce widget
   // (voir GALLERY_COUNT_BY_SIZE) plutôt qu'un nombre fixe qui gâcherait l'espace en Grand
   // ou déborderait en Petit.
-  const galleryPlans = useMemo(() => (allPlans || activePlans).filter(p => p.coverImage), [allPlans, activePlans])
+  // p.inGallery (pas p.coverImage) : ce widget doit prévisualiser le même sous-ensemble
+  // que "Ma galerie" (GalleryPage.jsx, épinglage explicite) — filtrer sur la seule
+  // présence d'une couverture montrait ici des plans jamais réellement ajoutés à la
+  // galerie, en désaccord avec le nombre réel affiché sur la page complète (retour
+  // utilisateur : "3 plans dans le widget, 2 seulement sur la page").
+  const galleryPlans = useMemo(() => (allPlans || activePlans).filter(p => p.inGallery), [allPlans, activePlans])
 
   // Tous les plans par ordre de dernière activité, pour le widget "Voir tout l'historique"
   // — même tri que "Reprendre" (byRecency) et même principe d'adapter le nombre de lignes
@@ -592,7 +598,7 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                           label={p.product?.name || t(lang, 'plans.untitled')}
                           onClick={() => onLoadPlan?.(p)}
                         >
-                          <img src={p.coverImage} alt="" />
+                          <img src={p.coverImage || galleryCover} alt="" />
                         </HoverTooltip>
                       ))}
                     </div>
