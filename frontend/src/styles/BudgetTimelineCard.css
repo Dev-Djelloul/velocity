@@ -61,4 +61,11 @@
 
 .budget-timeline-regenerate {
   margin-top: 1rem;
+  /* Le texte du bouton est long ("Rebuild the roadmap from the current timeline") —
+     .btn-secondary a white-space:nowrap par défaut, qui le forçait hors de sa carte sur
+     mobile au lieu de s'adapter, lui donnant l'air de ne plus être un bouton du tout
+     (retour utilisateur, capture à l'appui). */
+  width: 100%;
+  white-space: normal;
+  text-align: center;
 }

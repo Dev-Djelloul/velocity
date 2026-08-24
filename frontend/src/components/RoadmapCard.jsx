@@ -184,7 +184,7 @@ export default function RoadmapCard({ roadmap, lang, planStartDate, onPlanStartD
               {issues.map((issue, i) => (
                 <div key={i} className="roadmap-issue-item">
                   <span className={`issue-tag issue-${issue.type}`}>{t(lang, `roadmapIssues.${issue.type}`)}</span>
-                  <span>{issue.message}</span>
+                  <span className="roadmap-issue-message">{issue.message}</span>
                 </div>
               ))}
             </div>

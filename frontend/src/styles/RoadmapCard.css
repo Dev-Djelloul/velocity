@@ -205,6 +205,15 @@
   color: var(--color-text-secondary);
 }
 
+/* Sans min-width:0, un enfant flex ne rétrécit jamais sous la largeur de son mot le plus
+   long (valeur par défaut min-width:auto) — dans une rangée trop étroite, le flex
+   l'écrasait quand même à peu près à cette largeur minimale, forçant un retour à la ligne
+   sur chaque mot au lieu d'un habillage normal (retour utilisateur, capture à l'appui). */
+.roadmap-issue-message {
+  flex: 1;
+  min-width: 0;
+}
+
 .issue-tag {
   flex-shrink: 0;
   background: rgba(239, 68, 68, 0.15);
