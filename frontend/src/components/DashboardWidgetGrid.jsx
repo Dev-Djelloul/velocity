@@ -5,6 +5,15 @@ import '../styles/DashboardWidgetGrid.css'
 
 const SIZES = ['small', 'medium', 'large']
 
+// Le glisser-déposer HTML5 (draggable="true") n'a jamais été conçu pour le tactile — sur un
+// vrai écran tactile (contrairement à l'émulation souris de Chrome DevTools), cet attribut
+// intercepte le tout premier tap sur la carte comme un début de glisser natif avant qu'il
+// n'atteigne quoi que ce soit en dessous, y compris le bouton engrenage lui-même : impossible
+// d'ouvrir le menu "Taille", donc impossible de redimensionner un widget au tactile (retour
+// utilisateur sur iPhone réel — un correctif précédent ne désactivait draggable que pendant
+// que le menu était déjà ouvert, pas au moment du tap initial qui l'ouvre).
+const IS_TOUCH_DEVICE = typeof window !== 'undefined' && (navigator.maxTouchPoints > 0 || 'ontouchstart' in window)
+
 // Menu contextuel "Taille" façon macOS (clic droit sur un widget de bureau ou du centre de
 // notifications) — rendu en position fixe pour ne jamais être rogné par l'overflow d'une
 // carte parente. `onRemove` est optionnel : absent pour les widgets obligatoires
@@ -54,12 +63,7 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, removable, onDragS
   return (
     <div
       className={`dashboard-widget-slot size-${size} ${isDragging ? 'is-dragging' : ''} ${isDragOver ? 'is-drag-over' : ''}`}
-      // draggable désactivé tant que le menu "Taille" est ouvert : sur tactile, un attribut
-      // draggable="true" sur cet ancêtre intercepte le geste de tap comme un début de
-      // glisser-déposer natif avant qu'il n'atteigne les boutons du menu (rendu en position
-      // fixe, mais toujours un descendant DOM de ce div) — aucun choix de taille ne
-      // s'appliquait alors au tactile (retour utilisateur).
-      draggable={!menu}
+      draggable={!IS_TOUCH_DEVICE && !menu}
       onDragStart={(e) => { e.dataTransfer.effectAllowed = 'move'; onDragStart(id) }}
       onDragEnd={onDragEnd}
       // dragOver (pas seulement dragEnter) : sur un widget "Grand" (2x2), le pointeur passe

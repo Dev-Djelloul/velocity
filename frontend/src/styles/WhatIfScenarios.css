@@ -161,3 +161,15 @@
     grid-template-columns: 80px 1fr auto;
   }
 }
+
+@media (max-width: 480px) {
+  /* minmax(260px, 1fr) impose un plancher de 260px par curseur — sur un iPhone étroit,
+     ce plancher dépasse la largeur réellement disponible dans la carte (padding compris),
+     ce qui faisait déborder les graduations et le curseur hors du cadre noir arrondi
+     (retour utilisateur, capture à l'appui). Une seule colonne sans plancher fixe laisse
+     chaque curseur épouser toute la largeur réellement disponible. */
+  .sim-sliders {
+    grid-template-columns: 1fr;
+    padding: 1rem 1.1rem;
+  }
+}
