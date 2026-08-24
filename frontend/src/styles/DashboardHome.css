@@ -101,6 +101,19 @@
   gap: 2rem;
 }
 
+/* Sur mobile, 3rem de marge de chaque côté mange près d'un quart de la largeur d'un
+   iPhone — les cartes se retrouvaient comprimées dans une colonne étroite avec un grand
+   vide à droite (retour utilisateur, capture à l'appui). On ramène la marge latérale à
+   un espacement standard mobile et on réduit aussi la marge du haut, pensée pour un
+   grand écran. */
+@media (max-width: 768px) {
+  .dashboard-home {
+    margin: 1.5rem auto 2rem;
+    padding: 0 1rem 2.5rem;
+    gap: 1.25rem;
+  }
+}
+
 /* Titre, sous-titre et bouton "Créer un plan" empilés à gauche, plutôt que le bouton
    écarté à droite — tout le contenu reste groupé côté gauche pour dégager le centre où
    se trouve la pyramide de la photo de fond. */
@@ -205,6 +218,20 @@
   display: flex;
   align-items: center;
   gap: 0.6rem;
+}
+
+/* Sur mobile, le texte "Créer un nouveau plan" force le bouton à s'étirer à côté de
+   l'icône carrée 40x40 des widgets — les deux se retrouvent mal alignés / le CTA
+   tronqué. On les étale sur toute la largeur disponible, CTA en premier et bien visible. */
+@media (max-width: 480px) {
+  .dashboard-home-header-actions {
+    width: 100%;
+  }
+
+  .dashboard-home-cta {
+    flex: 1;
+    justify-content: center;
+  }
 }
 
 /* Bouton d'ouverture de la bibliothèque de widgets — dégradé de marque plein (violet →

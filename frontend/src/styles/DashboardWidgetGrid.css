@@ -26,6 +26,31 @@
   height: 100%;
 }
 
+/* Équivalent tactile du clic droit (voir commentaire JSX) — coin haut-droit, toujours
+   visible plutôt que révélé au survol pour rester découvrable sur mobile/tablette. */
+.dashboard-widget-slot-menu-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  border: none;
+  background: rgba(0, 0, 0, 0.35);
+  color: rgba(255, 255, 255, 0.85);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+}
+
+.dashboard-widget-slot-menu-btn:hover {
+  background: rgba(0, 0, 0, 0.55);
+  transform: scale(1.06);
+}
+
 .dashboard-widget-slot.size-small { grid-column: span 1; grid-row: span 1; }
 .dashboard-widget-slot.size-medium { grid-column: span 2; grid-row: span 1; }
 .dashboard-widget-slot.size-large { grid-column: span 2; grid-row: span 2; }

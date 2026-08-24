@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { t } from '../lib/i18n'
-import { IconCheck, IconTrash } from './Icons'
+import { IconCheck, IconTrash, IconSettings } from './Icons'
 import '../styles/DashboardWidgetGrid.css'
 
 const SIZES = ['small', 'medium', 'large']
@@ -69,6 +69,22 @@ function WidgetSlot({ id, lang, size, isDragging, isDragOver, removable, onDragS
       onContextMenu={(e) => { e.preventDefault(); setMenu({ x: e.clientX, y: e.clientY }) }}
     >
       <div className="dashboard-widget-slot-content">{children}</div>
+      {/* Le clic droit n'existe pas au tactile (mobile/tablette) — sans cet équivalent
+          visible, il n'y avait aucun moyen de redimensionner ou retirer un widget sur ces
+          appareils (retour utilisateur). Toujours affiché plutôt que révélé au survol,
+          pour rester découvrable au tactile où il n'y a pas de "survol". */}
+      <button
+        type="button"
+        className="dashboard-widget-slot-menu-btn"
+        aria-label={t(lang, 'dashboard.widgetSizeLabel')}
+        onClick={(e) => {
+          e.stopPropagation()
+          const rect = e.currentTarget.getBoundingClientRect()
+          setMenu({ x: rect.right, y: rect.bottom })
+        }}
+      >
+        <IconSettings width={14} height={14} />
+      </button>
       {menu && (
         <WidgetSizeMenu
           lang={lang}
