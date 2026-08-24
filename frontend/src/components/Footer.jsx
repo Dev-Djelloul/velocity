@@ -8,7 +8,7 @@ const TWITTER_URL = 'https://twitter.com/digitalblueskye'
 const LINKEDIN_URL = 'https://www.linkedin.com/in/yellowblueskye/'
 const GITHUB_URL = 'https://github.com/Dev-Djelloul'
 
-export default function Footer({ lang, onOpenModal }) {
+export default function Footer({ lang, onOpenModal, onNavigateFeatures }) {
   const currentYear = new Date().getFullYear()
 
   return (
@@ -27,7 +27,7 @@ export default function Footer({ lang, onOpenModal }) {
         <div className="footer-section">
           <h4>{t(lang, 'footer.product')}</h4>
           <ul>
-            <li><button className="footer-link" onClick={() => onOpenModal('features')}>{t(lang, 'footer.features')}</button></li>
+            <li><button className="footer-link" onClick={onNavigateFeatures}>{t(lang, 'footer.features')}</button></li>
             <li><button className="footer-link" onClick={() => onOpenModal('pricing')}>{t(lang, 'footer.pricing')}</button></li>
             <li><button className="footer-link" onClick={() => onOpenModal('changelog')}>{t(lang, 'footer.changelog')}</button></li>
             <li><button className="footer-link" onClick={() => onOpenModal('roadmap')}>{t(lang, 'footer.roadmap')}</button></li>
