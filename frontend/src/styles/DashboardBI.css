@@ -22,12 +22,14 @@
   grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: var(--spacing-lg);
   align-items: stretch;
+  max-width: 100%;
 }
 
 .dashboard-bi-tile {
   display: flex;
   flex-direction: column;
   min-height: 210px;
+  min-width: 0;
   background: var(--color-bg-primary);
   border-radius: 8px;
   padding: var(--spacing-md);
@@ -410,4 +412,23 @@
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+}
+
+/* En dessous de ~2 colonnes réelles (auto-fit avec un minmax de 240px passe à 1 seule
+   colonne autour de 640px), .dashboard-bi-tile-half continue de réclamer 2 pistes de
+   grille qui n'existent plus — la tuile déborde du conteneur. On la repasse en pleine
+   largeur pour qu'elle s'empile normalement avec les autres tuiles. */
+@media (max-width: 640px) {
+  .dashboard-bi-tile-half {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Garde-fou explicite : sur petit mobile, une seule colonne quoi qu'il arrive plutôt que
+   de compter sur le calcul auto-fit (qui peut se faire piéger par le contenu interne d'une
+   tuile — légende de donut longue, etc. — et garder deux colonnes trop étroites). */
+@media (max-width: 480px) {
+  .dashboard-bi-grid {
+    grid-template-columns: 1fr;
+  }
 }
