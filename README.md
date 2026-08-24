@@ -1,10 +1,12 @@
 # VelocityLaunch
 
-**Génère un plan de lancement produit complet — roadmap, stratégie marketing et KPIs — en répondant à 12 questions.**
+**Génère un plan de lancement produit complet — roadmap, stratégie marketing et KPIs — en répondant à 22 questions.**
 
 VelocityLaunch transforme une idée de produit en plan de lancement actionnable en quelques minutes : roadmap Agile par sprints, stratégie marketing chiffrée par canal, KPIs personnalisés et prévisionnel financier, générés à partir d'un questionnaire guidé. Disponible en français et en anglais.
 
 🔗 [velocity.digitalblueskye.com](https://velocity.digitalblueskye.com)
+
+![Démo VelocityLaunch](docs/media/velocitylaunch-demo.gif)
 
 ---
 
