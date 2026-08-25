@@ -1,6 +1,6 @@
 import * as db from '../lib/db'
 import { createCheckoutSession, verifyWebhookSignature } from '../lib/stripe'
-import { verifyClerkWebhook, listUserOrganizationMemberships, deleteOrganization, TEAM_SPACE_LIMITS, getUserEmail } from '../lib/clerk'
+import { verifyClerkWebhook, listUserOrganizationMemberships, deleteOrganization, TEAM_SPACE_LIMITS, getUserProfile } from '../lib/clerk'
 import { generateTableWithAI } from '../lib/ai/tableClient'
 import { generateTableFromPrompt } from '../lib/generator/tableFallback'
 import { generateVeilleWithAI } from '../lib/ai/veilleClient'
@@ -242,7 +242,7 @@ export async function handleApi(request, env, url) {
     const userId = searchParams.get('userId')
     if (userId) {
       const entry = await db.getSignupAttribution(env, userId)
-      if (entry && env.CLERK_SECRET_KEY) entry.email = await getUserEmail(env, entry.user_id)
+      if (entry && env.CLERK_SECRET_KEY) Object.assign(entry, await getUserProfile(env, entry.user_id) || {})
       return json(entry)
     }
     const entries = await db.listSignupAttribution(env)
@@ -251,7 +251,7 @@ export async function handleApi(request, env, url) {
     // inscrit par quel canal (retour utilisateur). Best-effort, en parallèle plutôt qu'en
     // série vu le nombre d'entrées potentiel (jusqu'à 100).
     if (env.CLERK_SECRET_KEY) {
-      await Promise.all(entries.map(async e => { e.email = await getUserEmail(env, e.user_id) }))
+      await Promise.all(entries.map(async e => { Object.assign(e, await getUserProfile(env, e.user_id) || {}) }))
     }
     return json(entries)
   }

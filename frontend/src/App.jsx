@@ -53,7 +53,7 @@ import './styles/design-system.css'
 import './styles/accessibility.css'
 import './App.css'
 
-const AUTH_ONLY_PAGES = ['dashboard', 'questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations', 'admin-signups']
+const AUTH_ONLY_PAGES = ['dashboard', 'questionnaire', 'result', 'account', 'team', 'space', 'gallery', 'settings', 'notifications', 'integrations']
 
 // Chaque page "logique" de l'app (currentPage) correspond à une vraie URL, indispensable
 // pour que Google indexe plusieurs pages distinctes et que les liens soient partageables.
@@ -471,10 +471,6 @@ export default function App() {
     if (AUTH_ONLY_PAGES.includes(currentPage) && !isSignedIn) {
       // Une entrée directe sur l'outil interne doit survivre à la redirection OAuth :
       // après la connexion, l'effet de transition reprend cette destination.
-      if (currentPage === 'admin-signups') {
-        goToAuth('signin', 'admin-signups')
-        return
-      }
       setCurrentPage('landing')
     }
     if (currentPage === 'auth' && isSignedIn) {
@@ -1319,7 +1315,7 @@ export default function App() {
         )}
         {/* Jamais liée dans la nav — outil interne accessible uniquement en tapant
             /admin/inscrits, protégé par ADMIN_SECRET (voir AdminSignupsPage.jsx). */}
-        {currentPage === 'admin-signups' && isSignedIn && (
+        {currentPage === 'admin-signups' && (
           <AdminSignupsPage
             lang={lang}
             onBack={() => setCurrentPage('dashboard')}

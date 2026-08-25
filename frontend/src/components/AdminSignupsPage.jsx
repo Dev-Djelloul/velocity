@@ -19,6 +19,18 @@ function channelLabel(entry, lang) {
   return lang === 'fr' ? 'Direct' : 'Direct'
 }
 
+function providerLabel(provider, lang) {
+  const normalizedProvider = provider?.toLowerCase().replace(/^oauth_/, '')
+  const labels = {
+    google: 'Google',
+    apple: 'Apple',
+    slack: 'Slack',
+    github: 'GitHub',
+    email: lang === 'fr' ? 'Email' : 'Email'
+  }
+  return labels[normalizedProvider] || provider || (lang === 'fr' ? 'Inconnu' : 'Unknown')
+}
+
 // Page interne (jamais liée dans la nav) qui remplace la lecture brute de
 // /admin/attribution en curl par un vrai tableau — voir backend/src/workers/api.js. Le
 // secret est demandé une fois par onglet, jamais codé en dur ni transmis ailleurs qu'à
@@ -109,19 +121,30 @@ export default function AdminSignupsPage({ lang, onBack }) {
                 <table className="admin-signups-table">
                   <thead>
                     <tr>
+                      <th>{lang === 'fr' ? 'Personne' : 'Person'}</th>
                       <th>{lang === 'fr' ? 'Email' : 'Email'}</th>
+                      <th>{lang === 'fr' ? 'Connexion' : 'Sign-in'}</th>
                       <th>{lang === 'fr' ? 'Canal' : 'Channel'}</th>
                       <th>{lang === 'fr' ? 'Page d\'atterrissage' : 'Landing page'}</th>
                       <th>{lang === 'fr' ? 'Inscrit·e le' : 'Signed up'}</th>
+                      <th>{lang === 'fr' ? 'Dernière connexion' : 'Last sign-in'}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {entries.map(entry => (
                       <tr key={entry.user_id}>
+                        <td data-label={lang === 'fr' ? 'Personne' : 'Person'}>
+                          <span className="admin-signups-person">
+                            {entry.avatarUrl ? <img src={entry.avatarUrl} alt="" /> : <IconUsers width={16} height={16} />}
+                            <span>{entry.name || <span className="admin-signups-muted">{entry.user_id}</span>}</span>
+                          </span>
+                        </td>
                         <td>{entry.email || <span className="admin-signups-muted">{entry.user_id}</span>}</td>
+                        <td>{providerLabel(entry.provider, lang)}</td>
                         <td>{channelLabel(entry, lang)}</td>
                         <td>{entry.landing_page || <span className="admin-signups-muted">—</span>}</td>
                         <td>{formatFullDateTime(entry.created_at, lang)}</td>
+                        <td>{entry.lastSignInAt ? formatFullDateTime(entry.lastSignInAt, lang) : <span className="admin-signups-muted">—</span>}</td>
                       </tr>
                     ))}
                   </tbody>

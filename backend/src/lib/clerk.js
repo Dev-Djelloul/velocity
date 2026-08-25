@@ -85,10 +85,25 @@ export async function deleteOrganization(env, organizationId) {
 // d'autre choix que ce second appel à la Backend API. Best-effort : jamais bloquant pour
 // l'export si Clerk est indisponible ou l'utilisateur introuvable.
 export async function getUserEmail(env, userId) {
+  const profile = await getUserProfile(env, userId)
+  return profile?.email || null
+}
+
+// Profil minimal pour les outils d'administration : les données sont récupérées à la
+// demande depuis Clerk plutôt que recopiées dans D1, afin que les changements de nom,
+// avatar ou dernière connexion restent à jour.
+export async function getUserProfile(env, userId) {
   try {
     const data = await clerkRequest(env, `/users/${userId}`)
     const emails = data?.email_addresses || []
     const primary = emails.find(e => e.id === data?.primary_email_address_id) || emails[0]
-    return primary?.email_address || null
+    const external = data?.external_accounts?.[0]
+    return {
+      email: primary?.email_address || null,
+      name: [data?.first_name, data?.last_name].filter(Boolean).join(' ') || null,
+      provider: external?.provider || (external ? 'social' : 'email'),
+      avatarUrl: data?.image_url || null,
+      lastSignInAt: data?.last_sign_in_at || null
+    }
   } catch { return null }
 }
