@@ -22,7 +22,7 @@ import * as jira from '../lib/jira/jiraClient'
 import * as linear from '../lib/linear/linearClient'
 import * as googleCalendar from '../lib/google/googleCalendarClient'
 import * as github from '../lib/github/githubClient'
-import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail, feedNotificationContent } from '../lib/email/resendClient'
+import { sendEmail, agentDoneEmail, extractHighlights, AGENT_TYPE_LABELS, mentionEmail, feedNotificationContent, betaFeedbackEmail } from '../lib/email/resendClient'
 import { sendSlackMessage, agentDoneSlackMessage, mentionSlackMessage } from '../lib/slack/slackClient'
 import { triggerWebhooks, generateSecret } from '../lib/webhooks/webhookClient'
 import { generatePlanOgImage } from '../lib/og/ogImage'
@@ -232,6 +232,25 @@ export async function handleApi(request, env, url) {
     if (!body.userId) return json({ error: 'userId required' }, 400)
     await db.setPro(env, body.userId, body.isPro !== false, null)
     return json({ ok: true, userId: body.userId, isPro: body.isPro !== false })
+  }
+
+  if (pathname === '/beta-feedback' && method === 'POST') {
+    if (!env.RESEND_API_KEY || !env.RESEND_FROM) return json({ error: 'email_not_configured' }, 503)
+    const raw = await request.text()
+    if (raw.length > 100000) return json({ error: 'payload_too_large' }, 413)
+    let feedback
+    try { feedback = JSON.parse(raw || '{}') } catch { return json({ error: 'invalid_payload' }, 400) }
+    if (!feedback || typeof feedback !== 'object' || Array.isArray(feedback)) return json({ error: 'invalid_payload' }, 400)
+    if (feedback.website) return json({ ok: true })
+    if (!feedback.name || typeof feedback.name !== 'string') return json({ error: 'name_required' }, 400)
+    const destination = env.BETA_FEEDBACK_TO || 'contact@digitalblueskye.com'
+    const email = betaFeedbackEmail(feedback)
+    try {
+      await sendEmail(env, { to: destination, ...email })
+      return json({ ok: true })
+    } catch {
+      return json({ error: 'email_send_failed' }, 502)
+    }
   }
 
   // Consultation du canal d'acquisition des inscriptions (voir /webhooks/clerk plus bas) —

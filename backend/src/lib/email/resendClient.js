@@ -2,7 +2,7 @@
 // fetch suffit et évite une dépendance de plus dans le Worker. Nécessite RESEND_API_KEY
 // (secret) et RESEND_FROM (var, ex: "VelocityLaunch <notifications@digitalblueskye.com>",
 // le domaine doit être vérifié dans Resend).
-export async function sendEmail(env, { to, subject, html }) {
+export async function sendEmail(env, { to, subject, html, text }) {
   if (!env.RESEND_API_KEY || !env.RESEND_FROM) {
     console.log('[resend] skipped: not_configured (missing RESEND_API_KEY or RESEND_FROM)')
     return { skipped: true, reason: 'not_configured' }
@@ -14,7 +14,7 @@ export async function sendEmail(env, { to, subject, html }) {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ from: env.RESEND_FROM, to: [to], subject, html })
+    body: JSON.stringify({ from: env.RESEND_FROM, to: [to], subject, html, ...(text ? { text } : {}) })
   })
   if (!res.ok) {
     const body = await res.text()
@@ -63,6 +63,24 @@ export const AGENT_TYPE_LABELS = {
 
 function esc(s) {
   return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+}
+
+export function betaFeedbackEmail(feedback) {
+  const name = truncate(feedback.name, 120) || 'Testeur anonyme'
+  const email = truncate(feedback.email, 160)
+  const entries = Object.entries(feedback)
+    .filter(([key]) => !['website', 'name', 'email'].includes(key) && feedback[key] !== '')
+    .map(([key, value]) => `<tr><th style="text-align:left;vertical-align:top;padding:8px;background:#f3f4f6;color:#374151">${esc(key)}</th><td style="padding:8px;border-bottom:1px solid #e5e7eb;color:#1a1a1a;white-space:pre-wrap">${esc(Array.isArray(value) ? value.join(', ') : value)}</td></tr>`)
+    .join('')
+  const text = Object.entries(feedback)
+    .filter(([key]) => !['website'].includes(key) && feedback[key] !== '')
+    .map(([key, value]) => `${key}: ${Array.isArray(value) ? value.join(', ') : value}`)
+    .join('\n')
+  return {
+    subject: `Retour beta VelocityLaunch — ${name}`,
+    text,
+    html: `<div style="font-family:sans-serif;max-width:680px;margin:0 auto;padding:24px;color:#1a1a1a"><h2 style="color:#6366f1;margin-bottom:4px">Retour test beta</h2><p style="color:#6b7280">${esc(name)}${email ? ` · ${esc(email)}` : ''}</p><table style="border-collapse:collapse;width:100%;font-size:13px">${entries}</table>${brandSignature()}</div>`
+  }
 }
 
 function truncate(s, max) {
