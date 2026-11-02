@@ -375,6 +375,108 @@
   color: var(--color-text-secondary);
 }
 
+.dashboard-next-action-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.65rem 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-next-action-row:disabled,
+.dashboard-launch-overview-row:disabled {
+  cursor: default;
+}
+
+.dashboard-next-action-info {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.dashboard-next-action-plan {
+  overflow: hidden;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-next-action-detail {
+  overflow: hidden;
+  color: var(--color-text-secondary);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-next-action-meta {
+  color: var(--color-text-muted, #9ca3af);
+  font-size: 0.68rem;
+}
+
+.dashboard-next-action-row:not(:disabled):hover .dashboard-next-action-plan,
+.dashboard-launch-overview-row:not(:disabled):hover .dashboard-launch-overview-name {
+  color: var(--color-accent);
+}
+
+.dashboard-launch-overview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-launch-overview-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 3rem 2.4rem;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-text-primary);
+  text-align: left;
+  cursor: pointer;
+}
+
+.dashboard-launch-overview-name {
+  overflow: hidden;
+  font-size: 0.76rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-launch-overview-progress {
+  height: 0.38rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(145, 132, 217, 0.18);
+}
+
+.dashboard-launch-overview-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--wordmark-gradient);
+}
+
+.dashboard-launch-overview-percent {
+  color: var(--color-text-secondary);
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-align: right;
+}
+
 .dashboard-weather-trend.is-up { color: #22c55e; }
 .dashboard-weather-trend.is-down { color: #ef4444; }
 

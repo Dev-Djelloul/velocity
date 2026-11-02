@@ -4,7 +4,8 @@ import { useBodyScrollLock } from '../hooks/useBodyScrollLock'
 import { WIDGET_CATALOG, WIDGET_CATEGORIES } from '../lib/widgetCatalog'
 import {
   IconSearch, IconCheck, IconPlus, IconCalendar, IconClock, IconActivity,
-  IconSparkle, IconClipboard, IconImage, IconGauge, IconFlame, IconCloudSun
+  IconSparkle, IconClipboard, IconImage, IconGauge, IconFlame, IconCloudSun,
+  IconTarget, IconLayoutGrid
 } from './Icons'
 import '../styles/DashboardWidgetLibrary.css'
 
@@ -18,7 +19,9 @@ const WIDGET_ICONS = {
   gallery: IconImage,
   portfolioHealth: IconGauge,
   streak: IconFlame,
-  businessWeather: IconCloudSun
+  businessWeather: IconCloudSun,
+  nextAction: IconTarget,
+  launchOverview: IconLayoutGrid
 }
 
 // Bibliothèque de widgets façon macOS ("+" à côté de "Créer un plan") : barre de recherche,

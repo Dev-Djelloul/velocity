@@ -16,7 +16,9 @@ export const WIDGET_CATALOG = [
   { id: 'gallery', category: 'organisation' },
   { id: 'portfolioHealth', category: 'insights', isNew: true },
   { id: 'streak', category: 'insights', isNew: true },
-  { id: 'businessWeather', category: 'insights', isNew: true }
+  { id: 'businessWeather', category: 'insights', isNew: true },
+  { id: 'nextAction', category: 'essentials', isNew: true },
+  { id: 'launchOverview', category: 'insights', isNew: true }
 ]
 
 export function catalogEntriesFor(availableIds) {

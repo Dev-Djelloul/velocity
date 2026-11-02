@@ -6,7 +6,7 @@ import { getPersonalSpace } from '../lib/personalSpace'
 import { isPro } from '../lib/creditTracker'
 import { TEAM_SPACE_LIMITS } from '../lib/pricingTiers'
 import { formatDateNumericShort } from '../lib/dateFormat'
-import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight, IconLayoutGrid, IconGauge, IconFlame, IconCloudSun, IconHelpCircle } from './Icons'
+import { IconPlus, IconUser, IconClipboard, IconClock, IconImage, IconSparkle, IconCalendar, IconChevronRight, IconLayoutGrid, IconGauge, IconFlame, IconCloudSun, IconHelpCircle, IconTarget } from './Icons'
 import TeamAvatar from './TeamAvatar'
 import DashboardCalendar from './DashboardCalendar'
 import DashboardActivityFeed from './DashboardActivityFeed'
@@ -225,6 +225,50 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
   // à la taille du widget.
   const recentPlans = useMemo(() => (allPlans || activePlans).slice().sort(byRecency), [allPlans, activePlans])
 
+  const activeLaunches = useMemo(() => (allPlans || activePlans)
+    .map(plan => {
+      const stories = (plan.roadmap?.sprints || []).flatMap(sprint =>
+        (sprint.stories || []).map(story => ({ ...story, sprintId: sprint.sprintId }))
+      )
+      const done = stories.filter(story => story.status === 'done').length
+      return { plan, stories, done, total: stories.length }
+    })
+    .filter(launch => launch.total > 0 && launch.done < launch.total)
+    .sort((a, b) => byRecency(a.plan, b.plan)), [allPlans, activePlans])
+
+  // Une priorité concrète : échéance dépassée, puis échéance dans les 7 jours ; en l'absence
+  // d'urgence, proposer une story inachevée du plan modifié le plus récemment.
+  const nextAction = useMemo(() => {
+    const candidates = []
+
+    activeLaunches.forEach(({ plan }) => {
+      if (plan.launchDate) {
+        const days = daysUntil(plan.launchDate)
+        if (days <= 7) candidates.push({ plan, kind: 'launch', days })
+      }
+
+      const planStart = new Date(plan.planStartDate || plan.generatedAt || Date.now())
+      ;(plan.roadmap?.sprints || []).forEach(sprint => {
+        const end = new Date(planStart)
+        end.setDate(end.getDate() + (sprint.sprintId || 1) * 14)
+        const days = daysUntil(end.toISOString())
+        const hasIncompleteStories = (sprint.stories || []).some(story => story.status !== 'done')
+        if (hasIncompleteStories && days <= 7) {
+          candidates.push({ plan, kind: 'sprint', sprintId: sprint.sprintId, days })
+        }
+      })
+    })
+
+    candidates.sort((a, b) => a.days - b.days)
+    if (candidates.length) return candidates[0]
+
+    const latestLaunch = activeLaunches[0]
+    if (!latestLaunch) return null
+    const story = latestLaunch.stories.find(item => item.status === 'in_progress')
+      || latestLaunch.stories.find(item => item.status !== 'done')
+    return story ? { plan: latestLaunch.plan, kind: 'story', story, sprintId: story.sprintId } : null
+  }, [activeLaunches])
+
   const lastUsedPlanSpaceName = lastUsedPlan
     ? (spaces.find(s => s.id === (lastUsedPlan.team_id ?? lastUsedPlan.createdSpaceId ?? null))?.name || personalSpace.name)
     : null
@@ -280,19 +324,20 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
     ...spaces.map(space => `space:${space.id ?? 'personal'}`),
     ...(!teamLimitReached ? ['newTeam'] : []),
     'history', 'gallery',
-    'portfolioHealth', 'streak', 'businessWeather'
+    'portfolioHealth', 'streak', 'businessWeather', 'nextAction', 'launchOverview'
   ], [pro, lastUsedPlan, spaces, teamLimitReached])
 
   const widgetDefaults = {
-    order: ['calendar', 'deadlines', 'activity', 'nova', 'resume', 'newTeam', 'history', 'gallery', 'portfolioHealth', 'streak', 'businessWeather'],
+    order: ['calendar', 'deadlines', 'activity', 'nova', 'resume', 'nextAction', 'launchOverview', 'newTeam', 'history', 'gallery', 'portfolioHealth', 'streak', 'businessWeather'],
     sizes: {
       calendar: 'large', deadlines: 'medium', activity: 'medium', nova: 'medium',
       resume: 'small', newTeam: 'medium', history: 'small', gallery: 'small',
-      portfolioHealth: 'medium', streak: 'small', businessWeather: 'small'
+      portfolioHealth: 'medium', streak: 'small', businessWeather: 'small',
+      nextAction: 'medium', launchOverview: 'medium'
     },
     // Widgets tout juste ajoutés au catalogue par une mise à jour du produit : masqués tant
     // que l'utilisateur ne les ajoute pas lui-même via la bibliothèque ("+").
-    hidden: ['portfolioHealth', 'streak', 'businessWeather']
+    hidden: ['portfolioHealth', 'streak', 'businessWeather', 'nextAction', 'launchOverview']
   }
 
   const widgetIdsKey = availableWidgetIds.slice().sort().join(',')
@@ -457,6 +502,92 @@ export default function DashboardHome({ lang, onOpenSpace, onCreatePlan, onOpenA
                 </button>
               )
             } : {}),
+            nextAction: (
+              <div className="dashboard-widget-card dashboard-next-action-widget">
+                <div className="dashboard-widget-header">
+                  {gradientIcon(<IconTarget width={16} height={16} />)}
+                  <h3>{t(lang, 'dashboard.nextActionTitle')}</h3>
+                </div>
+                {!nextAction ? (
+                  <p className="dashboard-deadlines-empty">{t(lang, 'dashboard.nextActionEmpty')}</p>
+                ) : (
+                  <button
+                    type="button"
+                    className="dashboard-next-action-row"
+                    onClick={() => onLoadPlan?.(nextAction.plan)}
+                    disabled={!onLoadPlan}
+                  >
+                    <span className="dashboard-next-action-info">
+                      <span className="dashboard-next-action-plan">{nextAction.plan.product?.name || t(lang, 'plans.untitled')}</span>
+                      {nextAction.kind === 'story' ? (
+                        <>
+                          <span className="dashboard-next-action-detail">{nextAction.story.title}</span>
+                          <span className="dashboard-next-action-meta">{t(lang, 'dashboard.nextActionSprint')(nextAction.sprintId)}</span>
+                        </>
+                      ) : (
+                        <>
+                          <span className="dashboard-next-action-detail">
+                            {nextAction.kind === 'launch'
+                              ? t(lang, 'dashboard.nextActionLaunch')
+                              : t(lang, 'dashboard.nextActionSprint')(nextAction.sprintId)}
+                          </span>
+                          <span className={`dashboard-deadline-when ${nextAction.days < 0 ? 'is-urgent' : nextAction.days <= 1 ? 'is-urgent' : 'is-soon'}`}>
+                            {nextAction.days < 0
+                              ? t(lang, 'dashboard.nextActionOverdue')(Math.abs(nextAction.days))
+                              : nextAction.days === 0
+                                ? t(lang, 'dashboard.deadlinesToday')
+                                : nextAction.days === 1
+                                  ? t(lang, 'dashboard.deadlinesTomorrow')
+                                  : t(lang, 'dashboard.deadlinesInDays')(nextAction.days)}
+                          </span>
+                        </>
+                      )}
+                    </span>
+                    <IconChevronRight width={16} height={16} />
+                  </button>
+                )}
+              </div>
+            ),
+            launchOverview: (size) => {
+              const rows = { small: 3, medium: 5, large: 8 }[size] || 5
+              return (
+                <div className="dashboard-widget-card dashboard-launch-overview-widget">
+                  <div className="dashboard-widget-header">
+                    {gradientIcon(<IconLayoutGrid width={16} height={16} />)}
+                    <h3>{t(lang, 'dashboard.launchOverviewTitle')}</h3>
+                  </div>
+                  {activeLaunches.length === 0 ? (
+                    <p className="dashboard-deadlines-empty">{t(lang, 'dashboard.launchOverviewEmpty')}</p>
+                  ) : (
+                    <ul className="dashboard-launch-overview-list">
+                      {activeLaunches.slice(0, rows).map(({ plan, done, total }) => {
+                        const progress = Math.round((done / total) * 100)
+                        return (
+                          <li key={plan.id}>
+                            <button
+                              type="button"
+                              className="dashboard-launch-overview-row"
+                              onClick={() => onLoadPlan?.(plan)}
+                              disabled={!onLoadPlan}
+                              aria-label={`${plan.product?.name || t(lang, 'plans.untitled')} — ${progress}%`}
+                            >
+                              <span className="dashboard-launch-overview-name">{plan.product?.name || t(lang, 'plans.untitled')}</span>
+                              <span className="dashboard-launch-overview-progress" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label={t(lang, 'dashboard.launchOverviewProgress')(progress)}>
+                                <span style={{ width: `${progress}%` }} />
+                              </span>
+                              <span className="dashboard-launch-overview-percent">{progress}%</span>
+                            </button>
+                          </li>
+                        )
+                      })}
+                    </ul>
+                  )}
+                  {activeLaunches.length > rows && (
+                    <p className="dashboard-widget-detail">{t(lang, 'dashboard.launchOverviewMore')(activeLaunches.length - rows)}</p>
+                  )}
+                </div>
+              )
+            },
 
             // Une carte d'espace = un widget (personnel + chaque équipe), plutôt qu'une
             // grille séparée à part de la disposition déplaçable.
