@@ -37,7 +37,7 @@ function getClerkAppearance(theme) {
       socialButtons: { width: '100%', justifyContent: 'center', gap: '0.6rem' },
       badge: {
         background: '#06b6d4',
-        color: '#04141a',
+        color: '#ffffff',
         border: 'none',
         fontWeight: 600
       },
@@ -46,7 +46,7 @@ function getClerkAppearance(theme) {
       // distincte de cl-badge qui ne le couvrait pas).
       lastAuthenticationStrategyBadge: {
         background: '#06b6d4',
-        color: '#04141a',
+        color: '#ffffff',
         border: 'none',
         fontWeight: 600
       },

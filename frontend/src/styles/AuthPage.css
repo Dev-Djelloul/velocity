@@ -219,7 +219,7 @@
 .auth-clerk-widget .cl-lastAuthenticationStrategyBadge,
 .auth-clerk-widget [class*="lastAuthenticationStrategyBadge" i] {
   background: #06b6d4 !important;
-  color: #04141a !important;
+  color: #ffffff !important;
   border: none !important;
   font-weight: 600 !important;
   opacity: 1 !important;
