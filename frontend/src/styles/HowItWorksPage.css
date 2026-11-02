@@ -87,6 +87,23 @@
   font-weight: var(--font-weight-medium);
 }
 
+.hiw-cta-note {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  margin: 0.65rem 0 0;
+}
+
+.hiw-inline-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem auto 0;
+}
+
+.hiw-inline-cta .hiw-cta-note {
+  text-align: center;
+}
+
 .hiw-hero-image {
   aspect-ratio: 3 / 2;
   border-radius: var(--border-radius);
@@ -477,6 +494,10 @@
 
 .hiw-final-cta .btn-cta-primary {
   margin: 0 auto;
+}
+
+.hiw-final-cta .hiw-cta-note {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 @media (max-width: 900px) {

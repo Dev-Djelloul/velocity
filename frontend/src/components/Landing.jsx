@@ -48,7 +48,7 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
     { number: '2.5k+', label: tLanding(lang, 'stats.generated') },
     { number: '4.9★', label: tLanding(lang, 'stats.rating') },
     { number: '95%', label: tLanding(lang, 'stats.satisfaction') },
-    { number: '15min', label: tLanding(lang, 'stats.avgTime') }
+    { number: '5–15', label: tLanding(lang, 'stats.avgTime') }
   ]
 
   return (
@@ -241,6 +241,14 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
           </div>
         </div>
 
+        <div className="landing-inline-cta">
+          <button className="btn-cta-primary" onClick={onStartClick}>
+            {tLanding(lang, 'hero.ctaPrimary')}
+            <span className="arrow">→</span>
+          </button>
+          <p>{tLanding(lang, 'ctaNextStep')}</p>
+        </div>
+
         <button className="link-demo how-it-works-link" onClick={onDiscoverClick}>
           {lang === 'fr' ? 'Voir le guide' : 'See the guide'}
           <span className="arrow">→</span>
@@ -285,6 +293,7 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
           {tLanding(lang, 'hero.ctaPrimary')}
           <span className="arrow">→</span>
         </button>
+        <p className="landing-cta-note">{tLanding(lang, 'ctaNextStep')}</p>
       </section>
 
       {/* FAQ Preview */}
@@ -310,6 +319,10 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
             <h4>{tLanding(lang, 'faq.q4.title')}</h4>
             <p>{tLanding(lang, 'faq.q4.answer')}</p>
           </div>
+          <div className="faq-card">
+            <h4>{tLanding(lang, 'faq.q5.title')}</h4>
+            <p>{tLanding(lang, 'faq.q5.answer')}</p>
+          </div>
         </div>
       </section>
 
@@ -324,6 +337,7 @@ export default function Landing({ lang, onStartClick, onOpenDemo, onDiscoverClic
           <button className="btn-cta-final" onClick={onStartClick}>
             {tLanding(lang, 'finalCta.button')}
           </button>
+          <p className="landing-cta-note">{tLanding(lang, 'ctaNextStep')}</p>
         </div>
       </section>
 

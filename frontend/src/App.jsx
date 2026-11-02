@@ -33,6 +33,7 @@ import { PricingModal, ChangelogModal, RoadmapModal, FeaturesModal } from './com
 import { PrivacyModal, TermsModal, CookiesModal } from './components/LegalModals'
 import { generatePlan } from './lib/planGenerator'
 import { t } from './lib/i18n'
+import { tLanding } from './lib/landingI18n'
 import { savePlan, getAllPlans, getShareLink, duplicatePlan, setActiveUser as setPlanActiveUser, setActiveTeam as setPlanActiveTeam, setActiveCreator as setPlanActiveCreator, syncPlansFromServer, generateId } from './lib/planStorage'
 import { collectRecentComments } from './lib/notifications'
 import { getReadIds } from './lib/commentReads'
@@ -895,7 +896,7 @@ export default function App() {
               </button>
               <button className="btn-header-cta" onClick={() => { setMobileNavOpen(false); handleStartClick() }}>
                 <IconSparkle width={14} height={14} />
-                <span className="btn-header-cta-text">{t(lang, 'auth.getStarted')}</span>
+                <span className="btn-header-cta-text">{tLanding(lang, 'hero.ctaPrimary')}</span>
               </button>
             </nav>
           )}

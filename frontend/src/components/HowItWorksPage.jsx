@@ -41,7 +41,7 @@ export default function HowItWorksPage({ lang, onStartClick }) {
 
   const initials = (name) => name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
 
-  const faqItems = ['q1', 'q2', 'q3', 'q4'].map(key => ({
+  const faqItems = ['q1', 'q2', 'q3', 'q4', 'q5'].map(key => ({
     key,
     title: tLanding(lang, `faq.${key}.title`),
     answer: tLanding(lang, `faq.${key}.answer`)
@@ -61,6 +61,7 @@ export default function HowItWorksPage({ lang, onStartClick }) {
             </button>
             <span className="hiw-meta">{tLanding(lang, 'hiw.meta')}</span>
           </div>
+          <p className="hiw-cta-note">{tLanding(lang, 'ctaNextStep')}</p>
         </div>
         <div className="hiw-hero-image">
           <img src={heroImg} alt="" loading="eager" />
@@ -103,6 +104,13 @@ export default function HowItWorksPage({ lang, onStartClick }) {
             </div>
           </div>
         ))}
+        <div className="hiw-inline-cta">
+          <button className="btn-cta-primary" onClick={onStartClick}>
+            {tLanding(lang, 'hiw.heroCta')}
+            <span className="arrow">→</span>
+          </button>
+          <p className="hiw-cta-note">{tLanding(lang, 'ctaNextStep')}</p>
+        </div>
       </section>
 
       {/* Outputs - aperçu de l'expérience */}
@@ -147,6 +155,13 @@ export default function HowItWorksPage({ lang, onStartClick }) {
             </div>
           ))}
         </div>
+        <div className="hiw-inline-cta">
+          <button className="btn-cta-primary" onClick={onStartClick}>
+            {tLanding(lang, 'hiw.heroCta')}
+            <span className="arrow">→</span>
+          </button>
+          <p className="hiw-cta-note">{tLanding(lang, 'ctaNextStep')}</p>
+        </div>
       </section>
 
       {/* FAQ accordion */}
@@ -179,6 +194,7 @@ export default function HowItWorksPage({ lang, onStartClick }) {
             {tLanding(lang, 'hiw.ctaButton')}
             <span className="arrow">→</span>
           </button>
+          <p className="hiw-cta-note">{tLanding(lang, 'ctaNextStep')}</p>
         </div>
       </section>
     </div>

@@ -430,6 +430,22 @@
   margin: 2.5rem auto 0;
 }
 
+.landing-inline-cta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.65rem;
+  margin: 2rem auto 0;
+}
+
+.landing-cta-note,
+.landing-inline-cta p {
+  margin: 0.65rem auto 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
 /* ===== STATS SECTION ===== */
 .stats-section {
   max-width: 1400px;
@@ -786,14 +802,18 @@
   gap: 1.5rem;
 }
 
-/* Les 4 cartes sur une seule rangée à partir d'une largeur qui leur laisse assez de place
-   (retour utilisateur, capture à l'appui : sur un écran large mais pas immense, auto-fit
-   ne calculait de la place que pour 3 colonnes de 280px+ et repoussait la 4e carte, seule,
-   à la ligne suivante). Au-delà de ce seuil on force 4 colonnes égales plutôt que de
-   dépendre du calcul auto-fit. */
+/* Three FAQ cards on the first row and two balanced cards below. */
 @media (min-width: 1100px) {
   .faq-grid {
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .faq-card {
+    grid-column: span 2;
+  }
+
+  .faq-card:nth-last-child(-n + 2) {
+    grid-column: span 3;
   }
 }
 
